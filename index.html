@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoundScape Pro 🌌</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        body {
+            background: linear-gradient(135deg, #0a0e27, #1a1f3a);
+            color: #fff;
+            min-height: 100vh;
+            padding-bottom: 120px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* КОСМИЧЕСКАЯ АНИМАЦИЯ ФОНА */
+        .space-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .comet {
+            position: absolute;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+            animation: shoot 8s infinite;
+            opacity: 0;
+        }
+
+        @keyframes shoot {
+            0% { transform: translateX(-100px) translateY(100px); opacity: 1; }
+            100% { transform: translateX(calc(100vw + 100px)) translateY(-100px); opacity: 0; }
+        }
+
+        .spaceship {
+            position: absolute;
+            font-size: 20px;
+            animation: fly 20s infinite linear;
+            opacity: 0.6;
+        }
+
+        @keyframes fly {
+            from { transform: translateX(-100px) translateY(0) rotate(45deg); }
+            to { transform: translateX(calc(100vw + 100px)) translateY(100px) rotate(45deg); }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0066ff, #ff6600);
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            flex-wrap: wrap;
+        }
+        .stat {
+            background: rgba(0,102,255,0.2);
+            border: 2px solid rgba(0,102,255,0.4);
+            padding: 10px 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+        .stat-label {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-top: 3px;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(10,14,39,0.95);
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            background: linear-gradient(135deg, #0066ff, #0099ff);
+            color: white;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,102,255,0.4);
+        }
+        .btn-orange {
+            background: linear-gradient(135deg, #ff6600, #ff8c00);
+        }
+
+        .section {
+            display: none;
+            padding: 20px;
+            animation: fade 0.3s;
+        }
+        .section.active {
+            display: block;
+        }
+        @keyframes fade {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .track {
+            background: rgba(10,14,39,0.7);
+            border: 2px solid rgba(0,102,255,0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+        }
+        .track:hover {
+            border-color: #ff6600;
+            transform: translateX(5px);
+        }
+        .track.playing {
+            border-color: #ff6600;
+            background: rgba(255,102,0,0.2);
+        }
+        .track-cover {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #0066ff, #ff6600);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        .track-info {
+            flex: 1;
+        }
+        .track-title {
+            font-weight: bold;
+            margin-bottom: 3px;
+            font-size: 14px;
+        }
+        .track-artist {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .player-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, rgba(0,102,255,0.98), rgba(255,102,0,0.98));
+            padding: 15px;
+            z-index: 1000;
+            display: none;
+        }
+        .player-container.active {
+            display: block;
+        }
+        .player-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .player-title {
+            font-weight: bold;
+        }
+        .player-artist {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        .player-controls {
+            display: flex;
+            gap: 10px;
+        }
+        .ctrl {
+            width: 45px;
+            height: 45px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .ctrl.play {
+            width: 55px;
+            height: 55px;
+            background: white;
+            color: #0066ff;
+            font-size: 24px;
+        }
+        .ctrl.close {
+            background: rgba(255,0,0,0.3);
+            font-size: 16px;
+        }
+        audio {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .notif {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: linear-gradient(135deg, #0066ff, #ff6600);
+            padding: 12px 24px;
+            border-radius: 25px;
+            transition: all 0.3s;
+            z-index: 2000;
+            pointer-events: none;
+        }
+        .notif.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .planet {
+            background: linear-gradient(135deg, rgba(0,102,255,0.2), rgba(255,102,0,0.2));
+            border: 2px solid rgba(0,102,255,0.4);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .planet:hover {
+            transform: translateY(-3px);
+            border-color: #ff6600;
+            box-shadow: 0 10px 30px rgba(255,102,0,0.3);
+        }
+        .planet-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .planet-icon {
+            font-size: 40px;
+        }
+        .planet-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .planet-content {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .planet-content.active {
+            display: block;
+        }
+
+        .info-box {
+            background: rgba(0,102,255,0.2);
+            border: 2px solid rgba(0,102,255,0.4);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .search-box {
+            background: rgba(10,14,39,0.7);
+            border: 2px solid rgba(0,102,255,0.3);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(0,102,255,0.3);
+            border-radius: 30px;
+            background: rgba(0,0,0,0.3);
+            color: white;
+            font-size: 16px;
+            outline: none;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .btn-search {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #0066ff, #ff6600);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .chat-box {
+            background: rgba(10,14,39,0.7);
+            border: 2px solid rgba(0,102,255,0.3);
+            border-radius: 15px;
+            padding: 15px;
+            height: 350px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            max-width: 85%;
+            animation: fade 0.3s;
+        }
+        .message.bot {
+            background: rgba(0,102,255,0.2);
+            border-left: 3px solid #0066ff;
+        }
+        .message.user {
+            background: rgba(255,102,0,0.2);
+            border-right: 3px solid #ff6600;
+            margin-left: auto;
+            text-align: right;
+        }
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid rgba(0,102,255,0.3);
+            border-radius: 25px;
+            background: rgba(10,14,39,0.7);
+            color: white;
+            outline: none;
+        }
+        .chat-input button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #0066ff, #ff6600);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .game-card {
+            background: linear-gradient(135deg, rgba(0,102,255,0.2), rgba(255,102,0,0.2));
+            border: 2px solid rgba(0,102,255,0.4);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .game-card:hover {
+            transform: translateY(-5px);
+            border-color: #ff6600;
+            box-shadow: 0 10px 30px rgba(255,102,0,0.3);
+        }
+        .game-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .game-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .game-desc {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #0a0e27;
+            border: 2px solid #0066ff;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s;
+            position: relative;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .upload-box {
+            background: rgba(0,204,102,0.2);
+            border: 2px dashed #00cc66;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-box:hover {
+            background: rgba(0,204,102,0.3);
+            transform: scale(1.02);
+        }
+
+        /* PLAYER CARD */
+        .player-card {
+            margin: 20px 0;
+            border-radius: 25px;
+            overflow: hidden;
+            display: none;
+            background: linear-gradient(135deg, rgba(0,102,255,0.2), rgba(255,102,0,0.2));
+            border: 2px solid rgba(0,102,255,0.4);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: slideUp 0.5s ease;
+        }
+        .player-card.active { display: block; }
+        .player-card-header {
+            background: linear-gradient(135deg, #0066ff, #ff6600);
+            padding: 30px;
+            text-align: center;
+        }
+        .player-card-header h3 { font-size: 24px; margin-bottom: 10px; }
+        .player-card-header p { opacity: 0.95; font-size: 16px; }
+        .player-card-body { padding: 40px 30px; text-align: center; }
+        .music-icon { font-size: 80px; margin-bottom: 20px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        .open-btn {
+            display: inline-block;
+            padding: 18px 50px;
+            background: linear-gradient(135deg, #0066ff, #ff6600);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(0,102,255,0.4);
+            border: none;
+            cursor: pointer;
+        }
+        .open-btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 30px rgba(0,102,255,0.6); }
+        .features { margin-top: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
+        .feature { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 15px; font-size: 13px; }
+        .feature-icon { font-size: 24px; margin-bottom: 8px; }
+        .integration-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #fc3f1d, #ff6b4a);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        /* УЛУЧШЕННЫЕ ИГРЫ */
+        .challenge-card {
+            background: linear-gradient(135deg, rgba(0,102,255,0.3), rgba(255,102,0,0.3));
+            border: 2px solid rgba(0,102,255,0.5);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .challenge-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(0,102,255,0.4);
+        }
+        .challenge-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+        .challenge-desc { opacity: 0.8; margin-bottom: 15px; font-size: 14px; }
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0066ff, #ff6600);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        .reward-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #000;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .hint-box {
+            background: rgba(255,165,0,0.2);
+            border: 2px solid rgba(255,165,0,0.5);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        .difficulty-selector {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        .diff-btn {
+            padding: 10px 20px;
+            border: 2px solid rgba(0,102,255,0.5);
+            background: rgba(0,102,255,0.2);
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .diff-btn.active { background: #ff6600; border-color: #ff6600; }
+        .ai-typing {
+            display: inline-block;
+            padding: 3px 8px;
+            background: rgba(0,102,255,0.2);
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        .typing-dots::after {
+            content: '...';
+            animation: dots 1.5s infinite;
+        }
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        .achievement {
+            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,165,0,0.2));
+            border: 2px solid rgba(255,215,0,0.5);
+            border-radius: 10px;
+            padding: 10px;
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .achievement.unlocked { background: linear-gradient(135deg, rgba(255,215,0,0.4), rgba(255,165,0,0.4)); }
+
+        .back-btn {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.5);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <!-- КОСМИЧЕСКИЙ ФОН -->
+    <div class="space-bg" id="space-bg"></div>
+
+    <div class="header">
+        <h1>🌌 SoundScape Pro</h1>
+        <p style="position:relative; z-index:1;">Музыка • Игры • AI</p>
+    </div>
+    <div class="stats">
+        <div class="stat"><div class="stat-value" id="xp">0</div><div class="stat-label">⭐ XP</div></div>
+        <div class="stat"><div class="stat-value" id="level">1</div><div class="stat-label">📊 Уровень</div></div>
+        <div class="stat"><div class="stat-value" id="tracks-count">12</div><div class="stat-label">🎵 Треков</div></div>
+        <div class="stat"><div class="stat-value" id="played">0</div><div class="stat-label">🎧 Сыграно</div></div>
+    </div>
+    <div class="nav">
+        <button class="btn" onclick="showSection('planets')">🪐 Планеты</button>
+        <button class="btn btn-orange" onclick="showSection('search')">🔍 Поиск</button>
+        <button class="btn" onclick="showSection('library')">📚 Библиотека</button>
+        <button class="btn btn-orange" onclick="showSection('games')">🎮 Игры</button>
+        <button class="btn" onclick="showSection('chat')">🤖 AI</button>
+    </div>
+
+    <!-- ПЛАНЕТЫ -->
+    <div id="planets" class="section active">
+        <h2 style="margin-bottom:20px; text-align:center;">🪐 Музыкальные Планеты</h2>
+        <div class="planet" onclick="togglePlanet('rock')">
+            <div class="planet-header"><div class="planet-icon">🎸</div><div><div class="planet-title">Планета Рок</div><div style="font-size:13px;opacity:0.8;">Rock Energy</div></div></div>
+            <div id="rock-content" class="planet-content"></div>
+        </div>
+        <div class="planet" onclick="togglePlanet('hiphop')">
+            <div class="planet-header"><div class="planet-icon">🎤</div><div><div class="planet-title">Планета Хип-Хоп</div><div style="font-size:13px;opacity:0.8;">Hip Hop Beats</div></div></div>
+            <div id="hiphop-content" class="planet-content"></div>
+        </div>
+        <div class="planet" onclick="togglePlanet('electronic')">
+            <div class="planet-header"><div class="planet-icon">🎧</div><div><div class="planet-title">Планета Электроника</div><div style="font-size:13px;opacity:0.8;">Electronic Vibes</div></div></div>
+            <div id="electronic-content" class="planet-content"></div>
+        </div>
+        <div class="planet" onclick="togglePlanet('pop')">
+            <div class="planet-header"><div class="planet-icon">⭐</div><div><div class="planet-title">Планета Поп</div><div style="font-size:13px;opacity:0.8;">Pop Melody</div></div></div>
+            <div id="pop-content" class="planet-content"></div>
+        </div>
+    </div>
+
+    <!-- ПОИСК -->
+    <div id="search" class="section">
+        <h2 style="margin-bottom:20px; text-align:center;">🔍 Поиск музыки</h2>
+        <div class="search-box">
+            <input type="text" class="search-input" id="query" placeholder="Введи название трека..." onkeypress="if(event.key==='Enter')searchAndPlay()">
+            <button class="btn-search" onclick="searchAndPlay()">🔍 Найти</button>
+        </div>
+
+        <div id="player-card" class="player-card">
+            <div class="player-card-header">
+                <h3>🎵 Сейчас играет</h3>
+                <p id="track-name">Загрузка...</p>
+            </div>
+            <div class="player-card-body">
+                <div class="music-icon">🎶</div>
+                <h2 style="margin-bottom:15px; font-size:22px;">Интеграция с Яндекс Музыкой</h2>
+                <p style="opacity:0.9; margin-bottom:25px; font-size:15px;">
+                    SoundScape Pro сотрудничает с Яндекс Музыкой<br>
+                    для предоставления лучшего качества звука
+                </p>
+                <a href="#" id="open-music-btn" class="open-btn" target="_blank">▶️ Слушать сейчас</a>
+                <div class="integration-badge">🔗 Интеграция с Яндекс</div>
+                <div class="features">
+                    <div class="feature"><div class="feature-icon">🎧</div><div>HD качество</div></div>
+                    <div class="feature"><div class="feature-icon">⚡</div><div>Мгновенный доступ</div></div>
+                    <div class="feature"><div class="feature-icon">🔒</div><div>Безопасно</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- БИБЛИОТЕКА -->
+    <div id="library" class="section">
+        <h2 style="margin-bottom:20px; text-align:center;">📚 Моя библиотека</h2>
+        <div class="info-box">
+            🎵 <strong>12 треков</strong><br>
+            <small>Все играют прямо в приложении!</small>
+        </div>
+        <div id="library-list"></div>
+        <div class="upload-box" onclick="document.getElementById('file-input').click()">
+            <div style="font-size:48px;">📁</div>
+            <h3>Добавить свой MP3</h3>
+            <p style="opacity:0.8; margin-top:10px;">Нажми чтобы выбрать файл</p>
+            <input type="file" id="file-input" accept="audio/*" style="display:none" onchange="handleFile(event)">
+        </div>
+    </div>
+
+    <!-- ИГРЫ -->
+    <div id="games" class="section">
+        <h2 style="margin-bottom:20px; text-align:center;">🎮 Игры и Челленджи</h2>
+
+        <div class="game-card" onclick="startGuessGame()">
+            <div class="game-icon">🎵</div>
+            <div class="game-title">Угадай трек</div>
+            <div class="game-desc">3 уровня сложности • +50/100/200 XP</div>
+        </div>
+
+        <div class="game-card" onclick="startChallengeMenu()">
+            <div class="game-icon">🏆</div>
+            <div class="game-title">Челленджи</div>
+            <div class="game-desc">Ежедневные задания • до +500 XP</div>
+        </div>
+
+        <div class="game-card" onclick="showAchievements()">
+            <div class="game-icon">🏅</div>
+            <div class="game-title">Достижения</div>
+            <div class="game-desc">Собери все награды!</div>
+        </div>
+
+        <button class="back-btn" onclick="showSection('planets')" style="width:100%;">← Вернуться назад</button>
+    </div>
+
+    <!-- AI ЧАТ -->
+    <div id="chat" class="section">
+        <h2 style="margin-bottom:20px; text-align:center;">🤖 AI Ассистент</h2>
+        <div class="chat-box" id="chat-box">
+            <div class="message bot">Привет! Я AI-ассистент SoundScape Pro 🎵<br>Могу порекомендовать музыку, рассказать факты или просто поболтать!</div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chat-input" placeholder="Напиши что-нибудь..." onkeypress="if(event.key==='Enter')sendMsg()">
+            <button onclick="sendMsg()">➤</button>
+        </div>
+    </div>
+
+    <!-- ПЛЕЕР -->
+    <div class="player-container" id="player-container">
+        <audio id="audio" controls></audio>
+        <div class="player-info">
+            <div><div class="player-title" id="p-title">Название</div><div class="player-artist" id="p-artist">Исполнитель</div></div>
+            <div class="player-controls">
+                <button class="ctrl" onclick="prev()">⏮</button>
+                <button class="ctrl play" id="play-btn" onclick="toggle()">▶</button>
+                <button class="ctrl" onclick="next()">⏭</button>
+                <button class="ctrl close" onclick="closePlayer()">✕</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛКА -->
+    <div class="modal" id="game-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Игра</h2>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div id="modal-body"></div>
+            <button class="back-btn" onclick="closeModal()" style="width:100%; margin-top:15px;">← Закрыть игру</button>
+        </div>
+    </div>
+
+    <div class="notif" id="notif"></div>
+
+    <script>
+        // КОСМИЧЕСКАЯ АНИМАЦИЯ
+        function createSpaceAnimation() {
+            const bg = document.getElementById('space-bg');
+
+            // Звезды
+            for(let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                bg.appendChild(star);
+            }
+
+            // Кометы
+            for(let i = 0; i < 5; i++) {
+                const comet = document.createElement('div');
+                comet.className = 'comet';
+                comet.style.top = Math.random() * 100 + '%';
+                comet.style.animationDelay = Math.random() * 8 + 's';
+                bg.appendChild(comet);
+            }
+
+            // Космические корабли
+            const ships = ['🚀', '🛸', '🛰️'];
+            for(let i = 0; i < 3; i++) {
+                const ship = document.createElement('div');
+                ship.className = 'spaceship';
+                ship.textContent = ships[i];
+                ship.style.top = Math.random() * 100 + '%';
+                ship.style.animationDelay = Math.random() * 20 + 's';
+                ship.style.animationDuration = (15 + Math.random() * 10) + 's';
+                bg.appendChild(ship);
+            }
+        }
+
+        createSpaceAnimation();
+
+        const audio = document.getElementById('audio');
+        let currentTrack = null;
+        let currentIndex = 0;
+        let isPlaying = false;
+        let quizTrack = null;
+        let currentDifficulty = 'easy';
+        let hintsUsed = 0;
+        let challengeStartTime = 0;
+
+        // 12 ТРЕКОВ В БИБЛИОТЕКЕ (без Самолётов)
+        const libraryTracks = [
+            {id:'2', title:'Ty ne bojjsya nochi', artist:'ENZRO', url:'https://cdn.jsdelivr.net/gh/melnikovvitalij02-hub/Soundscape2@main/ENZRO_-_Ty_ne_bojjsya_nochi_81423717.mp3'},
+            {id:'3', title:'A krasivykh zhenshhin mnogo', artist:'Igor Malinin', url:'https://cdn.jsdelivr.net/gh/melnikovvitalij02-hub/Soundscape2@main/Igor_Malinin_-_A_krasivykh_zhenshhin_mnogo_81681758.mp3'},
+            {id:'4', title:'Ona tancuet pod shadje', artist:'Indiya by', url:'https://cdn.jsdelivr.net/gh/melnikovvitalij02-hub/Soundscape2@main/Indiya_by_-_Ona_tancuet_pod_shadje_81415262.mp3'},
+            {id:'5', title:'Have a Nice Day', artist:'Demented Heart', url:'https://rus.hitmoz.org/get/music/20260616/Demented_Heart_-_Have_a_Nice_Day_81707826.mp3'},
+            {id:'6', title:'A labri', artist:'Shym Kmaro', url:'https://rus.hitmoz.org/get/music/20260616/Shym_Kmaro_-_A_labri_81707832.mp3'},
+            {id:'7', title:'i understand it now', artist:'Haiti Babii', url:'https://rus.hitmoz.org/get/music/20260616/Haiti_Babii_-_i_understand_it_now_81707843.mp3'},
+            {id:'8', title:'Begi', artist:'ROKER', url:'https://rus.hitmoz.org/get/music/20260616/ROKER_-_Begi_81707841.mp3'},
+            {id:'9', title:'Devochka tancuj', artist:'Artik & Asti', url:'https://rus.hitmoz.org/get/music/20200207/Artik_Asti_-_Devochka_tancujj_68289048.mp3'},
+            {id:'10', title:'Gde proshla ty', artist:'Kravc, Gio Pika', url:'https://rus.hitmoz.org/get/music/20230331/Kravc_Gio_Pika_-_Gde_proshla_ty_75704918.mp3'},
+            {id:'11', title:'Sedaya noch', artist:'YUrijj SHatunov', url:'https://rus.hitmoz.org/get/music/20171104/YUrijj_SHatunov_-_Sedaya_noch_50310007.mp3'},
+            {id:'12', title:'Orly ili vorony', artist:'Maksim adeev, Grigorijj Leps', url:'https://rus.hitmoz.org/get/music/20190315/Maksim_adeev_Grigorijj_Leps_-_Orly_ili_vorony_62791964.mp3'},
+            {id:'13', title:'Ty znaesh tak khochetsya zhit', artist:'Rozhdestvo', url:'https://rus.hitmoz.org/get/music/20110228/Rozhdestvo_-_Ty_znaesh_tak_khochetsya_zhit_530527.mp3'}
+        ];
+
+        const planetTracks = {
+            rock: [
+                {title:'Rock Energy 1', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'},
+                {title:'Rock Energy 2', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'}
+            ],
+            hiphop: [
+                {title:'Hip Hop Beat 1', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'},
+                {title:'Hip Hop Beat 2', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'}
+            ],
+            electronic: [
+                {title:'Electronic 1', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3'},
+                {title:'Electronic 2', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3'}
+            ],
+            pop: [
+                {title:'Pop Melody 1', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3'},
+                {title:'Pop Melody 2', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3'}
+            ]
+        };
+
+        let library = [...libraryTracks];
+        let xp = parseInt(localStorage.getItem('ss_xp') || '0');
+        let played = parseInt(localStorage.getItem('ss_played') || '0');
+        let openedPlanets = JSON.parse(localStorage.getItem('ss_planets') || '[]');
+        let achievements = JSON.parse(localStorage.getItem('ss_achievements') || '[]');
+        let completedChallenges = JSON.parse(localStorage.getItem('ss_challenges') || '[]');
+        let messagesCount = parseInt(localStorage.getItem('ss_messages') || '0');
+        let hardWins = parseInt(localStorage.getItem('ss_hard_wins') || '0');
+
+        // УМНЫЙ AI С БОЛЬШОЙ БАЗОЙ ОТВЕТОВ
+        const aiResponses = {
+            привет: [
+                'Привет! 🌌 Рад тебя видеть в SoundScape Pro!',
+                'Здравствуй! 🎵 Готов помочь с музыкой?',
+                'Приветик! ✨ Как настроение? Есть что послушать?'
+            ],
+            как: [
+                'У меня всё отлично! 🎶 А у тебя как дела?',
+                'Работаю на полную мощность! 🔋 Чем помочь?',
+                'Прекрасно! Только что послушал новый трек 🎵'
+            ],
+            рекоменд: [
+                'Попробуй планету Рок! 🎸 Там отличная энергия',
+                'Советую послушать Artik & Asti — Devochka tancuj! 🔥',
+                'Если хочешь чего-то нового — зайди в поиск и введи любимый жанр!',
+                'Рекомендую ROKER — Begi, очень драйвовый трек! 🎧',
+                'Попробуй Haiti Babii — атмосферная музыка для вечера 🌙'
+            ],
+            планет: [
+                'У нас 4 планеты: Рок 🎸, Хип-Хоп 🎤, Электроника 🎧 и Поп ⭐',
+                'За открытие каждой планеты ты получаешь +10 XP! 🎁',
+                'Планеты — это тематические подборки треков. Открывай все!',
+                'Моя любимая — Электроника 🎧, там крутые биты!'
+            ],
+            факт: [
+                '🎵 Факт: Музыка активирует те же зоны мозга, что и еда и любовь!',
+                '🎸 Факт: Самая длинная песня в мире длится 639 лет и всё ещё играет!',
+                '🎤 Факт: Бетховен продолжал сочинять музыку, будучи полностью глухим!',
+                '🎧 Факт: Слушание музыки выделяет дофамин — гормон счастья!',
+                '⭐ Факт: Мозг обрабатывает музыку быстрее, чем язык!'
+            ],
+            шутк: [
+                '😄 Почему музыканты не любят играть в прятки? Потому что их всегда найдут по звуку!',
+                '🎵 Что сказал бас гитарист барабанщику? "Ты задаёшь ритм моей жизни!"',
+                '🎸 Почему ноты не ходят в школу? Потому что они уже в ключе!',
+                '🎤 Как называется боязнь музыки? Меланофобия! (шутка, такого нет 😄)'
+            ],
+            спасибо: [
+                'Пожалуйста! 🌟 Всегда рад помочь!',
+                'Не за что! 🎵 Обращайся ещё!',
+                'Рад был помочь! ✨ Заходи почаще!'
+            ],
+            грустн: [
+                'Не грусти! 🎵 Послушай что-нибудь весёлое — музыка лечит!',
+                'Всё будет хорошо! 🌟 Давай послушаем что-нибудь позитивное?',
+                'Музыка — лучшее лекарство от грусти! 🎶 Попробуй планету Поп!'
+            ],
+            игр: [
+                'У нас есть крутые игры! 🎮 Попробуй "Угадай трек" — 3 уровня сложности!',
+                'Челленджи дают до +500 XP! 🏆 Загляни в раздел Игры!',
+                'Ещё есть достижения — собери их все! 🏅'
+            ],
+            музык: [
+                'Музыка — это язык души! 🎶 Что любишь слушать?',
+                'Я обожаю музыку всех жанров! 🎵 А ты?',
+                'Музыка делает мир лучше! 🌍 Какой твой любимый жанр?',
+                'Знаешь, в нашей библиотеке 12 крутых треков! 🎧 Слушай!'
+            ],
+            level: [
+                `У тебя сейчас ${Math.floor(xp/100)+1} уровень! 📊 Продолжай в том же духе!`,
+                `До следующего уровня осталось ${100 - (xp % 100)} XP! 🎯`,
+                'Каждый уровень открывает новые возможности! 🚀'
+            ],
+            help: [
+                'Я могу: 🎵 рекомендовать музыку, 🎮 играть с тобой, 📊 рассказывать о прогрессе, 💬 просто болтать!',
+                'Спроси меня о музыке, фактах, играх или просто поболтаем! 🌟',
+                'Попробуй написать: "порекомендуй трек", "расскажи факт" или "пошути"!'
+            ]
+        };
+
+        window.addEventListener('load', () => {
+            audio.addEventListener('ended', next);
+            audio.addEventListener('play', () => { isPlaying = true; document.getElementById('play-btn').textContent = '⏸'; });
+            audio.addEventListener('pause', () => { isPlaying = false; document.getElementById('play-btn').textContent = '▶'; });
+            audio.addEventListener('error', (e) => show('⚠️ Ошибка загрузки трека'));
+            updateStats();
+            renderLibrary();
+            checkAchievements();
+            show('🌌 SoundScape Pro готов!');
+        });
+
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(id === 'library') renderLibrary();
+        }
+
+        function togglePlanet(id) {
+            const content = document.getElementById(id + '-content');
+            if(!openedPlanets.includes(id)) {
+                openedPlanets.push(id);
+                localStorage.setItem('ss_planets', JSON.stringify(openedPlanets));
+                xp += 10;
+                localStorage.setItem('ss_xp', xp);
+                updateStats();
+                show('🎁 +10 XP за открытие планеты!');
+                checkAchievements();
+            }
+            content.classList.toggle('active');
+            const tracks = planetTracks[id] || [];
+            content.innerHTML = tracks.map((t, i) => `
+                <div class="track" onclick='playTrack(${JSON.stringify(t).replace(/'/g, "&#39;")})'>
+                    <div class="track-cover">🎵</div>
+                    <div class="track-info">
+                        <div class="track-title">${t.title}</div>
+                        <div class="track-artist">${t.artist}</div>
+                    </div>
+                    <div style="font-size:20px;">▶</div>
+                </div>
+            `).join('');
+        }
+
+        function playTrack(track) {
+            try {
+                currentTrack = { ...track, type: 'mp3' };
+                audio.src = track.url;
+                audio.load();
+                audio.play().catch(err => show('⚠️ Ошибка воспроизведения'));
+                document.getElementById('p-title').textContent = track.title;
+                document.getElementById('p-artist').textContent = track.artist;
+                document.getElementById('player-container').classList.add('active');
+                played++; xp += 2;
+                localStorage.setItem('ss_played', played);
+                localStorage.setItem('ss_xp', xp);
+                updateStats();
+                renderLibrary();
+                show('🎵 ' + track.title);
+                checkAchievements();
+            } catch(e) { show('⚠️ Ошибка'); }
+        }
+
+        function renderLibrary() {
+            const list = document.getElementById('library-list');
+            list.innerHTML = library.map((t, i) => `
+                <div class="track ${currentTrack?.id === t.id ? 'playing' : ''}" onclick="playLibraryTrack(${i})">
+                    <div class="track-cover">🎵</div>
+                    <div class="track-info">
+                        <div class="track-title">${t.title}</div>
+                        <div class="track-artist">${t.artist}</div>
+                    </div>
+                    <div style="font-size:20px;">${currentTrack?.id === t.id && isPlaying ? '⏸' : '▶'}</div>
+                </div>
+            `).join('');
+            document.getElementById('tracks-count').textContent = library.length;
+        }
+
+        function playLibraryTrack(index) {
+            currentIndex = index;
+            playTrack(library[index]);
+        }
+
+        function handleFile(event) {
+            const file = event.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const name = file.name.replace(/\.[^/.]+$/, "");
+                const parts = name.split(' - ');
+                const track = {
+                    id: 'user_' + Date.now(),
+                    title: parts.length > 1 ? parts[1].trim() : name,
+                    artist: parts.length > 1 ? parts[0].trim() : 'Неизвестный',
+                    url: e.target.result
+                };
+                library.push(track);
+                renderLibrary();
+                show('✅ Добавлено: ' + track.title);
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        function searchAndPlay() {
+            const query = document.getElementById('query').value.trim();
+            if(!query) { show('⚠️ Введи название'); return; }
+            const card = document.getElementById('player-card');
+            const trackName = document.getElementById('track-name');
+            const openBtn = document.getElementById('open-music-btn');
+            const yandexUrl = `https://music.yandex.ru/search?text=${encodeURIComponent(query)}`;
+            openBtn.href = yandexUrl;
+            trackName.textContent = `"${query}"`;
+            card.classList.add('active');
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => window.open(yandexUrl, '_blank'), 1500);
+            played++; xp += 2;
+            localStorage.setItem('ss_played', played);
+            localStorage.setItem('ss_xp', xp);
+            updateStats();
+            show('🎵 Открываю...');
+            checkAchievements();
+        }
+
+        function toggle() { if(!currentTrack) return; if(isPlaying) audio.pause(); else audio.play(); }
+        function prev() { if(library.length === 0) return; currentIndex = (currentIndex - 1 + library.length) % library.length; playLibraryTrack(currentIndex); }
+        function next() { if(library.length === 0) return; currentIndex = (currentIndex + 1) % library.length; playLibraryTrack(currentIndex); }
+        function closePlayer() { audio.pause(); currentTrack = null; isPlaying = false; document.getElementById('player-container').classList.remove('active'); document.getElementById('play-btn').textContent = '▶'; }
+
+        // ============ УЛУЧШЕННАЯ ИГРА "УГАДАЙ ТРЕК" ============
+        function startGuessGame() {
+            if(library.length === 0) { show('⚠️ Нет треков'); return; }
+            document.getElementById('modal-title').textContent = '🎵 Угадай трек';
+            document.getElementById('modal-body').innerHTML = `
+                <p style="margin-bottom:15px; text-align:center;">Выбери сложность:</p>
+                <div class="difficulty-selector">
+                    <div class="diff-btn active" onclick="setDifficulty('easy', this)">🟢 Легко<br><small>+50 XP</small></div>
+                    <div class="diff-btn" onclick="setDifficulty('medium', this)">🟡 Средне<br><small>+100 XP</small></div>
+                    <div class="diff-btn" onclick="setDifficulty('hard', this)">🔴 Сложно<br><small>+200 XP</small></div>
+                </div>
+                <button class="btn btn-orange" onclick="startGuessRound()" style="width:100%; padding:15px;">🎮 Начать игру</button>
+            `;
+            document.getElementById('game-modal').classList.add('active');
+        }
+
+        function setDifficulty(diff, el) {
+            currentDifficulty = diff;
+            document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function startGuessRound() {
+            quizTrack = library[Math.floor(Math.random() * library.length)];
+            hintsUsed = 0;
+            challengeStartTime = Date.now();
+
+            let hintContent = '';
+            if(currentDifficulty === 'easy') {
+                hintContent = `<p style="margin-bottom:15px; text-align:center;">Исполнитель: <strong>${quizTrack.artist}</strong></p>`;
+            } else if(currentDifficulty === 'medium') {
+                const firstLetter = quizTrack.artist[0];
+                hintContent = `<p style="margin-bottom:15px; text-align:center;">Исполнитель начинается на: <strong>${firstLetter}...</strong></p>`;
+            } else {
+                hintContent = `<p style="margin-bottom:15px; text-align:center;">Угадай без подсказок! 🎯</p>`;
+            }
+
+            document.getElementById('modal-title').textContent = '🎵 Угадай трек';
+            document.getElementById('modal-body').innerHTML = `
+                ${hintContent}
+                <div class="hint-box" id="hint-area" style="display:none;"></div>
+                <button class="btn" onclick="playQuizTrack()" style="width:100%;margin-bottom:10px;">▶️ Послушать фрагмент</button>
+                ${currentDifficulty !== 'hard' ? `<button class="btn" onclick="showHint()" style="width:100%;margin-bottom:10px; background:linear-gradient(135deg,#ffaa00,#ff6600);">💡 Подсказка (-20 XP)</button>` : ''}
+                <input type="text" id="quiz-answer" class="search-input" placeholder="Название трека..." style="margin-bottom:10px;">
+                <button class="btn btn-orange" onclick="checkGuess()" style="width:100%;">Проверить</button>
+            `;
+        }
+
+        function playQuizTrack() {
+            if(quizTrack) {
+                playLibraryTrack(library.indexOf(quizTrack));
+                show('🎵 Слушай внимательно!');
+            }
+        }
+
+        function showHint() {
+            if(hintsUsed >= 2) { show('⚠️ Больше нет подсказок'); return; }
+            hintsUsed++;
+            const hintArea = document.getElementById('hint-area');
+            hintArea.style.display = 'block';
+
+            if(hintsUsed === 1) {
+                const firstLetter = quizTrack.title[0];
+                const length = quizTrack.title.length;
+                hintArea.innerHTML = `💡 Первая буква: <strong>${firstLetter}</strong>, длина: <strong>${length} символов</strong>`;
+            } else {
+                const words = quizTrack.title.split(' ');
+                const revealed = words[0];
+                hintArea.innerHTML = `💡 Первое слово: <strong>${revealed}</strong>`;
+            }
+        }
+
+        function checkGuess() {
+            const ans = document.getElementById('quiz-answer').value.toLowerCase().trim();
+            const correctTitle = quizTrack.title.toLowerCase();
+            const timeSpent = (Date.now() - challengeStartTime) / 1000;
+
+            let isCorrect = false;
+            if(ans.length >= 4) {
+                let matchCount = 0;
+                for(let i = 0; i < Math.min(ans.length, correctTitle.length); i++) {
+                    if(ans[i] === correctTitle[i]) matchCount++;
+                }
+                isCorrect = matchCount / correctTitle.length >= 0.7 || correctTitle.includes(ans) || ans.includes(correctTitle.substring(0, Math.min(6, correctTitle.length)));
+            }
+
+            let reward = currentDifficulty === 'easy' ? 50 : currentDifficulty === 'medium' ? 100 : 200;
+            let penalty = hintsUsed * 20;
+            let finalReward = Math.max(10, reward - penalty);
+
+            if(timeSpent < 15 && isCorrect) {
+                finalReward += 30;
+                show('⚡ Бонус за скорость! +30 XP');
+            }
+
+            if(isCorrect) {
+                xp += finalReward;
+                localStorage.setItem('ss_xp', xp);
+                if(currentDifficulty === 'hard') {
+                    hardWins++;
+                    localStorage.setItem('ss_hard_wins', hardWins);
+                }
+                updateStats();
+                document.getElementById('modal-body').innerHTML = `
+                    <div style="text-align:center;">
+                        <div style="font-size:80px; margin-bottom:20px;">✅</div>
+                        <h2 style="margin-bottom:10px;">Правильно!</h2>
+                        <p style="margin-bottom:10px;">Трек: <strong>${quizTrack.title}</strong></p>
+                        <p style="margin-bottom:20px;">Исполнитель: <strong>${quizTrack.artist}</strong></p>
+                        <div class="reward-badge">+${finalReward} XP</div>
+                        ${hintsUsed > 0 ? `<p style="margin-top:10px; opacity:0.7;">Подсказок использовано: ${hintsUsed}</p>` : ''}
+                        <button class="btn btn-orange" onclick="startGuessRound()" style="width:100%;margin-top:20px;">🎮 Ещё раунд</button>
+                        <button class="btn" onclick="closeModal()" style="width:100%;margin-top:10px;">Закрыть</button>
+                    </div>
+                `;
+            } else {
+                document.getElementById('modal-body').innerHTML = `
+                    <div style="text-align:center;">
+                        <div style="font-size:80px; margin-bottom:20px;">❌</div>
+                        <h2 style="margin-bottom:10px;">Не угадал!</h2>
+                        <p style="margin-bottom:10px;">Правильный ответ:</p>
+                        <p style="margin-bottom:5px;"><strong>${quizTrack.title}</strong></p>
+                        <p style="margin-bottom:20px; opacity:0.7;">${quizTrack.artist}</p>
+                        <button class="btn btn-orange" onclick="startGuessRound()" style="width:100%;margin-bottom:10px;">🎮 Попробовать снова</button>
+                        <button class="btn" onclick="closeModal()" style="width:100%;">Закрыть</button>
+                    </div>
+                `;
+            }
+            checkAchievements();
+        }
+
+        // ============ УЛУЧШЕННЫЕ ЧЕЛЛЕНДЖИ ============
+        function startChallengeMenu() {
+            document.getElementById('modal-title').textContent = '🏆 Челленджи';
+            document.getElementById('modal-body').innerHTML = `
+                <p style="margin-bottom:20px; text-align:center;">Выбери челлендж:</p>
+
+                <div class="challenge-card">
+                    <div class="challenge-title">🎧 Меломан</div>
+                    <div class="challenge-desc">Прослушай 5 треков из библиотеки</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100, (played/5)*100)}%"></div></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>${Math.min(5, played)}/5 треков</span>
+                        <span class="reward-badge">+100 XP</span>
+                    </div>
+                </div>
+
+                <div class="challenge-card">
+                    <div class="challenge-title">🪐 Исследователь</div>
+                    <div class="challenge-desc">Открой все 4 планеты</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:${(openedPlanets.length/4)*100}%"></div></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>${openedPlanets.length}/4 планет</span>
+                        <span class="reward-badge">+150 XP</span>
+                    </div>
+                </div>
+
+                <div class="challenge-card">
+                    <div class="challenge-title">🔍 Искатель</div>
+                    <div class="challenge-desc">Найди 3 трека через поиск</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100, (played/3)*100)}%"></div></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>${Math.min(3, played)}/3 поисков</span>
+                        <span class="reward-badge">+100 XP</span>
+                    </div>
+                </div>
+
+                <div class="challenge-card">
+                    <div class="challenge-title">💬 Собеседник</div>
+                    <div class="challenge-desc">Напиши 5 сообщений AI</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100, (messagesCount/5)*100)}%"></div></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>${Math.min(5, messagesCount)}/5 сообщений</span>
+                        <span class="reward-badge">+75 XP</span>
+                    </div>
+                </div>
+
+                <div class="challenge-card">
+                    <div class="challenge-title">🎯 Мастер угадывания</div>
+                    <div class="challenge-desc">Угадай 3 трека на сложном уровне</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100, (hardWins/3)*100)}%"></div></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>${Math.min(3, hardWins)}/3 побед</span>
+                        <span class="reward-badge">+500 XP</span>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="claimRewards()" style="width:100%; margin-top:15px; padding:15px;">🎁 Забрать награды</button>
+            `;
+            document.getElementById('game-modal').classList.add('active');
+        }
+
+        function claimRewards() {
+            let totalReward = 0;
+
+            if(played >= 5 && !completedChallenges.includes('meloman')) {
+                totalReward += 100;
+                completedChallenges.push('meloman');
+            }
+            if(openedPlanets.length >= 4 && !completedChallenges.includes('explorer')) {
+                totalReward += 150;
+                completedChallenges.push('explorer');
+            }
+            if(played >= 3 && !completedChallenges.includes('seeker')) {
+                totalReward += 100;
+                completedChallenges.push('seeker');
+            }
+            if(messagesCount >= 5 && !completedChallenges.includes('chatter')) {
+                totalReward += 75;
+                completedChallenges.push('chatter');
+            }
+            if(hardWins >= 3 && !completedChallenges.includes('master')) {
+                totalReward += 500;
+                completedChallenges.push('master');
+            }
+
+            if(totalReward > 0) {
+                xp += totalReward;
+                localStorage.setItem('ss_xp', xp);
+                localStorage.setItem('ss_challenges', JSON.stringify(completedChallenges));
+                updateStats();
+                show(`🎁 Получено ${totalReward} XP!`);
+                checkAchievements();
+            } else {
+                show('⚠️ Сначала выполни задания!');
+            }
+            startChallengeMenu();
+        }
+
+        // ============ ДОСТИЖЕНИЯ ============
+        function showAchievements() {
+            const allAchievements = [
+                {id: 'first_play', icon: '🎵', title: 'Первый трек', desc: 'Прослушай первый трек', unlocked: played >= 1},
+                {id: 'meloman', icon: '🎧', title: 'Меломан', desc: 'Прослушай 5 треков', unlocked: played >= 5},
+                {id: 'explorer', icon: '🪐', title: 'Исследователь', desc: 'Открой все планеты', unlocked: openedPlanets.length >= 4},
+                {id: 'level5', icon: '⭐', title: 'Уровень 5', desc: 'Достигни 5 уровня', unlocked: Math.floor(xp/100)+1 >= 5},
+                {id: 'level10', icon: '🌟', title: 'Уровень 10', desc: 'Достигни 10 уровня', unlocked: Math.floor(xp/100)+1 >= 10},
+                {id: 'xp100', icon: '💯', title: 'Сотка', desc: 'Набери 100 XP', unlocked: xp >= 100},
+                {id: 'xp500', icon: '🔥', title: 'Огонь', desc: 'Набери 500 XP', unlocked: xp >= 500},
+                {id: 'xp1000', icon: '💎', title: 'Бриллиант', desc: 'Набери 1000 XP', unlocked: xp >= 1000}
+            ];
+
+            document.getElementById('modal-title').textContent = '🏅 Достижения';
+            document.getElementById('modal-body').innerHTML = `
+                <p style="margin-bottom:15px; text-align:center;">Открыто: ${allAchievements.filter(a => a.unlocked).length}/${allAchievements.length}</p>
+                ${allAchievements.map(a => `
+                    <div class="achievement ${a.unlocked ? 'unlocked' : ''}">
+                        <div class="achievement-icon">${a.icon}</div>
+                        <div style="flex:1;">
+                            <div style="font-weight:bold;">${a.title}</div>
+                            <div style="font-size:12px; opacity:0.7;">${a.desc}</div>
+                        </div>
+                        <div>${a.unlocked ? '✅' : '🔒'}</div>
+                    </div>
+                `).join('')}
+            `;
+            document.getElementById('game-modal').classList.add('active');
+        }
+
+        function checkAchievements() {
+            const newAchievements = [];
+            if(played >= 1 && !achievements.includes('first_play')) newAchievements.push('first_play');
+            if(played >= 5 && !achievements.includes('meloman')) newAchievements.push('meloman');
+            if(openedPlanets.length >= 4 && !achievements.includes('explorer')) newAchievements.push('explorer');
+            if(Math.floor(xp/100)+1 >= 5 && !achievements.includes('level5')) newAchievements.push('level5');
+            if(xp >= 100 && !achievements.includes('xp100')) newAchievements.push('xp100');
+            if(xp >= 500 && !achievements.includes('xp500')) newAchievements.push('xp500');
+            if(xp >= 1000 && !achievements.includes('xp1000')) newAchievements.push('xp1000');
+
+            if(newAchievements.length > 0) {
+                achievements = [...achievements, ...newAchievements];
+                localStorage.setItem('ss_achievements', JSON.stringify(achievements));
+                show(`🏅 Новое достижение!`);
+            }
+        }
+
+        // ============ УМНЫЙ AI ЧАТ ============
+        function sendMsg() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if(!text) return;
+
+            const box = document.getElementById('chat-box');
+            box.innerHTML += `<div class="message user">${text}</div>`;
+            input.value = '';
+
+            const typingId = 'typing-' + Date.now();
+            box.innerHTML += `<div class="message bot" id="${typingId}"><span class="ai-typing">🤖 печатает<span class="typing-dots"></span></span></div>`;
+            box.scrollTop = box.scrollHeight;
+
+            messagesCount++;
+            localStorage.setItem('ss_messages', messagesCount);
+
+            setTimeout(() => {
+                const answer = generateSmartAnswer(text.toLowerCase());
+                document.getElementById(typingId).innerHTML = answer;
+                box.scrollTop = box.scrollHeight;
+                xp += 1;
+                localStorage.setItem('ss_xp', xp);
+                updateStats();
+                checkAchievements();
+            }, 800 + Math.random() * 700);
+        }
+
+        function generateSmartAnswer(text) {
+            for(let key in aiResponses) {
+                if(text.includes(key)) {
+                    const variants = aiResponses[key];
+                    return variants[Math.floor(Math.random() * variants.length)];
+                }
+            }
+
+            if(text.includes('какой трек') || text.includes('что послушать')) {
+                const randomTrack = library[Math.floor(Math.random() * library.length)];
+                return `🎵 Советую послушать: <strong>${randomTrack.title}</strong> — ${randomTrack.artist}! Отличный выбор!`;
+            }
+
+            if(text.includes('уровень') || text.includes('прогресс')) {
+                return `📊 Твой уровень: ${Math.floor(xp/100)+1}<br>⭐ XP: ${xp}<br>🎧 Прослушано треков: ${played}<br>🪐 Открыто планет: ${openedPlanets.length}/4`;
+            }
+
+            if(text.includes('сколько') && (text.includes('xp') || text.includes('очков'))) {
+                return `⭐ У тебя ${xp} XP! До следующего уровня: ${100 - (xp % 100)} XP 🎯`;
+            }
+
+            if(text.includes('библиотек')) {
+                return `📚 В твоей библиотеке <strong>${library.length} треков</strong>! Все играют прямо в приложении 🎵`;
+            }
+
+            if(text.includes('планет')) {
+                return `🪐 У тебя открыто ${openedPlanets.length} из 4 планет! ${openedPlanets.length < 4 ? 'Открой все и получи +40 XP!' : 'Все планеты открыты! Ты молодец! 🎉'}`;
+            }
+
+            if(text.includes('яндекс')) {
+                return `🔗 Мы интегрированы с Яндекс Музыкой! Введи трек в поиске и слушай полную версию в HD качестве 🎧`;
+            }
+
+            if(text.includes('прив') && text.length < 10) {
+                return 'Привет! 👋 Чем могу помочь? Могу порекомендовать музыку, рассказать факт или просто поболтать!';
+            }
+
+            if(text.includes('как дела') || text.includes('как ты')) {
+                return 'Отлично! 🎶 Только что переслушал всю библиотеку — 12 крутых треков! А ты как?';
+            }
+
+            if(text.includes('кто ты') || text.includes('что ты')) {
+                return '🤖 Я AI-ассистент SoundScape Pro! Помогаю с музыкой, играми и просто болтаю. Спроси что угодно!';
+            }
+
+            if(text.includes('спасибо') || text.includes('благодар')) {
+                return 'Пожалуйста! 🌟 Рад помочь! Обращайся ещё!';
+            }
+
+            if(text.includes('пока') || text.includes('до свидания')) {
+                return 'До встречи! 👋 Возвращайся скорее — тут всегда хорошая музыка! 🎵';
+            }
+
+            if(text.length < 3) {
+                return 'Расскажи подробнее? 🤔 Я могу помочь с музыкой, играми или просто поболтать!';
+            }
+
+            const smartDefaults = [
+                `Интересно! 🤔 Расскажи больше о своём музыкальном вкусе?`,
+                `Хм, любопытно! 🎵 А какой жанр музыки ты предпочитаешь?`,
+                `Понял! ✨ Может, посоветовать тебе что-нибудь из нашей библиотеки?`,
+                `Круто! 🌟 У нас как раз есть треки на любой вкус. Что хочешь послушать?`,
+                `Согласен! 🎶 Кстати, ты уже слушал ROKER — Begi? Очень драйвово!`,
+                `О, интересно! 😊 Знаешь, в нашей библиотеке 12 треков — есть из чего выбрать!`,
+                `Понятно! 🎧 Кстати, попробуй челленджи — там можно заработать до 500 XP!`,
+                `Хорошо! 🌌 А ты уже открывал все 4 планеты? Там крутые треки!`
+            ];
+
+            return smartDefaults[Math.floor(Math.random() * smartDefaults.length)];
+        }
+
+        function closeModal() {
+            document.getElementById('game-modal').classList.remove('active');
+        }
+
+        function updateStats() {
+            document.getElementById('xp').textContent = xp;
+            document.getElementById('level').textContent = Math.floor(xp / 100) + 1;
+            document.getElementById('played').textContent = played;
+        }
+
+        function show(text) {
+            const n = document.getElementById('notif');
+            n.textContent = text;
+            n.classList.add('show');
+            setTimeout(() => n.classList.remove('show'), 2500);
+        }
+    </script>
+</body>
+</html>
