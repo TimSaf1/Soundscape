@@ -1,1020 +1,211 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="theme-color" content="#0a0e27">
-    <meta name="description" content="SoundScape Pro - Музыкальная социальная сеть">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>SoundScape Pro 🌌</title>
-    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiU291bmRTY2FwZSBQcm8iLCJzaG9ydF9uYW1lIjoiU291bmRTY2FwZSIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMGEwZTI3IiwidGhlbWVfY29sb3IiOiIjMGEwZTI3IiwiaWNvbnMiOlt7InNyYyI6Imh0dHBzOi8vZW1vd2kuY29tL2FwaS9zdGF0aWMvMWY2MDEucG5nIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
-    
+
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { 
-            background: linear-gradient(135deg, #0a0e27, #1a1f3a); 
-            color: #fff; 
-            min-height: 100vh; 
+        html, body { overflow-x: hidden; width: 100%; height: auto; }
+        body {
+            background: linear-gradient(135deg, #0a0e27, #1a1f3a);
+            color: #fff;
+            min-height: 100vh;
             padding-bottom: 120px;
             position: relative;
-            overflow-x: hidden;
         }
-        
-        /* КОСМИЧЕСКАЯ АНИМАЦИЯ */
-        .space-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
-            pointer-events: none;
-        }
-        
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle 3s infinite;
-        }
-        
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.2); }
-        }
-        
-        .comet {
-            position: absolute;
-            width: 150px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #00d4ff, transparent);
-            animation: shoot 10s infinite;
-            opacity: 0;
-        }
-        
-        @keyframes shoot {
-            0% { transform: translateX(-150px) translateY(100px); opacity: 1; }
-            100% { transform: translateX(calc(100vw + 150px)) translateY(-100px); opacity: 0; }
-        }
-        
-        .spaceship {
-            position: absolute;
-            font-size: 24px;
-            animation: fly 25s infinite linear;
-            opacity: 0.6;
-            filter: drop-shadow(0 0 10px rgba(0,212,255,0.8));
-        }
-        
-        @keyframes fly {
-            from { transform: translateX(-100px) translateY(0) rotate(45deg); }
-            to { transform: translateX(calc(100vw + 100px)) translateY(100px) rotate(45deg); }
-        }
-        
-        .nebula {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(0,102,255,0.2) 0%, transparent 70%);
-            border-radius: 50%;
-            animation: float 20s infinite ease-in-out;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(50px, -50px) scale(1.1); }
-            66% { transform: translate(-50px, 50px) scale(0.9); }
-        }
-        
-        .header { 
-            background: linear-gradient(135deg, #0066ff, #ff6600); 
-            padding: 25px 20px; 
-            text-align: center; 
-            position: relative; 
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }
-        
-        .header h1 { 
-            font-size: 32px; 
-            margin-bottom: 5px; 
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            animation: glow 3s infinite;
-        }
-        
-        @keyframes glow {
-            0%, 100% { text-shadow: 0 2px 10px rgba(0,0,0,0.3), 0 0 20px rgba(255,255,255,0.3); }
-            50% { text-shadow: 0 2px 20px rgba(0,0,0,0.5), 0 0 40px rgba(255,255,255,0.6); }
-        }
-        
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: rotate 20s linear infinite;
-        }
-        
+
+        /* КОСМИЧЕСКИЙ ФОН */
+        .space-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
+        .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 3s infinite; }
+        @keyframes twinkle { 0%,100%{opacity:0.3;transform:scale(1);} 50%{opacity:1;transform:scale(1.2);} }
+        .comet { position: absolute; width: 150px; height: 2px; background: linear-gradient(90deg, transparent, #00d4ff, transparent); animation: shoot 10s infinite; opacity: 0; }
+        @keyframes shoot { 0%{transform:translateX(-150px) translateY(100px);opacity:1;} 100%{transform:translateX(calc(100vw + 150px)) translateY(-100px);opacity:0;} }
+        .spaceship { position: absolute; font-size: 24px; animation: fly 25s infinite linear; opacity: 0.6; filter: drop-shadow(0 0 10px rgba(0,212,255,0.8)); }
+        @keyframes fly { from{transform:translateX(-100px) translateY(0) rotate(45deg);} to{transform:translateX(calc(100vw + 100px)) translateY(100px) rotate(45deg);} }
+        .nebula { position: absolute; width: 300px; height: 300px; background: radial-gradient(circle, rgba(0,102,255,0.2) 0%, transparent 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
+        @keyframes float { 0%,100%{transform:translate(0,0) scale(1);} 33%{transform:translate(50px,-50px) scale(1.1);} 66%{transform:translate(-50px,50px) scale(0.9);} }
+
+        .header { background: linear-gradient(135deg, #0066ff, #ff6600); padding: 25px 20px; text-align: center; position: relative; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .header h1 { font-size: 32px; margin-bottom: 5px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); animation: glow 3s infinite; position: relative; z-index: 1; }
+        @keyframes glow { 0%,100%{text-shadow:0 2px 10px rgba(0,0,0,0.3),0 0 20px rgba(255,255,255,0.3);} 50%{text-shadow:0 2px 20px rgba(0,0,0,0.5),0 0 40px rgba(255,255,255,0.6);} }
+        .header::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); animation: rotate 20s linear infinite; }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        
-        .stats { 
-            display: flex; 
-            justify-content: space-around; 
-            padding: 15px; 
-            background: rgba(0,0,0,0.4); 
-            flex-wrap: wrap;
-            gap: 10px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .stat { 
-            background: linear-gradient(135deg, rgba(0,102,255,0.3), rgba(255,102,0,0.3)); 
-            border: 2px solid rgba(0,102,255,0.5); 
-            padding: 12px 18px; 
-            border-radius: 15px; 
-            text-align: center;
-            transition: all 0.3s;
-            min-width: 80px;
-        }
-        
-        .stat:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 20px rgba(0,102,255,0.4);
-        }
-        
-        .stat-value { 
-            font-size: 24px; 
-            font-weight: bold; 
-            color: #00d4ff;
-            text-shadow: 0 0 10px rgba(0,212,255,0.5);
-        }
-        
-        .stat-label { 
-            font-size: 11px; 
-            opacity: 0.9; 
-            margin-top: 3px; 
-        }
-        
-        .nav { 
-            display: flex; 
-            justify-content: center; 
-            gap: 10px; 
-            padding: 15px; 
-            background: rgba(10,14,39,0.95); 
-            flex-wrap: wrap; 
-            position: sticky; 
-            top: 0; 
-            z-index: 100;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-        
-        .btn { 
-            padding: 12px 24px; 
-            border: none; 
-            border-radius: 25px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 14px; 
-            background: linear-gradient(135deg, #0066ff, #0099ff); 
-            color: white; 
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0,102,255,0.3);
-        }
-        
-        .btn:hover { 
-            transform: translateY(-3px); 
-            box-shadow: 0 6px 20px rgba(0,102,255,0.5);
-        }
-        
-        .btn:active {
-            transform: translateY(-1px);
-        }
-        
-        .btn-orange { 
-            background: linear-gradient(135deg, #ff6600, #ff8c00);
-            box-shadow: 0 4px 15px rgba(255,102,0,0.3);
-        }
-        
-        .btn-orange:hover {
-            box-shadow: 0 6px 20px rgba(255,102,0,0.5);
-        }
-        
-        .section { 
-            display: none; 
-            padding: 20px; 
-            animation: fade 0.3s; 
-        }
-        
-        .section.active { 
-            display: block; 
-        }
-        
-        @keyframes fade { 
-            from { opacity: 0; transform: translateY(20px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-        
-        .track { 
-            background: rgba(10,14,39,0.7); 
-            border: 2px solid rgba(0,102,255,0.3); 
-            border-radius: 15px; 
-            padding: 15px; 
-            margin-bottom: 10px; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-            transition: all 0.3s;
-            backdrop-filter: blur(5px);
-        }
-        
-        .track:hover { 
-            border-color: #ff6600; 
-            transform: translateX(5px) scale(1.02);
-            box-shadow: 0 5px 20px rgba(255,102,0,0.3);
-        }
-        
-        .track.playing { 
-            border-color: #ff6600; 
-            background: rgba(255,102,0,0.2);
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 10px rgba(255,102,0,0.3); }
-            50% { box-shadow: 0 0 30px rgba(255,102,0,0.6); }
-        }
-        
-        .track-cover { 
-            width: 60px; 
-            height: 60px; 
-            background: linear-gradient(135deg, #0066ff, #ff6600); 
-            border-radius: 12px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 28px; 
-            flex-shrink: 0;
-            box-shadow: 0 4px 15px rgba(0,102,255,0.3);
-        }
-        
-        .track-info { 
-            flex: 1; 
-        }
-        
-        .track-title { 
-            font-weight: bold; 
-            margin-bottom: 3px; 
-            font-size: 15px;
-        }
-        
-        .track-artist { 
-            font-size: 13px; 
-            opacity: 0.8; 
-        }
-        
-        .player-container { 
-            position: fixed; 
-            bottom: 0; 
-            left: 0; 
-            right: 0; 
-            background: linear-gradient(135deg, rgba(0,102,255,0.98), rgba(255,102,0,0.98)); 
-            padding: 20px; 
-            z-index: 1000; 
-            display: none;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
-        }
-        
-        .player-container.active { 
-            display: block;
-            animation: slideUp 0.3s;
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-        
-        .player-info { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 15px; 
-        }
-        
-        .player-title { 
-            font-weight: bold;
-            font-size: 16px;
-        }
-        
-        .player-artist { 
-            font-size: 13px; 
-            opacity: 0.9; 
-        }
-        
-        .player-controls { 
-            display: flex; 
-            gap: 15px;
-            justify-content: center;
-        }
-        
-        .ctrl { 
-            width: 50px; 
-            height: 50px; 
-            border: none; 
-            border-radius: 50%; 
-            background: rgba(255,255,255,0.2); 
-            color: white; 
-            cursor: pointer; 
-            font-size: 22px;
-            transition: all 0.3s;
-        }
-        
-        .ctrl:hover {
-            transform: scale(1.1);
-            background: rgba(255,255,255,0.3);
-        }
-        
-        .ctrl.play { 
-            width: 60px; 
-            height: 60px; 
-            background: white; 
-            color: #0066ff; 
-            font-size: 28px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        
-        .ctrl.close { 
-            background: rgba(255,0,0,0.3); 
-            font-size: 18px; 
-        }
-        
-        audio { 
-            width: 100%; 
-            border-radius: 10px;
-            filter: brightness(1.2);
-        }
-        
-        .notif { 
-            position: fixed; 
-            top: 20px; 
-            left: 50%; 
-            transform: translateX(-50%) translateY(-100px); 
-            background: linear-gradient(135deg, #0066ff, #ff6600); 
-            padding: 15px 30px; 
-            border-radius: 30px; 
-            transition: all 0.3s; 
-            z-index: 3000; 
-            pointer-events: none;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            font-weight: bold;
-        }
-        
-        .notif.show { 
-            transform: translateX(-50%) translateY(0);
-            animation: bounce 0.5s;
-        }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-10px); }
-        }
-        
-        .planet { 
-            background: linear-gradient(135deg, rgba(0,102,255,0.2), rgba(255,102,0,0.2)); 
-            border: 2px solid rgba(0,102,255,0.4); 
-            border-radius: 20px; 
-            padding: 20px; 
-            margin-bottom: 15px; 
-            cursor: pointer; 
-            transition: all 0.3s;
-            backdrop-filter: blur(5px);
-        }
-        
-        .planet:hover { 
-            transform: translateY(-5px) scale(1.02); 
-            border-color: #ff6600;
-            box-shadow: 0 10px 30px rgba(255,102,0,0.3);
-        }
-        
-        .planet-header { 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-            margin-bottom: 10px; 
-        }
-        
-        .planet-icon { 
-            font-size: 45px;
-            animation: float 3s infinite ease-in-out;
-        }
-        
-        .planet-title { 
-            font-size: 22px; 
-            font-weight: bold; 
-        }
-        
-        .planet-content { 
-            display: none; 
-            margin-top: 15px; 
-            padding-top: 15px; 
-            border-top: 1px solid rgba(255,255,255,0.1); 
-        }
-        
-        .planet-content.active { 
-            display: block;
-            animation: fade 0.3s;
-        }
-        
-        .info-box { 
-            background: linear-gradient(135deg, rgba(0,102,255,0.3), rgba(255,102,0,0.3)); 
-            border: 2px solid rgba(0,102,255,0.5); 
-            border-radius: 15px; 
-            padding: 20px; 
-            margin-bottom: 20px; 
-            text-align: center;
-            backdrop-filter: blur(10px);
-        }
-        
-        .search-box { 
-            background: rgba(10,14,39,0.7); 
-            border: 2px solid rgba(0,102,255,0.3); 
-            border-radius: 20px; 
-            padding: 20px; 
-            margin-bottom: 20px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .search-input { 
-            width: 100%; 
-            padding: 18px; 
-            border: 2px solid rgba(0,102,255,0.3); 
-            border-radius: 35px; 
-            background: rgba(0,0,0,0.4); 
-            color: white; 
-            font-size: 16px; 
-            outline: none; 
-            margin-bottom: 15px; 
-            text-align: center;
-            transition: all 0.3s;
-        }
-        
-        .search-input:focus {
-            border-color: #ff6600;
-            box-shadow: 0 0 20px rgba(255,102,0,0.3);
-        }
-        
-        .btn-search { 
-            width: 100%; 
-            padding: 18px; 
-            border: none; 
-            border-radius: 35px; 
-            background: linear-gradient(135deg, #0066ff, #ff6600); 
-            color: white; 
-            font-size: 16px; 
-            cursor: pointer; 
-            font-weight: bold;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0,102,255,0.3);
-        }
-        
-        .btn-search:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,102,255,0.5);
-        }
-        
-        .chat-box { 
-            background: rgba(10,14,39,0.7); 
-            border: 2px solid rgba(0,102,255,0.3); 
-            border-radius: 20px; 
-            padding: 15px; 
-            height: 400px; 
-            overflow-y: auto; 
-            margin-bottom: 15px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .message { 
-            margin-bottom: 12px; 
-            padding: 12px 16px; 
-            border-radius: 18px; 
-            max-width: 85%; 
-            animation: fade 0.3s;
-            word-wrap: break-word;
-        }
-        
-        .message.bot { 
-            background: rgba(0,102,255,0.2); 
-            border-left: 4px solid #0066ff; 
-        }
-        
-        .message.user { 
-            background: rgba(255,102,0,0.2); 
-            border-right: 4px solid #ff6600; 
-            margin-left: auto; 
-            text-align: right; 
-        }
-        
-        .chat-input { 
-            display: flex; 
-            gap: 10px; 
-        }
-        
-        .chat-input input { 
-            flex: 1; 
-            padding: 15px; 
-            border: 2px solid rgba(0,102,255,0.3); 
-            border-radius: 30px; 
-            background: rgba(10,14,39,0.7); 
-            color: white; 
-            outline: none;
-            transition: all 0.3s;
-        }
-        
-        .chat-input input:focus {
-            border-color: #ff6600;
-        }
-        
-        .chat-input button { 
-            padding: 15px 30px; 
-            border: none; 
-            border-radius: 30px; 
-            background: linear-gradient(135deg, #0066ff, #ff6600); 
-            color: white; 
-            cursor: pointer; 
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        
-        .chat-input button:hover {
-            transform: scale(1.05);
-        }
-        
-        .game-card { 
-            background: linear-gradient(135deg, rgba(0,102,255,0.2), rgba(255,102,0,0.2)); 
-            border: 2px solid rgba(0,102,255,0.4); 
-            border-radius: 20px; 
-            padding: 25px; 
-            margin-bottom: 15px; 
-            text-align: center; 
-            cursor: pointer; 
-            transition: all 0.3s;
-            backdrop-filter: blur(5px);
-        }
-        
-        .game-card:hover { 
-            transform: translateY(-8px) scale(1.03); 
-            border-color: #ff6600;
-            box-shadow: 0 15px 40px rgba(255,102,0,0.3);
-        }
-        
-        .game-icon { 
-            font-size: 55px; 
-            margin-bottom: 15px;
-            animation: float 3s infinite ease-in-out;
-        }
-        
-        .game-title { 
-            font-size: 20px; 
-            font-weight: bold; 
-            margin-bottom: 8px; 
-        }
-        
-        .game-desc { 
-            font-size: 14px; 
-            opacity: 0.9; 
-        }
-        
-        .modal { 
-            display: none; 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            right: 0; 
-            bottom: 0; 
-            background: rgba(0,0,0,0.9); 
-            z-index: 3000; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 20px;
-            backdrop-filter: blur(5px);
-        }
-        
-        .modal.active { 
-            display: flex;
-            animation: fade 0.3s;
-        }
-        
-        .modal-content { 
-            background: linear-gradient(135deg, #0a0e27, #1a1f3a); 
-            border: 2px solid #0066ff; 
-            border-radius: 25px; 
-            padding: 30px; 
-            max-width: 600px; 
-            width: 100%; 
-            max-height: 90vh; 
-            overflow-y: auto;
-            animation: slideUp 0.3s;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-        }
-        
-        .modal-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 25px; 
-        }
-        
-        .modal-close { 
-            background: none; 
-            border: none; 
-            color: white; 
-            font-size: 32px; 
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .modal-close:hover {
-            transform: rotate(90deg);
-            color: #ff6600;
-        }
-        
-        .upload-box { 
-            background: linear-gradient(135deg, rgba(0,204,102,0.2), rgba(0,255,136,0.2)); 
-            border: 3px dashed #00cc66; 
-            border-radius: 20px; 
-            padding: 40px; 
-            margin: 20px 0; 
-            text-align: center; 
-            cursor: pointer; 
-            transition: all 0.3s;
-        }
-        
-        .upload-box:hover { 
-            background: linear-gradient(135deg, rgba(0,204,102,0.3), rgba(0,255,136,0.3));
-            transform: scale(1.02);
-            border-color: #00ff88;
-        }
-        
-        .player-card {
-            margin: 20px 0;
-            border-radius: 30px;
-            overflow: hidden;
-            display: none;
-            background: linear-gradient(135deg, rgba(0,102,255,0.2), rgba(255,102,0,0.2));
-            border: 2px solid rgba(0,102,255,0.5);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            animation: slideUp 0.5s ease;
-            backdrop-filter: blur(10px);
-        }
-        
+
+        .stats { display: flex; justify-content: space-around; padding: 15px; background: rgba(0,0,0,0.4); flex-wrap: wrap; gap: 10px; backdrop-filter: blur(10px); }
+        .stat { background: linear-gradient(135deg, rgba(0,102,255,0.3), rgba(255,102,0,0.3)); border: 2px solid rgba(0,102,255,0.5); padding: 12px 18px; border-radius: 15px; text-align: center; transition: all 0.3s; flex: 1; min-width: 80px; }
+        .stat:hover { transform: translateY(-3px); box-shadow: 0 5px 20px rgba(0,102,255,0.4); }
+        .stat-value { font-size: 24px; font-weight: bold; color: #00d4ff; text-shadow: 0 0 10px rgba(0,212,255,0.5); }
+        .stat-label { font-size: 11px; opacity: 0.9; margin-top: 3px; }
+
+        .nav { display: flex; justify-content: center; gap: 10px; padding: 15px; background: rgba(10,14,39,0.95); flex-wrap: wrap; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .btn { padding: 12px 24px; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 14px; background: linear-gradient(135deg, #0066ff, #0099ff); color: white; transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,102,255,0.3); min-height: 44px; }
+        .btn:hover, .btn:active { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,102,255,0.5); }
+        .btn-orange { background: linear-gradient(135deg, #ff6600, #ff8c00); box-shadow: 0 4px 15px rgba(255,102,0,0.3); }
+
+        .section { display: none; padding: 20px; animation: fade 0.3s; }
+        .section.active { display: block; }
+        @keyframes fade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .track { background: rgba(10,14,39,0.7); border: 2px solid rgba(0,102,255,0.3); border-radius: 15px; padding: 15px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; gap: 15px; transition: all 0.3s; backdrop-filter: blur(5px); min-height: 44px; }
+        .track:hover, .track:active { border-color: #ff6600; transform: translateX(5px) scale(1.02); box-shadow: 0 5px 20px rgba(255,102,0,0.3); }
+        .track.playing { border-color: #ff6600; background: rgba(255,102,0,0.2); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{box-shadow:0 0 10px rgba(255,102,0,0.3);} 50%{box-shadow:0 0 30px rgba(255,102,0,0.6);} }
+        .track-cover { width: 60px; height: 60px; background: linear-gradient(135deg, #0066ff, #ff6600); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; box-shadow: 0 4px 15px rgba(0,102,255,0.3); }
+        .track-info { flex: 1; }
+        .track-title { font-weight: bold; margin-bottom: 3px; font-size: 15px; }
+        .track-artist { font-size: 13px; opacity: 0.8; }
+
+        .player-container { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, rgba(0,102,255,0.98), rgba(255,102,0,0.98)); padding: 20px; z-index: 1000; display: none; backdrop-filter: blur(20px); box-shadow: 0 -4px 20px rgba(0,0,0,0.3); }
+        .player-container.active { display: block; animation: slideUp 0.3s; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .player-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; }
+        .player-title { font-weight: bold; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%; }
+        .player-artist { font-size: 13px; opacity: 0.9; }
+        .player-controls { display: flex; gap: 15px; justify-content: center; }
+        .ctrl { width: 50px; height: 50px; border: none; border-radius: 50%; background: rgba(255,255,255,0.2); color: white; cursor: pointer; font-size: 22px; transition: all 0.3s; }
+        .ctrl:hover, .ctrl:active { transform: scale(1.1); background: rgba(255,255,255,0.3); }
+        .ctrl.play { width: 60px; height: 60px; background: white; color: #0066ff; font-size: 28px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .ctrl.close { background: rgba(255,0,0,0.3); font-size: 18px; }
+        audio { width: 100%; border-radius: 10px; filter: brightness(1.2); height: 40px; }
+
+        .notif { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: linear-gradient(135deg, #0066ff, #ff6600); padding: 15px 30px; border-radius: 30px; transition: all 0.3s; z-index: 3000; pointer-events: none; box-shadow: 0 4px 20px rgba(0,0,0,0.3); font-weight: bold; font-size: 15px; max-width: 90%; text-align: center; }
+        .notif.show { transform: translateX(-50%) translateY(0); animation: bounce 0.5s; }
+        @keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0);} 50%{transform:translateX(-50%) translateY(-10px);} }
+
+        .planet { background: linear-gradient(135deg, rgba(0,102,255,0.2), rgba(255,102,0,0.2)); border: 2px solid rgba(0,102,255,0.4); border-radius: 20px; padding: 20px; margin-bottom: 15px; cursor: pointer; transition: all 0.3s; backdrop-filter: blur(5px); }
+        .planet:hover, .planet:active { transform: translateY(-5px) scale(1.02); border-color: #ff6600; box-shadow: 0 10px 30px rgba(255,102,0,0.3); }
+        .planet-header { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+        .planet-icon { font-size: 45px; animation: float 3s infinite ease-in-out; }
+        .planet-title { font-size: 22px; font-weight: bold; }
+        .planet-content { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .planet-content.active { display: block; animation: fade 0.3s; }
+
+        .info-box { background: linear-gradient(135deg, rgba(0,102,255,0.3), rgba(255,102,0,0.3)); border: 2px solid rgba(0,102,255,0.5); border-radius: 15px; padding: 20px; margin-bottom: 20px; text-align: center; backdrop-filter: blur(10px); font-size: 15px; }
+
+        .search-box { background: rgba(10,14,39,0.7); border: 2px solid rgba(0,102,255,0.3); border-radius: 20px; padding: 20px; margin-bottom: 20px; backdrop-filter: blur(10px); }
+        .search-input { width: 100%; padding: 18px; border: 2px solid rgba(0,102,255,0.3); border-radius: 35px; background: rgba(0,0,0,0.4); color: white; font-size: 16px; outline: none; margin-bottom: 15px; text-align: center; transition: all 0.3s; min-height: 44px; }
+        .search-input:focus { border-color: #ff6600; box-shadow: 0 0 20px rgba(255,102,0,0.3); }
+        .btn-search { width: 100%; padding: 18px; border: none; border-radius: 35px; background: linear-gradient(135deg, #0066ff, #ff6600); color: white; font-size: 16px; cursor: pointer; font-weight: bold; transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,102,255,0.3); min-height: 44px; }
+        .btn-search:hover, .btn-search:active { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,102,255,0.5); }
+
+        .chat-box { background: rgba(10,14,39,0.7); border: 2px solid rgba(0,102,255,0.3); border-radius: 20px; padding: 15px; height: 400px; overflow-y: auto; margin-bottom: 15px; backdrop-filter: blur(10px); }
+        .message { margin-bottom: 12px; padding: 12px 16px; border-radius: 18px; max-width: 85%; animation: fade 0.3s; word-wrap: break-word; font-size: 15px; }
+        .message.bot { background: rgba(0,102,255,0.2); border-left: 4px solid #0066ff; }
+        .message.user { background: rgba(255,102,0,0.2); border-right: 4px solid #ff6600; margin-left: auto; text-align: right; }
+        .chat-input { display: flex; gap: 10px; }
+        .chat-input input { flex: 1; padding: 15px; border: 2px solid rgba(0,102,255,0.3); border-radius: 30px; background: rgba(10,14,39,0.7); color: white; outline: none; transition: all 0.3s; min-height: 44px; font-size: 15px; }
+        .chat-input input:focus { border-color: #ff6600; }
+        .chat-input button { padding: 15px 30px; border: none; border-radius: 30px; background: linear-gradient(135deg, #0066ff, #ff6600); color: white; cursor: pointer; font-weight: bold; transition: all 0.3s; min-height: 44px; }
+        .chat-input button:hover, .chat-input button:active { transform: scale(1.05); }
+
+        .game-card { background: linear-gradient(135deg, rgba(0,102,255,0.2), rgba(255,102,0,0.2)); border: 2px solid rgba(0,102,255,0.4); border-radius: 20px; padding: 25px; margin-bottom: 15px; text-align: center; cursor: pointer; transition: all 0.3s; backdrop-filter: blur(5px); }
+        .game-card:hover, .game-card:active { transform: translateY(-8px) scale(1.03); border-color: #ff6600; box-shadow: 0 15px 40px rgba(255,102,0,0.3); }
+        .game-icon { font-size: 55px; margin-bottom: 15px; animation: float 3s infinite ease-in-out; }
+        .game-title { font-size: 20px; font-weight: bold; margin-bottom: 8px; }
+        .game-desc { font-size: 14px; opacity: 0.9; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
+        .modal.active { display: flex; animation: fade 0.3s; }
+        .modal-content { background: linear-gradient(135deg, #0a0e27, #1a1f3a); border: 2px solid #0066ff; border-radius: 25px; padding: 30px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .modal-close { background: none; border: none; color: white; font-size: 32px; cursor: pointer; transition: all 0.3s; }
+        .modal-close:hover, .modal-close:active { transform: rotate(90deg); color: #ff6600; }
+
+        .upload-box { background: linear-gradient(135deg, rgba(0,204,102,0.2), rgba(0,255,136,0.2)); border: 3px dashed #00cc66; border-radius: 20px; padding: 40px; margin: 20px 0; text-align: center; cursor: pointer; transition: all 0.3s; }
+        .upload-box:hover, .upload-box:active { background: linear-gradient(135deg, rgba(0,204,102,0.3), rgba(0,255,136,0.3)); transform: scale(1.02); border-color: #00ff88; }
+
+        .player-card { margin: 20px 0; border-radius: 30px; overflow: hidden; display: none; background: linear-gradient(135deg, rgba(0,102,255,0.2), rgba(255,102,0,0.2)); border: 2px solid rgba(0,102,255,0.5); box-shadow: 0 20px 60px rgba(0,0,0,0.5); animation: slideUp 0.5s ease; backdrop-filter: blur(10px); }
         .player-card.active { display: block; }
-        
-        .player-card-header {
-            background: linear-gradient(135deg, #0066ff, #ff6600);
-            padding: 35px;
-            text-align: center;
-        }
-        
-        .player-card-header h3 { 
-            font-size: 26px; 
-            margin-bottom: 10px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-        
-        .player-card-header p { 
-            opacity: 0.95; 
-            font-size: 16px; 
-        }
-        
-        .player-card-body { 
-            padding: 40px 30px; 
-            text-align: center; 
-        }
-        
-        .music-icon { 
-            font-size: 90px; 
-            margin-bottom: 25px;
-            animation: pulse 2s infinite;
-        }
-        
-        .open-btn {
-            display: inline-block;
-            padding: 20px 55px;
-            background: linear-gradient(135deg, #0066ff, #ff6600);
-            color: white;
-            text-decoration: none;
-            border-radius: 35px;
-            font-weight: bold;
-            font-size: 17px;
-            transition: all 0.3s;
-            box-shadow: 0 5px 25px rgba(0,102,255,0.4);
-            border: none;
-            cursor: pointer;
-        }
-        
-        .open-btn:hover { 
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 10px 35px rgba(0,102,255,0.6);
-        }
-        
-        .features { 
-            margin-top: 35px; 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
-            gap: 20px; 
-        }
-        
-        .feature { 
-            background: rgba(255,255,255,0.1); 
-            padding: 20px; 
-            border-radius: 20px; 
-            font-size: 14px;
-            backdrop-filter: blur(5px);
-            transition: all 0.3s;
-        }
-        
-        .feature:hover {
-            transform: translateY(-3px);
-            background: rgba(255,255,255,0.15);
-        }
-        
-        .feature-icon { 
-            font-size: 28px; 
-            margin-bottom: 10px; 
-        }
-        
-        .integration-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #fc3f1d, #ff6b4a);
-            color: white;
-            padding: 10px 25px;
-            border-radius: 25px;
-            font-size: 13px;
-            margin-top: 20px;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(252,63,29,0.3);
-        }
-        
-        .challenge-card {
-            background: linear-gradient(135deg, rgba(0,102,255,0.3), rgba(255,102,0,0.3));
-            border: 2px solid rgba(0,102,255,0.5);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            backdrop-filter: blur(5px);
-        }
-        
-        .challenge-card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 8px 25px rgba(0,102,255,0.4);
-        }
-        
-        .challenge-title { 
-            font-size: 20px; 
-            font-weight: bold; 
-            margin-bottom: 12px; 
-        }
-        
-        .challenge-desc { 
-            opacity: 0.9; 
-            margin-bottom: 15px; 
-            font-size: 15px; 
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 15px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 12px;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #0066ff, #ff6600);
-            border-radius: 10px;
-            transition: width 0.8s ease;
-            box-shadow: 0 0 10px rgba(0,102,255,0.5);
-        }
-        
-        .reward-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #ffd700, #ffaa00);
-            color: #000;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 14px;
-            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
-        }
-        
-        .hint-box {
-            background: linear-gradient(135deg, rgba(255,165,0,0.2), rgba(255,102,0,0.2));
-            border: 2px solid rgba(255,165,0,0.5);
-            border-radius: 15px;
-            padding: 18px;
-            margin: 18px 0;
-            text-align: center;
-            backdrop-filter: blur(5px);
-        }
-        
-        .difficulty-selector {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-        
-        .diff-btn {
-            padding: 12px 25px;
-            border: 2px solid rgba(0,102,255,0.5);
-            background: rgba(0,102,255,0.2);
-            color: white;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        
-        .diff-btn.active { 
-            background: #ff6600; 
-            border-color: #ff6600;
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(255,102,0,0.4);
-        }
-        
-        .ai-typing {
-            display: inline-block;
-            padding: 5px 12px;
-            background: rgba(0,102,255,0.2);
-            border-radius: 15px;
-            font-size: 13px;
-        }
-        
-        .typing-dots::after {
-            content: '...';
-            animation: dots 1.5s infinite;
-        }
-        
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60%, 100% { content: '...'; }
-        }
-        
-        .achievement {
-            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,165,0,0.2));
-            border: 2px solid rgba(255,215,0,0.5);
-            border-radius: 15px;
-            padding: 15px;
-            margin: 8px 0;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: all 0.3s;
-            backdrop-filter: blur(5px);
-        }
-        
-        .achievement:hover {
-            transform: translateX(5px);
-        }
-        
-        .achievement.unlocked { 
-            background: linear-gradient(135deg, rgba(255,215,0,0.4), rgba(255,165,0,0.4));
-            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
-        }
-        
-        .achievement-icon { 
-            font-size: 35px; 
-        }
-        
-        .back-btn {
-            margin-top: 25px;
-            padding: 15px 35px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
-            border: 2px solid rgba(255,255,255,0.5);
-            color: white;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 15px;
-            transition: all 0.3s;
-            width: 100%;
-        }
-        
-        .back-btn:hover {
-            background: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.2));
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(255,255,255,0.2);
-        }
-        
-        .auth-box {
-            background: linear-gradient(135deg, rgba(0,102,255,0.2), rgba(255,102,0,0.2));
-            border: 2px solid rgba(0,102,255,0.4);
-            border-radius: 20px;
-            padding: 30px;
-            margin: 20px 0;
-            text-align: center;
-            backdrop-filter: blur(10px);
-        }
-        
-        .auth-btn {
-            padding: 15px 40px;
-            background: linear-gradient(135deg, #0066ff, #ff6600);
-            border: none;
-            border-radius: 30px;
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 10px;
-            transition: all 0.3s;
-        }
-        
-        .auth-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,102,255,0.4);
-        }
-        
-        .user-info {
-            background: rgba(0,102,255,0.2);
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .user-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #0066ff, #ff6600);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-        
-        .install-pwa {
-            position: fixed;
-            bottom: 100px;
-            right: 20px;
-            background: linear-gradient(135deg, #0066ff, #ff6600);
-            padding: 15px 25px;
-            border-radius: 30px;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            display: none;
-            z-index: 999;
-            animation: bounce 2s infinite;
-        }
-        
-        .install-pwa.show {
-            display: block;
-        }
-        
+        .player-card-header { background: linear-gradient(135deg, #0066ff, #ff6600); padding: 35px; text-align: center; }
+        .player-card-header h3 { font-size: 26px; margin-bottom: 10px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .player-card-header p { opacity: 0.95; font-size: 16px; }
+        .player-card-body { padding: 40px 30px; text-align: center; }
+        .music-icon { font-size: 90px; margin-bottom: 25px; animation: pulse 2s infinite; }
+        .open-btn { display: inline-block; padding: 20px 55px; background: linear-gradient(135deg, #0066ff, #ff6600); color: white; text-decoration: none; border-radius: 35px; font-weight: bold; font-size: 17px; transition: all 0.3s; box-shadow: 0 5px 25px rgba(0,102,255,0.4); border: none; cursor: pointer; min-height: 44px; }
+        .open-btn:hover, .open-btn:active { transform: translateY(-5px) scale(1.05); box-shadow: 0 10px 35px rgba(0,102,255,0.6); }
+        .features { margin-top: 35px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; }
+        .feature { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 20px; font-size: 14px; backdrop-filter: blur(5px); transition: all 0.3s; }
+        .feature:hover { transform: translateY(-3px); background: rgba(255,255,255,0.15); }
+        .feature-icon { font-size: 28px; margin-bottom: 10px; }
+        .integration-badge { display: inline-block; background: linear-gradient(135deg, #fc3f1d, #ff6b4a); color: white; padding: 10px 25px; border-radius: 25px; font-size: 13px; margin-top: 20px; font-weight: bold; box-shadow: 0 4px 15px rgba(252,63,29,0.3); }
+
+        .challenge-card { background: linear-gradient(135deg, rgba(0,102,255,0.3), rgba(255,102,0,0.3)); border: 2px solid rgba(0,102,255,0.5); border-radius: 20px; padding: 25px; margin-bottom: 15px; cursor: pointer; transition: all 0.3s; backdrop-filter: blur(5px); }
+        .challenge-card:hover, .challenge-card:active { transform: scale(1.02); box-shadow: 0 8px 25px rgba(0,102,255,0.4); }
+        .challenge-title { font-size: 20px; font-weight: bold; margin-bottom: 12px; }
+        .challenge-desc { opacity: 0.9; margin-bottom: 15px; font-size: 15px; }
+        .progress-bar { width: 100%; height: 15px; background: rgba(0,0,0,0.3); border-radius: 10px; overflow: hidden; margin-bottom: 12px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #0066ff, #ff6600); border-radius: 10px; transition: width 0.8s ease; box-shadow: 0 0 10px rgba(0,102,255,0.5); }
+        .reward-badge { display: inline-block; background: linear-gradient(135deg, #ffd700, #ffaa00); color: #000; padding: 8px 20px; border-radius: 20px; font-weight: bold; font-size: 14px; box-shadow: 0 4px 15px rgba(255,215,0,0.3); }
+        .hint-box { background: linear-gradient(135deg, rgba(255,165,0,0.2), rgba(255,102,0,0.2)); border: 2px solid rgba(255,165,0,0.5); border-radius: 15px; padding: 18px; margin: 18px 0; text-align: center; backdrop-filter: blur(5px); font-size: 15px; }
+        .difficulty-selector { display: flex; gap: 12px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .diff-btn { padding: 12px 25px; border: 2px solid rgba(0,102,255,0.5); background: rgba(0,102,255,0.2); color: white; border-radius: 25px; cursor: pointer; font-weight: bold; transition: all 0.3s; min-height: 44px; }
+        .diff-btn.active { background: #ff6600; border-color: #ff6600; transform: scale(1.05); box-shadow: 0 4px 15px rgba(255,102,0,0.4); }
+        .ai-typing { display: inline-block; padding: 5px 12px; background: rgba(0,102,255,0.2); border-radius: 15px; font-size: 13px; }
+        .typing-dots::after { content: '...'; animation: dots 1.5s infinite; }
+        @keyframes dots { 0%,20%{content:'.';} 40%{content:'..';} 60%,100%{content:'...';} }
+        .achievement { background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,165,0,0.2)); border: 2px solid rgba(255,215,0,0.5); border-radius: 15px; padding: 15px; margin: 8px 0; display: flex; align-items: center; gap: 15px; transition: all 0.3s; backdrop-filter: blur(5px); }
+        .achievement:hover { transform: translateX(5px); }
+        .achievement.unlocked { background: linear-gradient(135deg, rgba(255,215,0,0.4), rgba(255,165,0,0.4)); box-shadow: 0 4px 15px rgba(255,215,0,0.3); }
+        .achievement-icon { font-size: 35px; }
+        .back-btn { margin-top: 25px; padding: 15px 35px; background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1)); border: 2px solid rgba(255,255,255,0.5); color: white; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 15px; transition: all 0.3s; width: 100%; min-height: 44px; }
+        .back-btn:hover, .back-btn:active { background: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.2)); transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,255,255,0.2); }
+
+        .auth-box { background: linear-gradient(135deg, rgba(0,102,255,0.2), rgba(255,102,0,0.2)); border: 2px solid rgba(0,102,255,0.4); border-radius: 20px; padding: 30px; margin: 20px 0; text-align: center; backdrop-filter: blur(10px); }
+        .auth-btn { padding: 15px 40px; background: linear-gradient(135deg, #0066ff, #ff6600); border: none; border-radius: 30px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; margin: 10px; transition: all 0.3s; min-height: 44px; }
+        .auth-btn:hover, .auth-btn:active { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,102,255,0.4); }
+
+        /* МОБИЛЬНАЯ АДАПТАЦИЯ */
         @media (max-width: 768px) {
-            .header h1 { font-size: 24px; }
+            .header h1 { font-size: 26px; }
             .stat-value { font-size: 20px; }
             .game-icon { font-size: 45px; }
             .music-icon { font-size: 70px; }
-            .planet-icon { font-size: 35px; }
+            .planet-icon { font-size: 36px; }
+            .track-cover { width: 50px; height: 50px; font-size: 22px; }
+            .ctrl { width: 44px; height: 44px; font-size: 20px; }
+            .ctrl.play { width: 54px; height: 54px; font-size: 26px; }
+            .modal-content { padding: 20px; max-height: 85vh; }
+            .chat-box { height: 300px; }
+            .player-info { flex-direction: column; align-items: flex-start; gap: 5px; }
+            .player-title { max-width: 100%; }
+        }
+
+        @media (max-width: 480px) {
+            .nav { gap: 6px; padding: 10px 8px; }
+            .btn { padding: 10px 16px; font-size: 13px; }
+            .stats { padding: 10px 8px; }
+            .stat { padding: 10px 12px; }
+            .search-input, .btn-search, .chat-input input, .chat-input button, .back-btn, .open-btn, .diff-btn { font-size: 15px; padding: 14px; }
+            .section { padding: 15px 12px; }
         }
     </style>
 </head>
 <body>
-    <!-- КОСМИЧЕСКИЙ ФОН -->
     <div class="space-bg" id="space-bg"></div>
-    
+
     <div class="header">
         <h1>🌌 SoundScape Pro</h1>
-        <p style="position:relative; z-index:1;">Музыка • Игры • AI • PWA</p>
+        <p style="position:relative; z-index:1; font-size:15px;">Музыка • Игры • AI • PWA</p>
     </div>
-    
+
     <div class="stats">
         <div class="stat"><div class="stat-value" id="xp">0</div><div class="stat-label">⭐ XP</div></div>
         <div class="stat"><div class="stat-value" id="level">1</div><div class="stat-label">📊 Уровень</div></div>
         <div class="stat"><div class="stat-value" id="tracks-count">12</div><div class="stat-label">🎵 Треков</div></div>
         <div class="stat"><div class="stat-value" id="played">0</div><div class="stat-label">🎧 Сыграно</div></div>
     </div>
-    
+
     <div class="nav">
         <button class="btn" onclick="showSection('planets')">🪐 Планеты</button>
         <button class="btn btn-orange" onclick="showSection('search')">🔍 Поиск</button>
@@ -1026,8 +217,8 @@
     <!-- АВТОРИЗАЦИЯ -->
     <div id="auth" class="section">
         <div class="auth-box">
-            <h2 style="margin-bottom:20px;">🔐 Вход в SoundScape Pro</h2>
-            <p style="margin-bottom:25px; opacity:0.9;">Войди чтобы синхронизировать прогресс между устройствами!</p>
+            <h2 style="margin-bottom:20px; font-size:24px;">🔐 Вход в SoundScape Pro</h2>
+            <p style="margin-bottom:25px; opacity:0.9; font-size:15px;">Войди чтобы синхронизировать прогресс между устройствами!</p>
             <button class="auth-btn" onclick="loginWithGoogle()">🔵 Войти через Google</button>
             <button class="auth-btn" onclick="loginAnonymously()">👤 Войти как гость</button>
         </div>
@@ -1061,7 +252,7 @@
             <input type="text" class="search-input" id="query" placeholder="Введи название трека..." onkeypress="if(event.key==='Enter')searchAndPlay()">
             <button class="btn-search" onclick="searchAndPlay()">🔍 Найти</button>
         </div>
-        
+
         <div id="player-card" class="player-card">
             <div class="player-card-header">
                 <h3>🎵 Сейчас играет</h3>
@@ -1096,7 +287,7 @@
         <div class="upload-box" onclick="document.getElementById('file-input').click()">
             <div style="font-size:55px;">📁</div>
             <h3>Добавить свой MP3</h3>
-            <p style="opacity:0.8; margin-top:10px;">Нажми чтобы выбрать файл</p>
+            <p style="opacity:0.8; margin-top:10px; font-size:15px;">Нажми чтобы выбрать файл</p>
             <input type="file" id="file-input" accept="audio/*" style="display:none" onchange="handleFile(event)">
         </div>
     </div>
@@ -1104,25 +295,25 @@
     <!-- ИГРЫ -->
     <div id="games" class="section">
         <h2 style="margin-bottom:25px; text-align:center; font-size:28px;">🎮 Игры и Челленджи</h2>
-        
+
         <div class="game-card" onclick="startGuessGame()">
             <div class="game-icon">🎵</div>
             <div class="game-title">Угадай трек</div>
             <div class="game-desc">3 уровня сложности • +50/100/200 XP</div>
         </div>
-        
+
         <div class="game-card" onclick="startChallengeMenu()">
             <div class="game-icon">🏆</div>
             <div class="game-title">Челленджи</div>
             <div class="game-desc">Ежедневные задания • до +500 XP</div>
         </div>
-        
+
         <div class="game-card" onclick="showAchievements()">
             <div class="game-icon">🏅</div>
             <div class="game-title">Достижения</div>
             <div class="game-desc">Собери все награды!</div>
         </div>
-        
+
         <button class="back-btn" onclick="showSection('planets')" style="width:100%;">← Вернуться назад</button>
     </div>
 
@@ -1140,9 +331,12 @@
 
     <!-- ПЛЕЕР -->
     <div class="player-container" id="player-container">
-        <audio id="audio" controls></audio>
+        <audio id="audio" playsinline webkit-playsinline preload="metadata"></audio>
         <div class="player-info">
-            <div><div class="player-title" id="p-title">Название</div><div class="player-artist" id="p-artist">Исполнитель</div></div>
+            <div>
+                <div class="player-title" id="p-title">Название</div>
+                <div class="player-artist" id="p-artist">Исполнитель</div>
+            </div>
             <div class="player-controls">
                 <button class="ctrl" onclick="prev()">⏮</button>
                 <button class="ctrl play" id="play-btn" onclick="toggle()">▶</button>
@@ -1164,16 +358,10 @@
         </div>
     </div>
 
-    <!-- PWA INSTALL -->
-    <div class="install-pwa" id="install-pwa" onclick="installPWA()">
-        📱 Установить приложение
-    </div>
-
     <div class="notif" id="notif"></div>
 
     <script>
-        // ==================== FIREBASE CONFIG ====================
-        // ЗАМЕНИ НА СВОЙ КОНФИГ ИЗ FIREBASE CONSOLE
+        // FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
             authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -1183,7 +371,6 @@
             appId: "YOUR_APP_ID"
         };
 
-        // Инициализация Firebase
         let db, auth, currentUser;
         let isFirebaseReady = false;
 
@@ -1197,11 +384,9 @@
             console.log('⚠️ Firebase не настроен (работает локальный режим)');
         }
 
-        // ==================== КОСМИЧЕСКАЯ АНИМАЦИЯ ====================
+        // КОСМИЧЕСКАЯ АНИМАЦИЯ
         function createSpaceAnimation() {
             const bg = document.getElementById('space-bg');
-            
-            // Звезды
             for(let i = 0; i < 150; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
@@ -1212,8 +397,6 @@
                 star.style.animationDelay = Math.random() * 3 + 's';
                 bg.appendChild(star);
             }
-            
-            // Кометы
             for(let i = 0; i < 8; i++) {
                 const comet = document.createElement('div');
                 comet.className = 'comet';
@@ -1221,9 +404,7 @@
                 comet.style.animationDelay = Math.random() * 10 + 's';
                 bg.appendChild(comet);
             }
-            
-            // Космические корабли
-            const ships = ['🚀', '🛸', '️', '🌠'];
+            const ships = ['', '🛸', '️', '🌠'];
             for(let i = 0; i < 5; i++) {
                 const ship = document.createElement('div');
                 ship.className = 'spaceship';
@@ -1233,8 +414,6 @@
                 ship.style.animationDuration = (20 + Math.random() * 15) + 's';
                 bg.appendChild(ship);
             }
-            
-            // Туманности
             for(let i = 0; i < 3; i++) {
                 const nebula = document.createElement('div');
                 nebula.className = 'nebula';
@@ -1244,10 +423,9 @@
                 bg.appendChild(nebula);
             }
         }
-        
         createSpaceAnimation();
 
-        // ==================== ДАННЫЕ ====================
+        // ДАННЫЕ
         const libraryTracks = [
             {id:'2', title:'Ty ne bojjsya nochi', artist:'ENZRO', url:'https://cdn.jsdelivr.net/gh/melnikovvitalij02-hub/Soundscape2@main/ENZRO_-_Ty_ne_bojjsya_nochi_81423717.mp3'},
             {id:'3', title:'A krasivykh zhenshhin mnogo', artist:'Igor Malinin', url:'https://cdn.jsdelivr.net/gh/melnikovvitalij02-hub/Soundscape2@main/Igor_Malinin_-_A_krasivykh_zhenshhin_mnogo_81681758.mp3'},
@@ -1264,22 +442,10 @@
         ];
 
         const planetTracks = {
-            rock: [
-                {title:'Rock Energy 1', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'},
-                {title:'Rock Energy 2', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'}
-            ],
-            hiphop: [
-                {title:'Hip Hop Beat 1', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'},
-                {title:'Hip Hop Beat 2', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'}
-            ],
-            electronic: [
-                {title:'Electronic 1', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3'},
-                {title:'Electronic 2', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3'}
-            ],
-            pop: [
-                {title:'Pop Melody 1', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3'},
-                {title:'Pop Melody 2', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3'}
-            ]
+            rock: [{title:'Rock Energy 1', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'}, {title:'Rock Energy 2', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'}],
+            hiphop: [{title:'Hip Hop Beat 1', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'}, {title:'Hip Hop Beat 2', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'}],
+            electronic: [{title:'Electronic 1', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3'}, {title:'Electronic 2', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3'}],
+            pop: [{title:'Pop Melody 1', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3'}, {title:'Pop Melody 2', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3'}]
         };
 
         let library = [...libraryTracks];
@@ -1299,43 +465,41 @@
         let hintsUsed = 0;
         let challengeStartTime = 0;
 
-        // ==================== AI ОТВЕТЫ ====================
         const aiResponses = {
-            привет: ['Привет! 🌌 Рад тебя видеть!', 'Здравствуй! 🎵 Готов помочь?', 'Приветик! ✨ Как настроение?'],
+            привет: ['Привет! 🌌 Рад тебя видеть!', 'Здравствуй!  Готов помочь?', 'Приветик! ✨ Как настроение?'],
             как: ['Отлично! 🎶 А у тебя?', 'Работаю на полную! 🔋', 'Прекрасно! 🎵'],
             рекоменд: ['Попробуй планету Рок! 🎸', 'Советую Artik & Asti! 🔥', 'Попробуй ROKER — Begi! 🎧'],
-            планет: ['4 планеты: Рок 🎸, Хип-Хоп 🎤, Электроника 🎧, Поп ⭐', 'Открывай все планеты! 🎁'],
-            факт: ['🎵 Музыка активирует те же зоны мозга что и еда!', '🎸 Самая длинная песня длится 639 лет!', '🎧 Музыка выделяет дофамин!'],
+            планет: ['4 планеты: Рок 🎸, Хип-Хоп 🎤, Электроника , Поп ⭐', 'Открывай все планеты! 🎁'],
+            факт: ['🎵 Музыка активирует те же зоны мозга что и еда!', '🎸 Самая длинная песня длится 639 лет!', ' Музыка выделяет дофамин!'],
             шутк: ['😄 Почему музыканты не играют в прятки? Их найдут по звуку!', '🎵 Что сказал бас барабану? "Ты задаёшь ритм!"'],
-            спасибо: ['Пожалуйста! 🌟', 'Не за что! 🎵', 'Рад помочь! ✨'],
+            спасибо: ['Пожалуйста! 🌟', 'Не за что! ', 'Рад помочь! ✨'],
             грустн: ['Не грусти! 🎵 Послушай весёлую музыку!', 'Всё будет хорошо! 🌟'],
-            игр: ['У нас крутые игры! 🎮 Попробуй "Угадай трек"!', 'Челленджи дают до +500 XP! 🏆'],
+            игр: ['У нас крутые игры!  Попробуй "Угадай трек"!', 'Челленджи дают до +500 XP! 🏆'],
             музык: ['Музыка — язык души! 🎶', 'Я обожаю музыку! 🎵 А ты?'],
-            help: ['Я могу: 🎵 рекомендовать, 🎮 играть, 💬 болтать!', 'Спроси о музыке, фактах или играх! 🌟']
+            help: ['Я могу:  рекомендовать, 🎮 играть,  болтать!', 'Спроси о музыке, фактах или играх! 🌟']
         };
 
-        // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+        // ИНИЦИАЛИЗАЦИЯ
         window.addEventListener('load', () => {
             checkAuth();
             loadUserData();
+            const audio = document.getElementById('audio');
             audio.addEventListener('ended', next);
             audio.addEventListener('play', () => { isPlaying = true; document.getElementById('play-btn').textContent = '⏸'; });
             audio.addEventListener('pause', () => { isPlaying = false; document.getElementById('play-btn').textContent = '▶'; });
-            audio.addEventListener('error', (e) => show('⚠️ Ошибка загрузки'));
+            audio.addEventListener('error', () => show('⚠️ Ошибка загрузки. Попробуй другой трек.'));
             updateStats();
             renderLibrary();
             checkAchievements();
             show('🌌 SoundScape Pro готов!');
-            setupPWA();
         });
 
-        // ==================== FIREBASE AUTH ====================
+        // FIREBASE AUTH
         function checkAuth() {
             if(!isFirebaseReady) {
                 showSection('planets');
                 return;
             }
-            
             auth.onAuthStateChanged(user => {
                 if(user) {
                     currentUser = user;
@@ -1349,19 +513,13 @@
         }
 
         function loginWithGoogle() {
-            if(!isFirebaseReady) {
-                show('⚠️ Firebase не настроен');
-                return;
-            }
+            if(!isFirebaseReady) { show('⚠️ Firebase не настроен'); return; }
             const provider = new firebase.auth.GoogleAuthProvider();
             auth.signInWithPopup(provider).catch(err => show('❌ ' + err.message));
         }
 
         function loginAnonymously() {
-            if(!isFirebaseReady) {
-                show('⚠️ Firebase не настроен');
-                return;
-            }
+            if(!isFirebaseReady) { show('⚠️ Firebase не настроен'); return; }
             auth.signInAnonymously().catch(err => show('❌ ' + err.message));
         }
 
@@ -1370,10 +528,8 @@
             auth.signOut().then(() => show('👋 До встречи!'));
         }
 
-        // ==================== СОХРАНЕНИЕ ДАННЫХ ====================
         async function loadUserDataFromFirebase() {
             if(!currentUser || !isFirebaseReady) return;
-            
             try {
                 const doc = await db.collection('users').doc(currentUser.uid).get();
                 if(doc.exists) {
@@ -1397,7 +553,6 @@
 
         async function saveUserDataToFirebase() {
             if(!currentUser || !isFirebaseReady) return;
-            
             try {
                 await db.collection('users').doc(currentUser.uid).set({
                     xp, played, openedPlanets, achievements, completedChallenges, messagesCount, hardWins,
@@ -1409,7 +564,6 @@
         }
 
         function loadUserData() {
-            // Загрузка из localStorage (резервный вариант)
             xp = parseInt(localStorage.getItem('ss_xp') || '0');
             played = parseInt(localStorage.getItem('ss_played') || '0');
             openedPlanets = JSON.parse(localStorage.getItem('ss_planets') || '[]');
@@ -1419,14 +573,14 @@
             hardWins = parseInt(localStorage.getItem('ss_hard_wins') || '0');
         }
 
-        // ==================== НАВИГАЦИЯ ====================
+        // НАВИГАЦИЯ
         function showSection(id) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             if(id === 'library') renderLibrary();
         }
 
-        // ==================== ПЛАНЕТЫ ====================
+        // ПЛАНЕТЫ
         function togglePlanet(id) {
             const content = document.getElementById(id + '-content');
             if(!openedPlanets.includes(id)) {
@@ -1436,7 +590,7 @@
                 localStorage.setItem('ss_xp', xp);
                 saveUserDataToFirebase();
                 updateStats();
-                show('🎁 +10 XP за открытие планеты!');
+                show(' +10 XP за открытие планеты!');
                 checkAchievements();
             }
             content.classList.toggle('active');
@@ -1453,13 +607,23 @@
             `).join('');
         }
 
-        // ==================== ПЛЕЕР ====================
+        // ПЛЕЕР
         function playTrack(track) {
+            const audio = document.getElementById('audio');
             try {
                 currentTrack = { ...track, type: 'mp3' };
                 audio.src = track.url;
                 audio.load();
-                audio.play().catch(err => show('⚠️ Ошибка'));
+
+                // МОБИЛЬНЫЙ ФИКС
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.warn('Autoplay blocked:', error);
+                        show('👆 Нажми ▶ чтобы воспроизвести');
+                    });
+                }
+
                 document.getElementById('p-title').textContent = track.title;
                 document.getElementById('p-artist').textContent = track.artist;
                 document.getElementById('player-container').classList.add('active');
@@ -1471,7 +635,10 @@
                 renderLibrary();
                 show('🎵 ' + track.title);
                 checkAchievements();
-            } catch(e) { show('⚠️ Ошибка'); }
+            } catch(e) {
+                show('⚠️ Ошибка воспроизведения');
+                console.error(e);
+            }
         }
 
         function renderLibrary() {
@@ -1515,23 +682,19 @@
             event.target.value = '';
         }
 
-        // ==================== ПОИСК ====================
+        // ПОИСК
         function searchAndPlay() {
             const query = document.getElementById('query').value.trim();
             if(!query) { show('⚠️ Введи название'); return; }
-            
             const card = document.getElementById('player-card');
             const trackName = document.getElementById('track-name');
             const openBtn = document.getElementById('open-music-btn');
             const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query + ' official audio')}`;
-            
             openBtn.href = youtubeUrl;
             trackName.textContent = `"${query}"`;
             card.classList.add('active');
             card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            
             setTimeout(() => window.open(youtubeUrl, '_blank'), 1500);
-            
             played++; xp += 2;
             localStorage.setItem('ss_played', played);
             localStorage.setItem('ss_xp', xp);
@@ -1541,24 +704,38 @@
             checkAchievements();
         }
 
-        // ==================== УПРАВЛЕНИЕ ПЛЕЕРОМ ====================
-        function toggle() { if(!currentTrack) return; if(isPlaying) audio.pause(); else audio.play(); }
+        // УПРАВЛЕНИЕ
+        function toggle() {
+            const audio = document.getElementById('audio');
+            if(!currentTrack) return;
+            if(isPlaying) audio.pause();
+            else {
+                const p = audio.play();
+                if(p) p.catch(() => show('👆 Нажми ещё раз'));
+            }
+        }
         function prev() { if(library.length === 0) return; currentIndex = (currentIndex - 1 + library.length) % library.length; playLibraryTrack(currentIndex); }
         function next() { if(library.length === 0) return; currentIndex = (currentIndex + 1) % library.length; playLibraryTrack(currentIndex); }
-        function closePlayer() { audio.pause(); currentTrack = null; isPlaying = false; document.getElementById('player-container').classList.remove('active'); document.getElementById('play-btn').textContent = '▶'; }
+        function closePlayer() {
+            document.getElementById('audio').pause();
+            currentTrack = null;
+            isPlaying = false;
+            document.getElementById('player-container').classList.remove('active');
+            document.getElementById('play-btn').textContent = '▶';
+        }
 
-        // ==================== ИГРА "УГАДАЙ ТРЕК" ====================
+        // ИГРА "УГАДАЙ ТРЕК"
         function startGuessGame() {
             if(library.length === 0) { show('⚠️ Нет треков'); return; }
             document.getElementById('modal-title').textContent = '🎵 Угадай трек';
             document.getElementById('modal-body').innerHTML = `
-                <p style="margin-bottom:15px; text-align:center;">Выбери сложность:</p>
+                <p style="margin-bottom:15px; text-align:center; font-size:16px;">Выбери сложность:</p>
                 <div class="difficulty-selector">
                     <div class="diff-btn active" onclick="setDifficulty('easy', this)">🟢 Легко<br><small>+50 XP</small></div>
                     <div class="diff-btn" onclick="setDifficulty('medium', this)">🟡 Средне<br><small>+100 XP</small></div>
                     <div class="diff-btn" onclick="setDifficulty('hard', this)">🔴 Сложно<br><small>+200 XP</small></div>
                 </div>
-                <button class="btn btn-orange" onclick="startGuessRound()" style="width:100%; padding:15px;">🎮 Начать игру</button>
+                <button class="btn btn-orange" onclick="startGuessRound()" style="width:100%; padding:15px; font-size:16px;">🎮 Начать игру</button>
             `;
             document.getElementById('game-modal').classList.add('active');
         }
@@ -1573,22 +750,19 @@
             quizTrack = library[Math.floor(Math.random() * library.length)];
             hintsUsed = 0;
             challengeStartTime = Date.now();
-            
             let hintContent = '';
-            if(currentDifficulty === 'easy') hintContent = `<p style="margin-bottom:15px; text-align:center;">Исполнитель: <strong>${quizTrack.artist}</strong></p>`;
-            else if(currentDifficulty === 'medium') {
-                const firstLetter = quizTrack.artist[0];
-                hintContent = `<p style="margin-bottom:15px; text-align:center;">Исполнитель начинается на: <strong>${firstLetter}...</strong></p>`;
-            } else hintContent = `<p style="margin-bottom:15px; text-align:center;">Угадай без подсказок! 🎯</p>`;
-            
+            if(currentDifficulty === 'easy') hintContent = `<p style="margin-bottom:15px; text-align:center; font-size:16px;">Исполнитель: <strong>${quizTrack.artist}</strong></p>`;
+            else if(currentDifficulty === 'medium') hintContent = `<p style="margin-bottom:15px; text-align:center; font-size:16px;">Исполнитель начинается на: <strong>${quizTrack.artist[0]}...</strong></p>`;
+            else hintContent = `<p style="margin-bottom:15px; text-align:center; font-size:16px;">Угадай без подсказок! 🎯</p>`;
+
             document.getElementById('modal-title').textContent = '🎵 Угадай трек';
             document.getElementById('modal-body').innerHTML = `
                 ${hintContent}
                 <div class="hint-box" id="hint-area" style="display:none;"></div>
-                <button class="btn" onclick="playQuizTrack()" style="width:100%;margin-bottom:10px;">▶️ Послушать фрагмент</button>
-                ${currentDifficulty !== 'hard' ? `<button class="btn" onclick="showHint()" style="width:100%;margin-bottom:10px; background:linear-gradient(135deg,#ffaa00,#ff6600);">💡 Подсказка (-20 XP)</button>` : ''}
+                <button class="btn" onclick="playQuizTrack()" style="width:100%;margin-bottom:10px; font-size:16px;">▶️ Послушать фрагмент</button>
+                ${currentDifficulty !== 'hard' ? `<button class="btn" onclick="showHint()" style="width:100%;margin-bottom:10px; background:linear-gradient(135deg,#ffaa00,#ff6600); font-size:16px;">💡 Подсказка (-20 XP)</button>` : ''}
                 <input type="text" id="quiz-answer" class="search-input" placeholder="Название трека..." style="margin-bottom:10px;">
-                <button class="btn btn-orange" onclick="checkGuess()" style="width:100%;">Проверить</button>
+                <button class="btn btn-orange" onclick="checkGuess()" style="width:100%; font-size:16px;">Проверить</button>
             `;
         }
 
@@ -1601,14 +775,10 @@
             hintsUsed++;
             const hintArea = document.getElementById('hint-area');
             hintArea.style.display = 'block';
-            
             if(hintsUsed === 1) {
-                const firstLetter = quizTrack.title[0];
-                const length = quizTrack.title.length;
-                hintArea.innerHTML = `💡 Первая буква: <strong>${firstLetter}</strong>, длина: <strong>${length} символов</strong>`;
+                hintArea.innerHTML = ` Первая буква: <strong>${quizTrack.title[0]}</strong>, длина: <strong>${quizTrack.title.length} символов</strong>`;
             } else {
-                const words = quizTrack.title.split(' ');
-                hintArea.innerHTML = `💡 Первое слово: <strong>${words[0]}</strong>`;
+                hintArea.innerHTML = ` Первое слово: <strong>${quizTrack.title.split(' ')[0]}</strong>`;
             }
         }
 
@@ -1616,109 +786,71 @@
             const ans = document.getElementById('quiz-answer').value.toLowerCase().trim();
             const correctTitle = quizTrack.title.toLowerCase();
             const timeSpent = (Date.now() - challengeStartTime) / 1000;
-            
             let isCorrect = false;
             if(ans.length >= 4) {
                 let matchCount = 0;
-                for(let i = 0; i < Math.min(ans.length, correctTitle.length); i++) {
-                    if(ans[i] === correctTitle[i]) matchCount++;
-                }
+                for(let i = 0; i < Math.min(ans.length, correctTitle.length); i++) if(ans[i] === correctTitle[i]) matchCount++;
                 isCorrect = matchCount / correctTitle.length >= 0.7 || correctTitle.includes(ans) || ans.includes(correctTitle.substring(0, Math.min(6, correctTitle.length)));
             }
-            
             let reward = currentDifficulty === 'easy' ? 50 : currentDifficulty === 'medium' ? 100 : 200;
             let penalty = hintsUsed * 20;
             let finalReward = Math.max(10, reward - penalty);
-            
-            if(timeSpent < 15 && isCorrect) {
-                finalReward += 30;
-                show('⚡ Бонус за скорость! +30 XP');
-            }
-            
+            if(timeSpent < 15 && isCorrect) { finalReward += 30; show('⚡ Бонус за скорость! +30 XP'); }
+
             if(isCorrect) {
                 xp += finalReward;
                 localStorage.setItem('ss_xp', xp);
-                if(currentDifficulty === 'hard') {
-                    hardWins++;
-                    localStorage.setItem('ss_hard_wins', hardWins);
-                }
+                if(currentDifficulty === 'hard') { hardWins++; localStorage.setItem('ss_hard_wins', hardWins); }
                 saveUserDataToFirebase();
                 updateStats();
                 document.getElementById('modal-body').innerHTML = `
                     <div style="text-align:center;">
                         <div style="font-size:80px; margin-bottom:20px;">✅</div>
-                        <h2 style="margin-bottom:10px;">Правильно!</h2>
-                        <p style="margin-bottom:10px;">Трек: <strong>${quizTrack.title}</strong></p>
-                        <p style="margin-bottom:20px;">Исполнитель: <strong>${quizTrack.artist}</strong></p>
+                        <h2 style="margin-bottom:10px; font-size:22px;">Правильно!</h2>
+                        <p style="margin-bottom:10px; font-size:16px;">Трек: <strong>${quizTrack.title}</strong></p>
+                        <p style="margin-bottom:20px; opacity:0.8; font-size:15px;">Исполнитель: <strong>${quizTrack.artist}</strong></p>
                         <div class="reward-badge">+${finalReward} XP</div>
-                        ${hintsUsed > 0 ? `<p style="margin-top:10px; opacity:0.7;">Подсказок: ${hintsUsed}</p>` : ''}
-                        <button class="btn btn-orange" onclick="startGuessRound()" style="width:100%;margin-top:20px;">🎮 Ещё раунд</button>
-                        <button class="btn" onclick="closeModal()" style="width:100%;margin-top:10px;">Закрыть</button>
+                        ${hintsUsed > 0 ? `<p style="margin-top:10px; opacity:0.7; font-size:14px;">Подсказок: ${hintsUsed}</p>` : ''}
+                        <button class="btn btn-orange" onclick="startGuessRound()" style="width:100%;margin-top:20px; font-size:16px;">🎮 Ещё раунд</button>
+                        <button class="btn" onclick="closeModal()" style="width:100%;margin-top:10px; font-size:16px;">Закрыть</button>
                     </div>
                 `;
             } else {
                 document.getElementById('modal-body').innerHTML = `
                     <div style="text-align:center;">
                         <div style="font-size:80px; margin-bottom:20px;">❌</div>
-                        <h2 style="margin-bottom:10px;">Не угадал!</h2>
-                        <p style="margin-bottom:10px;">Правильный ответ:</p>
-                        <p style="margin-bottom:5px;"><strong>${quizTrack.title}</strong></p>
-                        <p style="margin-bottom:20px; opacity:0.7;">${quizTrack.artist}</p>
-                        <button class="btn btn-orange" onclick="startGuessRound()" style="width:100%;margin-bottom:10px;">🎮 Попробовать снова</button>
-                        <button class="btn" onclick="closeModal()" style="width:100%;">Закрыть</button>
+                        <h2 style="margin-bottom:10px; font-size:22px;">Не угадал!</h2>
+                        <p style="margin-bottom:10px; font-size:16px;">Правильный ответ:</p>
+                        <p style="margin-bottom:5px; font-weight:bold; font-size:17px;">${quizTrack.title}</p>
+                        <p style="margin-bottom:20px; opacity:0.7; font-size:15px;">${quizTrack.artist}</p>
+                        <button class="btn btn-orange" onclick="startGuessRound()" style="width:100%;margin-bottom:10px; font-size:16px;"> Попробовать снова</button>
+                        <button class="btn" onclick="closeModal()" style="width:100%; font-size:16px;">Закрыть</button>
                     </div>
                 `;
             }
             checkAchievements();
         }
 
-        // ==================== ЧЕЛЛЕНДЖИ ====================
+        // ЧЕЛЛЕНДЖИ
         function startChallengeMenu() {
             document.getElementById('modal-title').textContent = '🏆 Челленджи';
             document.getElementById('modal-body').innerHTML = `
-                <p style="margin-bottom:20px; text-align:center;">Выбери челлендж:</p>
-                
-                <div class="challenge-card">
-                    <div class="challenge-title">🎧 Меломан</div>
-                    <div class="challenge-desc">Прослушай 5 треков</div>
-                    <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100, (played/5)*100)}%"></div></div>
-                    <div style="display:flex; justify-content:space-between;"><span>${Math.min(5, played)}/5</span><span class="reward-badge">+100 XP</span></div>
-                </div>
-                
-                <div class="challenge-card">
-                    <div class="challenge-title">🪐 Исследователь</div>
-                    <div class="challenge-desc">Открой все 4 планеты</div>
-                    <div class="progress-bar"><div class="progress-fill" style="width:${(openedPlanets.length/4)*100}%"></div></div>
-                    <div style="display:flex; justify-content:space-between;"><span>${openedPlanets.length}/4</span><span class="reward-badge">+150 XP</span></div>
-                </div>
-                
-                <div class="challenge-card">
-                    <div class="challenge-title">💬 Собеседник</div>
-                    <div class="challenge-desc">Напиши 5 сообщений AI</div>
-                    <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100, (messagesCount/5)*100)}%"></div></div>
-                    <div style="display:flex; justify-content:space-between;"><span>${Math.min(5, messagesCount)}/5</span><span class="reward-badge">+75 XP</span></div>
-                </div>
-                
-                <div class="challenge-card">
-                    <div class="challenge-title">🎯 Мастер</div>
-                    <div class="challenge-desc">3 победы на сложном</div>
-                    <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100, (hardWins/3)*100)}%"></div></div>
-                    <div style="display:flex; justify-content:space-between;"><span>${Math.min(3, hardWins)}/3</span><span class="reward-badge">+500 XP</span></div>
-                </div>
-                
-                <button class="btn" onclick="claimRewards()" style="width:100%; margin-top:15px; padding:15px;">🎁 Забрать награды</button>
+                <p style="margin-bottom:20px; text-align:center; font-size:16px;">Выбери челлендж:</p>
+                <div class="challenge-card"><div class="challenge-title"> Меломан</div><div class="challenge-desc">Прослушай 5 треков</div><div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100, (played/5)*100)}%"></div></div><div style="display:flex; justify-content:space-between;"><span>${Math.min(5, played)}/5</span><span class="reward-badge">+100 XP</span></div></div>
+                <div class="challenge-card"><div class="challenge-title">🪐 Исследователь</div><div class="challenge-desc">Открой все 4 планеты</div><div class="progress-bar"><div class="progress-fill" style="width:${(openedPlanets.length/4)*100}%"></div></div><div style="display:flex; justify-content:space-between;"><span>${openedPlanets.length}/4</span><span class="reward-badge">+150 XP</span></div></div>
+                <div class="challenge-card"><div class="challenge-title">💬 Собеседник</div><div class="challenge-desc">Напиши 5 сообщений AI</div><div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100, (messagesCount/5)*100)}%"></div></div><div style="display:flex; justify-content:space-between;"><span>${Math.min(5, messagesCount)}/5</span><span class="reward-badge">+75 XP</span></div></div>
+                <div class="challenge-card"><div class="challenge-title">🎯 Мастер</div><div class="challenge-desc">3 победы на сложном</div><div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100, (hardWins/3)*100)}%"></div></div><div style="display:flex; justify-content:space-between;"><span>${Math.min(3, hardWins)}/3</span><span class="reward-badge">+500 XP</span></div></div>
+                <button class="btn" onclick="claimRewards()" style="width:100%; margin-top:15px; padding:15px; font-size:16px;">🎁 Забрать награды</button>
             `;
             document.getElementById('game-modal').classList.add('active');
         }
 
         function claimRewards() {
             let totalReward = 0;
-            
             if(played >= 5 && !completedChallenges.includes('meloman')) { totalReward += 100; completedChallenges.push('meloman'); }
             if(openedPlanets.length >= 4 && !completedChallenges.includes('explorer')) { totalReward += 150; completedChallenges.push('explorer'); }
             if(messagesCount >= 5 && !completedChallenges.includes('chatter')) { totalReward += 75; completedChallenges.push('chatter'); }
             if(hardWins >= 3 && !completedChallenges.includes('master')) { totalReward += 500; completedChallenges.push('master'); }
-            
             if(totalReward > 0) {
                 xp += totalReward;
                 localStorage.setItem('ss_xp', xp);
@@ -1727,17 +859,15 @@
                 updateStats();
                 show(`🎁 Получено ${totalReward} XP!`);
                 checkAchievements();
-            } else {
-                show('⚠️ Сначала выполни задания!');
-            }
+            } else show('⚠️ Сначала выполни задания!');
             startChallengeMenu();
         }
 
-        // ==================== ДОСТИЖЕНИЯ ====================
+        // ДОСТИЖЕНИЯ
         function showAchievements() {
             const allAchievements = [
                 {id: 'first_play', icon: '🎵', title: 'Первый трек', desc: 'Прослушай первый трек', unlocked: played >= 1},
-                {id: 'meloman', icon: '🎧', title: 'Меломан', desc: 'Прослушай 5 треков', unlocked: played >= 5},
+                {id: 'meloman', icon: '', title: 'Меломан', desc: 'Прослушай 5 треков', unlocked: played >= 5},
                 {id: 'explorer', icon: '🪐', title: 'Исследователь', desc: 'Открой все планеты', unlocked: openedPlanets.length >= 4},
                 {id: 'level5', icon: '⭐', title: 'Уровень 5', desc: 'Достигни 5 уровня', unlocked: Math.floor(xp/100)+1 >= 5},
                 {id: 'level10', icon: '🌟', title: 'Уровень 10', desc: 'Достигни 10 уровня', unlocked: Math.floor(xp/100)+1 >= 10},
@@ -1745,14 +875,13 @@
                 {id: 'xp500', icon: '🔥', title: 'Огонь', desc: 'Набери 500 XP', unlocked: xp >= 500},
                 {id: 'xp1000', icon: '💎', title: 'Бриллиант', desc: 'Набери 1000 XP', unlocked: xp >= 1000}
             ];
-            
             document.getElementById('modal-title').textContent = '🏅 Достижения';
             document.getElementById('modal-body').innerHTML = `
-                <p style="margin-bottom:15px; text-align:center;">Открыто: ${allAchievements.filter(a => a.unlocked).length}/${allAchievements.length}</p>
+                <p style="margin-bottom:15px; text-align:center; font-size:16px;">Открыто: ${allAchievements.filter(a => a.unlocked).length}/${allAchievements.length}</p>
                 ${allAchievements.map(a => `
                     <div class="achievement ${a.unlocked ? 'unlocked' : ''}">
                         <div class="achievement-icon">${a.icon}</div>
-                        <div style="flex:1;"><div style="font-weight:bold;">${a.title}</div><div style="font-size:12px; opacity:0.7;">${a.desc}</div></div>
+                        <div style="flex:1;"><div style="font-weight:bold; font-size:16px;">${a.title}</div><div style="font-size:13px; opacity:0.7;">${a.desc}</div></div>
                         <div>${a.unlocked ? '✅' : '🔒'}</div>
                     </div>
                 `).join('')}
@@ -1769,7 +898,6 @@
             if(xp >= 100 && !achievements.includes('xp100')) newAchievements.push('xp100');
             if(xp >= 500 && !achievements.includes('xp500')) newAchievements.push('xp500');
             if(xp >= 1000 && !achievements.includes('xp1000')) newAchievements.push('xp1000');
-            
             if(newAchievements.length > 0) {
                 achievements = [...achievements, ...newAchievements];
                 localStorage.setItem('ss_achievements', JSON.stringify(achievements));
@@ -1778,27 +906,24 @@
             }
         }
 
-        // ==================== AI ЧАТ ====================
+        // AI ЧАТ
         function sendMsg() {
             const input = document.getElementById('chat-input');
             const text = input.value.trim();
             if(!text) return;
-            
             const box = document.getElementById('chat-box');
             box.innerHTML += `<div class="message user">${text}</div>`;
             input.value = '';
-            
             const typingId = 'typing-' + Date.now();
             box.innerHTML += `<div class="message bot" id="${typingId}"><span class="ai-typing">🤖 печатает<span class="typing-dots"></span></span></div>`;
             box.scrollTop = box.scrollHeight;
-            
             messagesCount++;
             localStorage.setItem('ss_messages', messagesCount);
             saveUserDataToFirebase();
-            
             setTimeout(() => {
                 const answer = generateSmartAnswer(text.toLowerCase());
-                document.getElementById(typingId).innerHTML = answer;
+                const el = document.getElementById(typingId);
+                if(el) el.innerHTML = answer;
                 box.scrollTop = box.scrollHeight;
                 xp += 1;
                 localStorage.setItem('ss_xp', xp);
@@ -1809,128 +934,34 @@
         }
 
         function generateSmartAnswer(text) {
-            for(let key in aiResponses) {
-                if(text.includes(key)) {
-                    const variants = aiResponses[key];
-                    return variants[Math.floor(Math.random() * variants.length)];
-                }
-            }
-            
-            if(text.includes('какой трек') || text.includes('что послушать')) {
-                const randomTrack = library[Math.floor(Math.random() * library.length)];
-                return `🎵 Советую: <strong>${randomTrack.title}</strong> — ${randomTrack.artist}!`;
-            }
-            
-            if(text.includes('уровень') || text.includes('прогресс')) {
-                return `📊 Твой уровень: ${Math.floor(xp/100)+1}<br>⭐ XP: ${xp}<br>🎧 Треков: ${played}<br>🪐 Планет: ${openedPlanets.length}/4`;
-            }
-            
-            if(text.includes('сколько') && (text.includes('xp') || text.includes('очков'))) {
-                return `⭐ У тебя ${xp} XP! До следующего: ${100 - (xp % 100)} XP 🎯`;
-            }
-            
-            if(text.includes('библиотек')) {
-                return `📚 В библиотеке <strong>${library.length} треков</strong>! 🎵`;
-            }
-            
-            if(text.includes('планет')) {
-                return `🪐 Открыто: ${openedPlanets.length}/4! ${openedPlanets.length < 4 ? 'Открой все! +40 XP' : 'Все открыты! 🎉'}`;
-            }
-            
-            if(text.includes('youtube') || text.includes('ютуб')) {
-                return `🔗 Мы используем YouTube для поиска! Введи трек и слушай полную версию 🎧`;
-            }
-            
-            if(text.includes('прив') && text.length < 10) {
-                return 'Привет! 👋 Чем помочь? Могу порекомендовать музыку или рассказать факт!';
-            }
-            
-            if(text.includes('как дела') || text.includes('как ты')) {
-                return 'Отлично! 🎶 Переслушал всю библиотеку — 12 треков! А ты как?';
-            }
-            
-            if(text.includes('кто ты') || text.includes('что ты')) {
-                return '🤖 Я AI-ассистент SoundScape Pro! Помогаю с музыкой и играми!';
-            }
-            
-            if(text.includes('спасибо') || text.includes('благодар')) {
-                return 'Пожалуйста! 🌟 Рад помочь!';
-            }
-            
-            if(text.includes('пока') || text.includes('до свидания')) {
-                return 'До встречи! 👋 Возвращайся — тут хорошая музыка! 🎵';
-            }
-            
-            if(text.length < 3) {
-                return 'Расскажи подробнее? 🤔 Я могу помочь с музыкой!';
-            }
-            
-            const smartDefaults = [
-                `Интересно! 🤔 Расскажи о музыкальном вкусе?`,
-                `Хм! 🎵 Какой жанр предпочитаешь?`,
-                `Понял! ✨ Посоветовать что-то из библиотеки?`,
-                `Круто! 🌟 У нас 12 треков на любой вкус!`,
-                `Согласен! 🎶 Попробуй ROKER — Begi!`,
-                `О! 😊 В библиотеке 12 треков — выбирай!`,
-                `Понятно! 🎧 Попробуй челленджи — до +500 XP!`,
-                `Хорошо! 🌌 Открывал все 4 планеты?`
-            ];
-            
-            return smartDefaults[Math.floor(Math.random() * smartDefaults.length)];
+            for(let key in aiResponses) if(text.includes(key)) return aiResponses[key][Math.floor(Math.random() * aiResponses[key].length)];
+            if(text.includes('какой трек') || text.includes('что послушать')) return `🎵 Советую: <strong>${library[Math.floor(Math.random()*library.length)].title}</strong>!`;
+            if(text.includes('уровень') || text.includes('прогресс')) return `📊 Уровень: ${Math.floor(xp/100)+1}<br>⭐ XP: ${xp}<br>🎧 Треков: ${played}<br>🪐 Планет: ${openedPlanets.length}/4`;
+            if(text.includes('сколько') && (text.includes('xp') || text.includes('очков'))) return `⭐ У тебя ${xp} XP! До следующего: ${100 - (xp % 100)} XP 🎯`;
+            if(text.includes('библиотек')) return `📚 В библиотеке <strong>${library.length} треков</strong>! `;
+            if(text.includes('планет')) return `🪐 Открыто: ${openedPlanets.length}/4! ${openedPlanets.length < 4 ? 'Открой все! +40 XP' : 'Все открыты! 🎉'}`;
+            if(text.includes('youtube') || text.includes('ютуб')) return `🔗 Мы используем YouTube для поиска! Введи трек и слушай 🎧`;
+            if(text.includes('прив') && text.length < 10) return 'Привет! 👋 Чем помочь?';
+            if(text.includes('как дела') || text.includes('как ты')) return 'Отлично!  А ты как?';
+            if(text.includes('кто ты') || text.includes('что ты')) return '🤖 Я AI-ассистент SoundScape Pro!';
+            if(text.includes('спасибо') || text.includes('благодар')) return 'Пожалуйста! 🌟';
+            if(text.includes('пока') || text.includes('до свидания')) return 'До встречи! 👋';
+            if(text.length < 3) return 'Расскажи подробнее? 🤔';
+            const defaults = [`Интересно! 🤔 Расскажи о вкусе?`, `Хм! 🎵 Какой жанр любишь?`, `Понял! ✨ Посоветовать трек?`, `Круто! 🌟 У нас 12 треков!`, `Согласен!  Попробуй ROKER!`, `О! 😊 В библиотеке 12 треков!`, `Понятно!  Попробуй челленджи!`, `Хорошо! 🌌 Открывал все планеты?`];
+            return defaults[Math.floor(Math.random() * defaults.length)];
         }
 
         function closeModal() { document.getElementById('game-modal').classList.remove('active'); }
-
         function updateStats() {
             document.getElementById('xp').textContent = xp;
             document.getElementById('level').textContent = Math.floor(xp / 100) + 1;
             document.getElementById('played').textContent = played;
         }
-
         function show(text) {
             const n = document.getElementById('notif');
             n.textContent = text;
             n.classList.add('show');
             setTimeout(() => n.classList.remove('show'), 2500);
-        }
-
-        // ==================== PWA ====================
-        let deferredPrompt;
-        
-        function setupPWA() {
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                document.getElementById('install-pwa').classList.add('show');
-            });
-            
-            // Service Worker
-            if('serviceWorker' in navigator) {
-                const swCode = `
-                    self.addEventListener('install', e => {
-                        e.waitUntil(self.skipWaiting());
-                    });
-                    self.addEventListener('activate', e => {
-                        e.waitUntil(self.clients.claim());
-                    });
-                    self.addEventListener('fetch', e => {
-                        e.respondWith(fetch(e.request).catch(() => new Response('Offline')));
-                    });
-                `;
-                const blob = new Blob([swCode], {type: 'application/javascript'});
-                const swUrl = URL.createObjectURL(blob);
-                navigator.serviceWorker.register(swUrl).catch(() => console.log('SW not registered'));
-            }
-        }
-
-        function installPWA() {
-            if(deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then(() => {
-                    document.getElementById('install-pwa').classList.remove('show');
-                    deferredPrompt = null;
-                });
-            }
         }
     </script>
 </body>
