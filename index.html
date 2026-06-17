@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>SoundScape Pro 🌌</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; -webkit-tap-highlight-color:transparent; }
+body { background:linear-gradient(135deg,#0a0e27,#1a1f3a); color:#fff; min-height:100vh; padding-bottom:100px; }
+.space-bg { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; overflow:hidden; }
+.star { position:absolute; background:white; border-radius:50%; animation:twinkle 3s infinite; }
+@keyframes twinkle { 0%,100%{opacity:0.3;} 50%{opacity:1;} }
+.header { background:linear-gradient(135deg,#0066ff,#ff6600); padding:20px; text-align:center; }
+.header h1 { font-size:28px; }
+.stats { display:flex; justify-content:space-around; padding:12px; background:rgba(0,0,0,0.4); flex-wrap:wrap; gap:8px; }
+.stat { background:linear-gradient(135deg,rgba(0,102,255,0.3),rgba(255,102,0,0.3)); border:2px solid rgba(0,102,255,0.5); padding:10px 15px; border-radius:12px; text-align:center; flex:1; min-width:70px; }
+.stat-value { font-size:22px; font-weight:bold; color:#00d4ff; }
+.stat-label { font-size:10px; opacity:0.9; margin-top:2px; }
+.nav { display:flex; justify-content:center; gap:8px; padding:12px; background:rgba(10,14,39,0.95); flex-wrap:wrap; position:sticky; top:0; z-index:100; }
+.btn { padding:10px 18px; border:none; border-radius:20px; cursor:pointer; font-weight:bold; font-size:13px; background:linear-gradient(135deg,#0066ff,#0099ff); color:white; min-height:44px; }
+.btn-orange { background:linear-gradient(135deg,#ff6600,#ff8c00); }
+.section { display:none; padding:15px; }
+.section.active { display:block; }
+.track { background:rgba(10,14,39,0.7); border:2px solid rgba(0,102,255,0.3); border-radius:12px; padding:12px; margin-bottom:8px; cursor:pointer; display:flex; align-items:center; gap:12px; transition:all 0.2s; }
+.track:active { transform:scale(0.98); border-color:#ff6600; }
+.track.playing { border-color:#ff6600; background:rgba(255,102,0,0.2); }
+.track-cover { width:60px; height:60px; min-width:60px; background:linear-gradient(135deg,#0066ff,#ff6600); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:22px; background-size:cover; background-position:center; }
+.track-info { flex:1; min-width:0; }
+.track-title { font-weight:bold; font-size:14px; margin-bottom:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.track-artist { font-size:12px; opacity:0.8; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.track-play-btn { font-size:20px; color:#00d4ff; min-width:30px; text-align:center; }
+.player-container { position:fixed; bottom:0; left:0; right:0; background:linear-gradient(135deg,rgba(0,102,255,0.98),rgba(255,102,0,0.98)); padding:15px; z-index:1000; display:none; }
+.player-container.active { display:block; }
+.player-info { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:10px; }
+.player-title { font-weight:bold; font-size:15px; }
+.player-artist { font-size:12px; opacity:0.9; }
+.player-controls { display:flex; gap:10px; }
+.ctrl { width:44px; height:44px; border:none; border-radius:50%; background:rgba(255,255,255,0.2); color:white; cursor:pointer; font-size:20px; }
+.ctrl.play { width:54px; height:54px; background:white; color:#0066ff; font-size:24px; }
+audio { width:100%; height:40px; border-radius:10px; }
+.notif { position:fixed; top:15px; left:50%; transform:translateX(-50%) translateY(-100px); background:linear-gradient(135deg,#0066ff,#ff6600); padding:12px 24px; border-radius:25px; transition:all 0.3s; z-index:3000; font-weight:bold; font-size:14px; max-width:90%; text-align:center; }
+.notif.show { transform:translateX(-50%) translateY(0); }
+.planet { background:linear-gradient(135deg,rgba(0,102,255,0.2),rgba(255,102,0,0.2)); border:2px solid rgba(0,102,255,0.4); border-radius:15px; padding:15px; margin-bottom:12px; cursor:pointer; }
+.planet-header { display:flex; align-items:center; gap:12px; }
+.planet-icon { font-size:36px; }
+.planet-title { font-size:18px; font-weight:bold; }
+.planet-content { display:none; margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.1); }
+.planet-content.active { display:block; }
+.info-box { background:linear-gradient(135deg,rgba(0,102,255,0.3),rgba(255,102,0,0.3)); border:2px solid rgba(0,102,255,0.5); border-radius:12px; padding:15px; margin-bottom:15px; text-align:center; font-size:14px; }
+.search-box { background:rgba(10,14,39,0.7); border:2px solid rgba(0,102,255,0.3); border-radius:15px; padding:15px; margin-bottom:15px; }
+.search-input { width:100%; padding:14px; border:2px solid rgba(0,102,255,0.3); border-radius:25px; background:rgba(0,0,0,0.4); color:white; font-size:15px; outline:none; margin-bottom:12px; text-align:center; min-height:44px; }
+.btn-search { width:100%; padding:14px; border:none; border-radius:25px; background:linear-gradient(135deg,#0066ff,#ff6600); color:white; font-size:15px; cursor:pointer; font-weight:bold; min-height:44px; margin:5px 0; }
+.chat-box { background:rgba(10,14,39,0.7); border:2px solid rgba(0,102,255,0.3); border-radius:15px; padding:12px; height:300px; overflow-y:auto; margin-bottom:12px; }
+.message { margin-bottom:10px; padding:10px 12px; border-radius:12px; max-width:85%; font-size:14px; }
+.message.bot { background:rgba(0,102,255,0.2); border-left:3px solid #0066ff; }
+.message.user { background:rgba(255,102,0,0.2); border-right:3px solid #ff6600; margin-left:auto; text-align:right; }
+.chat-input { display:flex; gap:8px; }
+.chat-input input { flex:1; padding:12px; border:2px solid rgba(0,102,255,0.3); border-radius:25px; background:rgba(10,14,39,0.7); color:white; outline:none; min-height:44px; font-size:14px; }
+.chat-input button { padding:12px 20px; border:none; border-radius:25px; background:linear-gradient(135deg,#0066ff,#ff6600); color:white; cursor:pointer; font-weight:bold; min-height:44px; }
+.game-card { background:linear-gradient(135deg,rgba(0,102,255,0.2),rgba(255,102,0,0.2)); border:2px solid rgba(0,102,255,0.4); border-radius:15px; padding:20px; margin-bottom:12px; text-align:center; cursor:pointer; }
+.game-card:active { transform:scale(0.97); }
+.game-icon { font-size:45px; margin-bottom:10px; }
+.game-title { font-size:18px; font-weight:bold; margin-bottom:5px; }
+.game-desc { font-size:13px; opacity:0.9; }
+.modal { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.9); z-index:3000; align-items:center; justify-content:center; padding:15px; }
+.modal.active { display:flex; }
+.modal-content { background:linear-gradient(135deg,#0a0e27,#1a1f3a); border:2px solid #0066ff; border-radius:20px; padding:20px; max-width:95%; width:100%; max-height:90vh; overflow-y:auto; }
+.modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; }
+.modal-close { background:none; border:none; color:white; font-size:28px; cursor:pointer; }
+.upload-box { background:linear-gradient(135deg,rgba(0,204,102,0.2),rgba(0,255,136,0.2)); border:3px dashed #00cc66; border-radius:15px; padding:25px; margin:15px 0; text-align:center; cursor:pointer; }
+.chart-track { background:rgba(10,14,39,0.7); border:2px solid rgba(0,102,255,0.3); border-radius:12px; padding:12px; margin-bottom:8px; cursor:pointer; display:flex; align-items:center; gap:12px; }
+.chart-track:active { border-color:#ff6600; }
+.chart-track img { width:60px; height:60px; border-radius:10px; object-fit:cover; }
+.chart-rank { font-size:20px; font-weight:bold; color:#00d4ff; min-width:30px; }
+.loading { text-align:center; padding:30px; opacity:0.7; }
+.auth-box { background:linear-gradient(135deg,rgba(0,102,255,0.2),rgba(255,102,0,0.2)); border:2px solid rgba(0,102,255,0.4); border-radius:20px; padding:25px; margin:20px 0; text-align:center; }
+.auth-input { width:100%; padding:14px; border:2px solid rgba(0,102,255,0.3); border-radius:25px; background:rgba(0,0,0,0.4); color:white; font-size:15px; outline:none; margin-bottom:12px; text-align:center; min-height:44px; }
+.auth-btn { padding:14px 40px; background:linear-gradient(135deg,#0066ff,#ff6600); border:none; border-radius:25px; color:white; font-weight:bold; font-size:15px; cursor:pointer; margin:8px; min-height:44px; width:100%; }
+.user-info { background:rgba(0,102,255,0.2); border-radius:12px; padding:12px; margin-bottom:15px; display:flex; align-items:center; justify-content:space-between; }
+.back-btn { margin-top:15px; padding:12px; background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.5); color:white; border-radius:25px; cursor:pointer; font-weight:bold; font-size:14px; width:100%; min-height:44px; }
+.diff-btn { padding:10px 20px; border:2px solid rgba(0,102,255,0.5); background:rgba(0,102,255,0.2); color:white; border-radius:20px; cursor:pointer; font-weight:bold; min-height:44px; margin:5px; }
+.diff-btn.active { background:#ff6600; border-color:#ff6600; }
+.reward-badge { display:inline-block; background:linear-gradient(135deg,#ffd700,#ffaa00); color:#000; padding:6px 15px; border-radius:15px; font-weight:bold; font-size:13px; }
+.challenge-card { background:linear-gradient(135deg,rgba(0,102,255,0.3),rgba(255,102,0,0.3)); border:2px solid rgba(0,102,255,0.5); border-radius:15px; padding:18px; margin-bottom:12px; }
+.progress-bar { width:100%; height:12px; background:rgba(0,0,0,0.3); border-radius:8px; overflow:hidden; margin-bottom:10px; }
+.progress-fill { height:100%; background:linear-gradient(90deg,#0066ff,#ff6600); border-radius:8px; }
+.achievement { background:linear-gradient(135deg,rgba(255,215,0,0.2),rgba(255,165,0,0.2)); border:2px solid rgba(255,215,0,0.5); border-radius:12px; padding:12px; margin:6px 0; display:flex; align-items:center; gap:12px; }
+.achievement.unlocked { background:linear-gradient(135deg,rgba(255,215,0,0.4),rgba(255,165,0,0.4)); }
+.rhythm-btn { width:100px; height:100px; border-radius:50%; background:linear-gradient(135deg,#0066ff,#ff6600); border:none; color:white; font-size:32px; cursor:pointer; margin:20px auto; display:block; transition:all 0.1s; }
+.rhythm-btn.hit { background:linear-gradient(135deg,#00ff88,#00cc66); }
+.rhythm-btn.miss { background:linear-gradient(135deg,#ff4444,#cc0000); }
+.memory-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; max-width:400px; margin:20px auto; }
+.memory-card { width:100%; aspect-ratio:1; background:linear-gradient(135deg,#0066ff,#ff6600); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:32px; cursor:pointer; transition:all 0.3s; }
+.memory-card.flipped { background:rgba(255,255,255,0.2); }
+.memory-card.matched { background:linear-gradient(135deg,#00ff88,#00cc66); }
+@media (max-width:768px) {
+    .header h1 { font-size:24px; }
+    .stat-value { font-size:18px; }
+    .track-cover { width:50px; height:50px; min-width:50px; }
+}
+</style>
+</head>
+<body>
+<div class="space-bg" id="space-bg"></div>
+
+<div class="header">
+    <h1>🌌 SoundScape Pro</h1>
+    <p>Музыка • Игры • AI • Чарты</p>
+</div>
+
+<div class="stats">
+    <div class="stat"><div class="stat-value" id="xp">0</div><div class="stat-label">⭐ XP</div></div>
+    <div class="stat"><div class="stat-value" id="level">1</div><div class="stat-label">📊 Уровень</div></div>
+    <div class="stat"><div class="stat-value" id="tracks-count">12</div><div class="stat-label">🎵 Треков</div></div>
+    <div class="stat"><div class="stat-value" id="played">0</div><div class="stat-label">🎧 Сыграно</div></div>
+</div>
+
+<div class="nav">
+    <button class="btn" onclick="showSection('planets')">🪐 Планеты</button>
+    <button class="btn btn-orange" onclick="showSection('search')">🔍 Поиск</button>
+    <button class="btn" onclick="showSection('library')">📚 Библиотека</button>
+    <button class="btn" onclick="showSection('charts')">📊 Чарты</button>
+    <button class="btn btn-orange" onclick="showSection('games')">🎮 Игры</button>
+    <button class="btn" onclick="showSection('chat')">🤖 AI</button>
+    <button class="btn" onclick="showSection('profile')" style="background:linear-gradient(135deg,#9333ea,#ec4899);">👤</button>
+</div>
+
+<div id="profile" class="section">
+    <h2 style="margin-bottom:20px; text-align:center; font-size:24px;">👤 Профиль</h2>
+    <div id="auth-screen">
+        <div class="auth-box">
+            <h2 style="margin-bottom:15px; font-size:22px;">🔐 Вход</h2>
+            <input type="text" class="auth-input" id="user-name" placeholder="Имя">
+            <input type="email" class="auth-input" id="user-email" placeholder="Email">
+            <button class="auth-btn" onclick="doLogin()">🚀 Войти</button>
+        </div>
+    </div>
+    <div id="logged-screen" style="display:none;">
+        <div class="user-info">
+            <div>
+                <div style="font-weight:bold;" id="display-name">Имя</div>
+                <div id="display-email">email</div>
+            </div>
+            <button class="btn" onclick="doLogout()" style="background:#ef4444;">Выйти</button>
+        </div>
+    </div>
+</div>
+
+<div id="planets" class="section active">
+    <h2 style="margin-bottom:20px; text-align:center; font-size:24px;">🪐 Музыкальные Планеты</h2>
+    <div class="planet" onclick="togglePlanet('rock')">
+        <div class="planet-header"><div class="planet-icon">🎸</div><div><div class="planet-title">Планета Рок</div></div></div>
+        <div id="rock-content" class="planet-content"></div>
+    </div>
+    <div class="planet" onclick="togglePlanet('hiphop')">
+        <div class="planet-header"><div class="planet-icon">🎤</div><div><div class="planet-title">Планета Хип-Хоп</div></div></div>
+        <div id="hiphop-content" class="planet-content"></div>
+    </div>
+    <div class="planet" onclick="togglePlanet('electronic')">
+        <div class="planet-header"><div class="planet-icon">🎧</div><div><div class="planet-title">Планета Электроника</div></div></div>
+        <div id="electronic-content" class="planet-content"></div>
+    </div>
+    <div class="planet" onclick="togglePlanet('pop')">
+        <div class="planet-header"><div class="planet-icon">⭐</div><div><div class="planet-title">Планета Поп</div></div></div>
+        <div id="pop-content" class="planet-content"></div>
+    </div>
+</div>
+
+<div id="search" class="section">
+    <h2 style="margin-bottom:20px; text-align:center; font-size:24px;">🔍 Поиск музыки</h2>
+    <div class="search-box">
+        <input type="text" class="search-input" id="query" placeholder="Введи артиста или трек..." onkeypress="if(event.key==='Enter')searchMusic()">
+        <button class="btn-search" onclick="searchMusic()">🔍 Найти</button>
+        <button class="btn-search" style="background:#fc3f1d;" onclick="searchYandex()">🎵 Яндекс Музыка</button>
+    </div>
+    <div id="search-results"></div>
+</div>
+
+<div id="library" class="section">
+    <h2 style="margin-bottom:20px; text-align:center; font-size:24px;">📚 Моя библиотека</h2>
+    <div class="info-box">🎵 <strong id="lib-count">12 треков</strong><br><small>Нажми на трек чтобы слушать</small></div>
+    <div id="library-list"></div>
+    <div class="upload-box" onclick="document.getElementById('file-input').click()">
+        <div style="font-size:45px;">📁</div>
+        <h3>Добавить свой MP3</h3>
+        <input type="file" id="file-input" accept="audio/*" style="display:none" onchange="handleFile(event)">
+    </div>
+</div>
+
+<div id="charts" class="section">
+    <h2 style="margin-bottom:20px; text-align:center; font-size:24px;">📊 Онлайн Чарты</h2>
+    <div class="info-box">🔥 <strong>Топ-30 iTunes</strong><br><small>Нажми ▶ чтобы слушать превью</small></div>
+    <div id="charts-list"><div class="loading">🔄 Загрузка чартов...</div></div>
+    <button class="btn" onclick="loadCharts()" style="width:100%; margin-top:15px;">🔄 Обновить</button>
+</div>
+
+<div id="games" class="section">
+    <h2 style="margin-bottom:20px; text-align:center; font-size:24px;">🎮 Игры</h2>
+    <div class="game-card" onclick="startGuessGame()">
+        <div class="game-icon">🎵</div>
+        <div class="game-title">Угадай трек</div>
+        <div class="game-desc">30-сек превью • +50/100/200 XP</div>
+    </div>
+    <div class="game-card" onclick="startRhythmGame()">
+        <div class="game-icon">🎯</div>
+        <div class="game-title">Ритм-игра</div>
+        <div class="game-desc">Нажимай в такт! • +100 XP</div>
+    </div>
+    <div class="game-card" onclick="startMemoryGame()">
+        <div class="game-icon">🧠</div>
+        <div class="game-title">Музыкальная память</div>
+        <div class="game-desc">Найди пары! • +150 XP</div>
+    </div>
+    <div class="game-card" onclick="startChallengeMenu()">
+        <div class="game-icon"></div>
+        <div class="game-title">Челленджи</div>
+        <div class="game-desc">До +500 XP</div>
+    </div>
+    <div class="game-card" onclick="showAchievements()">
+        <div class="game-icon">🏅</div>
+        <div class="game-title">Достижения</div>
+    </div>
+    <button class="back-btn" onclick="showSection('planets')">← Назад</button>
+</div>
+
+<div id="chat" class="section">
+    <h2 style="margin-bottom:20px; text-align:center; font-size:24px;">🤖 AI Ассистент</h2>
+    <div class="chat-box" id="chat-box">
+        <div class="message bot">Привет! Я AI-ассистент SoundScape Pro 🎵</div>
+    </div>
+    <div class="chat-input">
+        <input type="text" id="chat-input" placeholder="Напиши..." onkeypress="if(event.key==='Enter')sendMsg()">
+        <button onclick="sendMsg()">➤</button>
+    </div>
+</div>
+
+<div class="player-container" id="player-container">
+    <audio id="audio" preload="none"></audio>
+    <div class="player-info">
+        <div style="flex:1; min-width:0;">
+            <div class="player-title" id="p-title">Название</div>
+            <div class="player-artist" id="p-artist">Исполнитель</div>
+        </div>
+        <div class="player-controls">
+            <button class="ctrl" onclick="prev()">⏮</button>
+            <button class="ctrl play" id="play-btn" onclick="togglePlay()">▶</button>
+            <button class="ctrl" onclick="next()">⏭</button>
+            <button class="ctrl" onclick="stopPlayback()">⏹</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="game-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modal-title">Игра</h2>
+            <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div id="modal-body"></div>
+    </div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+// Космический фон
+(function(){
+    const bg = document.getElementById('space-bg');
+    for(let i=0;i<100;i++){
+        const s = document.createElement('div');
+        s.className='star';
+        s.style.cssText='width:'+(Math.random()*3)+'px;height:'+(Math.random()*3)+'px;left:'+(Math.random()*100)+'%;top:'+(Math.random()*100)+'%;animation-delay:'+(Math.random()*3)+'s';
+        bg.appendChild(s);
+    }
+})();
+
+// JSONP ЗАПРОС - РАБОТАЕТ НА IPHONE И ANDROID!
+function jsonpRequest(url) {
+    return new Promise((resolve, reject) => {
+        const callbackName = 'jsonp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        const script = document.createElement('script');
+
+        // Создаём глобальную функцию для callback
+        window[callbackName] = (data) => {
+            resolve(data);
+            cleanup();
+        };
+
+        // Добавляем callback параметр к URL
+        const separator = url.includes('?') ? '&' : '?';
+        script.src = url + separator + 'callback=' + callbackName;
+
+        // Обработка ошибок
+        script.onerror = () => {
+            reject(new Error('Network error'));
+            cleanup();
+        };
+
+        // Очистка
+        function cleanup() {
+            delete window[callbackName];
+            if(script.parentNode) script.parentNode.removeChild(script);
+        }
+
+        // Добавляем скрипт на страницу
+        document.head.appendChild(script);
+
+        // Таймаут 15 секунд
+        setTimeout(() => {
+            if(window[callbackName]) {
+                reject(new Error('Timeout'));
+                cleanup();
+            }
+        }, 15000);
+    });
+}
+
+// БИБЛИОТЕКА С ТВОИМИ MP3
+const libraryTracks = [
+    {id:'1', title:'Ty ne bojjsya nochi', artist:'ENZRO', url:'https://cdn.jsdelivr.net/gh/melnikovvitalij02-hub/Soundscape2@main/ENZRO_-_Ty_ne_bojjsya_nochi_81423717.mp3'},
+    {id:'2', title:'A krasivykh zhenshhin mnogo', artist:'Igor Malinin', url:'https://cdn.jsdelivr.net/gh/melnikovvitalij02-hub/Soundscape2@main/Igor_Malinin_-_A_krasivykh_zhenshhin_mnogo_81681758.mp3'},
+    {id:'3', title:'Ona tancuet pod shadje', artist:'Indiya by', url:'https://cdn.jsdelivr.net/gh/melnikovvitalij02-hub/Soundscape2@main/Indiya_by_-_Ona_tancuet_pod_shadje_81415262.mp3'},
+    {id:'4', title:'Have a Nice Day', artist:'Demented Heart', url:'https://rus.hitmoz.org/get/music/20260616/Demented_Heart_-_Have_a_Nice_Day_81707826.mp3'},
+    {id:'5', title:'A labri', artist:'Shym Kmaro', url:'https://rus.hitmoz.org/get/music/20260616/Shym_Kmaro_-_A_labri_81707832.mp3'},
+    {id:'6', title:'i understand it now', artist:'Haiti Babii', url:'https://rus.hitmoz.org/get/music/20260616/Haiti_Babii_-_i_understand_it_now_81707843.mp3'},
+    {id:'7', title:'Begi', artist:'ROKER', url:'https://rus.hitmoz.org/get/music/20260616/ROKER_-_Begi_81707841.mp3'},
+    {id:'8', title:'Devochka tancuj', artist:'Artik & Asti', url:'https://rus.hitmoz.org/get/music/20200207/Artik_Asti_-_Devochka_tancujj_68289048.mp3'},
+    {id:'9', title:'Gde proshla ty', artist:'Kravc, Gio Pika', url:'https://rus.hitmoz.org/get/music/20230331/Kravc_Gio_Pika_-_Gde_proshla_ty_75704918.mp3'},
+    {id:'10', title:'Sedaya noch', artist:'YUrijj SHatunov', url:'https://rus.hitmoz.org/get/music/20171104/YUrijj_SHatunov_-_Sedaya_noch_50310007.mp3'},
+    {id:'11', title:'Orly ili vorony', artist:'Maksim adeev, Grigorijj Leps', url:'https://rus.hitmoz.org/get/music/20190315/Maksim_adeev_Grigorijj_Leps_-_Orly_ili_vorony_62791964.mp3'},
+    {id:'12', title:'Ty znaesh tak khochetsya zhit', artist:'Rozhdestvo', url:'https://rus.hitmoz.org/get/music/20110228/Rozhdestvo_-_Ty_znaesh_tak_khochetsya_zhit_530527.mp3'}
+];
+
+const planetTracks = {
+    rock: [{title:'Rock Energy 1', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'},{title:'Rock Energy 2', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'}],
+    hiphop: [{title:'Hip Hop Beat 1', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'},{title:'Hip Hop Beat 2', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'}],
+    electronic: [{title:'Electronic 1', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3'},{title:'Electronic 2', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3'}],
+    pop: [{title:'Pop Melody 1', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3'},{title:'Pop Melody 2', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3'}]
+};
+
+let library = [...libraryTracks];
+let chartTracks = [];
+let xp = parseInt(localStorage.getItem('ss_xp')||'0');
+let played = parseInt(localStorage.getItem('ss_played')||'0');
+let openedPlanets = JSON.parse(localStorage.getItem('ss_planets')||'[]');
+let achievements = JSON.parse(localStorage.getItem('ss_achievements')||'[]');
+let completedChallenges = JSON.parse(localStorage.getItem('ss_challenges')||'[]');
+let messagesCount = parseInt(localStorage.getItem('ss_messages')||'0');
+let hardWins = parseInt(localStorage.getItem('ss_hard_wins')||'0');
+let currentUser = JSON.parse(localStorage.getItem('ss_user')||'null');
+
+let currentTrack = null;
+let currentIndex = 0;
+let isPlaying = false;
+let quizTrack = null;
+let currentDifficulty = 'easy';
+let hintsUsed = 0;
+let challengeStartTime = 0;
+let rhythmScore = 0;
+let rhythmTime = 10;
+let rhythmInterval = null;
+let rhythmGameActive = false;
+
+const audio = document.getElementById('audio');
+
+function checkAuth() {
+    if(currentUser) {
+        document.getElementById('auth-screen').style.display='none';
+        document.getElementById('logged-screen').style.display='block';
+        document.getElementById('display-name').textContent = currentUser.name;
+        document.getElementById('display-email').textContent = currentUser.email;
+    } else {
+        document.getElementById('auth-screen').style.display='block';
+        document.getElementById('logged-screen').style.display='none';
+    }
+}
+
+function doLogin() {
+    const name = document.getElementById('user-name').value.trim();
+    const email = document.getElementById('user-email').value.trim();
+    if(!name || !email) { show('⚠️ Заполни поля'); return; }
+    currentUser = { name, email };
+    localStorage.setItem('ss_user', JSON.stringify(currentUser));
+    checkAuth();
+    show('🎉 Добро пожаловать, ' + name + '!');
+    xp += 50;
+    localStorage.setItem('ss_xp', xp);
+    updateStats();
+}
+
+function doLogout() {
+    if(confirm('Выйти?')) {
+        currentUser = null;
+        localStorage.removeItem('ss_user');
+        checkAuth();
+    }
+}
+
+function showSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if(id==='library') renderLibrary();
+    if(id==='profile') checkAuth();
+    if(id==='charts' && chartTracks.length===0) loadCharts();
+    window.scrollTo(0,0);
+}
+
+// ПОИСК ЧЕРЕЗ JSONP - РАБОТАЕТ НА IPHONE!
+async function searchMusic() {
+    const query = document.getElementById('query').value.trim();
+    if(!query) { show('⚠️ Введи название'); return; }
+    const results = document.getElementById('search-results');
+    results.innerHTML = '<div class="loading">🔄 Поиск...</div>';
+
+    try {
+        // Используем JSONP для обхода CORS на iOS
+        const url = 'https://itunes.apple.com/search?term=' + encodeURIComponent(query) + '&media=music&limit=20&entity=song';
+        const data = await jsonpRequest(url);
+
+        if(!data || !data.results || data.results.length === 0) {
+            // Если iTunes не нашёл - открываем Яндекс
+            show('🎵 iTunes не нашёл, открываю Яндекс...');
+            setTimeout(() => {
+                window.open('https://music.yandex.ru/search?text=' + encodeURIComponent(query), '_blank');
+            }, 1500);
+            results.innerHTML = '<div class="info-box">😕 iTunes не нашёл результатов. Открываю Яндекс Музыку...</div>';
+            return;
+        }
+
+        chartTracks = data.results.map(r => ({
+            id: 'itunes_'+r.trackId,
+            title: r.trackName || 'Unknown',
+            artist: r.artistName || 'Unknown',
+            url: r.previewUrl || '',
+            artwork: r.artworkUrl100 ? r.artworkUrl100.replace('100x100bb','600x600bb') : '',
+            artworkSmall: r.artworkUrl100 || '',
+            album: r.collectionName || '',
+            genre: r.primaryGenreName || ''
+        }));
+
+        let html = '';
+        chartTracks.forEach((t,i) => {
+            const imgHtml = t.artworkSmall
+                ? '<img src="'+t.artworkSmall+'" alt="'+t.title+'" style="width:60px;height:60px;border-radius:10px;object-fit:cover;">'
+                : '<div style="width:60px;height:60px;background:linear-gradient(135deg,#0066ff,#ff6600);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;"></div>';
+            html += '<div class="chart-track" onclick="loadTrack('+i+')">'+imgHtml+'<div style="flex:1;"><div style="font-weight:bold; font-size:14px;">'+t.title+'</div><div style="font-size:12px; opacity:0.8;">'+t.artist+'</div>'+(t.album?'<div style="font-size:11px; opacity:0.6;">'+t.album+'</div>':'')+'</div><div style="font-size:18px;">▶</div></div>';
+        });
+        results.innerHTML = html;
+        show('🎵 Найдено: '+data.results.length);
+
+    } catch(e) {
+        console.error('Search error:', e);
+        // При ошибке - открываем Яндекс
+        show('⚠️ iTunes недоступен, открываю Яндекс...');
+        setTimeout(() => {
+            window.open('https://music.yandex.ru/search?text=' + encodeURIComponent(query), '_blank');
+        }, 1500);
+        results.innerHTML = '<div class="info-box">⚠️ iTunes временно недоступен. Открываю Яндекс Музыку...</div>';
+    }
+}
+
+function searchYandex() {
+    const query = document.getElementById('query').value.trim();
+    if(!query) { show('⚠️ Введи название'); return; }
+    window.open('https://music.yandex.ru/search?text='+encodeURIComponent(query), '_blank');
+}
+
+// ЧАРТЫ ЧЕРЕЗ JSONP
+async function loadCharts() {
+    const list = document.getElementById('charts-list');
+    list.innerHTML = '<div class="loading">🔄 Загрузка чартов...</div>';
+
+    try {
+        const url = 'https://itunes.apple.com/search?term=top+hits&media=music&limit=30&entity=song';
+        const data = await jsonpRequest(url);
+
+        if(!data || !data.results || data.results.length === 0) {
+            list.innerHTML = '<div class="info-box">️ Чарты временно недоступны</div>';
+            return;
+        }
+
+        chartTracks = data.results.map((r,i) => ({
+            id: 'chart_'+i,
+            title: r.trackName || 'Unknown',
+            artist: r.artistName || 'Unknown',
+            url: r.previewUrl || '',
+            artwork: r.artworkUrl100 ? r.artworkUrl100.replace('100x100bb','600x600bb') : '',
+            album: r.collectionName || '',
+            genre: r.primaryGenreName || ''
+        }));
+
+        let html = '';
+        chartTracks.forEach((t,i) => {
+            const imgHtml = t.artwork
+                ? '<img src="'+t.artwork+'" alt="'+t.title+'" style="width:60px;height:60px;border-radius:10px;object-fit:cover;">'
+                : '<div style="width:60px;height:60px;background:linear-gradient(135deg,#0066ff,#ff6600);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;">🎵</div>';
+            html += '<div class="chart-track" onclick="loadTrack('+i+')"><div class="chart-rank">#'+(i+1)+'</div>'+imgHtml+'<div style="flex:1;"><div style="font-weight:bold; font-size:14px;">'+t.title+'</div><div style="font-size:12px; opacity:0.8;">'+t.artist+'</div></div><div style="font-size:18px;">▶</div></div>';
+        });
+        list.innerHTML = html;
+        show('📊 Чарты загружены! '+chartTracks.length+' треков');
+
+    } catch(e) {
+        console.error('Charts error:', e);
+        list.innerHTML = '<div class="info-box">⚠️ Не удалось загрузить чарты</div>';
+    }
+}
+
+function loadTrack(index) {
+    if(index < 0 || index >= chartTracks.length) return;
+    const track = chartTracks[index];
+    if(!track.url) {
+        show('⚠️ Нет превью для этого трека');
+        return;
+    }
+    loadTrackToPlayer(track);
+}
+
+function togglePlanet(id) {
+    const content = document.getElementById(id+'-content');
+    if(!openedPlanets.includes(id)) {
+        openedPlanets.push(id);
+        localStorage.setItem('ss_planets', JSON.stringify(openedPlanets));
+        xp += 10;
+        localStorage.setItem('ss_xp', xp);
+        updateStats();
+        show(' +10 XP!');
+        checkAchievements();
+    }
+    content.classList.toggle('active');
+    const tracks = planetTracks[id]||[];
+    content.innerHTML = tracks.map((t,i) => '<div class="track" onclick="loadPlanetTrack(\''+id+'\', '+i+')"><div class="track-cover">🎵</div><div class="track-info"><div class="track-title">'+t.title+'</div><div class="track-artist">'+t.artist+'</div></div><div class="track-play-btn">▶</div></div>').join('');
+}
+
+function loadPlanetTrack(planetId, trackIndex) {
+    const tracks = planetTracks[planetId];
+    if(!tracks || trackIndex >= tracks.length) return;
+    loadTrackToPlayer(tracks[trackIndex]);
+}
+
+function loadTrackToPlayer(track) {
+    if(!track || !track.url) {
+        show('⚠️ Ошибка: трек не найден');
+        return;
+    }
+    currentTrack = track;
+    audio.pause();
+    audio.src = track.url;
+    document.getElementById('p-title').textContent = track.title;
+    document.getElementById('p-artist').textContent = track.artist;
+    document.getElementById('player-container').classList.add('active');
+    isPlaying = false;
+    document.getElementById('play-btn').textContent = '▶';
+    show('🎵 '+track.title+' — Нажми ▶');
+    played++; xp += 2;
+    localStorage.setItem('ss_played', played);
+    localStorage.setItem('ss_xp', xp);
+    updateStats();
+    checkAchievements();
+    renderLibrary();
+}
+
+function playLibraryTrack(index) {
+    if(index < 0 || index >= library.length) return;
+    currentIndex = index;
+    loadTrackToPlayer(library[index]);
+}
+
+function renderLibrary() {
+    const list = document.getElementById('library-list');
+    document.getElementById('lib-count').textContent = library.length + ' треков';
+    list.innerHTML = library.map((t,i) => '<div class="track '+(currentTrack && currentTrack.id===t.id?'playing':'')+'" onclick="playLibraryTrack('+i+')"><div class="track-cover">🎵</div><div class="track-info"><div class="track-title">'+t.title+'</div><div class="track-artist">'+t.artist+'</div></div><div class="track-play-btn">'+(currentTrack && currentTrack.id===t.id && isPlaying?'⏸':'▶')+'</div></div>').join('');
+    document.getElementById('tracks-count').textContent = library.length;
+}
+
+function togglePlay() {
+    if(!currentTrack) {
+        show('⚠️ Сначала выбери трек');
+        return;
+    }
+    if(isPlaying) {
+        audio.pause();
+    } else {
+        audio.play().then(() => {
+            show('▶ Играет');
+        }).catch(err => {
+            console.error('Play error:', err);
+            show('⚠️ Ошибка: '+err.message);
+        });
+    }
+}
+
+function stopPlayback() {
+    audio.pause();
+    audio.currentTime = 0;
+    currentTrack = null;
+    isPlaying = false;
+    document.getElementById('player-container').classList.remove('active');
+    document.getElementById('play-btn').textContent = '▶';
+    show('⏹ Остановлено');
+    renderLibrary();
+}
+
+function prev() {
+    if(library.length===0) return;
+    currentIndex = (currentIndex-1+library.length)%library.length;
+    playLibraryTrack(currentIndex);
+}
+
+function next() {
+    if(library.length===0) return;
+    currentIndex = (currentIndex+1)%library.length;
+    playLibraryTrack(currentIndex);
+}
+
+audio.addEventListener('ended', () => {
+    isPlaying = false;
+    document.getElementById('play-btn').textContent = '▶';
+    show('✅ Трек завершён');
+    renderLibrary();
+    next();
+});
+audio.addEventListener('play', () => { isPlaying=true; document.getElementById('play-btn').textContent='⏸'; renderLibrary(); });
+audio.addEventListener('pause', () => { isPlaying=false; document.getElementById('play-btn').textContent='▶'; renderLibrary(); });
+audio.addEventListener('error', (e) => {
+    console.error('Audio error:', e);
+    show('⚠️ Ошибка загрузки трека');
+});
+
+function handleFile(event) {
+    const file = event.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const name = file.name.replace(/\.[^/.]+$/,"");
+        const parts = name.split(' - ');
+        const track = {
+            id: 'user_'+Date.now(),
+            title: parts.length>1 ? parts[1].trim() : name,
+            artist: parts.length>1 ? parts[0].trim() : 'Неизвестный',
+            url: e.target.result
+        };
+        library.push(track);
+        renderLibrary();
+        show('✅ Добавлено: '+track.title);
+    };
+    reader.readAsDataURL(file);
+    event.target.value = '';
+}
+
+function startGuessGame() {
+    if(library.length === 0) {
+        show('⚠️ Нет треков');
+        return;
+    }
+    document.getElementById('modal-title').textContent = '🎵 Угадай трек';
+    document.getElementById('modal-body').innerHTML = '<p style="margin-bottom:12px; text-align:center; font-size:15px;">Выбери сложность:</p><div style="display:flex; justify-content:center; flex-wrap:wrap;"><div class="diff-btn active" onclick="setDifficulty(\'easy\',this)"> Легко<br><small>+50 XP</small></div><div class="diff-btn" onclick="setDifficulty(\'medium\',this)">🟡 Средне<br><small>+100 XP</small></div><div class="diff-btn" onclick="setDifficulty(\'hard\',this)">🔴 Сложно<br><small>+200 XP</small></div></div><button class="btn btn-orange" onclick="startGuessRound()" style="width:100%; padding:12px; font-size:15px; margin-top:15px;"> Начать</button>';
+    document.getElementById('game-modal').classList.add('active');
+}
+
+function setDifficulty(diff, el) {
+    currentDifficulty = diff;
+    document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+}
+
+function startGuessRound() {
+    quizTrack = library[Math.floor(Math.random()*library.length)];
+    hintsUsed = 0;
+    challengeStartTime = Date.now();
+    let hint = '';
+    if(currentDifficulty==='easy') hint = '<p style="margin-bottom:12px; text-align:center;">Исполнитель: <strong>'+quizTrack.artist+'</strong></p>';
+    else if(currentDifficulty==='medium') hint = '<p style="margin-bottom:12px; text-align:center;">Исполнитель: <strong>'+quizTrack.artist[0]+'...</strong></p>';
+    else hint = '<p style="margin-bottom:12px; text-align:center;">Угадай без подсказок! 🎯</p>';
+    document.getElementById('modal-title').textContent = ' Угадай трек';
+    document.getElementById('modal-body').innerHTML = hint+'<button class="btn" onclick="playQuizTrack()" style="width:100%;margin-bottom:8px; font-size:15px;">▶️ Послушать превью</button>'+(currentDifficulty!=='hard'?'<button class="btn" onclick="showHint()" style="width:100%;margin-bottom:8px; background:linear-gradient(135deg,#ffaa00,#ff6600); font-size:15px;">💡 Подсказка (-20 XP)</button>':'')+'<input type="text" id="quiz-answer" class="search-input" placeholder="Название трека..." style="margin-bottom:8px;"><button class="btn btn-orange" onclick="checkGuess()" style="width:100%; font-size:15px;">Проверить</button>';
+}
+
+function playQuizTrack() {
+    if(quizTrack && quizTrack.url) {
+        loadTrackToPlayer(quizTrack);
+        show(' Слушай превью! Нажми ▶');
+    } else {
+        show('⚠️ Нет превью');
+    }
+}
+
+function showHint() {
+    if(hintsUsed>=2) { show('⚠️ Больше нет подсказок'); return; }
+    hintsUsed++;
+    if(hintsUsed===1) show('💡 Первая буква: '+quizTrack.title[0]);
+    else show('💡 Альбом: '+(quizTrack.album||'Неизвестно'));
+}
+
+function checkGuess() {
+    const ans = document.getElementById('quiz-answer').value.toLowerCase().trim();
+    const correct = quizTrack.title.toLowerCase();
+    const time = (Date.now()-challengeStartTime)/1000;
+    let ok = false;
+    if(ans.length>=4) {
+        let m=0;
+        for(let i=0;i<Math.min(ans.length,correct.length);i++) if(ans[i]===correct[i]) m++;
+        ok = m/correct.length>=0.7 || correct.includes(ans) || ans.includes(correct.substring(0,Math.min(6,correct.length)));
+    }
+    let reward = currentDifficulty==='easy'?50:currentDifficulty==='medium'?100:200;
+    let final = Math.max(10, reward - hintsUsed*20);
+    if(time<15 && ok) { final+=30; show('⚡ Бонус за скорость!'); }
+    if(ok) {
+        xp += final;
+        localStorage.setItem('ss_xp', xp);
+        if(currentDifficulty==='hard') { hardWins++; localStorage.setItem('ss_hard_wins', hardWins); }
+        updateStats();
+        document.getElementById('modal-body').innerHTML = '<div style="text-align:center;"><div style="font-size:70px; margin-bottom:15px;">✅</div><h2 style="margin-bottom:8px;">Правильно!</h2><p style="margin-bottom:6px;">Трек: <strong>'+quizTrack.title+'</strong></p><p style="margin-bottom:15px; opacity:0.8;">'+quizTrack.artist+'</p><div class="reward-badge">+'+final+' XP</div><button class="btn btn-orange" onclick="startGuessRound()" style="width:100%;margin-top:15px;">🎮 Ещё раунд</button><button class="btn" onclick="closeModal()" style="width:100%;margin-top:8px;">Закрыть</button></div>';
+    } else {
+        document.getElementById('modal-body').innerHTML = '<div style="text-align:center;"><div style="font-size:70px; margin-bottom:15px;">❌</div><h2 style="margin-bottom:8px;">Не угадал!</h2><p style="margin-bottom:4px; font-weight:bold;">'+quizTrack.title+'</p><p style="margin-bottom:15px; opacity:0.7;">'+quizTrack.artist+'</p><button class="btn btn-orange" onclick="startGuessRound()" style="width:100%;margin-bottom:8px;">🎮 Ещё раз</button><button class="btn" onclick="closeModal()" style="width:100%;">Закрыть</button></div>';
+    }
+    checkAchievements();
+}
+
+function startRhythmGame() {
+    document.getElementById('modal-title').textContent = '🎯 Ритм-игра';
+    document.getElementById('modal-body').innerHTML = '<div style="text-align:center;"><p style="margin-bottom:20px; font-size:16px;">Нажимай кнопку когда круг станет ЗЕЛЁНЫМ!</p><div id="rhythm-score" style="font-size:24px; margin-bottom:20px;">Счёт: 0</div><button class="rhythm-btn" id="rhythm-btn" onclick="hitRhythm()"></button><p id="rhythm-timer" style="font-size:18px;">Время: 10</p><button class="btn btn-orange" onclick="startRhythmRound()" style="margin-top:20px; width:100%;">Начать!</button></div>';
+    document.getElementById('game-modal').classList.add('active');
+}
+
+function startRhythmRound() {
+    rhythmScore = 0;
+    rhythmTime = 10;
+    rhythmGameActive = true;
+    document.getElementById('rhythm-score').textContent = 'Счёт: 0';
+    document.getElementById('rhythm-timer').textContent = 'Время: 10';
+
+    rhythmInterval = setInterval(() => {
+        rhythmTime--;
+        document.getElementById('rhythm-timer').textContent = 'Время: '+rhythmTime;
+        if(rhythmTime <= 0) {
+            clearInterval(rhythmInterval);
+            rhythmGameActive = false;
+            xp += rhythmScore * 10;
+            localStorage.setItem('ss_xp', xp);
+            updateStats();
+            document.getElementById('modal-body').innerHTML = '<div style="text-align:center;"><div style="font-size:70px; margin-bottom:15px;">🏆</div><h2 style="margin-bottom:8px;">Результат: '+rhythmScore+' попаданий!</h2><p style="margin-bottom:15px;">+'+(rhythmScore*10)+' XP</p><button class="btn btn-orange" onclick="startRhythmGame()" style="width:100%;margin-top:15px;">🎮 Ещё раз</button><button class="btn" onclick="closeModal()" style="width:100%;margin-top:8px;">Закрыть</button></div>';
+        }
+    }, 1000);
+
+    changeRhythmColor();
+}
+
+function changeRhythmColor() {
+    if(!rhythmGameActive) return;
+    const btn = document.getElementById('rhythm-btn');
+    btn.className = 'rhythm-btn';
+    setTimeout(() => {
+        if(rhythmGameActive) {
+            btn.className = 'rhythm-btn hit';
+            setTimeout(() => {
+                if(rhythmGameActive) changeRhythmColor();
+            }, 500 + Math.random()*1000);
+        }
+    }, 1000 + Math.random()*2000);
+}
+
+function hitRhythm() {
+    if(!rhythmGameActive) return;
+    const btn = document.getElementById('rhythm-btn');
+    if(btn.classList.contains('hit')) {
+        rhythmScore++;
+        document.getElementById('rhythm-score').textContent = 'Счёт: '+rhythmScore;
+        btn.className = 'rhythm-btn';
+    } else {
+        btn.className = 'rhythm-btn miss';
+        setTimeout(() => btn.className = 'rhythm-btn', 200);
+    }
+}
+
+function startMemoryGame() {
+    document.getElementById('modal-title').textContent = '🧠 Музыкальная память';
+    const emojis = ['🎵','🎸','🎤','🎧','🎹','🎺'];
+    const cards = [...emojis, ...emojis].sort(() => Math.random()-0.5);
+
+    document.getElementById('modal-body').innerHTML = '<div style="text-align:center;"><p style="margin-bottom:20px; font-size:16px;">Найди все пары!</p><div class="memory-grid" id="memory-grid">'+cards.map((emoji,i) => '<div class="memory-card" onclick="flipCard('+i+')" id="card-'+i+'">?</div>').join('')+'</div><p id="memory-moves" style="margin-top:20px; font-size:18px;">Ходы: 0</p></div>';
+    document.getElementById('game-modal').classList.add('active');
+
+    window.memoryCards = cards;
+    window.memoryFlipped = [];
+    window.memoryMatched = 0;
+    window.memoryMoves = 0;
+}
+
+function flipCard(index) {
+    const card = document.getElementById('card-'+index);
+    if(card.classList.contains('flipped') || card.classList.contains('matched')) return;
+    if(window.memoryFlipped.length >= 2) return;
+
+    card.textContent = window.memoryCards[index];
+    card.classList.add('flipped');
+    window.memoryFlipped.push(index);
+
+    if(window.memoryFlipped.length === 2) {
+        window.memoryMoves++;
+        document.getElementById('memory-moves').textContent = 'Ходы: '+window.memoryMoves;
+
+        const [first, second] = window.memoryFlipped;
+        if(window.memoryCards[first] === window.memoryCards[second]) {
+            document.getElementById('card-'+first).classList.add('matched');
+            document.getElementById('card-'+second).classList.add('matched');
+            window.memoryMatched += 2;
+            window.memoryFlipped = [];
+
+            if(window.memoryMatched === window.memoryCards.length) {
+                setTimeout(() => {
+                    xp += 150;
+                    localStorage.setItem('ss_xp', xp);
+                    updateStats();
+                    document.getElementById('modal-body').innerHTML = '<div style="text-align:center;"><div style="font-size:70px; margin-bottom:15px;">🏆</div><h2 style="margin-bottom:8px;">Победа за '+window.memoryMoves+' ходов!</h2><p style="margin-bottom:15px;">+150 XP</p><button class="btn btn-orange" onclick="startMemoryGame()" style="width:100%;margin-top:15px;">🎮 Ещё раз</button><button class="btn" onclick="closeModal()" style="width:100%;margin-top:8px;">Закрыть</button></div>';
+                }, 500);
+            }
+        } else {
+            setTimeout(() => {
+                document.getElementById('card-'+first).textContent = '?';
+                document.getElementById('card-'+first).classList.remove('flipped');
+                document.getElementById('card-'+second).textContent = '?';
+                document.getElementById('card-'+second).classList.remove('flipped');
+                window.memoryFlipped = [];
+            }, 1000);
+        }
+    }
+}
+
+function startChallengeMenu() {
+    document.getElementById('modal-title').textContent = '🏆 Челленджи';
+    document.getElementById('modal-body').innerHTML = '<p style="margin-bottom:15px; text-align:center;">Твои задания:</p><div class="challenge-card"><div class="challenge-title">🎧 Меломан</div><div class="challenge-desc">Прослушай 5 треков</div><div class="progress-bar"><div class="progress-fill" style="width:'+Math.min(100,(played/5)*100)+'%"></div></div><div style="display:flex;justify-content:space-between;"><span>'+Math.min(5,played)+'/5</span><span class="reward-badge">+100 XP</span></div></div><div class="challenge-card"><div class="challenge-title">🪐 Исследователь</div><div class="challenge-desc">Открой все 4 планеты</div><div class="progress-bar"><div class="progress-fill" style="width:'+(openedPlanets.length/4)*100+'%"></div></div><div style="display:flex;justify-content:space-between;"><span>'+openedPlanets.length+'/4</span><span class="reward-badge">+150 XP</span></div></div><div class="challenge-card"><div class="challenge-title">💬 Собеседник</div><div class="challenge-desc">Напиши 5 сообщений AI</div><div class="progress-bar"><div class="progress-fill" style="width:'+Math.min(100,(messagesCount/5)*100)+'%"></div></div><div style="display:flex;justify-content:space-between;"><span>'+Math.min(5,messagesCount)+'/5</span><span class="reward-badge">+75 XP</span></div></div><div class="challenge-card"><div class="challenge-title">🎯 Мастер</div><div class="challenge-desc">3 победы на сложном</div><div class="progress-bar"><div class="progress-fill" style="width:'+Math.min(100,(hardWins/3)*100)+'%"></div></div><div style="display:flex;justify-content:space-between;"><span>'+Math.min(3,hardWins)+'/3</span><span class="reward-badge">+500 XP</span></div></div><button class="btn" onclick="claimRewards()" style="width:100%; margin-top:12px; padding:12px;"> Забрать награды</button>';
+    document.getElementById('game-modal').classList.add('active');
+}
+
+function claimRewards() {
+    let total = 0;
+    if(played>=5 && !completedChallenges.includes('meloman')) { total+=100; completedChallenges.push('meloman'); }
+    if(openedPlanets.length>=4 && !completedChallenges.includes('explorer')) { total+=150; completedChallenges.push('explorer'); }
+    if(messagesCount>=5 && !completedChallenges.includes('chatter')) { total+=75; completedChallenges.push('chatter'); }
+    if(hardWins>=3 && !completedChallenges.includes('master')) { total+=500; completedChallenges.push('master'); }
+    if(total>0) {
+        xp += total;
+        localStorage.setItem('ss_xp', xp);
+        localStorage.setItem('ss_challenges', JSON.stringify(completedChallenges));
+        updateStats();
+        show('🎁 Получено '+total+' XP!');
+        checkAchievements();
+    } else show('⚠️ Сначала выполни задания!');
+    startChallengeMenu();
+}
+
+function showAchievements() {
+    const all = [
+        {icon:'🎵',title:'Первый трек',desc:'Прослушай первый трек',unlocked:played>=1},
+        {icon:'🎧',title:'Меломан',desc:'Прослушай 5 треков',unlocked:played>=5},
+        {icon:'🪐',title:'Исследователь',desc:'Открой все планеты',unlocked:openedPlanets.length>=4},
+        {icon:'⭐',title:'Уровень 5',desc:'Достигни 5 уровня',unlocked:Math.floor(xp/100)+1>=5},
+        {icon:'🌟',title:'Уровень 10',desc:'Достигни 10 уровня',unlocked:Math.floor(xp/100)+1>=10},
+        {icon:'💯',title:'Сотка',desc:'Набери 100 XP',unlocked:xp>=100},
+        {icon:'',title:'Огонь',desc:'Набери 500 XP',unlocked:xp>=500},
+        {icon:'💎',title:'Бриллиант',desc:'Набери 1000 XP',unlocked:xp>=1000}
+    ];
+    document.getElementById('modal-title').textContent = '🏅 Достижения';
+    document.getElementById('modal-body').innerHTML = '<p style="margin-bottom:12px; text-align:center;">Открыто: '+all.filter(a=>a.unlocked).length+'/'+all.length+'</p>'+all.map(a=>'<div class="achievement '+(a.unlocked?'unlocked':'')+'"><div style="font-size:28px;">'+a.icon+'</div><div style="flex:1;"><div style="font-weight:bold;">'+a.title+'</div><div style="font-size:12px; opacity:0.7;">'+a.desc+'</div></div><div>'+(a.unlocked?'✅':'🔒')+'</div></div>').join('');
+    document.getElementById('game-modal').classList.add('active');
+}
+
+function checkAchievements() {
+    const newAch = [];
+    if(played>=1 && !achievements.includes('first_play')) newAch.push('first_play');
+    if(played>=5 && !achievements.includes('meloman')) newAch.push('meloman');
+    if(openedPlanets.length>=4 && !achievements.includes('explorer')) newAch.push('explorer');
+    if(Math.floor(xp/100)+1>=5 && !achievements.includes('level5')) newAch.push('level5');
+    if(xp>=100 && !achievements.includes('xp100')) newAch.push('xp100');
+    if(xp>=500 && !achievements.includes('xp500')) newAch.push('xp500');
+    if(xp>=1000 && !achievements.includes('xp1000')) newAch.push('xp1000');
+    if(newAch.length>0) {
+        achievements = [...achievements, ...newAch];
+        localStorage.setItem('ss_achievements', JSON.stringify(achievements));
+        show('🏅 Новое достижение!');
+    }
+}
+
+const aiResponses = {
+    привет:['Привет! 🌌','Здравствуй! 🎵','Приветик! '],
+    как:['Отлично! 🎶 А у тебя?','Работаю на полную! '],
+    рекоменд:['Попробуй планету Рок! 🎸','Посмотри чарты! 📊'],
+    планет:['4 планеты: Рок 🎸, Хип-Хоп 🎤, Электроника 🎧, Поп ⭐'],
+    факт:[' Музыка активирует зоны мозга!',' Самая длинная песня длится 639 лет!'],
+    шутк:['😄 Почему музыканты не играют в прятки?'],
+    спасибо:['Пожалуйста! 🌟','Не за что! 🎵'],
+    грустн:['Не грусти! 🎵 Послушай музыку!'],
+    игр:['Попробуй "Угадай трек"! ','Сыграй в ритм-игру! 🎯'],
+    музык:['Музыка — язык души! 🎶'],
+    чарт:['Зайди в Чарты — там топ-30 iTunes! 📊'],
+    help:['Я могу: 🎵 рекомендовать, 🎮 играть, 💬 болтать!']
+};
+
+function sendMsg() {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if(!text) return;
+    const box = document.getElementById('chat-box');
+    box.innerHTML += '<div class="message user">'+text+'</div>';
+    input.value = '';
+    messagesCount++;
+    localStorage.setItem('ss_messages', messagesCount);
+    setTimeout(() => {
+        let ans = 'Интересно! 🤔';
+        for(let key in aiResponses) {
+            if(text.toLowerCase().includes(key)) {
+                const variants = aiResponses[key];
+                ans = variants[Math.floor(Math.random()*variants.length)];
+                break;
+            }
+        }
+        box.innerHTML += '<div class="message bot">'+ans+'</div>';
+        box.scrollTop = box.scrollHeight;
+        xp += 1;
+        localStorage.setItem('ss_xp', xp);
+        updateStats();
+        checkAchievements();
+    }, 500);
+}
+
+function closeModal() {
+    document.getElementById('game-modal').classList.remove('active');
+    if(rhythmInterval) clearInterval(rhythmInterval);
+    rhythmGameActive = false;
+}
+
+function updateStats() {
+    document.getElementById('xp').textContent = xp;
+    document.getElementById('level').textContent = Math.floor(xp/100)+1;
+    document.getElementById('played').textContent = played;
+}
+
+function show(text) {
+    const n = document.getElementById('notif');
+    n.textContent = text;
+    n.classList.add('show');
+    setTimeout(() => n.classList.remove('show'), 2500);
+}
+
+window.addEventListener('load', () => {
+    checkAuth();
+    updateStats();
+    renderLibrary();
+    checkAchievements();
+    show('🌌 SoundScape Pro готов!');
+});
+</script>
+</body>
+</html>
