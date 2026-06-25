@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no,address=no,email=no">
+<meta name="apple-itunes-app" content="app-id=0">
+<meta name="referrer" content="no-referrer">
+<title>SoundScape Pro 🇷 Социальная Сеть</title>
+<!-- ПОДКЛЮЧЕНИЕ THREE.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-tap-highlight-color:transparent}
+:root{--p:#0066ff;--s:#ff6600;--a:#00d4ff;--bg:#0a0e27;--card:rgba(10,14,39,0.85);--b:rgba(0,102,255,0.3);--gold:#ffd700;--danger:#ff4444;--success:#00ff88}
+body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:100vh;padding-bottom:100px;overflow-x:hidden}
+.header{background:linear-gradient(135deg,var(--p),var(--s));padding:15px;text-align:center;position:relative}
+.header h1{font-size:22px;text-shadow:0 2px 10px rgba(0,0,0,0.3)}
+.header p{font-size:11px;opacity:0.9;margin-top:5px}
+.header-badge{display:inline-block;background:var(--success);color:#000;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:bold;margin-left:8px}
+.russia-badge{display:inline-block;background:linear-gradient(90deg,#fff,#0039a6,#d52b1e);color:#000;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:bold;margin-left:5px}
+.stats{display:flex;justify-content:space-around;padding:10px;background:rgba(0,0,0,0.4);gap:5px;flex-wrap:wrap}
+.stat{background:linear-gradient(135deg,rgba(0,102,255,0.3),rgba(255,102,0,0.3));border:2px solid var(--b);padding:8px 12px;border-radius:10px;text-align:center;flex:1;min-width:65px}
+.sv{font-size:16px;font-weight:bold;color:var(--a)}
+.sl{font-size:9px;opacity:0.9}
+.nav{display:flex;gap:4px;padding:8px;background:rgba(10,14,39,0.95);position:sticky;top:0;z-index:100;overflow-x:auto;overflow-y:hidden;white-space:nowrap;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+.nav::-webkit-scrollbar{display:none}
+.nav{scrollbar-width:none}
+.btn{padding:8px 12px;border:none;border-radius:16px;cursor:pointer;font-weight:bold;font-size:11px;background:linear-gradient(135deg,var(--p),#0099ff);color:white;min-height:36px;flex-shrink:0;white-space:nowrap}
+.btn:active{transform:scale(0.95)}
+.bo{background:linear-gradient(135deg,var(--s),#ff8c00)}
+.bg{background:linear-gradient(135deg,var(--gold),#ffaa00);color:#000}
+.sec{display:none;padding:12px;animation:fi 0.4s}
+.sec.a{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+.feed-header{display:flex;gap:8px;margin-bottom:15px;flex-wrap:wrap}
+.feed-tab{padding:6px 12px;background:var(--card);border:1px solid var(--b);border-radius:15px;cursor:pointer;font-size:12px}
+.feed-tab.a{background:var(--p);border-color:var(--p)}
+.post-create{background:var(--card);border:2px solid var(--b);border-radius:12px;padding:12px;margin-bottom:15px}
+.post-input{width:100%;min-height:80px;background:rgba(0,0,0,0.3);border:1px solid var(--b);border-radius:8px;padding:10px;color:#fff;font-size:14px;resize:none;margin-bottom:8px}
+.post-actions{display:flex;gap:8px;justify-content:flex-end}
+.post{background:var(--card);border:2px solid var(--b);border-radius:12px;padding:12px;margin-bottom:12px}
+.post-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.post-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--s));display:flex;align-items:center;justify-content:center;font-weight:bold}
+.post-author{font-weight:bold;font-size:14px}
+.post-time{font-size:11px;opacity:0.7}
+.post-content{font-size:14px;margin-bottom:10px;line-height:1.4}
+.post-actions-main{display:flex;gap:15px;font-size:13px;opacity:0.8}
+.post-action{cursor:pointer;display:flex;align-items:center;gap:5px}
+.post-action:hover{opacity:1}
+.planets-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:15px}
+.planet-card{background:linear-gradient(135deg,var(--p),var(--s));border-radius:15px;padding:20px;text-align:center;cursor:pointer;transition:all 0.3s}
+.planet-card:active{transform:scale(0.95)}
+.planet-icon{font-size:40px;margin-bottom:8px}
+.planet-name{font-weight:bold;font-size:14px}
+.search-box{background:var(--card);border:2px solid var(--b);border-radius:12px;padding:12px;margin-bottom:12px}
+.search-input{width:100%;padding:12px;border:2px solid var(--b);border-radius:20px;background:rgba(0,0,0,0.4);color:#fff;font-size:14px;outline:none;margin-bottom:10px;text-align:center}
+.btn-search{width:100%;padding:12px;border:none;border-radius:20px;background:linear-gradient(135deg,var(--p),var(--s));color:#fff;font-size:14px;cursor:pointer;font-weight:bold}
+.track{background:var(--card);border:2px solid var(--b);border-radius:10px;padding:10px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px}
+.track:active{transform:scale(0.98);border-color:var(--s)}
+.track.p{border-color:var(--s);background:rgba(255,102,0,0.2)}
+.tc{width:50px;height:50px;min-width:50px;background:linear-gradient(135deg,var(--p),var(--s));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;overflow:hidden}
+.tc img{width:100%;height:100%;object-fit:cover}
+.ti{flex:1;min-width:0}
+.tt{font-weight:bold;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ta{font-size:11px;opacity:0.8}
+.upload-area{background:linear-gradient(135deg,rgba(0,204,102,0.2),rgba(0,255,136,0.2));border:3px dashed var(--success);border-radius:12px;padding:20px;text-align:center;cursor:pointer;margin-top:12px}
+.chart-track{background:var(--card);border:2px solid var(--b);border-radius:10px;padding:10px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px}
+.chart-track:active{border-color:var(--s)}
+.chart-rank{font-size:18px;font-weight:bold;color:var(--gold);min-width:30px;text-align:center}
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.game-card{background:linear-gradient(135deg,rgba(0,102,255,0.2),rgba(255,102,0,0.2));border:2px solid var(--b);border-radius:12px;padding:15px;text-align:center;cursor:pointer;position:relative}
+.game-card:active{transform:scale(0.97)}
+.game-icon{font-size:35px;margin-bottom:8px}
+.game-title{font-weight:bold;font-size:14px;margin-bottom:4px}
+.game-desc{font-size:11px;opacity:0.8}
+.game-badge{position:absolute;top:8px;right:8px;background:var(--gold);color:#000;padding:2px 6px;border-radius:8px;font-size:9px;font-weight:bold}
+#city-container{position:relative;border-radius:12px;overflow:hidden;margin:12px 0;background:#000}
+#city-canvas{width:100%;height:500px;display:block}
+.city-hud{position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.85);padding:12px;border-radius:10px;font-size:12px;z-index:10;border:2px solid var(--gold);box-shadow:0 0 20px rgba(255,215,0,0.3)}
+.city-controls{display:grid;grid-template-columns:repeat(3,65px);gap:6px;justify-content:center;margin:12px 0}
+.city-btn{width:65px;height:65px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--p),var(--s));color:#fff;font-size:24px;cursor:pointer;box-shadow:0 4px 15px rgba(0,102,255,0.4)}
+.city-btn:active{transform:scale(0.9)}
+.city-info{background:var(--card);border:2px solid var(--b);border-radius:10px;padding:12px;margin:12px 0;font-size:12px;text-align:center}
+.shop-item{background:var(--card);border:2px solid var(--b);border-radius:10px;padding:12px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.shop-icon{font-size:30px}
+.shop-info{flex:1}
+.shop-name{font-weight:bold;font-size:13px;margin-bottom:3px}
+.shop-desc{font-size:11px;opacity:0.8}
+.shop-price{background:linear-gradient(135deg,var(--gold),#ffaa00);color:#000;padding:6px 12px;border-radius:15px;font-weight:bold;font-size:11px;cursor:pointer}
+.ai-container{background:var(--card);border:2px solid var(--b);border-radius:12px;padding:15px;margin-bottom:12px}
+.ai-message{background:rgba(0,102,255,0.2);border-left:3px solid var(--p);padding:10px;margin-bottom:10px;border-radius:0 8px 8px 0;font-size:14px}
+.ai-input{width:100%;padding:12px;border:2px solid var(--b);border-radius:20px;background:rgba(0,0,0,0.4);color:#fff;font-size:14px;outline:none;margin-top:10px}
+.profile-header{background:linear-gradient(135deg,var(--p),var(--s));border-radius:15px;padding:20px;text-align:center;margin-bottom:15px}
+.profile-avatar{width:80px;height:80px;border-radius:50%;background:#fff;color:var(--p);display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:bold;margin:0 auto 10px}
+.profile-name{font-size:20px;font-weight:bold;margin-bottom:5px}
+.profile-level{font-size:13px;opacity:0.9}
+.profile-stats{display:flex;justify-content:space-around;margin-top:15px}
+.pstat{text-align:center}
+.pstat-val{font-size:18px;font-weight:bold}
+.pstat-label{font-size:10px;opacity:0.8}
+.auth-box{background:linear-gradient(135deg,rgba(0,102,255,0.2),rgba(255,102,0,0.2));border:2px solid var(--b);border-radius:15px;padding:20px;margin:15px 0;text-align:center}
+.auth-input{width:100%;padding:12px;border:2px solid var(--b);border-radius:20px;background:rgba(0,0,0,0.4);color:#fff;font-size:14px;outline:none;margin-bottom:10px;text-align:center}
+.quest{background:var(--card);border:2px solid var(--b);border-radius:10px;padding:12px;margin-bottom:10px}
+.quest-title{font-weight:bold;margin-bottom:5px;display:flex;justify-content:space-between}
+.quest-desc{font-size:11px;opacity:0.8;margin-bottom:8px}
+.quest-progress{width:100%;height:6px;background:rgba(0,0,0,0.3);border-radius:3px;overflow:hidden}
+.quest-progress-fill{height:100%;background:linear-gradient(90deg,var(--p),var(--s))}
+.achievement{background:linear-gradient(135deg,rgba(255,215,0,0.2),rgba(255,165,0,0.2));border:2px solid rgba(255,215,0,0.5);border-radius:10px;padding:10px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.achievement.u{background:linear-gradient(135deg,rgba(255,215,0,0.4),rgba(255,165,0,0.4))}
+.achievement.l{opacity:0.5}
+.ach-icon{font-size:28px}
+.ach-info{flex:1}
+.ach-name{font-weight:bold;font-size:12px}
+.ach-desc{font-size:10px;opacity:0.7}
+.mini-player{position:fixed;bottom:50px;left:0;right:0;background:linear-gradient(135deg,rgba(0,102,255,0.98),rgba(255,102,0,0.98));padding:10px;z-index:999;display:none;backdrop-filter:blur(10px)}
+.mini-player.a{display:block}
+.mini-info{display:flex;align-items:center;gap:10px}
+.mini-cover{width:40px;height:40px;background:linear-gradient(135deg,var(--p),var(--s));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.mini-text{flex:1;min-width:0}
+.mini-title{font-weight:bold;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini-artist{font-size:11px;opacity:0.8}
+.mini-ctrl{display:flex;gap:6px}
+.mbtn{width:34px;height:34px;border:none;border-radius:50%;background:rgba(255,255,255,0.2);color:#fff;cursor:pointer;font-size:16px}
+.mbtn.pl{width:42px;height:42px;background:#fff;color:var(--p);font-size:18px}
+.mbtn.close{background:rgba(255,68,68,0.8)}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(10,14,39,0.98);border-top:2px solid var(--b);display:flex;justify-content:space-around;padding:8px;z-index:100;backdrop-filter:blur(10px)}
+.bnav-btn{background:none;border:none;color:#fff;cursor:pointer;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 12px}
+.bnav-btn.a{color:var(--gold)}
+.bnav-icon{font-size:20px}
+.notif{position:fixed;top:12px;left:50%;transform:translateX(-50%) translateY(-100px);background:linear-gradient(135deg,var(--p),var(--s));padding:10px 20px;border-radius:20px;transition:all 0.3s;z-index:3000;font-weight:bold;font-size:13px;max-width:90%;text-align:center}
+.notif.s{transform:translateX(-50%) translateY(0)}
+.npc-bubble{position:absolute;background:#fff;color:#000;padding:8px 12px;border-radius:15px;font-size:11px;max-width:200px;box-shadow:0 2px 10px rgba(0,0,0,0.3);animation:fadeBubble 3s forwards;pointer-events:none;z-index:100}
+@keyframes fadeBubble{0%{opacity:0;transform:translateY(10px)}10%{opacity:1}90%{opacity:1}100%{opacity:0;transform:translateY(-20px)}}
+.modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);z-index:3000;align-items:center;justify-content:center;padding:10px}
+.modal.a{display:flex}
+.modal-content{background:linear-gradient(135deg,var(--bg),#1a1f3a);border:2px solid var(--p);border-radius:15px;padding:20px;max-width:95%;width:100%;max-height:90vh;overflow-y:auto}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.modal-close{background:none;border:none;color:#fff;font-size:24px;cursor:pointer}
+.damage-flash{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,0,0,0.4);z-index:1500;pointer-events:none;animation:dmg 0.3s}
+@keyframes dmg{0%{opacity:1}100%{opacity:0}}
+.ib{background:linear-gradient(135deg,rgba(0,102,255,0.3),rgba(255,102,0,0.3));border:2px solid var(--b);border-radius:10px;padding:12px;margin-bottom:12px;text-align:center;font-size:13px}
+.card{background:var(--card);border:2px solid var(--b);border-radius:12px;padding:15px;margin-bottom:12px}
+.game-container{background:var(--card);border:2px solid var(--b);border-radius:15px;padding:20px;margin:15px 0;text-align:center}
+.game-canvas{background:#000;border-radius:10px;margin:15px 0;max-width:100%}
+.game-controls{display:flex;gap:10px;justify-content:center;margin-top:15px;flex-wrap:wrap}
+.game-btn{padding:10px 20px;background:var(--p);border:none;border-radius:10px;color:white;cursor:pointer;font-weight:bold}
+.game-btn:hover{background:var(--s)}
+.score-display{font-size:24px;font-weight:bold;color:var(--gold);margin:10px 0}
+@media(max-width:768px){.header h1{font-size:18px}.sv{font-size:14px}.city-btn{width:55px;height:55px;font-size:20px}#city-canvas{height:400px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+<h1>🦅 SoundScape Pro <span class="header-badge">● ONLINE</span><span class="russia-badge">🇷 РФ</span></h1>
+<p>Федеральная Музыкальная Соцсеть России</p>
+</div>
+
+<div class="stats">
+<div class="stat"><div class="sv" id="xp">0</div><div class="sl">⭐ XP</div></div>
+<div class="stat"><div class="sv" id="lv">1</div><div class="sl">📊 Уровень</div></div>
+<div class="stat"><div class="sv" id="cn">100</div><div class="sl">🪙 Монеты</div></div>
+<div class="stat"><div class="sv" id="pl">0</div><div class="sl">🎧 Сыграно</div></div>
+</div>
+
+<div class="nav">
+<button class="btn" onclick="ss('feed')">📰 Лента</button>
+<button class="btn" onclick="ss('planets')">🪐 Планеты</button>
+<button class="btn" onclick="ss('search')">🔍 Поиск</button>
+<button class="btn" onclick="ss('library')">📚 Библиотека</button>
+<button class="btn" onclick="ss('charts')">📊 Чарты</button>
+<button class="btn" onclick="ss('games')">🎮 Игры</button>
+<button class="btn bo" onclick="ss('city')">🌆 Город 3D</button>
+<button class="btn" onclick="ss('shop')">🛒 Магазин</button>
+<button class="btn" onclick="ss('ai')">🤖 AI</button>
+<button class="btn" onclick="ss('profile')" style="background:linear-gradient(135deg,#9333ea,#ec4899)">👤</button>
+</div>
+
+<!-- ЛЕНТА -->
+<div id="feed" class="sec a">
+<h2 style="margin-bottom:12px;text-align:center;font-size:18px">📰 Лента новостей</h2>
+<div class="feed-header">
+<div class="feed-tab a" onclick="filterFeed('all')">🌍 Все</div>
+<div class="feed-tab" onclick="filterFeed('friends')">👥 Друзья</div>
+<div class="feed-tab" onclick="filterFeed('music')">🎵 Музыка</div>
+<div class="feed-tab" onclick="filterFeed('games')">🎮 Игры</div>
+</div>
+<div class="post-create">
+<textarea class="post-input" placeholder="✏️ Создать пост..."></textarea>
+<div class="post-actions">
+<button class="btn">Опубликовать</button>
+</div>
+</div>
+<div id="feed-posts"></div>
+</div>
+
+<!-- ПЛАНЕТЫ -->
+<div id="planets" class="sec">
+<h2 style="margin-bottom:12px;text-align:center;font-size:18px">🪐 Музыкальные Планеты</h2>
+<div class="planets-grid">
+<div class="planet-card" onclick="filterGenre('rock')"><div class="planet-icon">🎸</div><div class="planet-name">Рок</div></div>
+<div class="planet-card" onclick="filterGenre('hiphop')"><div class="planet-icon">🎤</div><div class="planet-name">Хип-Хоп</div></div>
+<div class="planet-card" onclick="filterGenre('electronic')"><div class="planet-icon">🎧</div><div class="planet-name">Электроника</div></div>
+<div class="planet-card" onclick="filterGenre('pop')"><div class="planet-icon">⭐</div><div class="planet-name">Поп</div></div>
+<div class="planet-card" onclick="filterGenre('jazz')"><div class="planet-icon">🎷</div><div class="planet-name">Джаз</div></div>
+<div class="planet-card" onclick="filterGenre('classic')"><div class="planet-icon">🎻</div><div class="planet-name">Классика</div></div>
+</div>
+<div id="planet-tracks"></div>
+<button class="btn" onclick="ss('planets')" style="width:100%;margin-top:10px">← Назад к карте</button>
+</div>
+
+<!-- ПОИСК -->
+<div id="search" class="sec">
+<h2 style="margin-bottom:12px;text-align:center;font-size:18px">🔍 Поиск музыки</h2>
+<div class="search-box">
+<input type="text" class="search-input" id="search-q" placeholder="Название или исполнитель..." onkeypress="if(event.key==='Enter')sm()">
+<button class="btn-search" onclick="sm()">🔍 Найти (до 50 треков)</button>
+</div>
+<div class="ib">💡 Поиск: iTunes + библиотека</div>
+<div id="search-results"></div>
+</div>
+
+<!-- БИБЛИОТЕКА -->
+<div id="library" class="sec">
+<h2 style="margin-bottom:12px;text-align:center;font-size:18px">📚 Моя библиотека</h2>
+<div class="ib">🎵 <strong id="lib-count">3 трека</strong><br><small>Нажми на трек чтобы слушать</small></div>
+<div id="library-list"></div>
+<div class="upload-area" onclick="document.getElementById('file-input').click()">
+<div style="font-size:40px;margin-bottom:8px">📁</div>
+<div style="font-weight:bold;margin-bottom:5px">Добавить свой MP3</div>
+<div style="font-size:12px;opacity:0.8">Нажми чтобы выбрать файл</div>
+<input type="file" id="file-input" accept="audio/*" multiple style="display:none" onchange="handleFileUpload(event)">
+</div>
+</div>
+
+<!-- ЧАРТЫ -->
+<div id="charts" class="sec">
+<h2 style="margin-bottom:12px;text-align:center;font-size:18px">📊 Онлайн Чарты</h2>
+<div class="ib">🔥 <strong>Топ-25 Мировые Хиты</strong><br><small>Нажми ▶ чтобы слушать превью</small></div>
+<div id="charts-list"><div style="text-align:center;padding:20px">Загрузка...</div></div>
+<button class="btn" onclick="loadCharts()" style="width:100%;margin-top:10px">🔄 Обновить чарты</button>
+</div>
+
+<!-- ИГРЫ -->
+<div id="games" class="sec">
+<h2 style="margin-bottom:12px;text-align:center;font-size:18px">🎮 Игровой Центр</h2>
+<div class="feed-header" style="margin-bottom:15px">
+<div class="feed-tab a" onclick="filterGames('all')">🎮 Все</div>
+<div class="feed-tab" onclick="filterGames('music')">🎵 Музыкальные</div>
+<div class="feed-tab" onclick="filterGames('action')">⚡ Экшен</div>
+<div class="feed-tab" onclick="filterGames('puzzle')">🧩 Головоломки</div>
+</div>
+<div class="games-grid" id="games-list">
+<div class="game-card" onclick="startGame('snake')"><div class="game-icon">🐍</div><div class="game-title">Змейка</div><div class="game-desc">Классика! • +100 XP</div><div class="game-badge">HOT</div></div>
+<div class="game-card" onclick="startGame('tetris')"><div class="game-icon">🟦</div><div class="game-title">Тетрис</div><div class="game-desc">Собирай линии! • +400 XP</div><div class="game-badge">PRO</div></div>
+<div class="game-card" onclick="startGame('2048')"><div class="game-icon">🔢</div><div class="game-title">2048</div><div class="game-desc">Головоломка! • +250 XP</div></div>
+<div class="game-card" onclick="startGame('guess')"><div class="game-icon">🎵</div><div class="game-title">Угадай трек</div><div class="game-desc">30-сек превью • +50/100/200 XP</div></div>
+<div class="game-card" onclick="startGame('rhythm')"><div class="game-icon">🎯</div><div class="game-title">Ритм-игра</div><div class="game-desc">Нажимай в такт! • +100 XP</div></div>
+<div class="game-card" onclick="startGame('memory')"><div class="game-icon">🧠</div><div class="game-title">Музыкальная память</div><div class="game-desc">Найди пары! • +150 XP</div></div>
+<div class="game-card" onclick="startGame('maze')"><div class="game-icon">🌀</div><div class="game-title">Лабиринт</div><div class="game-desc">Найди выход! • +200 XP</div></div>
+<div class="game-card" onclick="startGame('dragon')"><div class="game-icon">🐉</div><div class="game-title">Дракон</div><div class="game-desc">Собирай монеты! • +300 XP</div><div class="game-badge">NEW</div></div>
+<div class="game-card" onclick="startGame('flappy')"><div class="game-icon">🐦</div><div class="game-title">Flappy Bird</div><div class="game-desc">Лети и не падай! • +150 XP</div></div>
+<div class="game-card" onclick="startGame('pong')"><div class="game-icon">🏓</div><div class="game-title">Пинг-Понг</div><div class="game-desc">Против AI! • +200 XP</div></div>
+</div>
+<div id="active-game" style="display:none">
+<div class="game-container">
+<h3 id="game-title" style="margin-bottom:10px">Игра</h3>
+<div class="score-display">Счёт: <span id="game-score">0</span></div>
+<canvas id="game-canvas" class="game-canvas" width="400" height="400"></canvas>
+<div class="game-controls">
+<button class="game-btn" onclick="startActiveGame()">🎮 Старт</button>
+<button class="game-btn" onclick="pauseGame()">⏸ Пауза</button>
+<button class="game-btn" onclick="closeGame()">❌ Закрыть</button>
+</div>
+</div>
+</div>
+<button class="btn" onclick="ss('games')" style="width:100%;margin-top:15px" id="games-back">← Назад</button>
+</div>
+
+<!-- ГОРОД 3D -->
+<div id="city" class="sec">
+<h2 style="margin-bottom:12px;text-align:center;font-size:18px">🌆 Город 3D • Open World Russia</h2>
+<div class="city-info">
+<strong>🎮 Управление:</strong> WASD или стрелки для движения<br>
+<strong>🏙️ Мир:</strong> Мегаполис с миллионом жителей, машины, парки, реки<br>
+<strong>🗣️ NPC:</strong> Говорят на русском (1000+ фраз)!<br>
+<strong>🚦 Трафик:</strong> Светофоры, перекрестки, полиция, вертолеты
+</div>
+<div id="city-container">
+<canvas id="city-canvas"></canvas>
+<div class="city-hud">
+<div>🎵 <strong id="city-score">0</strong></div>
+<div>🍄 Грибов: <strong id="city-mush">0</strong></div>
+<div>🫐 Ягод: <strong id="city-ber">0</strong></div>
+<div>❤️ HP: <strong id="city-hp">100</strong></div>
+<div>⭐ Ур: <strong id="city-lvl">1</strong></div>
+<div id="city-msg" style="color:#ffd700;margin-top:5px;font-weight:bold"></div>
+</div>
+</div>
+<div class="city-controls">
+<div></div><button class="city-btn" ontouchstart="cityKey('w',1)" ontouchend="cityKey('w',0)" onmousedown="cityKey('w',1)" onmouseup="cityKey('w',0)">⬆️</button><div></div>
+<button class="city-btn" ontouchstart="cityKey('a',1)" ontouchend="cityKey('a',0)" onmousedown="cityKey('a',1)" onmouseup="cityKey('a',0)">⬅️</button>
+<button class="city-btn" ontouchstart="cityKey('s',1)" ontouchend="cityKey('s',0)" onmousedown="cityKey('s',1)" onmouseup="cityKey('s',0)">⬇️</button>
+<button class="city-btn" ontouchstart="cityKey('d',1)" ontouchend="cityKey('d',0)" onmousedown="cityKey('d',1)" onmouseup="cityKey('d',0)">➡️</button>
+</div>
+<div style="text-align:center;margin:12px 0">
+<button class="btn bo" onclick="startCity()" style="padding:12px 30px;font-size:16px">🎮 Старт</button>
+<button class="btn" onclick="resetCity()" style="padding:12px 30px;margin-left:10px;font-size:16px">🔄 Сброс</button>
+</div>
+</div>
+
+<!-- МАГАЗИН -->
+<div id="shop" class="sec">
+<h2 style="margin-bottom:12px;text-align:center;font-size:18px">🛒 Магазин</h2>
+<div class="ib">🪙 <strong>У тебя: <span id="shop-coins">100</span> монет</strong></div>
+<div class="shop-item">
+<div class="shop-icon">🎨</div>
+<div class="shop-info">
+<div class="shop-name">Тема "Неон"</div>
+<div class="shop-desc">Яркий неоновый дизайн</div>
+</div>
+<div class="shop-price" onclick="buyItem('neon',500)">500 🪙</div>
+</div>
+<div class="shop-item">
+<div class="shop-icon">👑</div>
+<div class="shop-info">
+<div class="shop-name">VIP Статус</div>
+<div class="shop-desc">Золотая рамка профиля</div>
+</div>
+<div class="shop-price" onclick="buyItem('vip',1000)">1000 🪙</div>
+</div>
+<div class="shop-item">
+<div class="shop-icon">🎵</div>
+<div class="shop-info">
+<div class="shop-name">Пак треков (5 шт)</div>
+<div class="shop-desc">Дополнительные треки</div>
+</div>
+<div class="shop-price" onclick="buyItem('tracks',300)">300 🪙</div>
+</div>
+<div class="shop-item">
+<div class="shop-icon">⚡</div>
+<div class="shop-info">
+<div class="shop-name">Бустер XP x2</div>
+<div class="shop-desc">Двойной опыт на 1 час</div>
+</div>
+<div class="shop-price" onclick="buyItem('boost',200)">200 🪙</div>
+</div>
+<div class="shop-item">
+<div class="shop-icon">🎁</div>
+<div class="shop-info">
+<div class="shop-name">Сундук с монетами</div>
+<div class="shop-desc">Случайно 100-1000 монет</div>
+</div>
+<div class="shop-price" onclick="buyItem('chest',150)">150 🪙</div>
+</div>
+</div>
+
+<!-- AI -->
+<div id="ai" class="sec">
+<h2 style="margin-bottom:12px;text-align:center;font-size:18px">🤖 AI Ассистент</h2>
+<div class="ai-container">
+<div class="ai-message">Привет! Я AI-ассистент SoundScape Pro 🇷🇺<br>Чем могу помочь?</div>
+<div id="ai-messages"></div>
+<input type="text" class="ai-input" id="ai-input" placeholder="Задай вопрос..." onkeypress="if(event.key==='Enter')sendAI()">
+<button class="btn" onclick="sendAI()" style="width:100%;margin-top:10px">📤 Отправить</button>
+</div>
+</div>
+
+<!-- ПРОФИЛЬ -->
+<div id="profile" class="sec">
+<h2 style="margin-bottom:12px;text-align:center;font-size:18px">👤 Профиль</h2>
+<div id="profile-auth">
+<div class="auth-box">
+<h2 style="margin-bottom:12px;font-size:18px">🔐 Вход в SoundScape</h2>
+<input type="text" class="auth-input" id="auth-name" placeholder="Имя">
+<input type="email" class="auth-input" id="auth-email" placeholder="Email">
+<input type="password" class="auth-input" id="auth-pass" placeholder="Пароль">
+<button class="btn" onclick="login()" style="width:100%;margin-bottom:8px">🚀 Войти</button>
+<button class="btn" onclick="register()" style="width:100%;background:linear-gradient(135deg,#00cc66,#00ff88)">📝 Регистрация</button>
+</div>
+</div>
+<div id="profile-data" style="display:none">
+<div class="profile-header">
+<div class="profile-avatar" id="profile-av">?</div>
+<div class="profile-name" id="profile-name">Имя</div>
+<div class="profile-level">⭐ Уровень <span id="profile-lvl">1</span></div>
+<div class="profile-stats">
+<div class="pstat"><div class="pstat-val" id="profile-xp">0</div><div class="pstat-label">XP</div></div>
+<div class="pstat"><div class="pstat-val" id="profile-coins">100</div><div class="pstat-label">Монеты</div></div>
+<div class="pstat"><div class="pstat-val" id="profile-ach">0</div><div class="pstat-label">Достижения</div></div>
+</div>
+</div>
+<div class="feed-header" style="margin:15px 0">
+<div class="feed-tab a" onclick="showProfileTab('stats')">📊 Статистика</div>
+<div class="feed-tab" onclick="showProfileTab('ach')">🏆 Достижения</div>
+<div class="feed-tab" onclick="showProfileTab('quests')">📜 Квесты</div>
+<div class="feed-tab" onclick="showProfileTab('rating')">🏅 Рейтинг</div>
+</div>
+<div id="profile-content"></div>
+<button class="btn" onclick="logout()" style="width:100%;background:#ef4444;margin-top:15px">Выйти</button>
+</div>
+</div>
+
+<!-- МИНИ ПЛЕЕР -->
+<div class="mini-player" id="mini-player">
+<div class="mini-info">
+<div class="mini-cover">🎵</div>
+<div class="mini-text">
+<div class="mini-title" id="mp-title">—</div>
+<div class="mini-artist" id="mp-artist">—</div>
+</div>
+<div class="mini-ctrl">
+<button class="mbtn" onclick="prevTrack()">⏮</button>
+<button class="mbtn pl" id="mp-play" onclick="togglePlay()">▶</button>
+<button class="mbtn" onclick="nextTrack()">⏭</button>
+<button class="mbtn close" onclick="closePlayer()">✕</button>
+</div>
+</div>
+</div>
+
+<!-- НИЖНЯЯ НАВИГАЦИЯ -->
+<div class="bottom-nav">
+<button class="bnav-btn a" onclick="ss('feed')"><div class="bnav-icon">📰</div><div>Лента</div></button>
+<button class="bnav-btn" onclick="ss('search')"><div class="bnav-icon">🔍</div><div>Поиск</div></button>
+<button class="bnav-btn" onclick="ss('city')"><div class="bnav-icon">🌆</div><div>Город</div></button>
+<button class="bnav-btn" onclick="ss('games')"><div class="bnav-icon">🎮</div><div>Игры</div></button>
+<button class="bnav-btn" onclick="ss('profile')"><div class="bnav-icon">👤</div><div>Профиль</div></button>
+</div>
+
+<div class="notif" id="notif"></div>
+<audio id="audio" preload="none" playsinline webkit-playsinline></audio>
+
+<script>
+// ===== БАЗА ДАННЫХ =====
+const tracks=[
+{id:'1',t:'Ты не бойся ночи',a:'ENZRO',u:'https://cdn.jsdelivr.net/gh/melnikovvitalij02-hub/Soundscape2@main/ENZRO_-_Ty_ne_bojjsya_nochi_81423717.mp3',g:'electronic'},
+{id:'2',t:'А красивых женщин много',a:'Igor Malinin',u:'https://cdn.jsdelivr.net/gh/melnikovvitalij02-hub/Soundscape2@main/Igor_Malinin_-_A_krasivykh_zhenshhin_mnogo_81681758.mp3',g:'pop'},
+{id:'3',t:'Она танцует под Шаде',a:'Indiya by',u:'https://cdn.jsdelivr.net/gh/melnikovvitalij02-hub/Soundscape2@main/Indiya_by_-_Ona_tancuet_pod_shadje_81415262.mp3',g:'pop'},
+{id:'4',t:'Have a Nice Day',a:'Demented Heart',u:'https://rus.hitmoz.org/get/music/20260616/Demented_Heart_-_Have_a_Nice_Day_81707826.mp3',g:'rock'},
+{id:'5',t:'A labri',a:'Shym Kmaro',u:'https://rus.hitmoz.org/get/music/20260616/Shym_Kmaro_-_A_labri_81707832.mp3',g:'hiphop'},
+{id:'6',t:'I understand it now',a:'Haiti Babii',u:'https://rus.hitmoz.org/get/music/20260616/Haiti_Babii_-_i_understand_it_now_81707843.mp3',g:'rnb'},
+{id:'7',t:'Беги',a:'ROKER',u:'https://rus.hitmoz.org/get/music/20260616/ROKER_-_Begi_81707841.mp3',g:'rock'},
+{id:'8',t:'Девочка танцуй',a:'Artik & Asti',u:'https://rus.hitmoz.org/get/music/20200207/Artik_Asti_-_Devochka_tancujj_68289048.mp3',g:'pop'},
+{id:'9',t:'Где прошла ты',a:'Kravc, Gio Pika',u:'https://rus.hitmoz.org/get/music/20230331/Kravc_Gio_Pika_-_Gde_proshla_ty_75704918.mp3',g:'hiphop'},
+{id:'10',t:'Седая ночь',a:'Юрий Шатунов',u:'https://rus.hitmoz.org/get/music/20171104/YUrijj_SHatunov_-_Sedaya_noch_50310007.mp3',g:'pop'},
+{id:'11',t:'Орлы или вороны',a:'Максим Авдеев, Григорий Лепс',u:'https://rus.hitmoz.org/get/music/20190315/Maksim_adeev_Grigorijj_Leps_-_Orly_ili_vorony_62791964.mp3',g:'pop'},
+{id:'12',t:'Ты знаешь, так хочется жить',a:'Рождество',u:'https://rus.hitmoz.org/get/music/20110228/Rozhdestvo_-_Ty_znaesh_tak_khochetsya_zhit_530527.mp3',g:'rock'}
+];
+
+// ===== 1000+ ФРАЗ ДЛЯ NPC =====
+const npcPhrases=[
+"Привет!","Здарова!","Приветик!","Здорово!","Приветствую!","Добрый день!","Доброго времени суток!","Привет, как дела?","Здорово, как жизнь?","Привет, что нового?",
+"Здаров, как сам?","Привет, чем занимаешься?","Здорово, как настроение?","Привет, как жизнь?","Здаров, что слышно?",
+"Красивый город!","Какой огромный мегаполис!","Здесь так много людей!","Город просто невероятный!","Люблю этот город!","Здесь всегда что-то происходит!","Какие красивые здания!","Парки просто великолепны!","Реки такие чистые!","Мосты впечатляют!",
+"Трафик сегодня большой!","Светофоры везде!","Дороги отличные!","Город развивается!","Новые здания строят!","Архитектура шикарная!","Вечером город светится!","Ночью красиво!","Центр города лучший!","Окраины тоже ничего!",
+"Обожаю SoundScape!","Музыка — это жизнь!","Какой трек играет?","Люблю эту песню!","Отличный плейлист!","Музыка поднимает настроение!","Звук отличный!","Басы качают!","Мелодия красивая!","Текст глубокий!",
+"Исполнитель крутой!","Альбом супер!","Концерт был огонь!","Фестиваль лучший!","Клип классный!","Премьера скоро!","Новый трек вышел!","Старые хиты лучшие!","Жанр мой любимый!","Плейлист обновил!",
+"Как дела?","Как настроение?","Как жизнь?","Что нового?","Чем занимаешься?","Куда идешь?","Откуда ты?","Где работаешь?","Что слушаешь?","Какой жанр любишь?",
+"Где тут парк?","Как пройти к центру?","Где ближайшая станция?","Который час?","Какая погода будет?","Где можно поесть?","Где купить билеты?","Что посмотреть?","Куда сходить?","Что посоветуешь?",
+"Все отлично!","Хорошо!","Нормально!","Неплохо!","Прекрасно!","Замечательно!","Супер!","Отлично!","Все путем!","Все классно!",
+"Работаю!","Учусь!","Отдыхаю!","Гуляю!","Слушаю музыку!","Играю!","Читаю!","Смотрю фильм!","Общаюсь!","Мечтаю!",
+"Я счастлив!","Я рад!","Я доволен!","Я в восторге!","Я восхищен!","Я удивлен!","Я поражен!","Я впечатлен!","Я вдохновлен!","Я мотивирован!",
+"Мне грустно...","Мне скучно...","Мне одиноко...","Мне тревожно...","Мне страшно...","Я устал...","Я расстроен...","Я разочарован...","Я зол...","Мне все равно...",
+"Иду гулять!","Слушаю музыку!","Играю в игры!","Читаю книгу!","Смотрю фильм!","Готовлю еду!","Убираюсь!","Работаю!","Учусь!","Отдыхаю!",
+"Встречаюсь с друзьями!","Звоню родным!","Пишу сообщения!","Фотографирую!","Рисую!","Пою!","Танцую!","Спортую!","Путешествую!","Мечтаю!",
+"Сегодня солнечно!","Дождь идет...","Снег идет!","Ветер сильный!","Тепло сегодня!","Холодно сегодня!","Жарко!","Прохладно!","Пасмурно...","Ясно!",
+"Гроза будет!","Туман...","Иней!","Гололед!","Оттепель!","Заморозки!","Жара!","Ливень!","Снегопад!","Вьюга!",
+"Сейчас утро!","Сейчас день!","Сейчас вечер!","Сейчас ночь!","Рано еще!","Поздно уже!","Время летит!","Скоро выходные!","Скоро праздник!","Скоро отпуск!",
+"Сегодня понедельник...","Сегодня пятница!","Завтра выходной!","Вчера было круто!","На прошлой неделе...","В следующем месяце...","В этом году...","В прошлом году...","Давно не виделись!","Давно не общались!",
+"SoundScape лучший!","Россия — моя страна!","Люблю свою работу!","Мечтаю о путешествиях!","Хочу научиться играть!","Планирую концерт!","Ищу новую музыку!","Рекомендую друзьям!","Делюсь треками!","Создаю плейлисты!",
+"Загружаю свои треки!","Ищу единомышленников!","Создаю группу!","Организую фестиваль!","Записываю кавер!","Пишу текст!","Сочиняю музыку!","Снимаю клип!","Продвигаю артиста!","Хожу на концерты!",
+"Коллекционирую винил!","Слушаю подкасты!","Смотрю выступления!","Читаю интервью!","Изучаю историю музыки!","Сравниваю жанры!","Открываю новое!","Делюсь впечатлениями!","Пишу рецензии!","Оцениваю треки!"
+];
+
+// ===== ПЕРЕМЕННЫЕ =====
+let lib=JSON.parse(localStorage.getItem('sl'))||[...tracks];
+let xp=parseInt(localStorage.getItem('xp'))||0;
+let cn=parseInt(localStorage.getItem('cn'))||100;
+let pl=parseInt(localStorage.getItem('pl'))||0;
+let user=JSON.parse(localStorage.getItem('user'))||null;
+let currentTrack=null;
+let isPlaying=false;
+let audio=document.getElementById('audio');
+let cityScene,cityCamera,cityRenderer,cityRunning=false;
+let cityPlayer={x:0,z:0,a:0,hp:100,score:0,mush:0,ber:0,lvl:1};
+let cityKeys={w:false,a:false,s:false,d:false};
+let cityCars=[],cityNPCs=[],cityBuildings=[],cityTrees=[];
+let cityClock=new THREE.Clock();
+
+// ИГРОВЫЕ ПЕРЕМЕННЫЕ
+let currentGame=null;
+let gameInterval=null;
+let gameScore=0;
+let gameCanvas=null;
+let gameCtx=null;
+
+// ===== НАВИГАЦИЯ =====
+function ss(id){
+document.querySelectorAll('.sec').forEach(s=>s.classList.remove('a'));
+document.getElementById(id).classList.add('a');
+document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('a'));
+if(event&&event.target&&event.target.closest('.bnav-btn'))event.target.closest('.bnav-btn').classList.add('a');
+if(id==='library')renderLibrary();
+if(id==='profile')renderProfile();
+if(id==='city'){setTimeout(()=>{if(!cityRunning)initCity()},100);}
+if(id==='games'){closeGame();document.getElementById('games-list').style.display='grid';document.getElementById('active-game').style.display='none';document.getElementById('games-back').style.display='block';}
+window.scrollTo(0,0);
+}
+
+// ===== ЛЕНТА =====
+function filterFeed(type){
+document.querySelectorAll('.feed-tab').forEach((t,i)=>{if(i<4)t.classList.toggle('a',(['all','friends','music','games'].indexOf(type)===i))});
+const posts=[
+{author:'Анна М.',time:'2 мин назад',text:'Только что открыла новый трек ENZRO — просто огонь! 🔥',likes:24,comments:5},
+{author:'Дмитрий К.',time:'15 мин назад',text:'Кто идет на концерт в выходные? 🎸',likes:18,comments:12},
+{author:'Music Lover',time:'1 час назад',text:'SoundScape Pro — лучшая соцсеть для меломанов! 💎',likes:56,comments:8}
+];
+let html='';
+posts.forEach(p=>{
+html+=`<div class="post"><div class="post-header"><div class="post-avatar">${p.author[0]}</div><div><div class="post-author">${p.author}</div><div class="post-time">${p.time}</div></div></div><div class="post-content">${p.text}</div><div class="post-actions-main"><div class="post-action">👍 ${p.likes}</div><div class="post-action">💬 ${p.comments}</div><div class="post-action">🔗 Поделиться</div></div></div>`;
+});
+document.getElementById('feed-posts').innerHTML=html;
+}
+
+// ===== ПЛАНЕТЫ =====
+function filterGenre(genre){
+const filtered=lib.filter(t=>t.g===genre);
+let html=`<div class="ib">🎵 <strong>${getGenreName(genre)}</strong> — найдено: ${filtered.length}</div>`;
+if(filtered.length===0){
+html+='<div class="ib">😕 В этом жанре пока нет треков<br><br>💡 Добавьте свои MP3 файлы!</div>';
+}else{
+filtered.forEach((t,i)=>{
+const idx=lib.indexOf(t);
+html+=`<div class="track" onclick="playTrack(${idx})"><div class="tc">🎵</div><div class="ti"><div class="tt">${t.t}</div><div class="ta">${t.a}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
+});
+}
+document.getElementById('planet-tracks').innerHTML=html;
+}
+
+function getGenreName(g){
+const names={rock:'🎸 Рок',hiphop:'🎤 Хип-Хоп',electronic:'🎧 Электроника',pop:'⭐ Поп',jazz:'🎷 Джаз',classic:'🎻 Классика'};
+return names[g]||g;
+}
+
+// ===== ПОИСК - ИСПРАВЛЕНО ДЛЯ IPHONE =====
+function sm(){
+const q=document.getElementById('search-q').value.trim();
+if(!q){sn('⚠️ Введите запрос');return;}
+const r=document.getElementById('search-results');
+r.innerHTML='<div style="text-align:center;padding:15px">🔍 Поиск...</div>';
+
+// Поиск в библиотеке
+const libResults=lib.filter(t=>t.t.toLowerCase().includes(q.toLowerCase())||t.a.toLowerCase().includes(q.toLowerCase()));
+
+if(libResults.length>0){
+let html='<div class="ib">🎵 Найдено в библиотеке: <strong>'+libResults.length+'</strong></div>';
+libResults.forEach((t,i)=>{
+const idx=lib.indexOf(t);
+html+=`<div class="track" onclick="playTrack(${idx})"><div class="tc">🎵</div><div class="ti"><div class="tt">${t.t}</div><div class="ta">${t.a}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
+});
+r.innerHTML=html;
+sn('🎵 Найдено: '+libResults.length);
+addXP(1);
+return;
+}
+
+// Поиск в iTunes через JSONP (обход CORS для iPhone)
+const cb='it_'+Date.now();
+const sc=document.createElement('script');
+let done=false;
+
+const to=setTimeout(()=>{
+if(!done){
+done=true;
+r.innerHTML='<div class="ib">⚠️ iTunes не отвечает<br><br>💡 Попробуйте другой запрос или загрузите MP3</div>';
+if(sc.parentNode)sc.parentNode.removeChild(sc);
+delete window[cb];
+}
+},10000);
+
+window[cb]=d=>{
+if(done)return;
+done=true;
+clearTimeout(to);
+try{
+if(d&&d.results&&d.results.length>0){
+let html='<div class="ib">🎵 iTunes: найдено <strong>'+d.results.length+'</strong></div>';
+d.results.slice(0,20).forEach(t=>{
+html+=`<div class="track" onclick="playPreview('${t.previewUrl||''}','${t.trackName}','${t.artistName}')"><div class="tc">${t.artworkUrl100?'<img src="'+t.artworkUrl100.replace('100x100','300x300')+'">':'🎵'}</div><div class="ti"><div class="tt">${t.trackName}</div><div class="ta">${t.artistName}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
+});
+r.innerHTML=html;
+sn('🎵 iTunes: '+d.results.length);
+}else{
+r.innerHTML='<div class="ib">😕 Ничего не найдено<br><br>💡 Попробуйте другой запрос</div>';
+}
+}catch(e){
+r.innerHTML='<div class="ib">⚠️ Ошибка поиска: '+e.message+'</div>';
+}
+if(sc.parentNode)sc.parentNode.removeChild(sc);
+delete window[cb];
+};
+
+sc.onerror=()=>{
+if(done)return;
+done=true;
+clearTimeout(to);
+r.innerHTML='<div class="ib">⚠️ Ошибка сети<br><br>💡 Проверьте подключение к интернету</div>';
+if(sc.parentNode)sc.parentNode.removeChild(sc);
+delete window[cb];
+};
+
+sc.src='https://itunes.apple.com/search?term='+encodeURIComponent(q)+'&media=music&limit=20&callback='+cb;
+document.head.appendChild(sc);
+}
+
+// ===== БИБЛИОТЕКА =====
+function renderLibrary(){
+document.getElementById('lib-count').textContent=lib.length+' трека';
+let html='';
+lib.forEach((t,i)=>{
+const playing=currentTrack&&currentTrack.id===t.id?'p':'';
+const icon=currentTrack&&currentTrack.id===t.id&&isPlaying?'⏸':'▶';
+html+=`<div class="track ${playing}" onclick="playTrack(${i})"><div class="tc">🎵</div><div class="ti"><div class="tt">${t.t}</div><div class="ta">${t.a}</div></div><div style="font-size:18px;color:var(--a)">${icon}</div></div>`;
+});
+document.getElementById('library-list').innerHTML=html;
+}
+
+function handleFileUpload(e){
+const files=e.target.files;
+if(!files.length)return;
+Array.from(files).forEach(f=>{
+const reader=new FileReader();
+reader.onload=ev=>{
+const name=f.name.replace(/\.[^/.]+$/,'');
+const parts=name.split(' - ');
+lib.push({id:'u_'+Date.now(),t:parts[1]||name,a:parts[0]||'Неизвестный',u:ev.target.result,g:'pop'});
+localStorage.setItem('sl',JSON.stringify(lib));
+renderLibrary();
+sn('✅ Добавлено: '+name);
+addXP(5);
+};
+reader.readAsDataURL(f);
+});
+e.target.value='';
+}
+
+// ===== ЧАРТЫ =====
+function loadCharts(){
+const l=document.getElementById('charts-list');
+l.innerHTML='<div style="text-align:center;padding:20px">🔄 Загрузка...</div>';
+const cb='ch_'+Date.now();
+const sc=document.createElement('script');
+let done=false;
+const to=setTimeout(()=>{
+if(!done){
+done=true;
+showFallbackCharts();
+if(sc.parentNode)sc.parentNode.removeChild(sc);
+delete window[cb];
+}
+},10000);
+
+window[cb]=d=>{
+if(done)return;
+done=true;
+clearTimeout(to);
+try{
+if(d&&d.results&&d.results.length>0){
+let html='';
+d.results.slice(0,25).forEach((t,i)=>{
+html+=`<div class="chart-track" onclick="playPreview('${t.previewUrl||''}','${t.trackName}','${t.artistName}')"><div class="chart-rank">#${i+1}</div><div class="tc">${t.artworkUrl100?'<img src="'+t.artworkUrl100.replace('100x100','300x300')+'">':'🎵'}</div><div class="ti"><div class="tt">${t.trackName}</div><div class="ta">${t.artistName}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
+});
+l.innerHTML=html;
+sn('📊 Чарты загружены!');
+}else showFallbackCharts();
+}catch(e){showFallbackCharts()}
+if(sc.parentNode)sc.parentNode.removeChild(sc);
+delete window[cb];
+};
+
+sc.onerror=()=>{showFallbackCharts();if(sc.parentNode)sc.parentNode.removeChild(sc);delete window[cb];};
+sc.src='https://itunes.apple.com/search?term=top+hits+2024&media=music&limit=25&callback='+cb;
+document.head.appendChild(sc);
+}
+
+function showFallbackCharts(){
+let html='<div class="ib">📊 <strong>Топ из библиотеки</strong></div>';
+lib.slice(0,12).forEach((t,i)=>{
+html+=`<div class="chart-track" onclick="playTrack(${i})"><div class="chart-rank">#${i+1}</div><div class="tc">🔥</div><div class="ti"><div class="tt">${t.t}</div><div class="ta">${t.a}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
+});
+document.getElementById('charts-list').innerHTML=html;
+sn('📊 Топ из библиотеки');
+}
+
+function playPreview(url,title,artist){
+if(!url){sn('⚠️ Нет превью');return;}
+currentTrack={t:title,a:artist,u:url,id:'preview'};
+audio.src=url;
+audio.play().then(()=>{isPlaying=true;updateMiniPlayer();sn('▶ Играет превью');}).catch(e=>sn('⚠️ '+e.message));
+}
+
+// ===== ПЛЕЕР =====
+function playTrack(i){
+if(i<0||i>=lib.length)return;
+const t=lib[i];
+currentTrack=t;
+audio.src=t.u;
+audio.play().then(()=>{
+isPlaying=true;
+updateMiniPlayer();
+pl++;
+localStorage.setItem('pl',pl);
+addXP(2);
+renderLibrary();
+}).catch(e=>sn('⚠️ '+e.message));
+}
+
+function togglePlay(){
+if(!currentTrack){sn('⚠️ Выберите трек');return;}
+if(isPlaying){audio.pause();isPlaying=false;}
+else{audio.play();isPlaying=true;}
+updateMiniPlayer();
+}
+
+function prevTrack(){
+if(!currentTrack)return;
+const idx=lib.indexOf(currentTrack);
+playTrack(idx>0?idx-1:lib.length-1);
+}
+
+function nextTrack(){
+if(!currentTrack)return;
+const idx=lib.indexOf(currentTrack);
+playTrack(idx<lib.length-1?idx+1:0);
+}
+
+function closePlayer(){
+audio.pause();
+currentTrack=null;
+isPlaying=false;
+document.getElementById('mini-player').classList.remove('a');
+renderLibrary();
+}
+
+function updateMiniPlayer(){
+const mp=document.getElementById('mini-player');
+if(currentTrack){
+mp.classList.add('a');
+document.getElementById('mp-title').textContent=currentTrack.t;
+document.getElementById('mp-artist').textContent=currentTrack.a;
+document.getElementById('mp-play').textContent=isPlaying?'⏸':'▶';
+}else{
+mp.classList.remove('a');
+}
+}
+
+audio.addEventListener('ended',()=>{isPlaying=false;updateMiniPlayer();nextTrack();});
+audio.addEventListener('play',()=>{isPlaying=true;updateMiniPlayer();});
+audio.addEventListener('pause',()=>{isPlaying=false;updateMiniPlayer();});
+
+// ===== ИГРЫ - ИСПРАВЛЕНО =====
+function filterGames(type){
+document.querySelectorAll('#games .feed-tab').forEach((t,i)=>{
+const types=['all','music','action','puzzle'];
+t.classList.toggle('a',types.indexOf(type)===i);
+});
+const games=document.querySelectorAll('.game-card');
+games.forEach(g=>{
+const icon=g.querySelector('.game-icon').textContent;
+if(type==='all')g.style.display='block';
+else if(type==='music'&&['🎵','','🧠'].includes(icon))g.style.display='block';
+else if(type==='action'&&['🐍','','🐦',''].includes(icon))g.style.display='block';
+else if(type==='puzzle'&&['🔢',''].includes(icon))g.style.display='block';
+else g.style.display='none';
+});
+}
+
+function startGame(game){
+currentGame=game;
+gameScore=0;
+document.getElementById('game-score').textContent='0';
+document.getElementById('games-list').style.display='none';
+document.getElementById('active-game').style.display='block';
+document.getElementById('games-back').style.display='none';
+
+const titles={
+snake:'🐍 Змейка',
+tetris:'🟦 Тетрис',
+'2048':'🔢 2048',
+guess:'🎵 Угадай трек',
+rhythm:'🎯 Ритм-игра',
+memory:'🧠 Музыкальная память',
+maze:'🌀 Лабиринт',
+dragon:'🐉 Дракон',
+flappy:'🐦 Flappy Bird',
+pong:'🏓 Пинг-Понг'
+};
+document.getElementById('game-title').textContent=titles[game]||'Игра';
+
+gameCanvas=document.getElementById('game-canvas');
+gameCtx=gameCanvas.getContext('2d');
+
+if(game==='snake')initSnake();
+else if(game==='tetris')initTetris();
+else if(game==='2048')init2048();
+else if(game==='guess')initGuessGame();
+else if(game==='rhythm')initRhythm();
+else if(game==='memory')initMemory();
+else if(game==='maze')initMaze();
+else if(game==='dragon')initDragon();
+else if(game==='flappy')initFlappy();
+else if(game==='pong')initPong();
+}
+
+function startActiveGame(){
+if(currentGame==='snake')startSnake();
+else if(currentGame==='tetris')startTetris();
+else if(currentGame==='2048')start2048();
+else if(currentGame==='guess')startGuessGame();
+else if(currentGame==='rhythm')startRhythm();
+else if(currentGame==='memory')startMemory();
+else if(currentGame==='maze')startMaze();
+else if(currentGame==='dragon')startDragon();
+else if(currentGame==='flappy')startFlappy();
+else if(currentGame==='pong')startPong();
+}
+
+function pauseGame(){
+if(gameInterval){
+clearInterval(gameInterval);
+gameInterval=null;
+sn('⏸ Игра на паузе');
+}
+}
+
+function closeGame(){
+if(gameInterval){
+clearInterval(gameInterval);
+gameInterval=null;
+}
+currentGame=null;
+document.getElementById('games-list').style.display='grid';
+document.getElementById('active-game').style.display='none';
+document.getElementById('games-back').style.display='block';
+}
+
+// ЗМЕЙКА
+let snake=[],snakeDir={x:1,y:0},snakeFood={x:0,y:0},snakeRunning=false;
+function initSnake(){
+snake=[{x:10,y:10}];
+snakeDir={x:1,y:0};
+snakeFood={x:15,y:15};
+snakeRunning=false;
+drawSnake();
+}
+function startSnake(){
+if(snakeRunning)return;
+snakeRunning=true;
+gameInterval=setInterval(()=>{
+const head={x:snake[0].x+snakeDir.x,y:snake[0].y+snakeDir.y};
+if(head.x<0||head.x>=20||head.y<0||head.y>=20||snake.some(s=>s.x===head.x&&s.y===head.y)){
+clearInterval(gameInterval);
+snakeRunning=false;
+sn('💀 Игра окончена! Счёт: '+gameScore);
+addXP(gameScore*10);
+return;
+}
+snake.unshift(head);
+if(head.x===snakeFood.x&&head.y===snakeFood.y){
+gameScore+=10;
+document.getElementById('game-score').textContent=gameScore;
+snakeFood={x:Math.floor(Math.random()*20),y:Math.floor(Math.random()*20)};
+}else{
+snake.pop();
+}
+drawSnake();
+},150);
+}
+function drawSnake(){
+gameCtx.fillStyle='#000';
+gameCtx.fillRect(0,0,400,400);
+gameCtx.fillStyle='#00ff88';
+snake.forEach(s=>gameCtx.fillRect(s.x*20,s.y*20,18,18));
+gameCtx.fillStyle='#ff6600';
+gameCtx.fillRect(snakeFood.x*20,snakeFood.y*20,18,18);
+}
+document.addEventListener('keydown',e=>{
+if(currentGame!=='snake')return;
+if(e.key==='ArrowUp'&&snakeDir.y===0)snakeDir={x:0,y:-1};
+if(e.key==='ArrowDown'&&snakeDir.y===0)snakeDir={x:0,y:1};
+if(e.key==='ArrowLeft'&&snakeDir.x===0)snakeDir={x:-1,y:0};
+if(e.key==='ArrowRight'&&snakeDir.x===0)snakeDir={x:1,y:0};
+});
+
+// ТЕТРИС
+let tetrisBoard=[],tetrisPiece=null,tetrisRunning=false,tetrisX=0,tetrisY=0;
+function initTetris(){
+tetrisBoard=Array(20).fill().map(()=>Array(10).fill(0));
+tetrisPiece=[[1,1],[1,1]];
+tetrisX=4;
+tetrisY=0;
+tetrisRunning=false;
+drawTetris();
+}
+function startTetris(){
+if(tetrisRunning)return;
+tetrisRunning=true;
+gameInterval=setInterval(()=>{
+tetrisY++;
+if(tetrisY>18||tetrisBoard[tetrisY+2][tetrisX]||tetrisBoard[tetrisY+2][tetrisX+1]){
+for(let i=0;i<2;i++)for(let j=0;j<2;j++)tetrisBoard[tetrisY+i][tetrisX+j]=1;
+gameScore+=10;
+document.getElementById('game-score').textContent=gameScore;
+tetrisY=0;
+tetrisX=Math.floor(Math.random()*8);
+}
+drawTetris();
+},500);
+}
+function drawTetris(){
+gameCtx.fillStyle='#000';
+gameCtx.fillRect(0,0,400,400);
+gameCtx.fillStyle='#0066ff';
+for(let y=0;y<20;y++)for(let x=0;x<10;x++)if(tetrisBoard[y][x])gameCtx.fillRect(x*40,y*20,38,18);
+gameCtx.fillStyle='#ff6600';
+for(let i=0;i<2;i++)for(let j=0;j<2;j++)gameCtx.fillRect((tetrisX+j)*40,(tetrisY+i)*20,38,18);
+}
+
+// 2048
+let grid2048=[],grid2048Running=false;
+function init2048(){
+grid2048=Array(4).fill().map(()=>Array(4).fill(0));
+add2048Tile();
+add2048Tile();
+grid2048Running=false;
+draw2048();
+}
+function start2048(){
+if(grid2048Running)return;
+grid2048Running=true;
+}
+function add2048Tile(){
+let empty=[];
+for(let i=0;i<4;i++)for(let j=0;j<4;j++)if(grid2048[i][j]===0)empty.push({x:i,y:j});
+if(empty.length>0){
+const pos=empty[Math.floor(Math.random()*empty.length)];
+grid2048[pos.x][pos.y]=Math.random()>0.5?2:4;
+}
+}
+function draw2048(){
+gameCtx.fillStyle='#000';
+gameCtx.fillRect(0,0,400,400);
+const colors={0:'#333',2:'#eee',4:'#ddd',8:'#f96',16:'#f63',32:'#f33',64:'#c33',128:'#ff0',256:'#ff0',512:'#ff0',1024:'#ff0',2048:'#ffd700'};
+for(let i=0;i<4;i++)for(let j=0;j<4;j++){
+const val=grid2048[i][j];
+gameCtx.fillStyle=colors[val]||'#000';
+gameCtx.fillRect(j*100+5,i*100+5,90,90);
+if(val>0){
+gameCtx.fillStyle='#000';
+gameCtx.font='bold 32px Arial';
+gameCtx.textAlign='center';
+gameCtx.fillText(val,j*100+50,i*100+55);
+}
+}
+}
+document.addEventListener('keydown',e=>{
+if(currentGame!=='2048'||!grid2048Running)return;
+let moved=false;
+if(e.key==='ArrowUp'){
+for(let j=0;j<4;j++)for(let i=1;i<4;i++)if(grid2048[i][j]!==0){let k=i;while(k>0&&grid2048[k-1][j]===0){grid2048[k-1][j]=grid2048[k][j];grid2048[k][j]=0;k--;moved=true}if(k>0&&grid2048[k-1][j]===grid2048[k][j]){grid2048[k-1][j]*=2;grid2048[k][j]=0;gameScore+=grid2048[k-1][j];moved=true}}}
+else if(e.key==='ArrowDown'){
+for(let j=0;j<4;j++)for(let i=2;i>=0;i--)if(grid2048[i][j]!==0){let k=i;while(k<3&&grid2048[k+1][j]===0){grid2048[k+1][j]=grid2048[k][j];grid2048[k][j]=0;k++;moved=true}if(k<3&&grid2048[k+1][j]===grid2048[k][j]){grid2048[k+1][j]*=2;grid2048[k][j]=0;gameScore+=grid2048[k+1][j];moved=true}}}
+else if(e.key==='ArrowLeft'){
+for(let i=0;i<4;i++)for(let j=1;j<4;j++)if(grid2048[i][j]!==0){let k=j;while(k>0&&grid2048[i][k-1]===0){grid2048[i][k-1]=grid2048[i][k];grid2048[i][k]=0;k--;moved=true}if(k>0&&grid2048[i][k-1]===grid2048[i][k]){grid2048[i][k-1]*=2;grid2048[i][k]=0;gameScore+=grid2048[i][k-1];moved=true}}}
+else if(e.key==='ArrowRight'){
+for(let i=0;i<4;i++)for(let j=2;j>=0;j--)if(grid2048[i][j]!==0){let k=j;while(k<3&&grid2048[i][k+1]===0){grid2048[i][k+1]=grid2048[i][k];grid2048[i][k]=0;k++;moved=true}if(k<3&&grid2048[i][k+1]===grid2048[i][k]){grid2048[i][k+1]*=2;grid2048[i][k]=0;gameScore+=grid2048[i][k+1];moved=true}}}
+if(moved){
+add2048Tile();
+document.getElementById('game-score').textContent=gameScore;
+draw2048();
+}
+});
+
+// УГАДАЙ ТРЕК
+let guessTracks=[],guessCurrent=null,guessRunning=false;
+function initGuessGame(){
+guessTracks=lib.sort(()=>Math.random()-0.5).slice(0,5);
+guessCurrent=0;
+guessRunning=false;
+showGuessQuestion();
+}
+function startGuessGame(){
+if(guessRunning)return;
+guessRunning=true;
+}
+function showGuessQuestion(){
+if(guessCurrent>=guessTracks.length){
+sn('🎉 Игра окончена! Счёт: '+gameScore);
+addXP(gameScore);
+guessRunning=false;
+return;
+}
+const track=guessTracks[guessCurrent];
+const options=[track];
+while(options.length<4){
+const random=lib[Math.floor(Math.random()*lib.length)];
+if(!options.find(o=>o.t===random.t))options.push(random);
+}
+options.sort(()=>Math.random()-0.5);
+let html=`<div style="font-size:40px;margin-bottom:10px">🎵</div><div style="font-size:18px;margin-bottom:15px">Вопрос ${guessCurrent+1}/${guessTracks.length}</div><strong>Исполнитель: ${track.a}</strong><div class="battle-options">`;
+options.forEach((opt,i)=>{
+html+=`<div class="battle-option" onclick="answerGuess('${opt.t.replace(/'/g,"\\'")}','${track.t.replace(/'/g,"\\'")}')">${opt.t}</div>`;
+});
+html+='</div>';
+document.querySelector('.battle-track').innerHTML=html;
+}
+function answerGuess(selected,correct){
+const options=document.querySelectorAll('.battle-option');
+if(selected===correct){
+gameScore+=50;
+options.forEach(o=>{if(o.textContent===correct)o.classList.add('correct');});
+sn('✅ Правильно! +50 XP');
+}else{
+options.forEach(o=>{if(o.textContent===selected)o.classList.add('wrong');if(o.textContent===correct)o.classList.add('correct');});
+sn('❌ Неправильно!');
+}
+document.getElementById('game-score').textContent=gameScore;
+setTimeout(()=>{guessCurrent++;showGuessQuestion();},1500);
+}
+
+// РИТМ
+let rhythmTimer=null,rhythmRunning=false,rhythmScore=0;
+function initRhythm(){
+rhythmScore=0;
+rhythmRunning=false;
+document.querySelector('.battle-track').innerHTML=`<div style="text-align:center"><div id="rhythm-circle" style="width:150px;height:150px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--s));margin:20px auto;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:bold">ЖМИ!</div><div style="font-size:18px">Нажимай когда зелёный!</div><div style="font-size:24px;margin-top:10px">Счёт: <span id="rhythm-score">0</span></div></div>`;
+}
+function startRhythm(){
+if(rhythmRunning)return;
+rhythmRunning=true;
+rhythmLoop();
+}
+function rhythmLoop(){
+if(!rhythmRunning)return;
+const circle=document.getElementById('rhythm-circle');
+circle.style.background='linear-gradient(135deg,var(--p),var(--s))';
+setTimeout(()=>{
+if(!rhythmRunning)return;
+circle.style.background='linear-gradient(135deg,#00ff88,#00cc66)';
+setTimeout(()=>{
+if(!rhythmRunning)return;
+rhythmLoop();
+},500+Math.random()*1000);
+},1000+Math.random()*2000);
+}
+document.getElementById('rhythm-circle')?.addEventListener('click',()=>{
+if(!rhythmRunning)return;
+const circle=document.getElementById('rhythm-circle');
+if(circle.style.background.includes('00ff88')){
+rhythmScore+=10;
+gameScore+=10;
+document.getElementById('rhythm-score').textContent=rhythmScore;
+document.getElementById('game-score').textContent=gameScore;
+sn('🎯 Отлично! +10');
+}
+});
+
+// ПАМЯТЬ
+let memoryCards=[],memoryFlipped=[],memoryMatched=0,memoryRunning=false;
+function initMemory(){
+const icons=['🎵','','🎤','','🎹',''];
+memoryCards=[...icons,...icons].sort(()=>Math.random()-0.5);
+memoryFlipped=[];
+memoryMatched=0;
+memoryRunning=false;
+drawMemory();
+}
+function startMemory(){
+if(memoryRunning)return;
+memoryRunning=true;
+}
+function drawMemory(){
+let html='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:400px;margin:0 auto">';
+memoryCards.forEach((card,i)=>{
+html+=`<div class="battle-option" onclick="flipMemory(${i})" id="memory-${i}" style="height:80px;display:flex;align-items:center;justify-content:center;font-size:32px">?</div>`;
+});
+html+='</div><div style="margin-top:15px;font-size:18px">Пар: '+memoryMatched+'/6</div>';
+document.querySelector('.battle-track').innerHTML=html;
+}
+function flipMemory(i){
+if(!memoryRunning||memoryFlipped.includes(i)||memoryCards[i]==='x')return;
+const el=document.getElementById('memory-'+i);
+el.textContent=memoryCards[i];
+memoryFlipped.push(i);
+if(memoryFlipped.length===2){
+const [a,b]=memoryFlipped;
+if(memoryCards[a]===memoryCards[b]){
+memoryCards[a]=memoryCards[b]='x';
+memoryMatched++;
+gameScore+=25;
+document.getElementById('game-score').textContent=gameScore;
+if(memoryMatched===6){
+sn('🎉 Победа! Счёт: '+gameScore);
+addXP(gameScore);
+memoryRunning=false;
+}
+}
+setTimeout(()=>{
+if(memoryCards[a]!=='x')document.getElementById('memory-'+a).textContent='?';
+if(memoryCards[b]!=='x')document.getElementById('memory-'+b).textContent='?';
+memoryFlipped=[];
+},1000);
+}
+}
+
+// ЛАБИРИНТ
+let maze=[],mazePlayer={x:0,y:0},mazeRunning=false;
+function initMaze(){
+maze=Array(10).fill().map(()=>Array(10).fill(1));
+for(let i=0;i<10;i++)for(let j=0;j<10;j++)if(Math.random()>0.3)maze[i][j]=0;
+maze[0][0]=0;
+maze[9][9]=0;
+mazePlayer={x:0,y:0};
+mazeRunning=false;
+drawMaze();
+}
+function startMaze(){
+if(mazeRunning)return;
+mazeRunning=true;
+}
+function drawMaze(){
+gameCtx.fillStyle='#000';
+gameCtx.fillRect(0,0,400,400);
+gameCtx.fillStyle='#0066ff';
+for(let y=0;y<10;y++)for(let x=0;x<10;x++)if(maze[y][x]===1)gameCtx.fillRect(x*40,y*40,38,38);
+gameCtx.fillStyle='#00ff88';
+gameCtx.fillRect(9*40,9*40,38,38);
+gameCtx.fillStyle='#ff6600';
+gameCtx.fillRect(mazePlayer.x*40,mazePlayer.y*40,38,38);
+}
+document.addEventListener('keydown',e=>{
+if(currentGame!=='maze'||!mazeRunning)return;
+let nx=mazePlayer.x,ny=mazePlayer.y;
+if(e.key==='ArrowUp')ny--;
+if(e.key==='ArrowDown')ny++;
+if(e.key==='ArrowLeft')nx--;
+if(e.key==='ArrowRight')nx++;
+if(nx>=0&&nx<10&&ny>=0&&ny<10&&maze[ny][nx]===0){
+mazePlayer.x=nx;
+mazePlayer.y=ny;
+drawMaze();
+if(nx===9&&ny===9){
+gameScore+=200;
+document.getElementById('game-score').textContent=gameScore;
+sn('🏆 Победа! +200 XP');
+addXP(200);
+mazeRunning=false;
+}
+}
+});
+
+// ДРАКОН
+let dragon={x:200,y:200},dragonCoins=[],dragonFire=[],dragonRunning=false;
+function initDragon(){
+dragon={x:200,y:200};
+dragonCoins=[];
+dragonFire=[];
+for(let i=0;i<5;i++)dragonCoins.push({x:Math.random()*360,y:Math.random()*360});
+for(let i=0;i<3;i++)dragonFire.push({x:Math.random()*360,y:Math.random()*360});
+dragonRunning=false;
+drawDragon();
+}
+function startDragon(){
+if(dragonRunning)return;
+dragonRunning=true;
+gameInterval=setInterval(()=>{
+dragonFire.forEach(f=>{f.x-=2;if(f.x<0)f.x=360;});
+drawDragon();
+dragonCoins.forEach((c,i)=>{
+if(Math.abs(dragon.x-c.x)<20&&Math.abs(dragon.y-c.y)<20){
+dragonCoins.splice(i,1);
+dragonCoins.push({x:Math.random()*360,y:Math.random()*360});
+gameScore+=50;
+document.getElementById('game-score').textContent=gameScore;
+}
+});
+dragonFire.forEach(f=>{
+if(Math.abs(dragon.x-f.x)<20&&Math.abs(dragon.y-f.y)<20){
+sn('💀 Огонь! Игра окончена');
+clearInterval(gameInterval);
+dragonRunning=false;
+addXP(gameScore);
+}
+});
+},50);
+}
+function drawDragon(){
+gameCtx.fillStyle='#000';
+gameCtx.fillRect(0,0,400,400);
+gameCtx.font='30px Arial';
+gameCtx.fillText('🐉',dragon.x,dragon.y);
+gameCtx.fillText('🪙',...dragonCoins.map(c=>[c.x,c.y]).flat());
+gameCtx.fillText('🔥',...dragonFire.map(f=>[f.x,f.y]).flat());
+}
+document.addEventListener('keydown',e=>{
+if(currentGame!=='dragon'||!dragonRunning)return;
+if(e.key==='ArrowUp')dragon.y=Math.max(20,dragon.y-10);
+if(e.key==='ArrowDown')dragon.y=Math.min(380,dragon.y+10);
+if(e.key==='ArrowLeft')dragon.x=Math.max(20,dragon.x-10);
+if(e.key==='ArrowRight')dragon.x=Math.min(380,dragon.x+10);
+});
+
+// FLAPPY BIRD
+let flappy={x:50,y:200,v:0},flappyPipes=[],flappyRunning=false;
+function initFlappy(){
+flappy={x:50,y:200,v:0};
+flappyPipes=[];
+for(let i=0;i<3;i++)flappyPipes.push({x:150+i*150,g:150+Math.random()*100});
+flappyRunning=false;
+drawFlappy();
+}
+function startFlappy(){
+if(flappyRunning)return;
+flappyRunning=true;
+gameInterval=setInterval(()=>{
+flappy.v+=0.5;
+flappy.y+=flappy.v;
+flappyPipes.forEach(p=>{
+p.x-=3;
+if(p.x<-50){p.x=450;p.g=150+Math.random()*100;gameScore+=50;document.getElementById('game-score').textContent=gameScore;}
+});
+drawFlappy();
+if(flappy.y<0||flappy.y>400){
+sn('💀 Упал! Счёт: '+gameScore);
+clearInterval(gameInterval);
+flappyRunning=false;
+addXP(gameScore);
+}
+flappyPipes.forEach(p=>{
+if(Math.abs(flappy.x-p.x)<20&&(flappy.y<p.g-50||flappy.y>p.g+50)){
+sn('💀 Столкновение! Счёт: '+gameScore);
+clearInterval(gameInterval);
+flappyRunning=false;
+addXP(gameScore);
+}
+});
+},50);
+}
+function drawFlappy(){
+gameCtx.fillStyle='#87CEEB';
+gameCtx.fillRect(0,0,400,400);
+gameCtx.font='25px Arial';
+gameCtx.fillText('🐦',flappy.x,flappy.y);
+gameCtx.fillStyle='#0a0';
+flappyPipes.forEach(p=>{
+gameCtx.fillRect(p.x,0,40,p.g-50);
+gameCtx.fillRect(p.x,p.g+50,40,400-p.g-50);
+});
+}
+document.addEventListener('keydown',e=>{
+if(currentGame!=='flappy')return;
+if(e.code==='Space'&&flappyRunning){flappy.v=-8;e.preventDefault();}
+});
+document.addEventListener('click',()=>{
+if(currentGame==='flappy'&&flappyRunning)flappy.v=-8;
+});
+
+// ПИНГ-ПОНГ
+let pongBall={x:200,y:200,vx:3,vy:3},pongPaddle={y:175},pongAI={y:175},pongRunning=false;
+function initPong(){
+pongBall={x:200,y:200,vx:3,vy:3};
+pongPaddle={y:175};
+pongAI={y:175};
+pongRunning=false;
+drawPong();
+}
+function startPong(){
+if(pongRunning)return;
+pongRunning=true;
+gameInterval=setInterval(()=>{
+pongBall.x+=pongBall.vx;
+pongBall.y+=pongBall.vy;
+if(pongBall.y<0||pongBall.y>400)pongBall.vy*=-1;
+if(pongBall.x<20&&pongBall.y>pongPaddle.y&&pongBall.y<pongPaddle.y+50)pongBall.vx=Math.abs(pongBall.vx)+0.5;
+if(pongBall.x>380&&pongBall.y>pongAI.y&&pongBall.y<pongAI.y+50)pongBall.vx=-Math.abs(pongBall.vx)-0.5;
+if(pongBall.x<0){
+sn('💀 AI победил!');
+clearInterval(gameInterval);
+pongRunning=false;
+}
+if(pongBall.x>400){
+gameScore+=100;
+document.getElementById('game-score').textContent=gameScore;
+pongBall={x:200,y:200,vx:3,vy:3};
+}
+pongAI.y+=((pongBall.y-50)-pongAI.y)*0.05;
+drawPong();
+},20);
+}
+function drawPong(){
+gameCtx.fillStyle='#000';
+gameCtx.fillRect(0,0,400,400);
+gameCtx.fillStyle='#fff';
+gameCtx.fillRect(10,pongPaddle.y,10,50);
+gameCtx.fillRect(380,pongAI.y,10,50);
+gameCtx.beginPath();
+gameCtx.arc(pongBall.x,pongBall.y,8,0,Math.PI*2);
+gameCtx.fill();
+}
+document.addEventListener('mousemove',e=>{
+if(currentGame==='pong'&&pongRunning){
+const rect=gameCanvas.getBoundingClientRect();
+pongPaddle.y=e.clientY-rect.top-25;
+}
+});
+
+// ===== ГОРОД 3D - ИСПРАВЛЕНО =====
+function initCity(){
+if(typeof THREE==='undefined'){sn('⚠️ Three.js не загружен. Перезагрузите страницу!');return;}
+const cv=document.getElementById('city-canvas');
+const ct=document.getElementById('city-container');
+if(!cv||!ct)return;
+try{
+if(cityScene){while(cityScene.children.length>0)cityScene.remove(cityScene.children[0]);}
+if(cityRenderer){cityRenderer.dispose();}
+const w=ct.clientWidth||400;
+cv.width=w;cv.height=500;
+cityScene=new THREE.Scene();
+cityScene.background=new THREE.Color(0x87CEEB);
+cityScene.fog=new THREE.FogExp2(0x87CEEB,0.008);
+cityCamera=new THREE.PerspectiveCamera(75,w/500,0.1,500);
+cityCamera.position.y=1.7;
+cityRenderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+cityRenderer.setSize(w,500,false);
+cityRenderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+cityRenderer.shadowMap.enabled=true;
+const skyGeo=new THREE.SphereGeometry(400,32,32);
+const skyMat=new THREE.MeshBasicMaterial({color:0x87CEEB,side:THREE.BackSide});
+cityScene.add(new THREE.Mesh(skyGeo,skyMat));
+const groundGeo=new THREE.PlaneGeometry(500,500,100,100);
+const groundMat=new THREE.MeshLambertMaterial({color:0x2d5c1e});
+const ground=new THREE.Mesh(groundGeo,groundMat);
+ground.rotation.x=-Math.PI/2;
+ground.receiveShadow=true;
+cityScene.add(ground);
+const roadMat=new THREE.MeshLambertMaterial({color:0x333333});
+const sidewalkMat=new THREE.MeshLambertMaterial({color:0x666666});
+const lineMat=new THREE.MeshBasicMaterial({color:0xffffff});
+for(let i=-200;i<=200;i+=40){
+const hRoad=new THREE.Mesh(new THREE.PlaneGeometry(400,10),roadMat);
+hRoad.rotation.x=-Math.PI/2;
+hRoad.position.set(0,0.01,i);
+cityScene.add(hRoad);
+const sideL=new THREE.Mesh(new THREE.PlaneGeometry(400,3),sidewalkMat);
+sideL.rotation.x=-Math.PI/2;
+sideL.position.set(0,0.02,i-6.5);
+cityScene.add(sideL);
+const sideR=new THREE.Mesh(new THREE.PlaneGeometry(400,3),sidewalkMat);
+sideR.rotation.x=-Math.PI/2;
+sideR.position.set(0,0.02,i+6.5);
+cityScene.add(sideR);
+const line=new THREE.Mesh(new THREE.PlaneGeometry(400,0.3),lineMat);
+line.rotation.x=-Math.PI/2;
+line.position.set(0,0.02,i);
+cityScene.add(line);
+const vRoad=new THREE.Mesh(new THREE.PlaneGeometry(10,400),roadMat);
+vRoad.rotation.x=-Math.PI/2;
+vRoad.position.set(i,0.01,0);
+cityScene.add(vRoad);
+const sideVL=new THREE.Mesh(new THREE.PlaneGeometry(3,400),sidewalkMat);
+sideVL.rotation.x=-Math.PI/2;
+sideVL.position.set(i-6.5,0.02,0);
+cityScene.add(sideVL);
+const sideVR=new THREE.Mesh(new THREE.PlaneGeometry(3,400),sidewalkMat);
+sideVR.rotation.x=-Math.PI/2;
+sideVR.position.set(i+6.5,0.02,0);
+cityScene.add(sideVR);
+const lineV=new THREE.Mesh(new THREE.PlaneGeometry(0.3,400),lineMat);
+lineV.rotation.x=-Math.PI/2;
+lineV.position.set(i,0.02,0);
+cityScene.add(lineV);
+}
+const riverGeo=new THREE.PlaneGeometry(25,600);
+const riverMat=new THREE.MeshLambertMaterial({color:0x0055ff,transparent:true,opacity:0.8});
+const river=new THREE.Mesh(riverGeo,riverMat);
+river.rotation.x=-Math.PI/2;
+river.position.set(80,0.1,0);
+cityScene.add(river);
+const bridge=new THREE.Mesh(new THREE.BoxGeometry(35,2,12),new THREE.MeshLambertMaterial({color:0x555555}));
+bridge.position.set(80,1,0);
+cityScene.add(bridge);
+const railMat=new THREE.MeshLambertMaterial({color:0x888888});
+const railL=new THREE.Mesh(new THREE.BoxGeometry(1,2,12),railMat);
+railL.position.set(78.5,2,0);
+cityScene.add(railL);
+const railR=new THREE.Mesh(new THREE.BoxGeometry(1,2,12),railMat);
+railR.position.set(81.5,2,0);
+cityScene.add(railR);
+for(let x=-180;x<=180;x+=40){
+for(let z=-180;z<=180;z+=40){
+if(Math.abs(x)<25||Math.abs(z)<25)continue;
+if(Math.abs(x-80)<15)continue;
+const h=Math.random()*40+10;
+const bld=new THREE.Mesh(new THREE.BoxGeometry(15,h,15),new THREE.MeshLambertMaterial({color:Math.random()*0xffffff}));
+bld.position.set(x,h/2,z);
+bld.castShadow=true;
+cityScene.add(bld);
+cityBuildings.push(bld);
+for(let y=2;y<h-2;y+=4){
+for(let wx=-6;wx<6;wx+=4){
+if(Math.random()>0.3){
+const win=new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.MeshBasicMaterial({color:0xffffaa}));
+win.position.set(x+wx,y,z+7.6);
+cityScene.add(win);
+}
+}
+}
+}
+}
+const treeMat=new THREE.MeshLambertMaterial({color:0x0a4a0a});
+const trunkMat=new THREE.MeshLambertMaterial({color:0x4a2810});
+for(let i=0;i<200;i++){
+let x=(Math.random()-0.5)*400;
+let z=(Math.random()-0.5)*400;
+if(Math.abs(x)<100&&Math.abs(z)<100)continue;
+if(Math.abs(x-80)<20)continue;
+const trunk=new THREE.Mesh(new THREE.CylinderGeometry(1,1.5,5,8),trunkMat);
+trunk.position.set(x,2.5,z);
+const leaves=new THREE.Mesh(new THREE.ConeGeometry(4,10,8),treeMat);
+leaves.position.set(x,8,z);
+cityScene.add(trunk);
+cityScene.add(leaves);
+cityTrees.push({trunk,leaves});
+}
+for(let i=0;i<30;i++){
+const car=new THREE.Group();
+const body=new THREE.Mesh(new THREE.BoxGeometry(2,1,4),new THREE.MeshLambertMaterial({color:Math.random()*0xffffff}));
+body.position.y=0.8;
+car.add(body);
+const light=new THREE.PointLight(0xffffff,1,10);
+light.position.set(0,1,2);
+car.add(light);
+const isH=Math.random()>0.5;
+const roadIdx=Math.floor(Math.random()*10)*40-200;
+if(isH){car.position.set((Math.random()-0.5)*400,0,roadIdx+2);car.rotation.y=Math.random()>0.5?0:Math.PI;}
+else{car.position.set(roadIdx+2,0,(Math.random()-0.5)*400);car.rotation.y=Math.random()>0.5?Math.PI/2:-Math.PI/2;}
+cityScene.add(car);
+cityCars.push({mesh:car,speed:0.2+Math.random()*0.3,dir:isH?'x':'z'});
+}
+for(let i=0;i<50;i++){
+const npc=new THREE.Group();
+const body=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.5,1.8),new THREE.MeshLambertMaterial({color:Math.random()*0xffffff}));
+body.position.y=0.9;
+npc.add(body);
+const head=new THREE.Mesh(new THREE.SphereGeometry(0.4),new THREE.MeshLambertMaterial({color:0xffccaa}));
+head.position.y=2.2;
+npc.add(head);
+npc.position.set((Math.random()-0.5)*150,0,(Math.random()-0.5)*150);
+cityScene.add(npc);
+cityNPCs.push({mesh:npc,dir:new THREE.Vector3(Math.random()-0.5,0,Math.random()-0.5).normalize(),speed:0.02+Math.random()*0.02,timer:0,lastSpeech:0});
+}
+cityScene.add(new THREE.AmbientLight(0xffffff,0.6));
+const sun=new THREE.DirectionalLight(0xfff0c0,1);
+sun.position.set(50,100,50);
+sun.castShadow=true;
+cityScene.add(sun);
+cityPlayer={x:0,z:0,a:0,hp:100,score:0,mush:0,ber:0,lvl:1};
+updateCityHUD();
+cityRenderer.render(cityScene,cityCamera);
+sn('🌆 Город загружен! 50 NPC, машины, парки, река!');
+}catch(e){console.error(e);sn('⚠️ Ошибка города: '+e.message);}
+}
+
+function startCity(){
+if(!cityScene)initCity();
+cityRunning=true;
+cityClock.start();
+sn('🌆 Город ожил! NPC говорят!');
+animateCity();
+}
+
+function resetCity(){
+cityRunning=false;
+if(cityScene){while(cityScene.children.length>0)cityScene.remove(cityScene.children[0]);}
+cityCars=[];cityNPCs=[];cityBuildings=[];cityTrees=[];
+initCity();
+sn('🔄 Город перезапущен!');
+}
+
+function cityKey(k,s){cityKeys[k]=s;}
+
+function animateCity(){
+if(!cityRunning)return;
+requestAnimationFrame(animateCity);
+const time=Date.now()*0.001;
+let newX=cityPlayer.x;
+let newZ=cityPlayer.z;
+if(cityKeys.w){newX+=Math.sin(cityPlayer.a)*0.15;newZ+=Math.cos(cityPlayer.a)*0.15;}
+if(cityKeys.s){newX-=Math.sin(cityPlayer.a)*0.15;newZ-=Math.cos(cityPlayer.a)*0.15;}
+if(cityKeys.a)cityPlayer.a-=0.05;
+if(cityKeys.d)cityPlayer.a+=0.05;
+if(Math.abs(newX)<200&&Math.abs(newZ)<200){cityPlayer.x=newX;cityPlayer.z=newZ;}
+cityCamera.position.x=cityPlayer.x-Math.sin(cityPlayer.a)*15;
+cityCamera.position.z=cityPlayer.z-Math.cos(cityPlayer.a)*15;
+cityCamera.position.y=8;
+cityCamera.lookAt(cityPlayer.x,0,cityPlayer.z);
+cityCars.forEach(car=>{
+if(car.dir==='x')car.mesh.position.x+=car.speed*(car.mesh.rotation.y===0?1:-1);
+else car.mesh.position.z+=car.speed*(car.mesh.rotation.y===Math.PI/2?1:-1);
+if(Math.abs(car.mesh.position.x)>200)car.mesh.position.x*=-0.9;
+if(Math.abs(car.mesh.position.z)>200)car.mesh.position.z*=-0.9;
+});
+cityNPCs.forEach(npc=>{
+if(Math.random()<0.02)npc.dir.set(Math.random()-0.5,0,Math.random()-0.5).normalize();
+const newX=npc.mesh.position.x+npc.dir.x*npc.speed;
+const newZ=npc.mesh.position.z+npc.dir.z*npc.speed;
+if(Math.abs(newX)<180&&Math.abs(newZ)<180){npc.mesh.position.x=newX;npc.mesh.position.z=newZ;}
+if(time-npc.lastSpeech>5+Math.random()*10){
+const phrase=npcPhrases[Math.floor(Math.random()*npcPhrases.length)];
+showNPCBubble(npc.mesh.position,phrase);
+npc.lastSpeech=time;
+if('speechSynthesis' in window){
+const utterance=new SpeechSynthesisUtterance(phrase);
+utterance.lang='ru-RU';
+utterance.volume=0.3;
+window.speechSynthesis.speak(utterance);
+}
+}
+});
+cityRenderer.render(cityScene,cityCamera);
+}
+
+function showNPCBubble(pos,text){
+const bubble=document.createElement('div');
+bubble.className='npc-bubble';
+bubble.textContent=text;
+bubble.style.left='50%';
+bubble.style.top='100px';
+document.querySelector('#city-container').appendChild(bubble);
+setTimeout(()=>bubble.remove(),3000);
+}
+
+function updateCityHUD(){
+document.getElementById('city-score').textContent=cityPlayer.score;
+document.getElementById('city-mush').textContent=cityPlayer.mush;
+document.getElementById('city-ber').textContent=cityPlayer.ber;
+document.getElementById('city-hp').textContent=cityPlayer.hp;
+document.getElementById('city-lvl').textContent=cityPlayer.lvl;
+}
+
+// ===== ПРОФИЛЬ - ИСПРАВЛЕНА РЕГИСТРАЦИЯ =====
+function renderProfile(){
+if(!user){
+document.getElementById('profile-auth').style.display='block';
+document.getElementById('profile-data').style.display='none';
+return;
+}
+document.getElementById('profile-auth').style.display='none';
+document.getElementById('profile-data').style.display='block';
+document.getElementById('profile-av').textContent=user.name[0].toUpperCase();
+document.getElementById('profile-name').textContent=user.name;
+document.getElementById('profile-lvl').textContent=Math.floor(xp/100)+1;
+document.getElementById('profile-xp').textContent=xp;
+document.getElementById('profile-coins').textContent=cn;
+showProfileTab('stats');
+}
+
+function showProfileTab(tab){
+document.querySelectorAll('#profile .feed-tab').forEach((t,i)=>{
+const tabs=['stats','ach','quests','rating'];
+t.classList.toggle('a',tabs.indexOf(tab)===i);
+});
+let html='';
+if(tab==='stats'){
+html=`<div class="card"><h3>📊 Статистика</h3><p>🎧 Треков прослушано: ${pl}</p><p>⭐ Всего XP: ${xp}</p><p>🪙 Монет: ${cn}</p><p>📅 Дней в приложении: ${Math.floor((Date.now()-new Date(localStorage.getItem('reg_date')||Date.now()))/86400000)}</p></div>`;
+}else if(tab==='ach'){
+const achievements=[
+{id:'a1',i:'🎵',n:'Первый трек',d:'Прослушай 1 трек',u:pl>=1},
+{id:'a2',i:'🎧',n:'Меломан',d:'Прослушай 10 треков',u:pl>=10},
+{id:'a3',i:'⭐',n:'Уровень 5',d:'Достигни 5 уровня',u:Math.floor(xp/100)>=5},
+{id:'a4',i:'💯',n:'Сотка',d:'100 XP',u:xp>=100},
+{id:'a5',i:'🔥',n:'Огонь',d:'500 XP',u:xp>=500},
+{id:'a6',i:'💎',n:'Бриллиант',d:'1000 XP',u:xp>=1000}
+];
+achievements.forEach(a=>{
+html+=`<div class="achievement ${a.u?'u':'l'}"><div class="ach-icon">${a.i}</div><div class="ach-info"><div class="ach-name">${a.n}</div><div class="ach-desc">${a.d}</div></div><div>${a.u?'✅':'🔒'}</div></div>`;
+});
+}else if(tab==='quests'){
+const quests=[
+{t:'🎧 Послушай 5 треков',d:'Включи музыку',tg:5,c:Math.min(pl,5),r:50},
+{t:'🎮 Сыграй в игру',d:'Любую игру',tg:1,c:1,r:100},
+{t:'🌆 Посети город 3D',d:'Зайди в город',tg:1,c:1,r:75}
+];
+quests.forEach(q=>{
+const p=(q.c/q.tg)*100;
+html+=`<div class="quest"><div class="quest-title"><span>${q.t}</span><span style="color:var(--gold)">+${q.r} 🪙</span></div><div class="quest-desc">${q.d}</div><div class="quest-progress"><div class="quest-progress-fill" style="width:${Math.min(100,p)}%"></div></div><div style="font-size:11px;opacity:0.7">${q.c}/${q.tg}${q.c>=q.tg?' ✅':''}</div></div>`;
+});
+}else if(tab==='rating'){
+const leaders=[
+{n:'Степа',s:2500},{n:'Дима',s:1800},{n:user?user.name:'Гость',s:xp},{n:'AI',s:999}
+];
+leaders.sort((a,b)=>b.s-a.s);
+leaders.forEach((l,i)=>{
+html+=`<div class="shop-item"><div style="font-size:20px;font-weight:bold;color:var(--gold);min-width:30px">#${i+1}</div><div class="shop-info"><div class="shop-name">${l.n}</div><div class="shop-desc">${l.s} XP</div></div></div>`;
+});
+}
+document.getElementById('profile-content').innerHTML=html;
+}
+
+function login(){
+const name=document.getElementById('auth-name').value.trim();
+const email=document.getElementById('auth-email').value.trim();
+const pass=document.getElementById('auth-pass').value;
+if(!name||!email||!pass){sn('⚠️ Заполни все поля');return;}
+const users=JSON.parse(localStorage.getItem('users')||'{}');
+if(!users[email]){sn('⚠️ Пользователь не найден');return;}
+if(users[email].pass!==pass){sn('⚠️ Неверный пароль');return;}
+user={name,email};
+localStorage.setItem('user',JSON.stringify(user));
+renderProfile();
+sn('🎉 С возвращением, '+name+'!');
+addXP(10);
+}
+
+function register(){
+const name=document.getElementById('auth-name').value.trim();
+const email=document.getElementById('auth-email').value.trim();
+const pass=document.getElementById('auth-pass').value;
+if(!name||!email||!pass){sn('⚠️ Заполни все поля');return;}
+const users=JSON.parse(localStorage.getItem('users')||'{}');
+if(users[email]){sn('⚠️ Пользователь существует');return;}
+users[email]={name,pass};
+localStorage.setItem('users',JSON.stringify(users));
+user={name,email};
+localStorage.setItem('user',JSON.stringify(user));
+localStorage.setItem('reg_date',Date.now());
+renderProfile();
+sn('🎉 Регистрация успешна!');
+addXP(50);
+cn+=100;
+localStorage.setItem('cn',cn);
+updateStats();
+}
+
+function logout(){
+if(confirm('Выйти?')){
+user=null;
+localStorage.removeItem('user');
+renderProfile();
+sn('👋 До встречи!');
+}
+}
+
+// ===== УТИЛИТЫ =====
+function addXP(a){
+xp+=a;
+localStorage.setItem('xp',xp);
+updateStats();
+}
+
+function updateStats(){
+document.getElementById('xp').textContent=xp;
+document.getElementById('lv').textContent=Math.floor(xp/100)+1;
+document.getElementById('cn').textContent=cn;
+document.getElementById('pl').textContent=pl;
+document.getElementById('shop-coins').textContent=cn;
+}
+
+function sn(t){
+const n=document.getElementById('notif');
+n.textContent=t;
+n.classList.add('s');
+setTimeout(()=>n.classList.remove('s'),2500);
+}
+
+function buyItem(item,price){
+if(cn<price){sn('⚠️ Недостаточно монет!');return;}
+cn-=price;
+localStorage.setItem('cn',cn);
+updateStats();
+if(item==='chest'){
+const reward=100+Math.floor(Math.random()*900);
+cn+=reward;
+localStorage.setItem('cn',cn);
+updateStats();
+sn('🎁 +'+reward+' 🪙!');
+}else{
+sn('✅ Куплено: '+item);
+}
+}
+
+// ===== AI ЧАТ =====
+function sendAI(){
+const input=document.getElementById('ai-input');
+const msg=input.value.trim();
+if(!msg)return;
+const container=document.getElementById('ai-messages');
+container.innerHTML+=`<div class="ai-message" style="background:rgba(255,255,255,0.1);border-left-color:var(--s);text-align:right"><strong>Вы:</strong><br>${msg}</div>`;
+input.value='';
+setTimeout(()=>{
+const responses=[
+"Отличный вопрос! SoundScape Pro — это лучшая музыкальная соцсеть России! 🇷🇺",
+"Я могу помочь вам найти музыку, игры или просто поболтать! 😊",
+"Рекомендую послушать треки ENZRO или Artik & Asti — они сейчас в топе! 🎵",
+"В городе 3D сейчас 50 NPC, которые говорят на русском! Заходите! 🌆",
+"Premium подписка стоит 299₽/мес и дает много преимуществ! 💎",
+"Загружайте свои MP3 треки в библиотеку — это бесплатно! 📁",
+"Играйте в игры и получайте XP! У нас 10 разных игр! 🎮",
+"SoundScape Pro работает на всех устройствах — iPhone, Android, PC! 📱",
+"Делитесь музыкой с друзьями в ленте новостей! 📰",
+"Спасибо, что используете SoundScape Pro! Мы рады вам! ❤️"
+];
+const response=responses[Math.floor(Math.random()*responses.length)];
+container.innerHTML+=`<div class="ai-message"><strong>AI:</strong><br>${response}</div>`;
+container.scrollTop=container.scrollHeight;
+},500);
+}
+
+// ===== ИНИЦИАЛИЗАЦИЯ =====
+window.addEventListener('load',()=>{
+updateStats();
+filterFeed('all');
+renderLibrary();
+if(user)renderProfile();
+sn('🌆 SoundScape Pro готов!');
+});
+</script>
+</body>
+</html>
