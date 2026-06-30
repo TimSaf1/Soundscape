@@ -8,7 +8,7 @@
 <meta name="format-detection" content="telephone=no,address=no,email=no">
 <meta name="apple-itunes-app" content="app-id=0">
 <meta name="referrer" content="no-referrer">
-<title>SoundScape Pro 🇷</title>
+<title>SoundScape Pro 🇷🇺</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-tap-highlight-color:transparent}
 :root{--p:#0066ff;--s:#ff6600;--a:#00d4ff;--bg:#0a0e27;--card:rgba(10,14,39,0.85);--b:rgba(0,102,255,0.3);--gold:#ffd700;--danger:#ff4444;--success:#00ff88}
@@ -89,15 +89,6 @@ body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:
 .planet-card:active{transform:scale(0.95)}
 .planet-icon{font-size:40px;margin-bottom:8px}
 .planet-name{font-weight:bold;font-size:14px}
-.modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);z-index:3000;align-items:center;justify-content:center;padding:10px}
-.modal.a{display:flex}
-.mc{background:linear-gradient(135deg,var(--bg),#1a1f3a);border:2px solid var(--p);border-radius:15px;padding:20px;max-width:95%;width:100%;max-height:90vh;overflow-y:auto}
-.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
-.mx{background:none;border:none;color:#fff;font-size:24px;cursor:pointer}
-.diff{padding:8px 16px;border:2px solid var(--b);background:rgba(0,102,255,0.2);color:#fff;border-radius:15px;cursor:pointer;font-weight:bold;margin:4px;font-size:11px}
-.diff.a{background:var(--s);border-color:var(--s)}
-.rbtn{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--s));border:none;color:#fff;font-size:28px;cursor:pointer;margin:15px auto;display:block}
-.memc{width:100%;aspect-ratio:1;background:linear-gradient(135deg,var(--p),var(--s));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer}
 .ach{background:linear-gradient(135deg,rgba(255,215,0,0.2),rgba(255,165,0,0.2));border:2px solid rgba(255,215,0,0.5);border-radius:10px;padding:10px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
 .ach.u{background:linear-gradient(135deg,rgba(255,215,0,0.4),rgba(255,165,0,0.4))}
 .ach.l{opacity:0.5}
@@ -118,7 +109,6 @@ body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:
 .feed-tab.a{background:var(--p);border-color:var(--p)}
 .post-create{background:var(--card);border:2px solid var(--b);border-radius:12px;padding:12px;margin-bottom:15px}
 .post-input{width:100%;min-height:80px;background:rgba(0,0,0,0.3);border:1px solid var(--b);border-radius:8px;padding:10px;color:#fff;font-size:14px;resize:none;margin-bottom:8px}
-.post-actions{display:flex;gap:8px;justify-content:flex-end}
 .post{background:var(--card);border:2px solid var(--b);border-radius:12px;padding:12px;margin-bottom:12px}
 .post-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .post-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--s));display:flex;align-items:center;justify-content:center;font-weight:bold}
@@ -127,14 +117,14 @@ body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:
 .post-content{font-size:14px;margin-bottom:10px;line-height:1.4}
 .post-actions-main{display:flex;gap:15px;font-size:13px;opacity:0.8}
 .post-action{cursor:pointer;display:flex;align-items:center;gap:5px}
-.damage-flash{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,0,0,0.4);z-index:1500;pointer-events:none;animation:dmg 0.3s}
-@keyframes dmg{0%{opacity:1}100%{opacity:0}}
 .game-container{background:var(--card);border:2px solid var(--b);border-radius:15px;padding:20px;margin:15px 0;text-align:center}
 .game-canvas{background:#000;border-radius:10px;margin:15px 0;max-width:100%}
 .game-controls{display:flex;gap:10px;justify-content:center;margin-top:15px;flex-wrap:wrap}
 .game-btn{padding:10px 20px;background:var(--p);border:none;border-radius:10px;color:#fff;cursor:pointer;font-weight:bold}
-.game-btn:hover{background:var(--s)}
 .score-display{font-size:24px;font-weight:bold;color:var(--gold);margin:10px 0}
+.battle-option{padding:12px;background:rgba(0,102,255,0.2);border:2px solid var(--b);border-radius:10px;cursor:pointer;text-align:center;margin:5px 0}
+.battle-option.correct{background:var(--success);border-color:var(--success)}
+.battle-option.wrong{background:var(--danger);border-color:var(--danger)}
 @media(max-width:768px){.header h1{font-size:20px}.sv{font-size:16px}.city-btn{width:55px;height:55px;font-size:20px}#city-canvas{height:320px}}
 </style>
 </head>
@@ -202,7 +192,7 @@ body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:
 <input type="text" class="search-input" id="search-q" placeholder="Название или исполнитель..." onkeypress="if(event.key==='Enter')sm()">
 <button class="btn-search" onclick="sm()">🔍 Найти (до 50 треков)</button>
 </div>
-<div class="ib">💡 Поиск: iTunes + библиотека</div>
+<div class="ib">💡 Поиск: iTunes через backend + библиотека</div>
 <div id="search-results"></div>
 </div>
 
@@ -339,7 +329,7 @@ body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:
 <div id="ai" class="sec">
 <h2 style="margin-bottom:12px;text-align:center;font-size:18px">🤖 AI Ассистент</h2>
 <div class="ai-container">
-<div class="ai-message">Привет! Я AI-ассистент SoundScape Pro 🇷<br>Чем могу помочь?</div>
+<div class="ai-message">Привет! Я AI-ассистент SoundScape Pro 🇷🇺<br>Чем могу помочь?</div>
 <div id="ai-messages"></div>
 <input type="text" class="ai-input" id="ai-input" placeholder="Задай вопрос..." onkeypress="if(event.key==='Enter')sendAI()">
 <button class="btn" onclick="sendAI()" style="width:100%;margin-top:10px">📤 Отправить</button>
@@ -409,6 +399,14 @@ body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
+// ============================================================
+// 🔥 URL BACKEND-ПРОКСИ (обход CORS Apple iTunes)
+// ============================================================
+const API_BASE = 'https://soundscape-api-9fng.onrender.com';
+
+// ============================================================
+// 📚 ВСТРОЕННЫЕ ТРЕКИ
+// ============================================================
 const tracks=[
 {id:'1',t:'Ты не бойся ночи',a:'ENZRO',u:'https://cdn.jsdelivr.net/gh/melnikovvitalij02-hub/Soundscape2@main/ENZRO_-_Ty_ne_bojjsya_nochi_81423717.mp3',g:'electronic'},
 {id:'2',t:'А красивых женщин много',a:'Igor Malinin',u:'https://cdn.jsdelivr.net/gh/melnikovvitalij02-hub/Soundscape2@main/Igor_Malinin_-_A_krasivykh_zhenshhin_mnogo_81681758.mp3',g:'pop'},
@@ -445,111 +443,136 @@ let gameScore=0;
 let gameCanvas=null;
 let gameCtx=null;
 
-function ss(id){
-document.querySelectorAll('.sec').forEach(s=>s.classList.remove('a'));
-document.getElementById(id).classList.add('a');
-document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('a'));
-if(event&&event.target&&event.target.closest('.bnav-btn'))event.target.closest('.bnav-btn').classList.add('a');
-if(id==='library')renderLibrary();
-if(id==='profile')renderProfile();
-if(id==='city'){setTimeout(()=>{if(!cityRunning)initCity()},100);}
-if(id==='games'){closeGame();document.getElementById('games-list').style.display='grid';document.getElementById('active-game').style.display='none';document.getElementById('games-back').style.display='block';}
-window.scrollTo(0,0);
-}
-
-function filterFeed(type){
-document.querySelectorAll('.feed-tab').forEach((t,i)=>{if(i<4)t.classList.toggle('a',(['all','friends','music','games'].indexOf(type)===i))});
-const posts=[
-{author:'Анна М.',time:'2 мин назад',text:'Только что открыла новый трек ENZRO — просто огонь! 🔥',likes:24,comments:5},
-{author:'Дмитрий К.',time:'15 мин назад',text:'Кто идет на концерт в выходные? 🎸',likes:18,comments:12},
-{author:'Music Lover',time:'1 час назад',text:'SoundScape Pro — лучшая соцсеть для меломанов! 💎',likes:56,comments:8}
-];
-let html='';
-posts.forEach(p=>{
-html+=`<div class="post"><div class="post-header"><div class="post-avatar">${p.author[0]}</div><div><div class="post-author">${p.author}</div><div class="post-time">${p.time}</div></div></div><div class="post-content">${p.text}</div><div class="post-actions-main"><div class="post-action">👍 ${p.likes}</div><div class="post-action">💬 ${p.comments}</div><div class="post-action">🔗 Поделиться</div></div></div>`;
-});
-document.getElementById('feed-posts').innerHTML=html;
-}
-
-function filterGenre(genre){
-const filtered=lib.filter(t=>t.g===genre);
-let html=`<div class="ib">🎵 <strong>${getGenreName(genre)}</strong> — найдено: ${filtered.length}</div>`;
-if(filtered.length===0){
-html+='<div class="ib">😕 В этом жанре пока нет треков<br><br>💡 Добавьте свои MP3 файлы!</div>';
-}else{
-filtered.forEach((t,i)=>{
-const idx=lib.indexOf(t);
-html+=`<div class="track" onclick="playTrack(${idx})"><div class="tc">🎵</div><div class="ti"><div class="tt">${t.t}</div><div class="ta">${t.a}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
-});
-}
-document.getElementById('planet-tracks').innerHTML=html;
-}
-
-function getGenreName(g){
-const names={rock:'🎸 Рок',hiphop:'🎤 Хип-Хоп',electronic:'🎧 Электроника',pop:'⭐ Поп',jazz:'🎷 Джаз',classic:'🎻 Классика'};
-return names[g]||g;
-}
-
+// ============================================================
+// 🔍 ПОИСК МУЗЫКИ (через backend + fallback на локальные)
+// ============================================================
 function sm(){
 const q=document.getElementById('search-q').value.trim();
 if(!q){sn('⚠️ Введите запрос');return;}
 const r=document.getElementById('search-results');
 r.innerHTML='<div style="text-align:center;padding:15px">🔍 Поиск...</div>';
+
+// 1. Сначала ищем в локальной библиотеке
 const libResults=lib.filter(t=>t.t.toLowerCase().includes(q.toLowerCase())||t.a.toLowerCase().includes(q.toLowerCase()));
+
 if(libResults.length>0){
 let html='<div class="ib">🎵 Найдено в библиотеке: <strong>'+libResults.length+'</strong></div>';
-libResults.forEach((t,i)=>{
+libResults.forEach((t)=>{
 const idx=lib.indexOf(t);
-html+=`<div class="track" onclick="playTrack(${idx})"><div class="tc">🎵</div><div class="ti"><div class="tt">${t.t}</div><div class="ta">${t.a}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
+html+=`<div class="trk" onclick="playTrack(${idx})"><div class="tc">🎵</div><div class="ti"><div class="tt">${t.t}</div><div class="ta">${t.a}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
+});
+
+// Если есть backend — дополняем результатами из iTunes
+if(API_BASE){
+r.innerHTML=html+'<div style="text-align:center;padding:10px">🔄 Загружаем ещё из iTunes...</div>';
+fetch(`${API_BASE}/api/search?term=${encodeURIComponent(q)}&limit=20&country=RU`)
+.then(res=>res.json())
+.then(d=>{
+if(d&&d.results&&d.results.length>0){
+html+='<div class="ib" style="margin-top:15px">🍎 <strong>iTunes:</strong> найдено '+d.results.length+'</div>';
+d.results.forEach(t=>{
+const pu=t.previewUrl||'';
+const tn=(t.trackName||'Без названия').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const an=(t.artistName||'Неизвестно').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const ar=t.artworkUrl100?t.artworkUrl100.replace('100x100','300x300'):'';
+html+=`<div class="trk" onclick="playPreview('${pu}','${tn}','${an}')"><div class="tc">${ar?'<img src="'+ar+'">':'🎵'}</div><div class="ti"><div class="tt">${tn}</div><div class="ta">${an}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
 });
 r.innerHTML=html;
+sn('🎵 Найдено: '+(libResults.length+d.results.length));
+}else{
+r.innerHTML=html;
+sn('🎵 Найдено в библиотеке: '+libResults.length);
+}
+})
+.catch(()=>{
+r.innerHTML=html;
+sn('🎵 Найдено в библиотеке: '+libResults.length);
+});
+}else{
+r.innerHTML=html;
 sn('🎵 Найдено: '+libResults.length);
+}
 addXP(1);
 return;
 }
-fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&media=music&limit=20`)
-.then(res=>{if(!res.ok)throw new Error('Network');return res.json()})
-.then(d=>{try{if(d&&d.results&&d.results.length>0){let html='<div class="ib">🎵 iTunes: найдено <strong>'+d.results.length+'</strong></div>';d.results.slice(0,20).forEach(t=>{const tn=(t.trackName||'').replace(/'/g,"\\'");const an=(t.artistName||'').replace(/'/g,"\\'");html+=`<div class="track" onclick="playPreview('${t.previewUrl||''}','${tn}','${an}')"><div class="tc">${t.artworkUrl100?'<img src="'+t.artworkUrl100.replace('100x100','300x300')+'">':'🎵'}</div><div class="ti"><div class="tt">${t.trackName||'Без названия'}</div><div class="ta">${t.artistName||'Неизвестно'}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;});r.innerHTML=html;sn('🎵 iTunes: '+d.results.length);}else{r.innerHTML='<div class="ib">😕 Ничего не найдено<br><br>💡 Попробуйте другой запрос</div>';}}catch(e){r.innerHTML='<div class="ib">⚠️ Ошибка поиска</div>';}})
-.catch(e=>{r.innerHTML='<div class="ib">⚠️ Ошибка сети (возможно заблокировано)<br><br>💡 Проверьте подключение или приватный режим</div>';});
-}
 
-function renderLibrary(){
-document.getElementById('lib-count').textContent=lib.length+' трека';
-let html='';
-lib.forEach((t,i)=>{
-const playing=currentTrack&&currentTrack.id===t.id?'p':'';
-const icon=currentTrack&&currentTrack.id===t.id&&isPlaying?'⏸':'▶';
-html+=`<div class="track ${playing}" onclick="playTrack(${i})"><div class="tc">🎵</div><div class="ti"><div class="tt">${t.t}</div><div class="ta">${t.a}</div></div><div style="font-size:18px;color:var(--a)">${icon}</div></div>`;
+// 2. Если в библиотеке нет — ищем через backend
+if(API_BASE){
+r.innerHTML='<div style="text-align:center;padding:15px">🔍 Ищу в iTunes через backend...</div>';
+fetch(`${API_BASE}/api/search?term=${encodeURIComponent(q)}&limit=20&country=RU`)
+.then(res=>res.json())
+.then(d=>{
+if(d&&d.results&&d.results.length>0){
+let html='<div class="ib">🍎 <strong>iTunes:</strong> найдено '+d.results.length+'</div>';
+d.results.forEach(t=>{
+const pu=t.previewUrl||'';
+const tn=(t.trackName||'Без названия').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const an=(t.artistName||'Неизвестно').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const ar=t.artworkUrl100?t.artworkUrl100.replace('100x100','300x300'):'';
+html+=`<div class="trk" onclick="playPreview('${pu}','${tn}','${an}')"><div class="tc">${ar?'<img src="'+ar+'">':'🎵'}</div><div class="ti"><div class="tt">${tn}</div><div class="ta">${an}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
 });
-document.getElementById('library-list').innerHTML=html;
+r.innerHTML=html;
+sn('🎵 iTunes: '+d.results.length);
+}else{
+showLocalFallback(r,q);
 }
-
-function handleFileUpload(e){
-const files=e.target.files;
-if(!files.length)return;
-Array.from(files).forEach(f=>{
-const reader=new FileReader();
-reader.onload=ev=>{
-const name=f.name.replace(/\.[^/.]+$/,'');
-const parts=name.split(' - ');
-lib.push({id:'u_'+Date.now(),t:parts[1]||name,a:parts[0]||'Неизвестный',u:ev.target.result,g:'pop'});
-localStorage.setItem('sl',JSON.stringify(lib));
-renderLibrary();
-sn('✅ Добавлено: '+name);
-addXP(5);
-};
-reader.readAsDataURL(f);
+})
+.catch(()=>{
+showLocalFallback(r,q);
 });
-e.target.value='';
+}else{
+showLocalFallback(r,q);
+}
 }
 
+// Fallback: если backend недоступен — показываем похожие треки из библиотеки
+function showLocalFallback(container,q){
+const similar=lib.filter(t=>{
+const words=q.toLowerCase().split(' ');
+return words.some(w=>t.t.toLowerCase().includes(w)||t.a.toLowerCase().includes(w));
+});
+let html='<div class="ib">⚠️ Backend недоступен — показываем похожие из библиотеки</div>';
+if(similar.length>0){
+similar.forEach((t)=>{
+const idx=lib.indexOf(t);
+html+=`<div class="trk" onclick="playTrack(${idx})"><div class="tc">🎵</div><div class="ti"><div class="tt">${t.t}</div><div class="ta">${t.a}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
+});
+}else{
+html+='<div class="ib">😕 Ничего не найдено<br><br>💡 Попробуйте другой запрос или загрузите свои MP3</div>';
+}
+container.innerHTML=html;
+}
+
+// ============================================================
+// 📊 ЧАРТЫ (через backend)
+// ============================================================
 function loadCharts(){
 const l=document.getElementById('charts-list');
 l.innerHTML='<div style="text-align:center;padding:20px">🔄 Загрузка...</div>';
-fetch(`https://itunes.apple.com/search?term=top+hits+2024&media=music&limit=25`)
-.then(res=>{if(!res.ok)throw new Error('Network');return res.json()})
-.then(d=>{try{if(d&&d.results&&d.results.length>0){let html='';d.results.slice(0,25).forEach((t,i)=>{const tn=(t.trackName||'').replace(/'/g,"\\'");const an=(t.artistName||'').replace(/'/g,"\\'");html+=`<div class="trk" onclick="playPreview('${t.previewUrl||''}','${tn}','${an}')"><div style="font-size:18px;font-weight:bold;color:var(--gold);min-width:30px">#${i+1}</div><div class="tc">${t.artworkUrl100?'<img src="'+t.artworkUrl100.replace('100x100','300x300')+'">':'🎵'}</div><div class="ti"><div class="tt">${t.trackName||'Без названия'}</div><div class="ta">${t.artistName||'Неизвестно'}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;});l.innerHTML=html;sn('📊 Чарты загружены!');}else showFallbackCharts();}catch(e){showFallbackCharts();}})
-.catch(e=>showFallbackCharts());
+
+if(API_BASE){
+fetch(`${API_BASE}/api/search?term=top+hits+2024&limit=25&country=RU`)
+.then(res=>res.json())
+.then(d=>{
+if(d&&d.results&&d.results.length>0){
+let html='';
+d.results.slice(0,25).forEach((t,i)=>{
+const pu=t.previewUrl||'';
+const tn=(t.trackName||'Без названия').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const an=(t.artistName||'Неизвестно').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const ar=t.artworkUrl100?t.artworkUrl100.replace('100x100','300x300'):'';
+html+=`<div class="trk" onclick="playPreview('${pu}','${tn}','${an}')"><div style="font-size:18px;font-weight:bold;color:var(--gold);min-width:30px">#${i+1}</div><div class="tc">${ar?'<img src="'+ar+'">':'🎵'}</div><div class="ti"><div class="tt">${tn}</div><div class="ta">${an}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
+});
+l.innerHTML=html;
+sn('📊 Чарты загружены!');
+}else{
+showFallbackCharts();
+}
+})
+.catch(()=>showFallbackCharts());
+}else{
+showFallbackCharts();
+}
 }
 
 function showFallbackCharts(){
@@ -561,9 +584,12 @@ document.getElementById('charts-list').innerHTML=html;
 sn('📊 Топ из библиотеки');
 }
 
+// ============================================================
+// 🎵 ПЛЕЕР
+// ============================================================
 function playPreview(url,title,artist){
 if(!url){sn('⚠️ Нет превью');return;}
-currentTrack={t:title,a:artist,u:url,id:'preview'};
+currentTrack={t:title,a:artist,u:url,id:'preview_'+Date.now()};
 audio.src=url;
 audio.play().then(()=>{isPlaying=true;updateMiniPlayer();sn('▶ Играет превью');}).catch(e=>sn('⚠️ '+e.message));
 }
@@ -626,7 +652,90 @@ audio.addEventListener('ended',()=>{isPlaying=false;updateMiniPlayer();nextTrack
 audio.addEventListener('play',()=>{isPlaying=true;updateMiniPlayer();});
 audio.addEventListener('pause',()=>{isPlaying=false;updateMiniPlayer();});
 
-// ИГРЫ
+// ============================================================
+// 📚 БИБЛИОТЕКА
+// ============================================================
+function renderLibrary(){
+document.getElementById('lib-count').textContent=lib.length+' трека';
+let html='';
+lib.forEach((t,i)=>{
+const playing=currentTrack&&currentTrack.id===t.id?'p':'';
+const icon=currentTrack&&currentTrack.id===t.id&&isPlaying?'⏸':'▶';
+html+=`<div class="trk ${playing}" onclick="playTrack(${i})"><div class="tc">🎵</div><div class="ti"><div class="tt">${t.t}</div><div class="ta">${t.a}</div></div><div style="font-size:18px;color:var(--a)">${icon}</div></div>`;
+});
+document.getElementById('library-list').innerHTML=html;
+}
+
+function handleFileUpload(e){
+const files=e.target.files;
+if(!files.length)return;
+Array.from(files).forEach(f=>{
+const reader=new FileReader();
+reader.onload=ev=>{
+const name=f.name.replace(/\.[^/.]+$/,'');
+const parts=name.split(' - ');
+lib.push({id:'u_'+Date.now(),t:parts[1]||name,a:parts[0]||'Неизвестный',u:ev.target.result,g:'pop'});
+localStorage.setItem('sl',JSON.stringify(lib));
+renderLibrary();
+sn('✅ Добавлено: '+name);
+addXP(5);
+};
+reader.readAsDataURL(f);
+});
+e.target.value='';
+}
+
+// ============================================================
+// 🧭 НАВИГАЦИЯ
+// ============================================================
+function ss(id){
+document.querySelectorAll('.sec').forEach(s=>s.classList.remove('a'));
+document.getElementById(id).classList.add('a');
+document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('a'));
+if(event&&event.target&&event.target.closest('.bnav-btn'))event.target.closest('.bnav-btn').classList.add('a');
+if(id==='library')renderLibrary();
+if(id==='profile')renderProfile();
+if(id==='city'){setTimeout(()=>{if(!cityRunning)initCity()},100);}
+if(id==='games'){closeGame();document.getElementById('games-list').style.display='grid';document.getElementById('active-game').style.display='none';document.getElementById('games-back').style.display='block';}
+window.scrollTo(0,0);
+}
+
+function filterFeed(type){
+document.querySelectorAll('#feed .feed-tab').forEach((t,i)=>{if(i<4)t.classList.toggle('a',(['all','friends','music','games'].indexOf(type)===i))});
+const posts=[
+{author:'Анна М.',time:'2 мин назад',text:'Только что открыла новый трек ENZRO — просто огонь! 🔥',likes:24,comments:5},
+{author:'Дмитрий К.',time:'15 мин назад',text:'Кто идет на концерт в выходные? 🎸',likes:18,comments:12},
+{author:'Music Lover',time:'1 час назад',text:'SoundScape Pro — лучшая соцсеть для меломанов! 💎',likes:56,comments:8}
+];
+let html='';
+posts.forEach(p=>{
+html+=`<div class="post"><div class="post-header"><div class="post-avatar">${p.author[0]}</div><div><div class="post-author">${p.author}</div><div class="post-time">${p.time}</div></div></div><div class="post-content">${p.text}</div><div class="post-actions-main"><div class="post-action">👍 ${p.likes}</div><div class="post-action">💬 ${p.comments}</div><div class="post-action">🔗 Поделиться</div></div></div>`;
+});
+document.getElementById('feed-posts').innerHTML=html;
+}
+
+function filterGenre(genre){
+const filtered=lib.filter(t=>t.g===genre);
+let html=`<div class="ib">🎵 <strong>${getGenreName(genre)}</strong> — найдено: ${filtered.length}</div>`;
+if(filtered.length===0){
+html+='<div class="ib">😕 В этом жанре пока нет треков<br><br>💡 Добавьте свои MP3 файлы!</div>';
+}else{
+filtered.forEach((t)=>{
+const idx=lib.indexOf(t);
+html+=`<div class="trk" onclick="playTrack(${idx})"><div class="tc">🎵</div><div class="ti"><div class="tt">${t.t}</div><div class="ta">${t.a}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
+});
+}
+document.getElementById('planet-tracks').innerHTML=html;
+}
+
+function getGenreName(g){
+const names={rock:'🎸 Рок',hiphop:'🎤 Хип-Хоп',electronic:'🎧 Электроника',pop:'⭐ Поп',jazz:'🎷 Джаз',classic:'🎻 Классика'};
+return names[g]||g;
+}
+
+// ============================================================
+// 🎮 ИГРЫ
+// ============================================================
 function filterGames(type){
 document.querySelectorAll('#games .feed-tab').forEach((t,i)=>{
 const types=['all','music','action','puzzle'];
@@ -637,13 +746,14 @@ games.forEach(g=>{
 const icon=g.querySelector('.game-icon').textContent;
 if(type==='all')g.style.display='block';
 else if(type==='music'&&['🎵','🎯','🧠'].includes(icon))g.style.display='block';
-else if(type==='action'&&['🐍','','🐦','🌀'].includes(icon))g.style.display='block';
-else if(type==='puzzle'&&['🔢',''].includes(icon))g.style.display='block';
+else if(type==='action'&&['🐍','🐉','🐦','🌀'].includes(icon))g.style.display='block';
+else if(type==='puzzle'&&['🔢','🟦'].includes(icon))g.style.display='block';
 else g.style.display='none';
 });
 }
 
 function startGame(game){
+if(gameInterval){clearInterval(gameInterval);gameInterval=null;}
 currentGame=game;
 gameScore=0;
 document.getElementById('game-score').textContent='0';
@@ -703,20 +813,19 @@ document.addEventListener('keydown',e=>{if(currentGame!=='2048'||!grid2048Runnin
 let guessTracks=[],guessCurrent=0,guessRunning=false;
 function initGuessGame(){guessTracks=lib.sort(()=>Math.random()-0.5).slice(0,5);guessCurrent=0;guessRunning=false;showGuessQuestion();}
 function startGuessGame(){if(guessRunning)return;guessRunning=true;}
-function showGuessQuestion(){if(guessCurrent>=guessTracks.length){sn('🎉 Игра окончена! Счёт: '+gameScore);addXP(gameScore);guessRunning=false;return;}const track=guessTracks[guessCurrent];const options=[track];while(options.length<4){const random=lib[Math.floor(Math.random()*lib.length)];if(!options.find(o=>o.t===random.t))options.push(random);}options.sort(()=>Math.random()-0.5);let html=`<div style="font-size:40px;margin-bottom:10px">🎵</div><div style="font-size:18px;margin-bottom:15px">Вопрос ${guessCurrent+1}/${guessTracks.length}</div><strong>Исполнитель: ${track.a}</strong><div class="battle-options">`;options.forEach((opt,i)=>{html+=`<div class="battle-option" onclick="answerGuess('${opt.t.replace(/'/g,"\\'")}','${track.t.replace(/'/g,"\\'")}')">${opt.t}</div>`;});html+='</div>';document.querySelector('.battle-track').innerHTML=html;}
-function answerGuess(selected,correct){const options=document.querySelectorAll('.battle-option');if(selected===correct){gameScore+=50;options.forEach(o=>{if(o.textContent===correct)o.classList.add('correct');});sn('✅ Правильно! +50 XP');}else{options.forEach(o=>{if(o.textContent===selected)o.classList.add('wrong');if(o.textContent===correct)o.classList.add('correct');});sn('❌ Неправильно!');}document.getElementById('game-score').textContent=gameScore;setTimeout(()=>{guessCurrent++;showGuessQuestion();},1500);}
+function showGuessQuestion(){if(guessCurrent>=guessTracks.length){sn('🎉 Игра окончена! Счёт: '+gameScore);addXP(gameScore);guessRunning=false;return;}const track=guessTracks[guessCurrent];const options=[track];while(options.length<4){const random=lib[Math.floor(Math.random()*lib.length)];if(!options.find(o=>o.t===random.t))options.push(random);}options.sort(()=>Math.random()-0.5);let html=`<div style="font-size:40px;margin-bottom:10px">🎵</div><div style="font-size:18px;margin-bottom:15px">Вопрос ${guessCurrent+1}/${guessTracks.length}</div><strong>Исполнитель: ${track.a}</strong><div id="battle-options">`;options.forEach((opt)=>{html+=`<div class="battle-option" data-answer="${opt.t.replace(/"/g,'&quot;').replace(/'/g,'&#39;')}" data-correct="${track.t.replace(/"/g,'&quot;').replace(/'/g,'&#39;')}">${opt.t}</div>`;});html+='</div>';const container=document.querySelector('.game-container');const existing=document.getElementById('battle-options');if(existing)existing.remove();container.insertAdjacentHTML('beforeend',html);document.querySelectorAll('#battle-options .battle-option').forEach(el=>{el.onclick=()=>answerGuess(el.dataset.answer,el.dataset.correct);});}
+function answerGuess(selected,correct){const options=document.querySelectorAll('#battle-options .battle-option');if(selected===correct){gameScore+=50;options.forEach(o=>{if(o.dataset.answer===correct)o.classList.add('correct');});sn('✅ Правильно! +50 XP');}else{options.forEach(o=>{if(o.dataset.answer===selected)o.classList.add('wrong');if(o.dataset.answer===correct)o.classList.add('correct');});sn('❌ Неправильно!');}document.getElementById('game-score').textContent=gameScore;setTimeout(()=>{const el=document.getElementById('battle-options');if(el)el.remove();guessCurrent++;showGuessQuestion();},1500);}
 
 let rhythmScore=0,rhythmRunning=false;
-function initRhythm(){rhythmScore=0;rhythmRunning=false;document.querySelector('.battle-track').innerHTML=`<div style="text-align:center"><div id="rhythm-circle" style="width:150px;height:150px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--s));margin:20px auto;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:bold">ЖМИ!</div><div style="font-size:18px">Нажимай когда зелёный!</div><div style="font-size:24px;margin-top:10px">Счёт: <span id="rhythm-score">0</span></div></div>`;}
+function initRhythm(){rhythmScore=0;rhythmRunning=false;const container=document.querySelector('.game-container');const existing=document.getElementById('rhythm-container');if(existing)existing.remove();container.insertAdjacentHTML('beforeend',`<div id="rhythm-container" style="text-align:center"><div id="rhythm-circle" style="width:150px;height:150px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--s));margin:20px auto;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:bold">ЖМИ!</div><div style="font-size:18px">Нажимай когда зелёный!</div><div style="font-size:24px;margin-top:10px">Счёт: <span id="rhythm-score">0</span></div></div>`);setTimeout(()=>{const rc=document.getElementById('rhythm-circle');if(rc)rc.addEventListener('click',()=>{if(!rhythmRunning)return;const circle=document.getElementById('rhythm-circle');if(circle&&circle.style.background.includes('00ff88')){rhythmScore+=10;gameScore+=10;document.getElementById('rhythm-score').textContent=rhythmScore;document.getElementById('game-score').textContent=gameScore;sn('🎯 Отлично! +10');}});},100);}
 function startRhythm(){if(rhythmRunning)return;rhythmRunning=true;rhythmLoop();}
-function rhythmLoop(){if(!rhythmRunning)return;const circle=document.getElementById('rhythm-circle');circle.style.background='linear-gradient(135deg,var(--p),var(--s))';setTimeout(()=>{if(!rhythmRunning)return;circle.style.background='linear-gradient(135deg,#00ff88,#00cc66)';setTimeout(()=>{if(!rhythmRunning)return;rhythmLoop();},500+Math.random()*1000);},1000+Math.random()*2000);}
-document.getElementById('rhythm-circle')?.addEventListener('click',()=>{if(!rhythmRunning)return;const circle=document.getElementById('rhythm-circle');if(circle.style.background.includes('00ff88')){rhythmScore+=10;gameScore+=10;document.getElementById('rhythm-score').textContent=rhythmScore;document.getElementById('game-score').textContent=gameScore;sn('🎯 Отлично! +10');}});
+function rhythmLoop(){if(!rhythmRunning)return;const circle=document.getElementById('rhythm-circle');if(!circle)return;circle.style.background='linear-gradient(135deg,var(--p),var(--s))';setTimeout(()=>{if(!rhythmRunning)return;circle.style.background='linear-gradient(135deg,#00ff88,#00cc66)';setTimeout(()=>{if(!rhythmRunning)return;rhythmLoop();},500+Math.random()*1000);},1000+Math.random()*2000);}
 
 let memoryCards=[],memoryFlipped=[],memoryMatched=0,memoryRunning=false;
-function initMemory(){const icons=['🎵','','🎤','','🎹',''];memoryCards=[...icons,...icons].sort(()=>Math.random()-0.5);memoryFlipped=[];memoryMatched=0;memoryRunning=false;drawMemory();}
+function initMemory(){const icons=['🎵','🎸','🎤','🎧','🎹','🎺'];memoryCards=[...icons,...icons].sort(()=>Math.random()-0.5);memoryFlipped=[];memoryMatched=0;memoryRunning=false;drawMemory();}
 function startMemory(){if(memoryRunning)return;memoryRunning=true;}
-function drawMemory(){let html='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:400px;margin:0 auto">';memoryCards.forEach((card,i)=>{html+=`<div class="battle-option" onclick="flipMemory(${i})" id="memory-${i}" style="height:80px;display:flex;align-items:center;justify-content:center;font-size:32px">?</div>`;});html+='</div><div style="margin-top:15px;font-size:18px">Пар: '+memoryMatched+'/6</div>';document.querySelector('.battle-track').innerHTML=html;}
-function flipMemory(i){if(!memoryRunning||memoryFlipped.includes(i)||memoryCards[i]==='x')return;const el=document.getElementById('memory-'+i);el.textContent=memoryCards[i];memoryFlipped.push(i);if(memoryFlipped.length===2){const [a,b]=memoryFlipped;if(memoryCards[a]===memoryCards[b]){memoryCards[a]=memoryCards[b]='x';memoryMatched++;gameScore+=25;document.getElementById('game-score').textContent=gameScore;if(memoryMatched===6){sn('🎉 Победа! Счёт: '+gameScore);addXP(gameScore);memoryRunning=false;}}setTimeout(()=>{if(memoryCards[a]!=='x')document.getElementById('memory-'+a).textContent='?';if(memoryCards[b]!=='x')document.getElementById('memory-'+b).textContent='?';memoryFlipped=[];},1000);}}
+function drawMemory(){let html='<div id="memory-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:400px;margin:0 auto">';memoryCards.forEach((card,i)=>{html+=`<div class="battle-option" data-idx="${i}" style="height:80px;display:flex;align-items:center;justify-content:center;font-size:32px">?</div>`;});html+='</div><div style="margin-top:15px;font-size:18px">Пар: '+memoryMatched+'/6</div>';const container=document.querySelector('.game-container');const existing=document.getElementById('memory-grid');if(existing)existing.parentElement.remove();container.insertAdjacentHTML('beforeend',html);document.querySelectorAll('#memory-grid .battle-option').forEach(el=>{el.onclick=()=>flipMemory(parseInt(el.dataset.idx));});}
+function flipMemory(i){if(!memoryRunning||memoryFlipped.includes(i)||memoryCards[i]==='x')return;const el=document.querySelector(`#memory-grid .battle-option[data-idx="${i}"]`);el.textContent=memoryCards[i];memoryFlipped.push(i);if(memoryFlipped.length===2){const [a,b]=memoryFlipped;if(memoryCards[a]===memoryCards[b]){memoryCards[a]=memoryCards[b]='x';memoryMatched++;gameScore+=25;document.getElementById('game-score').textContent=gameScore;if(memoryMatched===6){sn('🎉 Победа! Счёт: '+gameScore);addXP(gameScore);memoryRunning=false;}}setTimeout(()=>{if(memoryCards[a]!=='x')document.querySelector(`#memory-grid .battle-option[data-idx="${a}"]`).textContent='?';if(memoryCards[b]!=='x')document.querySelector(`#memory-grid .battle-option[data-idx="${b}"]`).textContent='?';memoryFlipped=[];},1000);}}
 
 let maze=[],mazePlayer={x:0,y:0},mazeRunning=false;
 function initMaze(){maze=Array(10).fill().map(()=>Array(10).fill(1));for(let i=0;i<10;i++)for(let j=0;j<10;j++)if(Math.random()>0.3)maze[i][j]=0;maze[0][0]=0;maze[9][9]=0;mazePlayer={x:0,y:0};mazeRunning=false;drawMaze();}
@@ -743,6 +852,9 @@ function startPong(){if(pongRunning)return;pongRunning=true;gameInterval=setInte
 function drawPong(){gameCtx.fillStyle='#000';gameCtx.fillRect(0,0,400,400);gameCtx.fillStyle='#fff';gameCtx.fillRect(10,pongPaddle.y,10,50);gameCtx.fillRect(380,pongAI.y,10,50);gameCtx.beginPath();gameCtx.arc(pongBall.x,pongBall.y,8,0,Math.PI*2);gameCtx.fill();}
 document.addEventListener('mousemove',e=>{if(currentGame==='pong'&&pongRunning){const rect=gameCanvas.getBoundingClientRect();pongPaddle.y=e.clientY-rect.top-25;}});
 
+// ============================================================
+// 🌆 ГОРОД 3D
+// ============================================================
 function initCity(){
 if(typeof THREE==='undefined'){sn('⚠️ Three.js не загружен');return;}
 const cv=document.getElementById('city-canvas');
@@ -814,6 +926,9 @@ cityRenderer.render(cityScene,cityCamera);
 function showNPCBubble(pos,text){const bubble=document.createElement('div');bubble.className='npc-bubble';bubble.textContent=text;bubble.style.left='50%';bubble.style.top='100px';document.querySelector('#city-container').appendChild(bubble);setTimeout(()=>bubble.remove(),3000);}
 function updateCityHUD(){document.getElementById('city-score').textContent=cityPlayer.score;document.getElementById('city-mush').textContent=cityPlayer.mush;document.getElementById('city-ber').textContent=cityPlayer.ber;document.getElementById('city-hp').textContent=cityPlayer.hp;document.getElementById('city-lvl').textContent=cityPlayer.lvl;}
 
+// ============================================================
+// 👤 ПРОФИЛЬ
+// ============================================================
 function renderProfile(){
 if(!user){document.getElementById('profile-auth').style.display='block';document.getElementById('profile-data').style.display='none';return;}
 document.getElementById('profile-auth').style.display='none';document.getElementById('profile-data').style.display='block';
@@ -828,7 +943,7 @@ showProfileTab('stats');
 function showProfileTab(tab){
 document.querySelectorAll('#profile .feed-tab').forEach((t,i)=>{const tabs=['stats','ach','quests','rating'];t.classList.toggle('a',tabs.indexOf(tab)===i);});
 let html='';
-if(tab==='stats'){html=`<div class="card"><h3>📊 Статистика</h3><p>🎧 Треков: ${pl}</p><p>⭐ XP: ${xp}</p><p>🪙 Монет: ${cn}</p></div>`;}
+if(tab==='stats'){html=`<div class="post"><h3>📊 Статистика</h3><p>🎧 Треков: ${pl}</p><p>⭐ XP: ${xp}</p><p>🪙 Монет: ${cn}</p></div>`;}
 else if(tab==='ach'){const achievements=[{id:'a1',i:'🎵',n:'Первый трек',d:'Прослушай 1 трек',u:pl>=1},{id:'a2',i:'🎧',n:'Меломан',d:'Прослушай 10 треков',u:pl>=10},{id:'a3',i:'⭐',n:'Уровень 5',d:'Достигни 5 уровня',u:Math.floor(xp/100)>=5},{id:'a4',i:'💯',n:'Сотка',d:'100 XP',u:xp>=100},{id:'a5',i:'🔥',n:'Огонь',d:'500 XP',u:xp>=500},{id:'a6',i:'💎',n:'Бриллиант',d:'1000 XP',u:xp>=1000}];achievements.forEach(a=>{html+=`<div class="ach ${a.u?'u':'l'}"><div style="font-size:28px">${a.i}</div><div style="flex:1"><div style="font-weight:bold;font-size:12px">${a.n}</div><div style="font-size:10px;opacity:0.7">${a.d}</div></div><div>${a.u?'✅':'🔒'}</div></div>`;});}
 else if(tab==='quests'){const quests=[{t:'🎧 Послушай 5 треков',d:'Включи музыку',tg:5,c:Math.min(pl,5),r:50},{t:'🎮 Сыграй в игру',d:'Любую игру',tg:1,c:1,r:100}];quests.forEach(q=>{const p=(q.c/q.tg)*100;html+=`<div class="quest"><div class="qt"><span>${q.t}</span><span style="color:var(--gold)">+${q.r} 🪙</span></div><div class="qd">${q.d}</div><div class="qp"><div class="qpf" style="width:${Math.min(100,p)}%"></div></div><div style="font-size:11px;opacity:0.7">${q.c}/${q.tg}${q.c>=q.tg?' ✅':''}</div></div>`;});}
 else if(tab==='rating'){const leaders=[{n:'Степа',s:2500},{n:'Дима',s:1800},{n:user?user.name:'Гость',s:xp},{n:'AI',s:999}];leaders.sort((a,b)=>b.s-a.s);leaders.forEach((l,i)=>{html+=`<div class="shop-item"><div style="font-size:20px;font-weight:bold;color:var(--gold);min-width:30px">#${i+1}</div><div class="shop-info"><div class="shop-name">${l.n}</div><div class="shop-desc">${l.s} XP</div></div></div>`;});}
