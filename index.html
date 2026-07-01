@@ -5,853 +5,805 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>SoundScape Pro - Музыкальный Плеер YouTube</title>
+    <title>SoundScape Pro 🎵</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow-x: hidden;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: #333;
-            background-attachment: fixed;
+            padding-bottom: 120px;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            padding-bottom: 150px;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-            color: white;
-            animation: slideDown 0.6s ease;
-        }
-
-        header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-
-        header p {
-            font-size: 1em;
-            opacity: 0.9;
-        }
-
-        .search-section {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            animation: slideUp 0.6s ease;
-        }
-
-        .search-box {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .search-box input {
-            flex: 1;
-            padding: 12px 18px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: all 0.3s ease;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .search-btn {
-            padding: 12px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-            white-space: nowrap;
-        }
-
-        .search-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-        }
-
-        .search-btn:active {
-            transform: translateY(0);
-        }
-
-        .search-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .results-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .track-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .track-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .track-thumbnail {
-            width: 100%;
-            height: 160px;
-            object-fit: cover;
-            background: #f0f0f0;
-        }
-
-        .track-info {
-            padding: 12px;
-        }
-
-        .track-title {
-            font-weight: bold;
-            font-size: 0.9em;
-            margin-bottom: 5px;
-            line-height: 1.3;
-            color: #333;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-        }
-
-        .track-artist {
-            font-size: 0.8em;
-            color: #999;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            margin-bottom: 10px;
-        }
-
-        .track-play-btn {
-            width: 100%;
-            padding: 8px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.9em;
-            transition: all 0.3s ease;
-        }
-
-        .track-play-btn:active {
-            transform: scale(0.95);
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: white;
-            font-size: 1.1em;
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 35px;
-            height: 35px;
-            border: 4px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 40px;
-            color: white;
-            font-size: 1em;
-        }
-
-        .error-message {
-            text-align: center;
-            padding: 20px;
-            background: rgba(255, 59, 48, 0.1);
-            border: 2px solid #ff3b30;
-            border-radius: 8px;
-            color: #ff3b30;
-            margin-bottom: 20px;
-        }
-
-        .player-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: white;
-            padding: 12px 15px;
-            box-shadow: 0 -5px 30px rgba(0,0,0,0.4);
-            z-index: 9999;
-            border-top: 3px solid #667eea;
-            animation: slideUp 0.4s ease;
-            max-height: 140px;
-            overflow-y: auto;
-        }
-
-        .player-container.hidden {
-            display: none;
-        }
-
-        .player-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            gap: 12px;
-            align-items: flex-start;
-        }
-
-        .player-thumbnail {
-            width: 65px;
-            height: 65px;
-            border-radius: 6px;
-            object-fit: cover;
-            background: rgba(255,255,255,0.1);
-            flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-
-        .player-info {
-            flex: 1;
-            min-width: 0;
-            padding-top: 3px;
-        }
-
-        .player-title {
-            font-weight: bold;
-            font-size: 0.9em;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-bottom: 3px;
-        }
-
-        .player-artist {
-            font-size: 0.8em;
-            color: rgba(255,255,255,0.7);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-bottom: 8px;
-        }
-
-        .progress-bar-container {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 8px;
-        }
-
-        .progress-bar {
-            flex: 1;
-            height: 4px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 2px;
-            cursor: pointer;
-            appearance: none;
-            -webkit-appearance: none;
-        }
-
-        .progress-bar::-webkit-slider-thumb {
-            appearance: none;
-            -webkit-appearance: none;
-            width: 12px;
-            height: 12px;
-            background: #667eea;
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 0 8px rgba(102, 126, 234, 0.6);
-        }
-
-        .progress-bar::-moz-range-thumb {
-            width: 12px;
-            height: 12px;
-            background: #667eea;
-            border-radius: 50%;
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 0 8px rgba(102, 126, 234, 0.6);
-        }
-
-        .time-display {
-            font-size: 0.75em;
-            color: rgba(255,255,255,0.6);
-            min-width: 35px;
-            text-align: right;
-            flex-shrink: 0;
-            font-family: 'Monaco', 'Courier New', monospace;
-        }
-
-        .player-controls {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .control-btn {
-            width: 36px;
-            height: 36px;
-            border: none;
-            background: rgba(255,255,255,0.1);
-            color: white;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1em;
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-        }
-
-        .control-btn:active {
-            background: rgba(255,255,255,0.2);
-            transform: scale(0.9);
-        }
-
-        .play-btn {
-            width: 42px;
-            height: 42px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            font-size: 1.2em;
-        }
-
-        .close-player-btn {
-            font-size: 1.1em;
-        }
-
-        #youtube-player {
-            display: none !important;
-            visibility: hidden;
-            height: 0;
-            width: 0;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 768px) {
-            header h1 { font-size: 1.8em; }
-            .results-container {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-                gap: 12px;
-            }
-            .player-inner { flex-wrap: wrap; }
-            .progress-bar-container {
-                width: 100%;
-                order: 2;
-                margin-top: 8px;
-                margin-bottom: 0;
-            }
-            .player-info { order: 1; flex: 1; min-width: 0; }
-            .player-controls { order: 1; }
-        }
-
-        @media (max-width: 480px) {
-            .container { padding: 12px; padding-bottom: 130px; }
-            header h1 { font-size: 1.5em; }
-            header p { font-size: 0.9em; }
-            .search-box { flex-direction: column; }
-            .search-btn { width: 100%; }
-            .results-container {
-                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-                gap: 10px;
-            }
-            .player-container { padding: 8px 10px; }
-            .player-thumbnail { width: 55px; height: 55px; }
-            .control-btn { width: 32px; height: 32px; font-size: 0.9em; }
-            .play-btn { width: 38px; height: 38px; font-size: 1.1em; }
-            .player-title { font-size: 0.8em; }
-            .player-artist { font-size: 0.7em; }
-            .time-display { font-size: 0.65em; min-width: 32px; }
-        }
-
-        @supports (padding: max(0px)) {
-            body {
-                padding-left: max(12px, env(safe-area-inset-left));
-                padding-right: max(12px, env(safe-area-inset-right));
-            }
-            .player-container {
-                padding-bottom: max(12px, env(safe-area-inset-bottom));
-            }
-        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { text-align: center; margin-bottom: 30px; color: white; }
+        header h1 { font-size: 2.5em; margin-bottom: 10px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .stats { display: flex; justify-content: space-around; background: rgba(255,255,255,0.15); padding: 15px; border-radius: 15px; margin-bottom: 20px; backdrop-filter: blur(10px); }
+        .stat { text-align: center; color: white; }
+        .stat-value { font-size: 1.8em; font-weight: bold; }
+        .stat-label { font-size: 0.85em; opacity: 0.9; }
+        .nav { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding: 10px 0; }
+        .nav-btn { padding: 10px 20px; background: rgba(255,255,255,0.2); border: none; border-radius: 20px; color: white; cursor: pointer; font-weight: bold; white-space: nowrap; backdrop-filter: blur(10px); }
+        .nav-btn.active { background: white; color: #667eea; }
+        .section { display: none; animation: fadeIn 0.4s; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        .search-box input { flex: 1; padding: 15px; border: 2px solid rgba(255,255,255,0.3); border-radius: 10px; font-size: 1em; background: rgba(255,255,255,0.95); }
+        .search-btn { padding: 15px 30px; background: white; color: #667eea; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1em; }
+        .results { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .track-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.3s; }
+        .track-card:hover { transform: translateY(-5px); }
+        .track-thumb { width: 100%; height: 150px; object-fit: cover; background: #f0f0f0; }
+        .track-info { padding: 12px; }
+        .track-title { font-weight: bold; font-size: 0.9em; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .track-artist { font-size: 0.8em; color: #999; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 10px; }
+        .play-btn { width: 100%; padding: 8px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .player { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 15px; box-shadow: 0 -5px 30px rgba(0,0,0,0.4); z-index: 1000; display: none; }
+        .player.active { display: block; }
+        .player-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 15px; align-items: center; }
+        .player-thumb { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
+        .player-info { flex: 1; }
+        .player-title { font-weight: bold; margin-bottom: 3px; }
+        .player-artist { font-size: 0.85em; opacity: 0.7; margin-bottom: 8px; }
+        .progress-container { display: flex; align-items: center; gap: 8px; }
+        .progress-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; cursor: pointer; -webkit-appearance: none; }
+        .progress-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: #667eea; border-radius: 50%; cursor: pointer; }
+        .time { font-size: 0.75em; opacity: 0.7; min-width: 35px; }
+        .controls { display: flex; gap: 8px; }
+        .ctrl-btn { width: 40px; height: 40px; border: none; background: rgba(255,255,255,0.1); color: white; border-radius: 50%; cursor: pointer; font-size: 1.2em; }
+        .ctrl-btn.play { background: linear-gradient(135deg, #667eea, #764ba2); width: 50px; height: 50px; font-size: 1.5em; }
+        #youtube-player { position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; }
+        .library-item { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; cursor: pointer; }
+        .library-item:hover { background: #f5f5f5; }
+        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+        .game-card { background: white; padding: 20px; border-radius: 12px; text-align: center; cursor: pointer; transition: transform 0.3s; }
+        .game-card:hover { transform: scale(1.05); }
+        .game-icon { font-size: 3em; margin-bottom: 10px; }
+        .achievement { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; }
+        .achievement.locked { opacity: 0.5; }
+        .ach-icon { font-size: 2em; }
+        .ach-info { flex: 1; }
+        .ach-name { font-weight: bold; margin-bottom: 3px; }
+        .ach-desc { font-size: 0.85em; color: #999; }
+        .error { background: rgba(255,59,48,0.1); border: 2px solid #ff3b30; color: #ff3b30; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: center; }
+        .loading { text-align: center; padding: 40px; color: white; }
+        .spinner { display: inline-block; width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .fallback-btn { display: inline-block; margin-top: 10px; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>🎵 SoundScape Pro</h1>
-            <p>Поиск и воспроизведение музыки с YouTube</p>
+            <p>Музыка, игры, достижения!</p>
         </header>
 
-        <div class="search-section">
-            <div class="search-box">
-                <input 
-                    type="text" 
-                    id="searchInput" 
-                    placeholder="🔍 Поиск трека или исполнителя..."
-                    autocomplete="off"
-                    spellcheck="false"
-                >
-                <button class="search-btn" id="searchBtn" onclick="performSearch()">Поиск</button>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="xp-display">0</div>
+                <div class="stat-label">⭐ XP</div>
             </div>
-            <div id="errorContainer"></div>
-            <div id="resultsContainer" class="results-container"></div>
+            <div class="stat">
+                <div class="stat-value" id="level-display">1</div>
+                <div class="stat-label">📊 Уровень</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="coins-display">100</div>
+                <div class="stat-label">🪙 Монеты</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="played-display">0</div>
+                <div class="stat-label">🎧 Сыграно</div>
+            </div>
+        </div>
+
+        <div class="nav">
+            <button class="nav-btn active" onclick="showSection('search')"> Поиск</button>
+            <button class="nav-btn" onclick="showSection('library')">📚 Библиотека</button>
+            <button class="nav-btn" onclick="showSection('games')"> Игры</button>
+            <button class="nav-btn" onclick="showSection('achievements')"> Достижения</button>
+        </div>
+
+        <!-- ПОИСК -->
+        <div id="search" class="section active">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder=" Поиск трека или исполнителя..." onkeypress="if(event.key==='Enter')performSearch()">
+                <button class="search-btn" onclick="performSearch()">Найти</button>
+            </div>
+            <div id="error-container"></div>
+            <div id="results" class="results"></div>
+        </div>
+
+        <!-- БИБЛИОТЕКА -->
+        <div id="library" class="section">
+            <h2 style="color: white; margin-bottom: 20px;">📚 Моя библиотека</h2>
+            <div id="library-list"></div>
+        </div>
+
+        <!-- ИГРЫ -->
+        <div id="games" class="section">
+            <h2 style="color: white; margin-bottom: 20px;">🎮 Игровой центр</h2>
+            <div class="game-grid">
+                <div class="game-card" onclick="startGame('snake')">
+                    <div class="game-icon">🐍</div>
+                    <h3>Змейка</h3>
+                    <p style="color: #999; font-size: 0.9em;">Классика! +100 XP</p>
+                </div>
+                <div class="game-card" onclick="startGame('2048')">
+                    <div class="game-icon">🔢</div>
+                    <h3>2048</h3>
+                    <p style="color: #999; font-size: 0.9em;">Головоломка! +250 XP</p>
+                </div>
+                <div class="game-card" onclick="startGame('guess')">
+                    <div class="game-icon">🎵</div>
+                    <h3>Угадай трек</h3>
+                    <p style="color: #999; font-size: 0.9em;">Музыкальная игра! +150 XP</p>
+                </div>
+            </div>
+            <div id="game-container" style="display: none; margin-top: 20px;">
+                <canvas id="game-canvas" width="400" height="400" style="background: #000; border-radius: 10px; max-width: 100%;"></canvas>
+                <div style="text-align: center; margin-top: 15px;">
+                    <button class="nav-btn" onclick="closeGame()">❌ Закрыть игру</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ДОСТИЖЕНИЯ -->
+        <div id="achievements" class="section">
+            <h2 style="color: white; margin-bottom: 20px;"> Достижения</h2>
+            <div id="achievements-list"></div>
         </div>
     </div>
 
+    <!-- YOUTUBE ПЛЕЕР -->
     <div id="youtube-player"></div>
-
-    <div class="player-container hidden" id="playerContainer">
+    <div class="player" id="player">
         <div class="player-inner">
-            <img id="playerThumbnail" class="player-thumbnail" alt="Album Art">
-            
+            <img id="player-thumb" class="player-thumb" src="" alt="">
             <div class="player-info">
-                <div class="player-title" id="playerTitle">Выберите трек</div>
-                <div class="player-artist" id="playerArtist">Артист</div>
-                
-                <div class="progress-bar-container">
-                    <span class="time-display" id="currentTime">0:00</span>
-                    <input 
-                        type="range" 
-                        id="progressBar" 
-                        class="progress-bar" 
-                        min="0" 
-                        max="100" 
-                        value="0"
-                        onchange="seekProgress(this.value)"
-                    >
-                    <span class="time-display" id="totalTime">0:00</span>
+                <div class="player-title" id="player-title">Выберите трек</div>
+                <div class="player-artist" id="player-artist">Артист</div>
+                <div class="progress-container">
+                    <span class="time" id="current-time">0:00</span>
+                    <input type="range" id="progress-bar" class="progress-bar" min="0" max="100" value="0" oninput="seekProgress(this.value)">
+                    <span class="time" id="total-time">0:00</span>
                 </div>
             </div>
-
-            <div class="player-controls">
-                <button class="control-btn" onclick="skipBackward15()" title="Назад 15 сек">⏪</button>
-                <button class="control-btn play-btn" id="playBtn" onclick="togglePlay()" title="Play/Pause">▶️</button>
-                <button class="control-btn" onclick="skipForward15()" title="Вперёд 15 сек">⏩</button>
-                <button class="control-btn close-player-btn" onclick="closePlayer()" title="Закрыть">✕</button>
+            <div class="controls">
+                <button class="ctrl-btn" onclick="skipBackward()">⏪</button>
+                <button class="ctrl-btn play" id="play-btn" onclick="togglePlay()">▶️</button>
+                <button class="ctrl-btn" onclick="skipForward()">⏩</button>
+                <button class="ctrl-btn" onclick="closePlayer()">✕</button>
             </div>
         </div>
     </div>
 
     <script src="https://www.youtube.com/iframe_api"></script>
-
     <script>
         // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
+        const API_BASE = 'https://soundscape-api-9fng.onrender.com';
         let youtubePlayer = null;
+        let playerReady = false;
         let currentVideoId = null;
         let isPlaying = false;
         let updateInterval = null;
-        let playerReady = false;
+        let loadAttempts = 0;
 
-        // 🔥 ВАЖНО: Полный URL к твоему backend на Render!
-        const API_BASE = 'https://soundscape-api-9fng.onrender.com';
+        // Геймификация
+        let xp = parseInt(localStorage.getItem('ss_xp')) || 0;
+        let level = parseInt(localStorage.getItem('ss_level')) || 1;
+        let coins = parseInt(localStorage.getItem('ss_coins')) || 100;
+        let played = parseInt(localStorage.getItem('ss_played')) || 0;
+        let achievements = JSON.parse(localStorage.getItem('ss_achievements')) || [];
 
-        // ========== ИНИЦИАЛИЗАЦИЯ YOUTUBE PLAYER ==========
+        // Библиотека
+        let library = JSON.parse(localStorage.getItem('ss_library')) || [
+            { id: '1', title: 'Never Gonna Give You Up', artist: 'Rick Astley', thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg', videoId: 'dQw4w9WgXcQ' },
+            { id: '2', title: 'Gangnam Style', artist: 'PSY', thumbnail: 'https://i.ytimg.com/vi/9bZkp7q19f0/mqdefault.jpg', videoId: '9bZkp7q19f0' },
+            { id: '3', title: 'Despacito', artist: 'Luis Fonsi', thumbnail: 'https://i.ytimg.com/vi/kJQP7kiw5Fk/mqdefault.jpg', videoId: 'kJQP7kiw5Fk' }
+        ];
+
+        // ========== ИНИЦИАЛИЗАЦИЯ YOUTUBE ==========
         window.onYouTubeIframeAPIReady = function() {
-            youtubePlayer = new YT.Player('youtube-player', {
-                height: '0',
-                width: '0',
-                videoId: '',
-                events: {
-                    'onReady': onPlayerReady,
-                    'onStateChange': onPlayerStateChange,
-                    'onError': onPlayerError
-                },
-                playerVars: {
-                    'autoplay': 0,
-                    'controls': 0,
-                    'showinfo': 0,
-                    'rel': 0,
-                    'modestbranding': 1,
-                    'playsinline': 1,
-                    'fs': 0
-                }
-            });
+            console.log('✅ YouTube API загружен');
+            tryCreatePlayer();
         };
 
-        function onPlayerReady(event) {
-            playerReady = true;
-            console.log('✅ YouTube Player готов');
+        function tryCreatePlayer() {
+            if (typeof YT === 'undefined' || !YT.Player) {
+                loadAttempts++;
+                if (loadAttempts < 5) {
+                    setTimeout(tryCreatePlayer, 2000);
+                } else {
+                    console.error('❌ YouTube API не загрузился');
+                    showError('YouTube не загружается. Видео можно открыть в новой вкладке.');
+                }
+                return;
+            }
+
+            try {
+                youtubePlayer = new YT.Player('youtube-player', {
+                    height: '1', width: '1', videoId: '',
+                    events: {
+                        'onReady': () => { playerReady = true; console.log('✅ Плеер готов'); clearError(); },
+                        'onStateChange': onPlayerStateChange,
+                        'onError': onPlayerError
+                    },
+                    playerVars: { 'autoplay': 1, 'controls': 0, 'playsinline': 1, 'origin': window.location.origin }
+                });
+            } catch (error) {
+                console.error('❌ Ошибка создания плеера:', error);
+            }
         }
 
         function onPlayerStateChange(event) {
-            const state = event.data;
-            
-            if (state === YT.PlayerState.PLAYING) {
+            if (event.data === YT.PlayerState.PLAYING) {
                 isPlaying = true;
-                updatePlayBtnUI();
+                updatePlayBtn();
                 startProgressUpdate();
-                console.log('▶️ Воспроизведение началось');
-            } else if (state === YT.PlayerState.PAUSED) {
+            } else if (event.data === YT.PlayerState.PAUSED) {
                 isPlaying = false;
-                updatePlayBtnUI();
-                console.log('⏸️ Пауза');
-            } else if (state === YT.PlayerState.ENDED) {
+                updatePlayBtn();
+            } else if (event.data === YT.PlayerState.ENDED) {
                 isPlaying = false;
-                updatePlayBtnUI();
-                youtubePlayer.seekTo(0);
-                console.log('⏹️ Конец трека');
-            } else if (state === YT.PlayerState.BUFFERING) {
-                console.log('⏳ Загрузка...');
+                updatePlayBtn();
             }
         }
 
         function onPlayerError(event) {
-            console.error('❌ YouTube Player ошибка:', event.data);
-            
-            let errorMsg = 'Ошибка при загрузке видео';
-            
-            switch(event.data) {
-                case 2: errorMsg = 'Ошибка: неверный параметр'; break;
-                case 5: errorMsg = 'Ошибка HTML5 плеера'; break;
-                case 100: errorMsg = 'Видео не найдено или удалено'; break;
-                case 101:
-                case 150: errorMsg = 'Видеоролик не может быть воспроизведён здесь'; break;
+            console.error(' YouTube ошибка:', event.data);
+            showError('Ошибка воспроизведения. Попробуйте открыть видео в новой вкладке.');
+            if (currentVideoId) {
+                const fallbackUrl = `https://www.youtube.com/watch?v=${currentVideoId}`;
+                document.getElementById('error-container').innerHTML += 
+                    `<a href="${fallbackUrl}" target="_blank" class="fallback-btn">▶️ Открыть в YouTube</a>`;
             }
-            
-            showError(errorMsg);
         }
 
-        // ========== ПОИСК МУЗЫКИ ==========
+        // ========== ПОИСК МУЗЫКИ (3 ИСТОЧНИКА) ==========
         async function performSearch() {
-            const query = document.getElementById('searchInput').value.trim();
-            
+            const query = document.getElementById('search-input').value.trim();
             if (!query || query.length < 2) {
-                showError('Введите название трека или исполнителя (минимум 2 символа)');
+                showError('Введите минимум 2 символа');
                 return;
             }
 
-            const resultsContainer = document.getElementById('resultsContainer');
-            const searchBtn = document.getElementById('searchBtn');
-            
-            resultsContainer.innerHTML = '<div class="loading"><span class="spinner"></span>Поиск...</div>';
-            searchBtn.disabled = true;
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p>Поиск...</p></div>';
             clearError();
 
+            let allResults = [];
+
+            // 1. YouTube API через backend
             try {
-                console.log(`🔍 Ищем: "${query}"`);
-                
-                // ✅ ИСПРАВЛЕНО: Полный URL к Render backend!
-                const response = await fetch(
-                    `${API_BASE}/api/youtube/search?q=${encodeURIComponent(query)}&limit=12`,
-                    {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'application/json'
+                console.log('🔍 Ищем в YouTube...');
+                const ytResponse = await fetch(`${API_BASE}/api/youtube/search?q=${encodeURIComponent(query)}&limit=10`);
+                if (ytResponse.ok) {
+                    const ytData = await ytResponse.json();
+                    if (ytData.items && ytData.items.length > 0) {
+                        allResults = allResults.concat(ytData.items.map(item => ({
+                            ...item,
+                            source: 'youtube',
+                            title: item.title || 'Без названия',
+                            artist: item.channelTitle || 'Неизвестно'
+                        })));
+                        console.log(`✅ YouTube: найдено ${ytData.items.length} треков`);
+                    }
+                }
+            } catch (error) {
+                console.warn('⚠️ YouTube API ошибка:', error);
+            }
+
+            // 2. iTunes API (резерв)
+            if (allResults.length === 0) {
+                try {
+                    console.log(' Ищем в iTunes...');
+                    const itunesResponse = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=10`);
+                    if (itunesResponse.ok) {
+                        const itunesData = await itunesResponse.json();
+                        if (itunesData.results && itunesData.results.length > 0) {
+                            allResults = allResults.concat(itunesData.results.map(item => ({
+                                videoId: null,
+                                title: item.trackName || 'Без названия',
+                                artist: item.artistName || 'Неизвестно',
+                                thumbnail: item.artworkUrl100 ? item.artworkUrl100.replace('100x100', '300x300') : '',
+                                previewUrl: item.previewUrl,
+                                source: 'itunes'
+                            })));
+                            console.log(`✅ iTunes: найдено ${itunesData.results.length} треков`);
                         }
                     }
-                );
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                } catch (error) {
+                    console.warn('⚠️ iTunes API ошибка:', error);
                 }
-
-                const data = await response.json();
-
-                if (!data.items || data.items.length === 0) {
-                    resultsContainer.innerHTML = '<div class="no-results">😔 Треки не найдены<br><small>Попробуй другой запрос</small></div>';
-                    console.warn('No results found');
-                    return;
-                }
-
-                console.log(`✅ Найдено треков: ${data.items.length} (источник: ${data.source || 'unknown'})`);
-
-                // Отрисовка результатов
-                let html = '';
-                data.items.forEach((item, index) => {
-                    const title = escapeHtml(item.title || 'Без названия');
-                    const artist = escapeHtml(item.channelTitle || 'Неизвестный артист');
-                    const thumbnail = item.thumbnail || 'https://via.placeholder.com/320x180';
-                    const videoId = item.videoId;
-
-                    html += `
-                        <div class="track-card">
-                            <img 
-                                src="${thumbnail}" 
-                                alt="${title}" 
-                                class="track-thumbnail"
-                                loading="lazy"
-                                onerror="this.src='https://via.placeholder.com/320x180?text=No+Image'"
-                            >
-                            <div class="track-info">
-                                <div class="track-title">${title}</div>
-                                <div class="track-artist">${artist}</div>
-                                <button 
-                                    class="track-play-btn" 
-                                    onclick="playYouTubeVideo('${videoId}', \`${title.replace(/`/g, "'")}\`, \`${artist.replace(/`/g, "'")}\`, '${thumbnail}')"
-                                >
-                                    ▶️ Включить
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                resultsContainer.innerHTML = html;
-
-            } catch (error) {
-                console.error('❌ Ошибка поиска:', error);
-                showError(`Ошибка поиска: ${error.message || 'Проверь интернет-соединение'}`);
-                resultsContainer.innerHTML = '';
-            } finally {
-                searchBtn.disabled = false;
             }
+
+            // 3. Локальная библиотека (резерв)
+            const localResults = library.filter(t => 
+                t.title.toLowerCase().includes(query.toLowerCase()) || 
+                t.artist.toLowerCase().includes(query.toLowerCase())
+            );
+            if (localResults.length > 0) {
+                allResults = allResults.concat(localResults.map(item => ({
+                    ...item,
+                    source: 'library'
+                })));
+                console.log(`✅ Библиотека: найдено ${localResults.length} треков`);
+            }
+
+            // Отображение результатов
+            if (allResults.length === 0) {
+                resultsDiv.innerHTML = '<div class="loading">😔 Ничего не найдено<br><small>Попробуйте другой запрос</small></div>';
+                return;
+            }
+
+            let html = '';
+            allResults.forEach(item => {
+                const title = escapeHtml(item.title);
+                const artist = escapeHtml(item.artist);
+                const thumbnail = item.thumbnail || 'https://via.placeholder.com/300x300?text=No+Image';
+                
+                let onclick = '';
+                if (item.source === 'youtube' && item.videoId) {
+                    onclick = `playYouTubeVideo('${item.videoId}', \`${title}\`, \`${artist}\`, '${thumbnail}')`;
+                } else if (item.source === 'itunes' && item.previewUrl) {
+                    onclick = `playPreview('${item.previewUrl}', \`${title}\`, \`${artist}\`, '${thumbnail}')`;
+                } else if (item.videoId) {
+                    onclick = `playYouTubeVideo('${item.videoId}', \`${title}\`, \`${artist}\`, '${thumbnail}')`;
+                } else {
+                    onclick = `showError('Этот трек недоступен')`;
+                }
+
+                html += `
+                    <div class="track-card">
+                        <img src="${thumbnail}" class="track-thumb" onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'">
+                        <div class="track-info">
+                            <div class="track-title">${title}</div>
+                            <div class="track-artist">${artist}</div>
+                            <button class="play-btn" onclick="${onclick}">▶️ Играть</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            resultsDiv.innerHTML = html;
+            addXP(5);
         }
 
-        // ========== ВОСПРОИЗВЕДЕНИЕ ВИДЕО ==========
+        // ========== ВОСПРОИЗВЕДЕНИЕ ==========
         function playYouTubeVideo(videoId, title, artist, thumbnail) {
-            if (!playerReady || !youtubePlayer) {
-                showError('YouTube плеер не готов. Попробуй ещё раз через 3 секунды');
-                return;
-            }
-
-            if (!videoId || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
-                showError('Ошибка: неверный ID видео');
-                return;
-            }
-
-            console.log(`▶️ Воспроизведение: ${title} - ${artist}`);
-
             currentVideoId = videoId;
 
-            document.getElementById('playerTitle').textContent = title;
-            document.getElementById('playerArtist').textContent = artist;
-            document.getElementById('playerThumbnail').src = thumbnail;
+            if (!playerReady || !youtubePlayer) {
+                showError('YouTube плеер загружается... Попробуйте через 3 секунды или откройте в новой вкладке.');
+                const fallbackUrl = `https://www.youtube.com/watch?v=${videoId}`;
+                document.getElementById('error-container').innerHTML += 
+                    `<a href="${fallbackUrl}" target="_blank" class="fallback-btn">▶️ Открыть в YouTube</a>`;
+                return;
+            }
 
-            document.getElementById('playerContainer').classList.remove('hidden');
+            document.getElementById('player-thumb').src = thumbnail;
+            document.getElementById('player-title').textContent = title;
+            document.getElementById('player-artist').textContent = artist;
+            document.getElementById('player').classList.add('active');
 
-            // ✅ Используем loadVideoById вместо cueVideoById - надёжнее!
             try {
                 youtubePlayer.loadVideoById(videoId);
             } catch (error) {
-                console.error('Error loading video:', error);
+                console.error('Error:', error);
                 showError('Ошибка загрузки видео');
             }
 
-            document.getElementById('progressBar').value = 0;
-            document.getElementById('currentTime').textContent = '0:00';
+            played++;
+            localStorage.setItem('ss_played', played);
+            updateStats();
+            checkAchievements();
+            addXP(10);
+        }
+
+        function playPreview(url, title, artist, thumbnail) {
+            const audio = new Audio(url);
+            audio.play();
             
-            clearError();
+            document.getElementById('player-thumb').src = thumbnail;
+            document.getElementById('player-title').textContent = title;
+            document.getElementById('player-artist').textContent = artist;
+            document.getElementById('player').classList.add('active');
+            
+            played++;
+            localStorage.setItem('ss_played', played);
+            updateStats();
+            addXP(5);
         }
 
-        // ========== УПРАВЛЕНИЕ ПЛЕЕРОМ ==========
         function togglePlay() {
-            if (!playerReady || !youtubePlayer) return;
-            try {
-                if (isPlaying) {
-                    youtubePlayer.pauseVideo();
-                } else {
-                    youtubePlayer.playVideo();
-                }
-            } catch (error) {
-                console.error('Error toggling play:', error);
-            }
+            if (!youtubePlayer) return;
+            if (isPlaying) youtubePlayer.pauseVideo();
+            else youtubePlayer.playVideo();
         }
 
-        function skipBackward15() {
-            if (!playerReady || !youtubePlayer) return;
-            try {
-                const currentTime = youtubePlayer.getCurrentTime();
-                youtubePlayer.seekTo(Math.max(0, currentTime - 15), true);
-            } catch (error) {
-                console.error('Error seeking backward:', error);
-            }
+        function skipBackward() {
+            if (!youtubePlayer) return;
+            const current = youtubePlayer.getCurrentTime();
+            youtubePlayer.seekTo(Math.max(0, current - 15), true);
         }
 
-        function skipForward15() {
-            if (!playerReady || !youtubePlayer) return;
-            try {
-                const currentTime = youtubePlayer.getCurrentTime();
-                const duration = youtubePlayer.getDuration();
-                youtubePlayer.seekTo(Math.min(duration, currentTime + 15), true);
-            } catch (error) {
-                console.error('Error seeking forward:', error);
-            }
+        function skipForward() {
+            if (!youtubePlayer) return;
+            const current = youtubePlayer.getCurrentTime();
+            const duration = youtubePlayer.getDuration();
+            youtubePlayer.seekTo(Math.min(duration, current + 15), true);
         }
 
         function seekProgress(value) {
-            if (!playerReady || !youtubePlayer) return;
-            try {
-                const duration = youtubePlayer.getDuration();
-                youtubePlayer.seekTo((value / 100) * duration, true);
-            } catch (error) {
-                console.error('Error seeking:', error);
-            }
+            if (!youtubePlayer) return;
+            const duration = youtubePlayer.getDuration();
+            youtubePlayer.seekTo((value / 100) * duration, true);
         }
 
         function closePlayer() {
-            try {
-                if (youtubePlayer) {
-                    youtubePlayer.stopVideo();
-                }
-            } catch (error) {
-                console.error('Error closing player:', error);
-            }
-            
+            if (youtubePlayer) youtubePlayer.stopVideo();
             isPlaying = false;
-            currentVideoId = null;
-            document.getElementById('playerContainer').classList.add('hidden');
+            document.getElementById('player').classList.remove('active');
             stopProgressUpdate();
         }
 
-        // ========== ОБНОВЛЕНИЕ ПРОГРЕССА ==========
         function startProgressUpdate() {
             if (updateInterval) clearInterval(updateInterval);
-            
             updateInterval = setInterval(() => {
-                if (!playerReady || !youtubePlayer || !isPlaying) return;
-
+                if (!youtubePlayer || !isPlaying) return;
                 try {
-                    const currentTime = youtubePlayer.getCurrentTime();
+                    const current = youtubePlayer.getCurrentTime();
                     const duration = youtubePlayer.getDuration();
-
-                    if (duration > 0) {
-                        document.getElementById('currentTime').textContent = formatTime(currentTime);
-                        document.getElementById('totalTime').textContent = formatTime(duration);
-                        document.getElementById('progressBar').max = 100;
-                        document.getElementById('progressBar').value = (currentTime / duration) * 100;
-                    }
-                } catch (error) {
-                    // Игнорируем ошибки обновления прогресса
-                }
+                    document.getElementById('current-time').textContent = formatTime(current);
+                    document.getElementById('total-time').textContent = formatTime(duration);
+                    document.getElementById('progress-bar').value = (current / duration) * 100;
+                } catch (error) {}
             }, 500);
         }
 
         function stopProgressUpdate() {
-            if (updateInterval) {
-                clearInterval(updateInterval);
-                updateInterval = null;
+            if (updateInterval) { clearInterval(updateInterval); updateInterval = null; }
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updatePlayBtn() {
+            document.getElementById('play-btn').textContent = isPlaying ? '️' : '▶️';
+        }
+
+        // ========== БИБЛИОТЕКА ==========
+        function renderLibrary() {
+            const list = document.getElementById('library-list');
+            if (library.length === 0) {
+                list.innerHTML = '<p style="color: white; text-align: center;">Библиотека пуста</p>';
+                return;
             }
+
+            let html = '';
+            library.forEach(item => {
+                html += `
+                    <div class="library-item" onclick="playYouTubeVideo('${item.videoId}', '${escapeHtml(item.title)}', '${escapeHtml(item.artist)}', '${item.thumbnail}')">
+                        <img src="${item.thumbnail}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;">
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold;">${escapeHtml(item.title)}</div>
+                            <div style="font-size: 0.85em; color: #999;">${escapeHtml(item.artist)}</div>
+                        </div>
+                        <div style="font-size: 1.5em;">▶️</div>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+        }
+
+        // ========== ИГРЫ ==========
+        let currentGame = null;
+        let gameInterval = null;
+
+        function startGame(gameType) {
+            currentGame = gameType;
+            document.getElementById('game-container').style.display = 'block';
+            const canvas = document.getElementById('game-canvas');
+            const ctx = canvas.getContext('2d');
+
+            if (gameType === 'snake') {
+                initSnakeGame(ctx, canvas);
+            } else if (gameType === '2048') {
+                init2048Game(ctx, canvas);
+            } else if (gameType === 'guess') {
+                initGuessGame();
+            }
+        }
+
+        function initSnakeGame(ctx, canvas) {
+            let snake = [{x: 10, y: 10}];
+            let food = {x: 15, y: 15};
+            let dx = 1, dy = 0;
+            let score = 0;
+
+            function draw() {
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, 400, 400);
+                
+                ctx.fillStyle = '#00ff88';
+                snake.forEach(s => ctx.fillRect(s.x * 20, s.y * 20, 18, 18));
+                
+                ctx.fillStyle = '#ff6600';
+                ctx.fillRect(food.x * 20, food.y * 20, 18, 18);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = '20px Arial';
+                ctx.fillText(`Счёт: ${score}`, 10, 30);
+            }
+
+            function update() {
+                const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+                
+                if (head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20 || snake.some(s => s.x === head.x && s.y === head.y)) {
+                    clearInterval(gameInterval);
+                    alert(`Игра окончена! Счёт: ${score}`);
+                    addXP(score * 10);
+                    closeGame();
+                    return;
+                }
+                
+                snake.unshift(head);
+                
+                if (head.x === food.x && head.y === food.y) {
+                    score += 10;
+                    food = {x: Math.floor(Math.random() * 20), y: Math.floor(Math.random() * 20)};
+                } else {
+                    snake.pop();
+                }
+                
+                draw();
+            }
+
+            gameInterval = setInterval(update, 150);
+            draw();
+
+            document.onkeydown = (e) => {
+                if (e.key === 'ArrowUp' && dy === 0) { dx = 0; dy = -1; }
+                if (e.key === 'ArrowDown' && dy === 0) { dx = 0; dy = 1; }
+                if (e.key === 'ArrowLeft' && dx === 0) { dx = -1; dy = 0; }
+                if (e.key === 'ArrowRight' && dx === 0) { dx = 1; dy = 0; }
+            };
+        }
+
+        function init2048Game(ctx, canvas) {
+            let grid = Array(4).fill().map(() => Array(4).fill(0));
+            let score = 0;
+
+            function addTile() {
+                let empty = [];
+                for (let i = 0; i < 4; i++)
+                    for (let j = 0; j < 4; j++)
+                        if (grid[i][j] === 0) empty.push({i, j});
+                if (empty.length > 0) {
+                    const pos = empty[Math.floor(Math.random() * empty.length)];
+                    grid[pos.i][pos.j] = Math.random() > 0.5 ? 2 : 4;
+                }
+            }
+
+            function draw() {
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, 400, 400);
+                
+                const colors = {0: '#333', 2: '#eee', 4: '#ddd', 8: '#f96', 16: '#f63', 32: '#f33', 64: '#c33', 128: '#ff0', 256: '#ff0', 512: '#ff0', 1024: '#ff0', 2048: '#ffd700'};
+                
+                for (let i = 0; i < 4; i++) {
+                    for (let j = 0; j < 4; j++) {
+                        const val = grid[i][j];
+                        ctx.fillStyle = colors[val] || '#000';
+                        ctx.fillRect(j * 100 + 5, i * 100 + 5, 90, 90);
+                        if (val > 0) {
+                            ctx.fillStyle = '#000';
+                            ctx.font = 'bold 32px Arial';
+                            ctx.textAlign = 'center';
+                            ctx.fillText(val, j * 100 + 50, i * 100 + 60);
+                        }
+                    }
+                }
+                
+                ctx.fillStyle = 'white';
+                ctx.font = '20px Arial';
+                ctx.textAlign = 'left';
+                ctx.fillText(`Счёт: ${score}`, 10, 30);
+            }
+
+            addTile();
+            addTile();
+            draw();
+
+            document.onkeydown = (e) => {
+                let moved = false;
+                // Упрощённая логика 2048
+                if (e.key === 'ArrowLeft') {
+                    for (let i = 0; i < 4; i++) {
+                        for (let j = 1; j < 4; j++) {
+                            if (grid[i][j] !== 0) {
+                                let k = j;
+                                while (k > 0 && grid[i][k-1] === 0) {
+                                    grid[i][k-1] = grid[i][k];
+                                    grid[i][k] = 0;
+                                    k--;
+                                    moved = true;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (moved) {
+                    addTile();
+                    draw();
+                }
+            };
+        }
+
+        function initGuessGame() {
+            const tracks = library.sort(() => Math.random() - 0.5).slice(0, 5);
+            let current = 0;
+            let score = 0;
+
+            function showQuestion() {
+                if (current >= tracks.length) {
+                    alert(`Игра окончена! Счёт: ${score}`);
+                    addXP(score * 15);
+                    closeGame();
+                    return;
+                }
+
+                const track = tracks[current];
+                const options = [track];
+                while (options.length < 4) {
+                    const random = library[Math.floor(Math.random() * library.length)];
+                    if (!options.find(o => o.title === random.title)) options.push(random);
+                }
+                options.sort(() => Math.random() - 0.5);
+
+                const container = document.getElementById('game-container');
+                container.innerHTML = `
+                    <h3 style="color: white; text-align: center; margin-bottom: 20px;">Угадай трек #${current + 1}/${tracks.length}</h3>
+                    <p style="color: white; text-align: center; margin-bottom: 20px;">Исполнитель: <strong>${track.artist}</strong></p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 600px; margin: 0 auto;">
+                        ${options.map(opt => `
+                            <button class="nav-btn" onclick="answerGuess('${opt.title.replace(/'/g, "\\'")}', '${track.title.replace(/'/g, "\\'")}', ${score})" style="padding: 15px;">
+                                ${opt.title}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            window.answerGuess = (selected, correct, currentScore) => {
+                if (selected === correct) {
+                    currentScore += 50;
+                    alert('✅ Правильно! +50 XP');
+                } else {
+                    alert('❌ Неправильно!');
+                }
+                current++;
+                score = currentScore;
+                showQuestion();
+            };
+
+            showQuestion();
+        }
+
+        function closeGame() {
+            if (gameInterval) { clearInterval(gameInterval); gameInterval = null; }
+            currentGame = null;
+            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('game-container').innerHTML = `
+                <canvas id="game-canvas" width="400" height="400" style="background: #000; border-radius: 10px; max-width: 100%;"></canvas>
+                <div style="text-align: center; margin-top: 15px;">
+                    <button class="nav-btn" onclick="closeGame()">❌ Закрыть игру</button>
+                </div>
+            `;
+        }
+
+        // ========== ДОСТИЖЕНИЯ ==========
+        const allAchievements = [
+            { id: 'first_play', name: 'Первый трек', desc: 'Сыграйте 1 трек', icon: '🎵', condition: () => played >= 1 },
+            { id: 'ten_plays', name: 'Меломан', desc: 'Сыграйте 10 треков', icon: '🎧', condition: () => played >= 10 },
+            { id: 'hundred_xp', name: 'Сотка', desc: 'Наберите 100 XP', icon: '💯', condition: () => xp >= 100 },
+            { id: 'level_5', name: 'Уровень 5', desc: 'Достигните 5 уровня', icon: '⭐', condition: () => level >= 5 },
+            { id: 'snake_master', name: 'Мастер змейки', desc: 'Наберите 100 очков в змейке', icon: '🐍', condition: () => false }
+        ];
+
+        function checkAchievements() {
+            allAchievements.forEach(ach => {
+                if (!achievements.includes(ach.id) && ach.condition()) {
+                    achievements.push(ach.id);
+                    coins += 50;
+                    alert(`🏆 Достижение разблокировано: ${ach.name}! +50 `);
+                }
+            });
+            localStorage.setItem('ss_achievements', JSON.stringify(achievements));
+            localStorage.setItem('ss_coins', coins);
+            updateStats();
+        }
+
+        function renderAchievements() {
+            const list = document.getElementById('achievements-list');
+            let html = '';
+            allAchievements.forEach(ach => {
+                const unlocked = achievements.includes(ach.id);
+                html += `
+                    <div class="achievement ${unlocked ? '' : 'locked'}">
+                        <div class="ach-icon">${ach.icon}</div>
+                        <div class="ach-info">
+                            <div class="ach-name">${ach.name}</div>
+                            <div class="ach-desc">${ach.desc}</div>
+                        </div>
+                        <div>${unlocked ? '✅' : '🔒'}</div>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
         }
 
         // ========== УТИЛИТЫ ==========
-        function formatTime(seconds) {
-            if (isNaN(seconds) || !isFinite(seconds)) return '0:00';
-            
-            const totalSeconds = Math.floor(seconds);
-            const hours = Math.floor(totalSeconds / 3600);
-            const minutes = Math.floor((totalSeconds % 3600) / 60);
-            const secs = totalSeconds % 60;
-            
-            if (hours > 0) {
-                return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        function addXP(amount) {
+            xp += amount;
+            const newLevel = Math.floor(xp / 100) + 1;
+            if (newLevel > level) {
+                level = newLevel;
+                coins += 100;
+                alert(`🎉 Уровень повышен! Теперь уровень ${level}! +100 🪙`);
             }
-            
-            return `${minutes}:${secs.toString().padStart(2, '0')}`;
+            localStorage.setItem('ss_xp', xp);
+            localStorage.setItem('ss_level', level);
+            localStorage.setItem('ss_coins', coins);
+            updateStats();
+            checkAchievements();
         }
 
-        function updatePlayBtnUI() {
-            const playBtn = document.getElementById('playBtn');
-            playBtn.textContent = isPlaying ? '⏸️' : '▶️';
+        function updateStats() {
+            document.getElementById('xp-display').textContent = xp;
+            document.getElementById('level-display').textContent = level;
+            document.getElementById('coins-display').textContent = coins;
+            document.getElementById('played-display').textContent = played;
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (sectionId === 'library') renderLibrary();
+            if (sectionId === 'achievements') renderAchievements();
+        }
+
+        function showError(message) {
+            const container = document.getElementById('error-container');
+            container.innerHTML = `<div class="error">⚠️ ${message}</div>`;
+        }
+
+        function clearError() {
+            document.getElementById('error-container').innerHTML = '';
         }
 
         function escapeHtml(text) {
             if (!text) return '';
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
-            return text.replace(/[&<>"']/g, char => map[char]);
-        }
-
-        function showError(message) {
-            const container = document.getElementById('errorContainer');
-            container.innerHTML = `<div class="error-message">⚠️ ${message}</div>`;
-            console.warn(`⚠️ ${message}`);
-        }
-
-        function clearError() {
-            document.getElementById('errorContainer').innerHTML = '';
+            return text.replace(/[&<>"']/g, char => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+            }[char]));
         }
 
         // ========== ИНИЦИАЛИЗАЦИЯ ==========
-        document.addEventListener('DOMContentLoaded', () => {
-            const searchInput = document.getElementById('searchInput');
-            
-            searchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    performSearch();
-                }
-            });
-
-            console.log('🎵 SoundScape Pro загружен успешно!');
+        window.addEventListener('load', () => {
+            updateStats();
+            console.log(' SoundScape Pro загружен!');
             console.log('📝 Backend:', API_BASE);
-        });
-
-        window.addEventListener('beforeunload', () => {
-            if (youtubePlayer) {
-                try {
-                    youtubePlayer.stopVideo();
-                } catch (error) {
-                    // Игнорируем
-                }
-            }
         });
     </script>
 </body>
