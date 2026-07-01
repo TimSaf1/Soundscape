@@ -2,8 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SoundScape Pro 🎵</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -42,25 +41,20 @@
         .track-artist { color: #999; font-size: 0.8em; margin-bottom: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .play-btn { width: 100%; padding: 8px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
         
-        /* СКРЫТЫЙ YOUTUBE - реклама не видна */
-        #yt-wrapper { position: fixed; left: -9999px; top: -9999px; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none; z-index: -1; }
-        
-        /* ВИДИМЫЙ ПЛЕЕР */
-        .player { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 15px; box-shadow: 0 -5px 30px rgba(0,0,0,0.4); z-index: 1000; }
+        .player { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 15px; box-shadow: 0 -5px 30px rgba(0,0,0,0.4); z-index: 1000; display: none; }
+        .player.active { display: block; }
         .player-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 15px; align-items: center; }
         .player-thumb { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
-        .player-info { flex: 1; min-width: 0; }
-        .player-title { font-weight: 600; font-size: 1em; margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .player-artist { opacity: 0.8; font-size: 0.85em; margin-bottom: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .player-info { flex: 1; }
+        .player-title { font-weight: 600; font-size: 1em; margin-bottom: 3px; }
+        .player-artist { opacity: 0.8; font-size: 0.85em; margin-bottom: 8px; }
         .progress-container { display: flex; align-items: center; gap: 8px; }
         .progress-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; cursor: pointer; -webkit-appearance: none; }
         .progress-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: #667eea; border-radius: 50%; cursor: pointer; }
         .time { font-size: 0.75em; opacity: 0.8; min-width: 40px; font-family: monospace; }
         .controls { display: flex; gap: 8px; }
-        .ctrl-btn { width: 40px; height: 40px; border: none; background: rgba(255,255,255,0.15); color: white; border-radius: 50%; cursor: pointer; font-size: 1.2em; transition: all 0.2s; }
-        .ctrl-btn:active { background: rgba(255,255,255,0.3); transform: scale(0.9); }
+        .ctrl-btn { width: 40px; height: 40px; border: none; background: rgba(255,255,255,0.15); color: white; border-radius: 50%; cursor: pointer; font-size: 1.2em; }
         .ctrl-btn.play { background: linear-gradient(135deg, #667eea, #764ba2); width: 50px; height: 50px; font-size: 1.4em; }
-        .ctrl-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         
         .library-item { background: white; padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
         .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
@@ -74,21 +68,23 @@
         .auth-input { width: 100%; padding: 12px; margin-bottom: 12px; border: 2px solid #ddd; border-radius: 8px; }
         .auth-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         
-        .loading { text-align: center; padding: 40px; color: white; }
+        .fallback-link { display: inline-block; margin-top: 10px; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; }
+        
+        #youtube-player { position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>🎵 SoundScape Pro</h1>
-            <p>Чистая музыка без рекламы</p>
+            <p>Музыка • Игры • Достижения</p>
         </header>
 
         <div class="stats">
             <div class="stat"><div class="stat-value" id="xp">0</div><div class="stat-label">⭐ XP</div></div>
             <div class="stat"><div class="stat-value" id="level">1</div><div class="stat-label">📊 Уровень</div></div>
             <div class="stat"><div class="stat-value" id="coins">100</div><div class="stat-label">🪙 Монеты</div></div>
-            <div class="stat"><div class="stat-value" id="played">0</div><div class="stat-label">🎧 Сыграно</div></div>
+            <div class="stat"><div class="stat-value" id="played">0</div><div class="stat-label"> Сыграно</div></div>
         </div>
 
         <div class="nav">
@@ -116,7 +112,7 @@
             <h2 style="color: white; margin-bottom: 15px;">🎮 Игры</h2>
             <div class="game-grid">
                 <div class="game-card" onclick="startSnake()"><div class="game-icon">🐍</div><h3>Змейка</h3></div>
-                <div class="game-card" onclick="start2048()"><div class="game-icon">🔢</div><h3>2048</h3></div>
+                <div class="game-card" onclick="start2048()"><div class="game-icon"></div><h3>2048</h3></div>
                 <div class="game-card" onclick="startGuess()"><div class="game-icon">🎵</div><h3>Угадай трек</h3></div>
             </div>
             <div id="game-area" style="margin-top:15px;display:none;text-align:center">
@@ -141,19 +137,14 @@
             <div id="profile-data" style="display:none;text-align:center;color:white;padding:20px">
                 <h2 id="profile-name" style="margin-bottom:15px"></h2>
                 <p style="margin-bottom:10px">Уровень: <strong id="profile-level"></strong></p>
-                <p style="margin-bottom:20px">XP: <strong id="profile-xp"></strong></p>
                 <button class="nav-btn" onclick="logout()">Выйти</button>
             </div>
         </div>
     </div>
 
-    <!-- СКРЫТЫЙ YOUTUBE IFRAME -->
-    <div id="yt-wrapper">
-        <div id="youtube-player"></div>
-    </div>
+    <div id="youtube-player"></div>
     
-    <!-- ВИДИМЫЙ ПЛЕЕР -->
-    <div class="player" id="player" style="display:none">
+    <div class="player" id="player">
         <div class="player-inner">
             <img id="player-thumb" class="player-thumb" src="" alt="">
             <div class="player-info">
@@ -166,15 +157,14 @@
                 </div>
             </div>
             <div class="controls">
-                <button class="ctrl-btn" id="btn-back" onclick="skip(-15)" title="Назад 15 сек">⏪</button>
-                <button class="ctrl-btn play" id="play-btn" onclick="togglePlay()" title="Play/Pause">▶️</button>
-                <button class="ctrl-btn" id="btn-forward" onclick="skip(15)" title="Вперёд 15 сек">⏩</button>
-                <button class="ctrl-btn" onclick="closePlayer()" title="Закрыть">✕</button>
+                <button class="ctrl-btn" onclick="skip(-15)">⏪</button>
+                <button class="ctrl-btn play" id="play-btn" onclick="togglePlay()">▶️</button>
+                <button class="ctrl-btn" onclick="skip(15)">⏩</button>
+                <button class="ctrl-btn" onclick="closePlayer()"></button>
             </div>
         </div>
     </div>
 
-    <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         const API_BASE = 'https://soundscape-api-9fng.onrender.com';
         let player = null;
@@ -182,10 +172,6 @@
         let currentVideoId = null;
         let isPlaying = false;
         let progressInterval = null;
-        let isSeeking = false;
-        let seekTimeout = null;
-        let retryCount = 0;
-        const MAX_RETRIES = 3;
         
         let xp = parseInt(localStorage.getItem('ss_xp')) || 0;
         let level = parseInt(localStorage.getItem('ss_level')) || 1;
@@ -200,86 +186,70 @@
             {id:'3',title:'Despacito',artist:'Luis Fonsi',videoId:'kJQP7kiw5Fk',thumb:'https://i.ytimg.com/vi/kJQP7kiw5Fk/mqdefault.jpg'}
         ];
 
-        // YOUTUBE API С ПАРАМЕТРАМИ БЕЗ РЕКЛАМЫ
-        function onYouTubeIframeAPIReady() {
-            player = new YT.Player('youtube-player', {
-                height: '1',
-                width: '1',
-                playerVars: {
-                    'autoplay': 0,
-                    'controls': 0,
-                    'playsinline': 1,
-                    'rel': 0,              // Не показывать похожие видео
-                    'modestbranding': 1,   // Минимум брендинга YouTube
-                    'iv_load_policy': 3,   // Не показывать аннотации
-                    'fs': 0,               // Скрыть кнопку fullscreen
-                    'disablekb': 1         // Отключить клавиатуру
-                },
-                events: {
-                    'onReady': onPlayerReady,
-                    'onStateChange': onPlayerStateChange,
-                    'onError': onPlayerError
-                }
-            });
-        }
+        // ЗАГРУЗКА YOUTUBE API
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-        function onPlayerReady(event) {
-            playerReady = true;
-            console.log('✅ Плеер готов');
-            retryCount = 0;
-        }
-
-        function onPlayerStateChange(event) {
-            if (event.data === YT.PlayerState.PLAYING) {
-                isPlaying = true;
-                updatePlayBtn();
-                startProgress();
-                retryCount = 0;
-            } else if (event.data === YT.PlayerState.PAUSED) {
-                isPlaying = false;
-                updatePlayBtn();
-            } else if (event.data === YT.PlayerState.ENDED) {
-                isPlaying = false;
-                updatePlayBtn();
-                retryCount = 0;
-            } else if (event.data === YT.PlayerState.BUFFERING) {
-                // Показываем что идёт загрузка
-                document.getElementById('play-btn').textContent = '⏳';
-            }
-        }
-
-        function onPlayerError(event) {
-            console.error('YouTube error:', event.data);
-            
-            // Пробуем перезагрузить трек
-            if (retryCount < MAX_RETRIES && currentVideoId) {
-                retryCount++;
-                console.log(`🔄 Попытка ${retryCount}/${MAX_RETRIES} перезагрузить трек...`);
-                setTimeout(() => {
-                    if (player && player.loadVideoById) {
-                        player.loadVideoById(currentVideoId);
-                        player.playVideo();
+        window.onYouTubeIframeAPIReady = function() {
+            console.log('YouTube API готов, создаём плеер...');
+            try {
+                player = new YT.Player('youtube-player', {
+                    height: '1',
+                    width: '1',
+                    playerVars: {
+                        'autoplay': 0,
+                        'controls': 0,
+                        'playsinline': 1,
+                        'rel': 0,
+                        'modestbranding': 1
+                    },
+                    events: {
+                        'onReady': function() {
+                            playerReady = true;
+                            console.log('✅ Плеер готов!');
+                        },
+                        'onStateChange': function(event) {
+                            if (event.data === YT.PlayerState.PLAYING) {
+                                isPlaying = true;
+                                updatePlayBtn();
+                                startProgress();
+                            } else if (event.data === YT.PlayerState.PAUSED) {
+                                isPlaying = false;
+                                updatePlayBtn();
+                            } else if (event.data === YT.PlayerState.ENDED) {
+                                isPlaying = false;
+                                updatePlayBtn();
+                            }
+                        },
+                        'onError': function(event) {
+                            console.error('YouTube error:', event.data);
+                            alert('Ошибка воспроизведения. Открываем в новой вкладке...');
+                            if (currentVideoId) {
+                                window.open(`https://www.youtube.com/watch?v=${currentVideoId}`, '_blank');
+                            }
+                        }
                     }
-                }, 2000);
-            } else {
-                alert('Ошибка воспроизведения. Попробуйте другой трек.');
-                retryCount = 0;
+                });
+            } catch (error) {
+                console.error('Ошибка создания плеера:', error);
             }
-        }
+        };
 
         async function performSearch() {
             const q = document.getElementById('search-input').value.trim();
             if (!q || q.length < 2) { alert('Введите минимум 2 символа'); return; }
             
             const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '<div class="loading">🔍 Поиск...</div>';
+            resultsDiv.innerHTML = '<div style="text-align:center;padding:40px;color:white">🔍 Поиск...</div>';
             
             try {
                 const res = await fetch(`${API_BASE}/api/youtube/search?q=${encodeURIComponent(q)}&limit=12`);
                 const data = await res.json();
                 
                 if (!data.items || data.items.length === 0) {
-                    resultsDiv.innerHTML = '<div class="loading">😔 Ничего не найдено</div>';
+                    resultsDiv.innerHTML = '<div style="text-align:center;padding:40px;color:white">😔 Ничего не найдено</div>';
                     return;
                 }
                 
@@ -287,16 +257,16 @@
                 data.items.forEach(item => {
                     const title = escapeHtml(item.title || 'Без названия');
                     const artist = escapeHtml(item.channelTitle || 'Неизвестно');
-                    const thumb = item.thumbnail || item.snippet?.thumbnails?.medium?.url || 'https://via.placeholder.com/300';
+                    const thumb = item.thumbnail || 'https://via.placeholder.com/300';
                     const videoId = item.videoId;
                     
                     html += `
-                        <div class="track-card" onclick="playTrack('${videoId}', \`${title}\`, \`${artist}\`, '${thumb}')">
+                        <div class="track-card">
                             <img src="${thumb}" class="track-thumb" loading="lazy">
                             <div class="track-info">
                                 <div class="track-title">${title}</div>
                                 <div class="track-artist">${artist}</div>
-                                <button class="play-btn" onclick="event.stopPropagation(); playTrack('${videoId}', \`${title}\`, \`${artist}\`, '${thumb}')">▶️ Играть</button>
+                                <button class="play-btn" onclick="playTrack('${videoId}', '${title.replace(/'/g, "\\'")}', '${artist.replace(/'/g, "\\'")}', '${thumb}')">▶️ Играть</button>
                             </div>
                         </div>
                     `;
@@ -306,7 +276,7 @@
                 addXP(5);
             } catch (error) {
                 console.error('Search error:', error);
-                resultsDiv.innerHTML = '<div class="loading">❌ Ошибка поиска</div>';
+                resultsDiv.innerHTML = '<div style="text-align:center;padding:40px;color:white">❌ Ошибка поиска</div>';
             }
         }
 
@@ -316,26 +286,29 @@
             document.getElementById('player-thumb').src = thumb;
             document.getElementById('player-title').textContent = title;
             document.getElementById('player-artist').textContent = artist;
-            document.getElementById('player').style.display = 'block';
+            document.getElementById('player').classList.add('active');
             
-            // Блокируем кнопки на время загрузки
-            setButtonsDisabled(true);
-            
+            // Пробуем играть через YouTube плеер
             if (playerReady && player && player.loadVideoById) {
-                loadAndPlay(videoId);
+                try {
+                    player.loadVideoById(videoId);
+                    player.playVideo();
+                } catch (error) {
+                    console.error('Play error:', error);
+                    // Fallback - открываем в новой вкладке
+                    window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+                }
             } else {
-                // Ждём готовности плеера
-                const checkReady = setInterval(() => {
-                    if (playerReady && player && player.loadVideoById) {
-                        clearInterval(checkReady);
-                        loadAndPlay(videoId);
-                    }
-                }, 500);
-                
+                // Плеер не готов - открываем в новой вкладке
+                console.log('Плеер не готов, открываем в новой вкладке...');
                 setTimeout(() => {
-                    clearInterval(checkReady);
-                    setButtonsDisabled(false);
-                }, 10000);
+                    if (playerReady && player && player.loadVideoById) {
+                        player.loadVideoById(videoId);
+                        player.playVideo();
+                    } else {
+                        window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+                    }
+                }, 2000);
             }
             
             played++;
@@ -344,162 +317,51 @@
             addXP(10);
         }
 
-        function loadAndPlay(videoId) {
-            try {
-                // Сначала останавливаем текущее
-                if (player.stopVideo) player.stopVideo();
-                
-                // Загружаем новое видео
-                player.loadVideoById({
-                    videoId: videoId,
-                    startSeconds: 0
-                });
-                
-                // Пробуем играть через 500мс
-                setTimeout(() => {
-                    if (player && player.playVideo) {
-                        player.playVideo();
-                        setButtonsDisabled(false);
-                    }
-                }, 500);
-                
-            } catch (error) {
-                console.error('Load error:', error);
-                setButtonsDisabled(false);
-                alert('Ошибка загрузки трека');
-            }
-        }
-
         function togglePlay() {
-            if (!player || !playerReady) return;
-            
-            setButtonsDisabled(true);
-            try {
-                if (isPlaying) {
-                    player.pauseVideo();
-                } else {
-                    player.playVideo();
-                }
-                setTimeout(() => setButtonsDisabled(false), 500);
-            } catch (error) {
-                console.error('Toggle error:', error);
-                setButtonsDisabled(false);
+            if (!player || !playerReady) {
+                alert('Плеер загружается...');
+                return;
+            }
+            if (isPlaying) {
+                player.pauseVideo();
+            } else {
+                player.playVideo();
             }
         }
 
-        // ПЕРЕМОТКА С DEBOUNCE - НЕ ЗАВИСАЕТ!
         function skip(seconds) {
-            if (!player || !playerReady || !currentVideoId) return;
-            
-            // Очищаем предыдущий таймер
-            if (seekTimeout) {
-                clearTimeout(seekTimeout);
-            }
-            
-            // Показываем что идёт перемотка
-            document.getElementById('play-btn').textContent = '⏳';
-            setButtonsDisabled(true);
-            
-            // Debounce - ждём 100мс перед выполнением
-            seekTimeout = setTimeout(() => {
-                try {
-                    const currentTime = player.getCurrentTime();
-                    const duration = player.getDuration();
-                    let newTime = currentTime + seconds;
-                    
-                    // Проверяем границы
-                    if (newTime < 0) newTime = 0;
-                    if (newTime > duration) newTime = duration;
-                    
-                    // Перемотка с флагом allowSeekAhead
-                    player.seekTo(newTime, true);
-                    
-                    // Возвращаем кнопки через 500мс
-                    setTimeout(() => {
-                        setButtonsDisabled(false);
-                        if (isPlaying) {
-                            document.getElementById('play-btn').textContent = '⏸️';
-                        } else {
-                            document.getElementById('play-btn').textContent = '▶️';
-                        }
-                    }, 500);
-                    
-                } catch (error) {
-                    console.error('Skip error:', error);
-                    setButtonsDisabled(false);
-                }
-            }, 100);
+            if (!player || !playerReady) return;
+            const current = player.getCurrentTime();
+            player.seekTo(current + seconds, true);
         }
 
         function closePlayer() {
             if (player && player.stopVideo) {
                 player.stopVideo();
             }
-            if (seekTimeout) {
-                clearTimeout(seekTimeout);
-            }
             isPlaying = false;
-            currentVideoId = null;
-            document.getElementById('player').style.display = 'none';
+            document.getElementById('player').classList.remove('active');
             if (progressInterval) { clearInterval(progressInterval); progressInterval = null; }
-            setButtonsDisabled(false);
         }
 
         function startProgress() {
             if (progressInterval) clearInterval(progressInterval);
-            
             progressInterval = setInterval(() => {
-                if (!player || !playerReady || isSeeking) return;
-                
+                if (!player || !playerReady) return;
                 try {
                     const current = player.getCurrentTime();
                     const duration = player.getDuration();
-                    
-                    if (duration > 0 && !isNaN(current)) {
+                    if (duration > 0) {
                         document.getElementById('current-time').textContent = formatTime(current);
                         document.getElementById('total-time').textContent = formatTime(duration);
-                        
-                        // Обновляем прогресс-бар только если не перематываем
-                        if (!isSeeking) {
-                            document.getElementById('progress-bar').value = (current / duration) * 100;
-                        }
+                        document.getElementById('progress-bar').value = (current / duration) * 100;
                     }
-                } catch(e) {
-                    console.error('Progress error:', e);
-                }
+                } catch(e) {}
             }, 1000);
         }
 
-        // Обработчик прогресс-бара с debounce
-        document.addEventListener('DOMContentLoaded', () => {
-            const progressBar = document.getElementById('progress-bar');
-            
-            progressBar.addEventListener('mousedown', () => { isSeeking = true; });
-            progressBar.addEventListener('touchstart', () => { isSeeking = true; });
-            
-            progressBar.addEventListener('change', function() {
-                if (!player || !playerReady) return;
-                
-                isSeeking = true;
-                setButtonsDisabled(true);
-                
-                const duration = player.getDuration();
-                const seekTime = (this.value / 100) * duration;
-                
-                // Перемотка
-                player.seekTo(seekTime, true);
-                
-                // Возвращаем состояние
-                setTimeout(() => {
-                    isSeeking = false;
-                    setButtonsDisabled(false);
-                    if (isPlaying) player.playVideo();
-                }, 500);
-            });
-        });
-
         function formatTime(sec) {
-            if (isNaN(sec) || !isFinite(sec)) return '0:00';
+            if (isNaN(sec)) return '0:00';
             const m = Math.floor(sec / 60);
             const s = Math.floor(sec % 60);
             return `${m}:${s.toString().padStart(2,'0')}`;
@@ -507,12 +369,6 @@
 
         function updatePlayBtn() {
             document.getElementById('play-btn').textContent = isPlaying ? '⏸️' : '▶️';
-        }
-
-        function setButtonsDisabled(disabled) {
-            document.getElementById('btn-back').disabled = disabled;
-            document.getElementById('play-btn').disabled = disabled;
-            document.getElementById('btn-forward').disabled = disabled;
         }
 
         function renderLibrary() {
@@ -526,9 +382,9 @@
                 html += `
                     <div class="library-item" onclick="playTrack('${item.videoId}', '${escapeHtml(item.title)}', '${escapeHtml(item.artist)}', '${item.thumb}')">
                         <img src="${item.thumb}" style="width:60px;height:60px;border-radius:8px;object-fit:cover">
-                        <div style="flex:1;min-width:0">
-                            <div style="font-weight:600;font-size:0.95em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(item.title)}</div>
-                            <div style="font-size:0.8em;color:#999;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(item.artist)}</div>
+                        <div style="flex:1">
+                            <div style="font-weight:600">${escapeHtml(item.title)}</div>
+                            <div style="font-size:0.8em;color:#999">${escapeHtml(item.artist)}</div>
                         </div>
                         <div style="font-size:1.5em;color:#667eea">▶️</div>
                     </div>
@@ -617,10 +473,10 @@
                 opts.sort(()=>Math.random()-0.5);
                 
                 const div = document.getElementById('game-area');
-                div.innerHTML = `<h3 style="color:white;margin-bottom:15px;font-size:1.2em">Угадай трек #${current+1}/${tracks.length}</h3>
-                    <p style="color:white;margin-bottom:15px;font-size:1em">Исполнитель: <strong>${track.artist}</strong></p>
+                div.innerHTML = `<h3 style="color:white;margin-bottom:15px">Угадай трек #${current+1}/${tracks.length}</h3>
+                    <p style="color:white;margin-bottom:15px">Исполнитель: <strong>${track.artist}</strong></p>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:350px;margin:0 auto">
-                        ${opts.map(o=>`<button class="nav-btn" onclick="answer('${o.title.replace(/'/g,"\\'")}','${track.title.replace(/'/g,"\\'")}',${score})" style="padding:12px;font-size:0.85em">${o.title}</button>`).join('')}
+                        ${opts.map(o=>`<button class="nav-btn" onclick="answer('${o.title.replace(/'/g,"\\'")}','${track.title.replace(/'/g,"\\'")}',${score})" style="padding:12px">${o.title}</button>`).join('')}
                     </div>`;
                 
                 window.answer = (sel, corr, sc) => { if(sel===corr) { sc+=50; alert('✅ Правильно! +50 XP'); } else alert('❌ Неправильно!'); current++; score=sc; showQ(); };
@@ -631,7 +487,7 @@
         function closeGame() { document.getElementById('game-area').style.display = 'none'; document.getElementById('game-area').innerHTML = `<canvas id="game-canvas" width="350" height="350" style="background:#000;border-radius:10px;max-width:100%"></canvas><br><br><button class="nav-btn" onclick="closeGame()">❌ Закрыть</button>`; }
 
         const allAch = [
-            {id:'first',name:'Первый трек',desc:'Сыграйте 1 трек',icon:'🎵',cond:()=>played>=1},
+            {id:'first',name:'Первый трек',desc:'Сыграйте 1 трек',icon:'',cond:()=>played>=1},
             {id:'ten',name:'Меломан',desc:'Сыграйте 10 треков',icon:'🎧',cond:()=>played>=10},
             {id:'hundred',name:'Сотка',desc:'100 XP',icon:'💯',cond:()=>xp>=100},
             {id:'level5',name:'Уровень 5',desc:'Достигните 5 уровня',icon:'⭐',cond:()=>level>=5}
@@ -642,7 +498,7 @@
                 if(!achievements.includes(ach.id) && ach.cond()) {
                     achievements.push(ach.id);
                     coins += 50;
-                    alert(`🏆 Достижение: ${ach.name}! +50 🪙`);
+                    alert(`🏆 Достижение: ${ach.name}! +50 `);
                 }
             });
             localStorage.setItem('ss_achievements', JSON.stringify(achievements));
@@ -657,11 +513,11 @@
                 const unlocked = achievements.includes(ach.id);
                 html += `<div class="achievement ${unlocked?'':'locked'}">
                     <div style="font-size:2em">${ach.icon}</div>
-                    <div style="flex:1;min-width:0">
-                        <div style="font-weight:600;font-size:0.95em">${ach.name}</div>
+                    <div style="flex:1">
+                        <div style="font-weight:600">${ach.name}</div>
                         <div style="font-size:0.8em;color:#999">${ach.desc}</div>
                     </div>
-                    <div style="font-size:1.5em">${unlocked?'✅':'🔒'}</div>
+                    <div>${unlocked?'✅':'🔒'}</div>
                 </div>`;
             });
             list.innerHTML = html;
@@ -704,7 +560,6 @@
                 document.getElementById('profile-data').style.display = 'block';
                 document.getElementById('profile-name').textContent = currentUser;
                 document.getElementById('profile-level').textContent = level;
-                document.getElementById('profile-xp').textContent = xp;
             }
         }
 
