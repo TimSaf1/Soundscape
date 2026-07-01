@@ -11,7 +11,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: #333;
-            padding-bottom: 150px;
+            padding-bottom: 120px;
         }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         header { text-align: center; margin-bottom: 30px; color: white; }
@@ -26,9 +26,8 @@
         .nav-btn { padding: 12px 24px; background: rgba(255,255,255,0.3); border: none; border-radius: 25px; color: white; cursor: pointer; font-weight: bold; }
         .nav-btn.active { background: white; color: #667eea; }
         
-        .section { display: none; animation: fadeIn 0.4s; }
+        .section { display: none; }
         .section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
         .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
         .search-box input { flex: 1; padding: 15px; border: 2px solid rgba(255,255,255,0.3); border-radius: 10px; font-size: 1em; }
@@ -37,14 +36,14 @@
         .results { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
         .track-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.3s; }
         .track-card:hover { transform: translateY(-5px); }
-        .track-thumb { width: 100%; height: 180px; object-fit: cover; background: #f0f0f0; }
+        .track-thumb { width: 100%; height: 180px; object-fit: cover; }
         .track-info { padding: 15px; }
-        .track-title { font-weight: bold; margin-bottom: 5px; }
-        .track-artist { color: #999; font-size: 0.9em; margin-bottom: 10px; }
+        .track-title { font-weight: bold; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .track-artist { color: #999; font-size: 0.9em; margin-bottom: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .play-btn { width: 100%; padding: 10px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         
-        .player { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 20px; box-shadow: 0 -5px 30px rgba(0,0,0,0.4); z-index: 1000; display: none; }
-        .player.active { display: block; }
+        /* ПЛЕЕР ВНИЗУ */
+        .player { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 20px; box-shadow: 0 -5px 30px rgba(0,0,0,0.4); z-index: 1000; }
         .player-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 20px; align-items: center; }
         .player-thumb { width: 80px; height: 80px; border-radius: 10px; object-fit: cover; }
         .player-info { flex: 1; }
@@ -55,14 +54,15 @@
         .progress-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: #667eea; border-radius: 50%; cursor: pointer; }
         .time { font-size: 0.85em; opacity: 0.8; min-width: 45px; font-family: monospace; }
         .controls { display: flex; gap: 10px; }
-        .ctrl-btn { width: 45px; height: 45px; border: none; background: rgba(255,255,255,0.2); color: white; border-radius: 50%; cursor: pointer; font-size: 1.3em; }
+        .ctrl-btn { width: 45px; height: 45px; border: none; background: rgba(255,255,255,0.2); color: white; border-radius: 50%; cursor: pointer; font-size: 1.3em; transition: all 0.2s; }
+        .ctrl-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
         .ctrl-btn.play { background: linear-gradient(135deg, #667eea, #764ba2); width: 55px; height: 55px; font-size: 1.5em; }
         
         .library-item { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; cursor: pointer; }
         .library-item:hover { background: #f5f5f5; }
         
         .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
-        .game-card { background: white; padding: 25px; border-radius: 12px; text-align: center; cursor: pointer; transition: transform 0.3s; }
+        .game-card { background: white; padding: 25px; border-radius: 12px; text-align: center; cursor: pointer; }
         .game-card:hover { transform: scale(1.05); }
         .game-icon { font-size: 3em; margin-bottom: 10px; }
         
@@ -70,17 +70,10 @@
         .achievement.locked { opacity: 0.5; }
         
         .auth-box { background: white; padding: 30px; border-radius: 15px; max-width: 400px; margin: 0 auto; }
-        .auth-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 1em; }
-        .auth-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1em; }
+        .auth-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #ddd; border-radius: 8px; }
+        .auth-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         
-        .error { background: rgba(255,59,48,0.1); border: 2px solid #ff3b30; color: #ff3b30; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: center; }
-        .loading { text-align: center; padding: 40px; color: white; }
-        .spinner { display: inline-block; width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        
-        .fallback-link { display: inline-block; margin-top: 10px; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; }
-        
-        #youtube-frame { position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; }
+        #youtube-player { position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; }
     </style>
 </head>
 <body>
@@ -105,48 +98,41 @@
             <button class="nav-btn" onclick="showSection('profile')">👤 Профиль</button>
         </div>
 
-        <!-- ПОИСК -->
         <div id="search" class="section active">
             <div class="search-box">
-                <input type="text" id="search-input" placeholder=" Поиск трека или исполнителя..." onkeypress="if(event.key==='Enter')performSearch()">
+                <input type="text" id="search-input" placeholder="🔍 Поиск трека..." onkeypress="if(event.key==='Enter')performSearch()">
                 <button class="search-btn" onclick="performSearch()">Найти</button>
             </div>
-            <div id="error-container"></div>
             <div id="results" class="results"></div>
         </div>
 
-        <!-- БИБЛИОТЕКА -->
         <div id="library" class="section">
-            <h2 style="color: white; margin-bottom: 20px;">📚 Моя библиотека</h2>
+            <h2 style="color: white; margin-bottom: 20px;">📚 Библиотека</h2>
             <div id="library-list"></div>
         </div>
 
-        <!-- ИГРЫ -->
         <div id="games" class="section">
-            <h2 style="color: white; margin-bottom: 20px;">🎮 Игровой центр</h2>
+            <h2 style="color: white; margin-bottom: 20px;">🎮 Игры</h2>
             <div class="game-grid">
-                <div class="game-card" onclick="startSnake()"><div class="game-icon">🐍</div><h3>Змейка</h3><p style="color:#999">+100 XP</p></div>
-                <div class="game-card" onclick="start2048()"><div class="game-icon">🔢</div><h3>2048</h3><p style="color:#999">+250 XP</p></div>
-                <div class="game-card" onclick="startGuess()"><div class="game-icon">🎵</div><h3>Угадай трек</h3><p style="color:#999">+150 XP</p></div>
+                <div class="game-card" onclick="startSnake()"><div class="game-icon">🐍</div><h3>Змейка</h3></div>
+                <div class="game-card" onclick="start2048()"><div class="game-icon">🔢</div><h3>2048</h3></div>
+                <div class="game-card" onclick="startGuess()"><div class="game-icon">🎵</div><h3>Угадай трек</h3></div>
             </div>
             <div id="game-area" style="margin-top:20px;display:none;text-align:center">
                 <canvas id="game-canvas" width="400" height="400" style="background:#000;border-radius:10px;max-width:100%"></canvas>
-                <br><br>
-                <button class="nav-btn" onclick="closeGame()">❌ Закрыть</button>
+                <br><br><button class="nav-btn" onclick="closeGame()">❌ Закрыть</button>
             </div>
         </div>
 
-        <!-- ДОСТИЖЕНИЯ -->
         <div id="achievements" class="section">
             <h2 style="color: white; margin-bottom: 20px;">🏆 Достижения</h2>
             <div id="achievements-list"></div>
         </div>
 
-        <!-- ПРОФИЛЬ -->
         <div id="profile" class="section">
             <div id="auth-form" class="auth-box">
                 <h2 style="margin-bottom:20px">🔐 Вход</h2>
-                <input type="text" id="username" class="auth-input" placeholder="Имя пользователя">
+                <input type="text" id="username" class="auth-input" placeholder="Имя">
                 <input type="password" id="password" class="auth-input" placeholder="Пароль">
                 <button class="auth-btn" onclick="login()">Войти</button>
                 <button class="auth-btn" onclick="register()" style="margin-top:10px;background:#28a745">Регистрация</button>
@@ -154,15 +140,16 @@
             <div id="profile-data" style="display:none;text-align:center;color:white">
                 <h2 id="profile-name"></h2>
                 <p>Уровень: <strong id="profile-level"></strong></p>
-                <p>XP: <strong id="profile-xp"></strong></p>
                 <button class="nav-btn" onclick="logout()" style="margin-top:20px">Выйти</button>
             </div>
         </div>
     </div>
 
-    <!-- ПЛЕЕР -->
-    <div id="youtube-frame"></div>
-    <div class="player" id="player">
+    <!-- YOUTUBE PLAYER -->
+    <div id="youtube-player"></div>
+    
+    <!-- ПЛЕЕР ВНИЗУ -->
+    <div class="player" id="player" style="display:none">
         <div class="player-inner">
             <img id="player-thumb" class="player-thumb" src="" alt="">
             <div class="player-info">
@@ -175,22 +162,23 @@
                 </div>
             </div>
             <div class="controls">
-                <button class="ctrl-btn" onclick="skip(-15)">⏪</button>
-                <button class="ctrl-btn play" id="play-btn" onclick="togglePlay()">▶️</button>
-                <button class="ctrl-btn" onclick="skip(15)">⏩</button>
-                <button class="ctrl-btn" onclick="closePlayer()">✕</button>
+                <button class="ctrl-btn" onclick="skip(-15)" title="Назад 15 сек">⏪</button>
+                <button class="ctrl-btn play" id="play-btn" onclick="togglePlay()" title="Play/Pause">▶️</button>
+                <button class="ctrl-btn" onclick="skip(15)" title="Вперёд 15 сек">⏩</button>
+                <button class="ctrl-btn" onclick="closePlayer()" title="Закрыть">✕</button>
             </div>
         </div>
     </div>
 
+    <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         const API_BASE = 'https://soundscape-api-9fng.onrender.com';
+        let player = null;
+        let playerReady = false;
         let currentVideoId = null;
         let isPlaying = false;
         let progressInterval = null;
-        let audioElement = null;
         
-        // Геймификация
         let xp = parseInt(localStorage.getItem('ss_xp')) || 0;
         let level = parseInt(localStorage.getItem('ss_level')) || 1;
         let coins = parseInt(localStorage.getItem('ss_coins')) || 100;
@@ -198,207 +186,168 @@
         let achievements = JSON.parse(localStorage.getItem('ss_achievements')) || [];
         let currentUser = localStorage.getItem('ss_user') || null;
         
-        // Библиотека
         let library = JSON.parse(localStorage.getItem('ss_library')) || [
             {id:'1',title:'Never Gonna Give You Up',artist:'Rick Astley',videoId:'dQw4w9WgXcQ',thumb:'https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg'},
             {id:'2',title:'Gangnam Style',artist:'PSY',videoId:'9bZkp7q19f0',thumb:'https://i.ytimg.com/vi/9bZkp7q19f0/mqdefault.jpg'},
             {id:'3',title:'Despacito',artist:'Luis Fonsi',videoId:'kJQP7kiw5Fk',thumb:'https://i.ytimg.com/vi/kJQP7kiw5Fk/mqdefault.jpg'}
         ];
 
-        // ========== ПОИСК ==========
-        async function performSearch() {
-            const q = document.getElementById('search-input').value.trim();
-            if (!q || q.length < 2) { showError('Введите минимум 2 символа'); return; }
-            
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p>Поиск...</p></div>';
-            clearError();
-            
-            let results = [];
-            
-            // 1. YouTube через backend
-            try {
-                const res = await fetch(`${API_BASE}/api/youtube/search?q=${encodeURIComponent(q)}&limit=10`);
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.items && data.items.length > 0) {
-                        results = results.concat(data.items.map(item => ({...item, source: 'youtube'})));
-                    }
+        // YOUTUBE API
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtube-player', {
+                height: '1',
+                width: '1',
+                playerVars: {
+                    'autoplay': 0,
+                    'controls': 0,
+                    'playsinline': 1
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
                 }
-            } catch(e) { console.warn('YouTube error:', e); }
-            
-            // 2. iTunes (резерв)
-            if (results.length === 0) {
-                try {
-                    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&media=music&limit=10`);
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (data.results && data.results.length > 0) {
-                            results = results.concat(data.results.map(item => ({
-                                videoId: null,
-                                title: item.trackName,
-                                artist: item.artistName,
-                                thumbnail: item.artworkUrl100?.replace('100x100','300x300') || '',
-                                previewUrl: item.previewUrl,
-                                source: 'itunes'
-                            })));
-                        }
-                    }
-                } catch(e) { console.warn('iTunes error:', e); }
-            }
-            
-            // 3. Локальная библиотека
-            const local = library.filter(t => t.title.toLowerCase().includes(q.toLowerCase()) || t.artist.toLowerCase().includes(q.toLowerCase()));
-            if (local.length > 0) {
-                results = results.concat(local.map(item => ({...item, source: 'library'})));
-            }
-            
-            if (results.length === 0) {
-                resultsDiv.innerHTML = '<div class="loading">😔 Ничего не найдено</div>';
-                return;
-            }
-            
-            let html = '';
-            results.forEach(item => {
-                const title = escapeHtml(item.title || 'Без названия');
-                const artist = escapeHtml(item.artist || item.channelTitle || 'Неизвестно');
-                const thumb = item.thumbnail || item.snippet?.thumbnails?.medium?.url || 'https://via.placeholder.com/300x300';
-                const vid = item.videoId || item.id?.videoId;
-                
-                let onclick = '';
-                if (vid) {
-                    onclick = `playTrack('${vid}', \`${title}\`, \`${artist}\`, '${thumb}')`;
-                } else if (item.previewUrl) {
-                    onclick = `playPreview('${item.previewUrl}', \`${title}\`, \`${artist}\`, '${thumb}')`;
-                }
-                
-                html += `
-                    <div class="track-card">
-                        <img src="${thumb}" class="track-thumb" onerror="this.src='https://via.placeholder.com/300x300'">
-                        <div class="track-info">
-                            <div class="track-title">${title}</div>
-                            <div class="track-artist">${artist}</div>
-                            <button class="play-btn" onclick="${onclick}">▶️ Играть</button>
-                        </div>
-                    </div>
-                `;
             });
-            
-            resultsDiv.innerHTML = html;
-            addXP(5);
         }
 
-        // ========== ВОСПРОИЗВЕДЕНИЕ ==========
+        function onPlayerReady(event) {
+            playerReady = true;
+            console.log('✅ Плеер готов');
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                isPlaying = true;
+                updatePlayBtn();
+                startProgress();
+            } else if (event.data === YT.PlayerState.PAUSED) {
+                isPlaying = false;
+                updatePlayBtn();
+            } else if (event.data === YT.PlayerState.ENDED) {
+                isPlaying = false;
+                updatePlayBtn();
+            }
+        }
+
+        // ПОИСК
+        async function performSearch() {
+            const q = document.getElementById('search-input').value.trim();
+            if (!q || q.length < 2) { alert('Введите минимум 2 символа'); return; }
+            
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div style="text-align:center;padding:40px;color:white">🔍 Поиск...</div>';
+            
+            try {
+                const res = await fetch(`${API_BASE}/api/youtube/search?q=${encodeURIComponent(q)}&limit=12`);
+                const data = await res.json();
+                
+                if (!data.items || data.items.length === 0) {
+                    resultsDiv.innerHTML = '<div style="text-align:center;padding:40px;color:white">😔 Ничего не найдено</div>';
+                    return;
+                }
+                
+                let html = '';
+                data.items.forEach(item => {
+                    const title = escapeHtml(item.title || 'Без названия');
+                    const artist = escapeHtml(item.channelTitle || 'Неизвестно');
+                    const thumb = item.thumbnail || item.snippet?.thumbnails?.medium?.url || 'https://via.placeholder.com/300';
+                    const videoId = item.videoId;
+                    
+                    html += `
+                        <div class="track-card" onclick="playTrack('${videoId}', \`${title}\`, \`${artist}\`, '${thumb}')">
+                            <img src="${thumb}" class="track-thumb">
+                            <div class="track-info">
+                                <div class="track-title">${title}</div>
+                                <div class="track-artist">${artist}</div>
+                                <button class="play-btn" onclick="event.stopPropagation(); playTrack('${videoId}', \`${title}\`, \`${artist}\`, '${thumb}')">▶️ Играть</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                resultsDiv.innerHTML = html;
+                addXP(5);
+            } catch (error) {
+                resultsDiv.innerHTML = '<div style="text-align:center;padding:40px;color:white">❌ Ошибка поиска</div>';
+            }
+        }
+
+        // ВОСПРОИЗВЕДЕНИЕ
         function playTrack(videoId, title, artist, thumb) {
             currentVideoId = videoId;
             
-            // Создаём audio элемент для YouTube (через yt-dlp или аналогичный сервис)
-            // Или используем iframe
-            const playerDiv = document.getElementById('youtube-frame');
-            playerDiv.innerHTML = `<iframe id="yt-player" src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-            
             document.getElementById('player-thumb').src = thumb;
             document.getElementById('player-title').textContent = title;
             document.getElementById('player-artist').textContent = artist;
-            document.getElementById('player').classList.add('active');
+            document.getElementById('player').style.display = 'block';
             
-            // Пытаемся получить доступ к YouTube player API
-            setTimeout(() => {
-                try {
-                    const iframe = document.getElementById('yt-player');
-                    if (iframe) {
-                        isPlaying = true;
-                        updatePlayBtn();
-                        startProgress();
+            if (playerReady && player && player.loadVideoById) {
+                player.loadVideoById(videoId);
+                player.playVideo();
+            } else {
+                // Если плеер ещё не готов - пробуем через 2 секунды
+                setTimeout(() => {
+                    if (player && player.loadVideoById) {
+                        player.loadVideoById(videoId);
+                        player.playVideo();
                     }
-                } catch(e) {
-                    console.warn('Player API error:', e);
-                    // Fallback - просто показываем ссылку
-                    showError('Если трек не играет, откройте его в новой вкладке:');
-                    const link = document.createElement('a');
-                    link.href = `https://www.youtube.com/watch?v=${videoId}`;
-                    link.target = '_blank';
-                    link.className = 'fallback-link';
-                    link.textContent = '▶️ Открыть в YouTube';
-                    document.getElementById('error-container').appendChild(link);
-                }
-            }, 2000);
+                }, 2000);
+            }
             
             played++;
             localStorage.setItem('ss_played', played);
             updateStats();
-            checkAchievements();
             addXP(10);
         }
 
-        function playPreview(url, title, artist, thumb) {
-            if (audioElement) { audioElement.pause(); }
-            audioElement = new Audio(url);
-            audioElement.play();
-            
-            document.getElementById('player-thumb').src = thumb;
-            document.getElementById('player-title').textContent = title;
-            document.getElementById('player-artist').textContent = artist;
-            document.getElementById('player').classList.add('active');
-            
-            isPlaying = true;
-            updatePlayBtn();
-            
-            audioElement.addEventListener('ended', () => { isPlaying = false; updatePlayBtn(); });
-            
-            played++;
-            localStorage.setItem('ss_played', played);
-            updateStats();
-            addXP(5);
-        }
-
         function togglePlay() {
-            const iframe = document.getElementById('yt-player');
-            if (iframe) {
-                // YouTube iframe - открываем/закрываем через postMessage
-                if (isPlaying) {
-                    iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-                } else {
-                    iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                }
-                isPlaying = !isPlaying;
-                updatePlayBtn();
-            } else if (audioElement) {
-                if (isPlaying) audioElement.pause();
-                else audioElement.play();
-                isPlaying = !isPlaying;
-                updatePlayBtn();
+            if (!player || !playerReady) return;
+            if (isPlaying) {
+                player.pauseVideo();
+            } else {
+                player.playVideo();
             }
         }
 
         function skip(seconds) {
-            // Для YouTube iframe перемотка сложная, поэтому просто показываем сообщение
-            showError('Перемотка доступна в YouTube плеере');
+            if (!player || !playerReady) return;
+            const current = player.getCurrentTime();
+            player.seekTo(current + seconds, true);
         }
 
         function closePlayer() {
-            const iframe = document.getElementById('yt-player');
-            if (iframe) {
-                iframe.contentWindow.postMessage('{"event":"command","func":"stopVideo","args":""}', '*');
-                iframe.remove();
+            if (player && player.stopVideo) {
+                player.stopVideo();
             }
-            if (audioElement) { audioElement.pause(); audioElement = null; }
             isPlaying = false;
-            document.getElementById('player').classList.remove('active');
+            document.getElementById('player').style.display = 'none';
             if (progressInterval) { clearInterval(progressInterval); progressInterval = null; }
         }
 
         function startProgress() {
             if (progressInterval) clearInterval(progressInterval);
             progressInterval = setInterval(() => {
-                // Для iTunes превью
-                if (audioElement) {
-                    document.getElementById('current-time').textContent = formatTime(audioElement.currentTime);
-                    document.getElementById('total-time').textContent = formatTime(audioElement.duration || 0);
-                    document.getElementById('progress-bar').value = (audioElement.currentTime / (audioElement.duration || 1)) * 100;
-                }
-            }, 500);
+                if (!player || !playerReady) return;
+                try {
+                    const current = player.getCurrentTime();
+                    const duration = player.getDuration();
+                    if (duration > 0) {
+                        document.getElementById('current-time').textContent = formatTime(current);
+                        document.getElementById('total-time').textContent = formatTime(duration);
+                        document.getElementById('progress-bar').value = (current / duration) * 100;
+                    }
+                } catch(e) {}
+            }, 1000);
         }
+
+        // Обработчик прогресс-бара
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('progress-bar').addEventListener('input', function() {
+                if (!player || !playerReady) return;
+                const duration = player.getDuration();
+                const seekTime = (this.value / 100) * duration;
+                player.seekTo(seekTime, true);
+            });
+        });
 
         function formatTime(sec) {
             if (isNaN(sec)) return '0:00';
@@ -411,7 +360,7 @@
             document.getElementById('play-btn').textContent = isPlaying ? '⏸️' : '▶️';
         }
 
-        // ========== БИБЛИОТЕКА ==========
+        // БИБЛИОТЕКА
         function renderLibrary() {
             const list = document.getElementById('library-list');
             if (library.length === 0) {
@@ -434,7 +383,7 @@
             list.innerHTML = html;
         }
 
-        // ========== ИГРЫ ==========
+        // ИГРЫ
         function startSnake() {
             document.getElementById('game-area').style.display = 'block';
             const canvas = document.getElementById('game-canvas');
@@ -442,43 +391,31 @@
             let snake = [{x:10,y:10}], food = {x:15,y:15}, dx=1, dy=0, score=0;
             
             function draw() {
-                ctx.fillStyle = '#000';
-                ctx.fillRect(0,0,400,400);
-                ctx.fillStyle = '#0f0';
-                snake.forEach(s => ctx.fillRect(s.x*20, s.y*20, 18, 18));
-                ctx.fillStyle = '#f00';
-                ctx.fillRect(food.x*20, food.y*20, 18, 18);
-                ctx.fillStyle = '#fff';
-                ctx.font = '20px Arial';
-                ctx.fillText('Счёт: '+score, 10, 30);
+                ctx.fillStyle = '#000'; ctx.fillRect(0,0,400,400);
+                ctx.fillStyle = '#0f0'; snake.forEach(s => ctx.fillRect(s.x*20, s.y*20, 18, 18));
+                ctx.fillStyle = '#f00'; ctx.fillRect(food.x*20, food.y*20, 18, 18);
+                ctx.fillStyle = '#fff'; ctx.font = '20px Arial'; ctx.fillText('Счёт: '+score, 10, 30);
             }
             
             function update() {
                 const head = {x: snake[0].x+dx, y: snake[0].y+dy};
                 if (head.x<0 || head.x>=20 || head.y<0 || head.y>=20 || snake.some(s=>s.x===head.x && s.y===head.y)) {
-                    alert('Игра окончена! Счёт: '+score);
-                    addXP(score);
-                    closeGame();
-                    return;
+                    alert('Игра окончена! Счёт: '+score); addXP(score); closeGame(); return;
                 }
                 snake.unshift(head);
-                if (head.x===food.x && head.y===food.y) {
-                    score += 10;
-                    food = {x:Math.floor(Math.random()*20), y:Math.floor(Math.random()*20)};
-                } else snake.pop();
+                if (head.x===food.x && head.y===food.y) { score += 10; food = {x:Math.floor(Math.random()*20), y:Math.floor(Math.random()*20)}; }
+                else snake.pop();
                 draw();
             }
             
             const interval = setInterval(update, 150);
             draw();
-            
             document.onkeydown = (e) => {
                 if (e.key==='ArrowUp' && dy===0) { dx=0; dy=-1; }
                 if (e.key==='ArrowDown' && dy===0) { dx=0; dy=1; }
                 if (e.key==='ArrowLeft' && dx===0) { dx=-1; dy=0; }
                 if (e.key==='ArrowRight' && dx===0) { dx=1; dy=0; }
             };
-            
             window.closeSnake = () => { clearInterval(interval); closeGame(); };
         }
 
@@ -491,49 +428,25 @@
             function addTile() {
                 let empty = [];
                 for(let i=0;i<4;i++) for(let j=0;j<4;j++) if(grid[i][j]===0) empty.push({i,j});
-                if(empty.length>0) {
-                    const pos = empty[Math.floor(Math.random()*empty.length)];
-                    grid[pos.i][pos.j] = Math.random()>0.5 ? 2 : 4;
-                }
+                if(empty.length>0) { const pos = empty[Math.floor(Math.random()*empty.length)]; grid[pos.i][pos.j] = Math.random()>0.5 ? 2 : 4; }
             }
             
             function draw() {
-                ctx.fillStyle = '#000';
-                ctx.fillRect(0,0,400,400);
+                ctx.fillStyle = '#000'; ctx.fillRect(0,0,400,400);
                 const colors = {0:'#333',2:'#eee',4:'#ddd',8:'#f96',16:'#f63',32:'#f33',64:'#c33',128:'#ff0',256:'#ff0',512:'#ff0',1024:'#ff0',2048:'#ffd700'};
-                for(let i=0;i<4;i++) {
-                    for(let j=0;j<4;j++) {
-                        const val = grid[i][j];
-                        ctx.fillStyle = colors[val] || '#000';
-                        ctx.fillRect(j*100+5, i*100+5, 90, 90);
-                        if(val>0) {
-                            ctx.fillStyle = '#000';
-                            ctx.font = 'bold 32px Arial';
-                            ctx.textAlign = 'center';
-                            ctx.fillText(val, j*100+50, i*100+60);
-                        }
-                    }
-                }
-                ctx.fillStyle = '#fff';
-                ctx.font = '20px Arial';
-                ctx.textAlign = 'left';
-                ctx.fillText('Счёт: '+score, 10, 30);
+                for(let i=0;i<4;i++) { for(let j=0;j<4;j++) {
+                    const val = grid[i][j];
+                    ctx.fillStyle = colors[val] || '#000';
+                    ctx.fillRect(j*100+5, i*100+5, 90, 90);
+                    if(val>0) { ctx.fillStyle = '#000'; ctx.font = 'bold 32px Arial'; ctx.textAlign = 'center'; ctx.fillText(val, j*100+50, i*100+60); }
+                }}
+                ctx.fillStyle = '#fff'; ctx.font = '20px Arial'; ctx.textAlign = 'left'; ctx.fillText('Счёт: '+score, 10, 30);
             }
             
             addTile(); addTile(); draw();
-            
             document.onkeydown = (e) => {
                 let moved = false;
-                if(e.key==='ArrowLeft') {
-                    for(let i=0;i<4;i++) {
-                        for(let j=1;j<4;j++) {
-                            if(grid[i][j]!==0) {
-                                let k=j;
-                                while(k>0 && grid[i][k-1]===0) { grid[i][k-1]=grid[i][k]; grid[i][k]=0; k--; moved=true; }
-                            }
-                        }
-                    }
-                }
+                if(e.key==='ArrowLeft') { for(let i=0;i<4;i++) { for(let j=1;j<4;j++) { if(grid[i][j]!==0) { let k=j; while(k>0 && grid[i][k-1]===0) { grid[i][k-1]=grid[i][k]; grid[i][k]=0; k--; moved=true; } } } } }
                 if(moved) { addTile(); draw(); }
             };
         }
@@ -547,10 +460,7 @@
                 if(current>=tracks.length) { alert('Игра окончена! Счёт: '+score); addXP(score*3); closeGame(); return; }
                 const track = tracks[current];
                 const opts = [track];
-                while(opts.length<4) {
-                    const r = library[Math.floor(Math.random()*library.length)];
-                    if(!opts.find(o=>o.title===r.title)) opts.push(r);
-                }
+                while(opts.length<4) { const r = library[Math.floor(Math.random()*library.length)]; if(!opts.find(o=>o.title===r.title)) opts.push(r); }
                 opts.sort(()=>Math.random()-0.5);
                 
                 const div = document.getElementById('game-area');
@@ -560,21 +470,14 @@
                         ${opts.map(o=>`<button class="nav-btn" onclick="answer('${o.title.replace(/'/g,"\\'")}','${track.title.replace(/'/g,"\\'")}',${score})" style="padding:15px">${o.title}</button>`).join('')}
                     </div>`;
                 
-                window.answer = (sel, corr, sc) => {
-                    if(sel===corr) { sc+=50; alert('✅ Правильно! +50 XP'); }
-                    else alert('❌ Неправильно!');
-                    current++; score=sc; showQ();
-                };
+                window.answer = (sel, corr, sc) => { if(sel===corr) { sc+=50; alert('✅ Правильно! +50 XP'); } else alert('❌ Неправильно!'); current++; score=sc; showQ(); };
             }
             showQ();
         }
 
-        function closeGame() {
-            document.getElementById('game-area').style.display = 'none';
-            document.getElementById('game-area').innerHTML = `<canvas id="game-canvas" width="400" height="400" style="background:#000;border-radius:10px;max-width:100%"></canvas><br><br><button class="nav-btn" onclick="closeGame()">❌ Закрыть</button>`;
-        }
+        function closeGame() { document.getElementById('game-area').style.display = 'none'; document.getElementById('game-area').innerHTML = `<canvas id="game-canvas" width="400" height="400" style="background:#000;border-radius:10px;max-width:100%"></canvas><br><br><button class="nav-btn" onclick="closeGame()">❌ Закрыть</button>`; }
 
-        // ========== ДОСТИЖЕНИЯ ==========
+        // ДОСТИЖЕНИЯ
         const allAch = [
             {id:'first',name:'Первый трек',desc:'Сыграйте 1 трек',icon:'🎵',cond:()=>played>=1},
             {id:'ten',name:'Меломан',desc:'Сыграйте 10 треков',icon:'🎧',cond:()=>played>=10},
@@ -612,15 +515,13 @@
             list.innerHTML = html;
         }
 
-        // ========== АВТОРИЗАЦИЯ ==========
+        // АВТОРИЗАЦИЯ
         function login() {
             const user = document.getElementById('username').value.trim();
             const pass = document.getElementById('password').value;
-            if(!user || !pass) { showError('Заполните все поля'); return; }
-            
+            if(!user || !pass) { alert('Заполните все поля'); return; }
             const users = JSON.parse(localStorage.getItem('ss_users') || '{}');
-            if(!users[user] || users[user].pass!==pass) { showError('Неверное имя или пароль'); return; }
-            
+            if(!users[user] || users[user].pass!==pass) { alert('Неверное имя или пароль'); return; }
             currentUser = user;
             localStorage.setItem('ss_user', user);
             showProfile();
@@ -630,12 +531,10 @@
         function register() {
             const user = document.getElementById('username').value.trim();
             const pass = document.getElementById('password').value;
-            if(!user || !pass) { showError('Заполните все поля'); return; }
-            
+            if(!user || !pass) { alert('Заполните все поля'); return; }
             const users = JSON.parse(localStorage.getItem('ss_users') || '{}');
-            if(users[user]) { showError('Пользователь существует'); return; }
-            
-            users[user] = {pass: pass, xp:0, level:1, coins:100};
+            if(users[user]) { alert('Пользователь существует'); return; }
+            users[user] = {pass: pass};
             localStorage.setItem('ss_users', JSON.stringify(users));
             currentUser = user;
             localStorage.setItem('ss_user', user);
@@ -645,35 +544,23 @@
             updateStats();
         }
 
-        function logout() {
-            currentUser = null;
-            localStorage.removeItem('ss_user');
-            document.getElementById('auth-form').style.display = 'block';
-            document.getElementById('profile-data').style.display = 'none';
-        }
+        function logout() { currentUser = null; localStorage.removeItem('ss_user'); document.getElementById('auth-form').style.display = 'block'; document.getElementById('profile-data').style.display = 'none'; }
 
         function showProfile() {
-            if(!currentUser) {
-                document.getElementById('auth-form').style.display = 'block';
-                document.getElementById('profile-data').style.display = 'none';
-            } else {
+            if(!currentUser) { document.getElementById('auth-form').style.display = 'block'; document.getElementById('profile-data').style.display = 'none'; }
+            else {
                 document.getElementById('auth-form').style.display = 'none';
                 document.getElementById('profile-data').style.display = 'block';
                 document.getElementById('profile-name').textContent = currentUser;
                 document.getElementById('profile-level').textContent = level;
-                document.getElementById('profile-xp').textContent = xp;
             }
         }
 
-        // ========== УТИЛИТЫ ==========
+        // УТИЛИТЫ
         function addXP(amount) {
             xp += amount;
             const newLevel = Math.floor(xp/100) + 1;
-            if(newLevel > level) {
-                level = newLevel;
-                coins += 100;
-                alert(`🎉 Уровень повышен! Теперь ${level}! +100 🪙`);
-            }
+            if(newLevel > level) { level = newLevel; coins += 100; alert(`🎉 Уровень повышен! Теперь ${level}! +100 🪙`); }
             localStorage.setItem('ss_xp', xp);
             localStorage.setItem('ss_level', level);
             localStorage.setItem('ss_coins', coins);
@@ -693,31 +580,15 @@
             document.getElementById(id).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             event.target.classList.add('active');
-            
             if(id==='library') renderLibrary();
             if(id==='achievements') renderAchievements();
             if(id==='profile') showProfile();
         }
 
-        function showError(msg) {
-            const div = document.getElementById('error-container');
-            div.innerHTML = `<div class="error">⚠️ ${msg}</div>`;
-        }
+        function escapeHtml(text) { if(!text) return ''; return text.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
 
-        function clearError() {
-            document.getElementById('error-container').innerHTML = '';
-        }
-
-        function escapeHtml(text) {
-            if(!text) return '';
-            return text.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-        }
-
-        // ========== ИНИЦИАЛИЗАЦИЯ ==========
-        window.addEventListener('load', () => {
-            updateStats();
-            console.log('✅ SoundScape Pro загружен!');
-        });
+        // ИНИЦИАЛИЗАЦИЯ
+        window.addEventListener('load', () => { updateStats(); console.log('✅ SoundScape Pro загружен!'); });
     </script>
 </body>
 </html>
