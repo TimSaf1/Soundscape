@@ -1,10 +1,18 @@
 /**
- * SoundScape Pro — backend-прокси для iTunes + YouTube
+ * SoundScape Pro — backend-прокси iTunes + Piped (YouTube без ключа!)
  */
 const http = require('http');
 const { URL } = require('url');
 const PORT = process.env.PORT || 3000;
-const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
+
+// Публичные Piped инстансы (бесплатный YouTube API без ключа!)
+const PIPED_INSTANCES = [
+  'https://pipedapi.kavin.rocks',
+  'https://pipedapi.adminforge.de',
+  'https://pipedapi.in.projectsegfau.lt',
+  'https://piped-api.privacy.com.de',
+  'https://api.piped.yt'
+];
 
 function setCorsHeaders(req, res) {
   const origin = req.headers.origin || '';
@@ -25,12 +33,60 @@ async function fetchItunes(term, limit, country) {
   return response.json();
 }
 
-async function fetchYoutube(query, limit) {
-  if (!YOUTUBE_API_KEY) throw new Error('YouTube API key not configured');
-  const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoCategoryId=10&maxResults=${limit}&q=${encodeURIComponent(query)}&relevanceLanguage=ru&key=${YOUTUBE_API_KEY}`;
-  const response = await fetch(url, { signal: AbortSignal.timeout(10000) });
-  if (!response.ok) throw new Error(`YouTube HTTP ${response.status}`);
-  return response.json();
+// Поиск через Piped (бесплатно, без ключа, без VPN!)
+async function fetchPiped(query, limit) {
+  let lastError = null;
+  
+  for (const instance of PIPED_INSTANCES) {
+    try {
+      const url = `${instance}/search?q=${encodeURIComponent(query + ' official audio')}&filter=music_songs`;
+      console.log('Trying Piped instance:', instance);
+      
+      const response = await fetch(url, { 
+        signal: AbortSignal.timeout(8000),
+        headers: { 'User-Agent': 'SoundScapePro/1.0' }
+      });
+      
+      if (!response.ok) {
+        lastError = new Error(`Piped HTTP ${response.status}`);
+        continue;
+      }
+      
+      const data = await response.json();
+      
+      if (!data.items || data.items.length === 0) {
+        lastError = new Error('No results');
+        continue;
+      }
+      
+      // Преобразуем в формат совместимый с frontend
+      const items = data.items.slice(0, limit).map(item => {
+        // Извлекаем videoId из URL (/watch?v=XXXXX)
+        let videoId = '';
+        if (item.url) {
+          const match = item.url.match(/[?&]v=([^&]+)/);
+          if (match) videoId = match[1];
+        }
+        
+        return {
+          videoId: videoId,
+          title: item.title || 'Без названия',
+          channelTitle: item.uploaderName || item.uploader || 'Неизвестно',
+          thumbnail: item.thumbnail || ''
+        };
+      }).filter(item => item.videoId); // Убираем элементы без videoId
+      
+      console.log('Piped OK from', instance, '- found', items.length, 'items');
+      return { items, totalResults: items.length };
+      
+    } catch (err) {
+      console.log('Piped instance failed:', instance, err.message);
+      lastError = err;
+      continue;
+    }
+  }
+  
+  throw lastError || new Error('All Piped instances failed');
 }
 
 const server = http.createServer(async (req, res) => {
@@ -55,21 +111,16 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // YouTube поиск
+  // YouTube поиск через Piped (БЕЗ КЛЮЧА!)
   if (url.pathname === '/api/youtube/search' && req.method === 'GET') {
     const q = url.searchParams.get('q') || '';
     const limit = Math.min(parseInt(url.searchParams.get('limit') || '10', 10), 50);
     try {
-      const data = await fetchYoutube(q, limit);
-      const items = (data.items || []).map(item => ({
-        videoId: item.id.videoId,
-        title: item.snippet.title,
-        channelTitle: item.snippet.channelTitle,
-        thumbnail: item.snippet.thumbnails?.medium?.url || item.snippet.thumbnails?.default?.url
-      }));
+      const data = await fetchPiped(q, limit);
       res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-      res.end(JSON.stringify({ items, totalResults: data.pageInfo?.totalResults || 0 }));
+      res.end(JSON.stringify(data));
     } catch (err) {
+      console.error('Piped error:', err.message);
       res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
       res.end(JSON.stringify({ error: err.message, items: [] }));
     }
@@ -79,7 +130,11 @@ const server = http.createServer(async (req, res) => {
   // Health check
   if (url.pathname === '/api/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ status: 'OK', youtubeConfigured: !!YOUTUBE_API_KEY }));
+    res.end(JSON.stringify({ 
+      status: 'OK', 
+      pipedConfigured: true,
+      timestamp: new Date().toISOString()
+    }));
     return;
   }
 
@@ -87,4 +142,4 @@ const server = http.createServer(async (req, res) => {
   res.end('Not Found');
 });
 
-server.listen(PORT, () => console.log(`SoundScape Pro API on port ${PORT}`));
+server.listen(PORT, () => console.log(`SoundScape Pro API on port ${PORT} (using Piped - no API key needed!)`));
