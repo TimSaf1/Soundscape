@@ -2,78 +2,100 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>SoundScape Pro 🎵</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: #333;
-            padding-bottom: 120px;
+            padding-bottom: 140px;
+            -webkit-font-smoothing: antialiased;
         }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        header { text-align: center; margin-bottom: 30px; color: white; }
-        header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 15px; }
+        header { text-align: center; margin-bottom: 20px; color: white; padding: 20px 0; }
+        header h1 { font-size: 2em; margin-bottom: 5px; font-weight: 700; }
+        header p { font-size: 0.9em; opacity: 0.9; }
         
-        .stats { display: flex; justify-content: space-around; background: rgba(255,255,255,0.2); padding: 15px; border-radius: 15px; margin-bottom: 20px; }
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: rgba(255,255,255,0.15); padding: 15px; border-radius: 15px; margin-bottom: 15px; backdrop-filter: blur(10px); }
         .stat { text-align: center; color: white; }
-        .stat-value { font-size: 1.8em; font-weight: bold; }
-        .stat-label { font-size: 0.85em; }
+        .stat-value { font-size: 1.5em; font-weight: bold; }
+        .stat-label { font-size: 0.75em; opacity: 0.9; }
         
-        .nav { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .nav-btn { padding: 12px 24px; background: rgba(255,255,255,0.3); border: none; border-radius: 25px; color: white; cursor: pointer; font-weight: bold; }
+        .nav { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .nav::-webkit-scrollbar { display: none; }
+        .nav-btn { padding: 10px 20px; background: rgba(255,255,255,0.25); border: none; border-radius: 20px; color: white; cursor: pointer; font-weight: 600; white-space: nowrap; font-size: 0.9em; transition: all 0.3s; }
+        .nav-btn:active { transform: scale(0.95); }
         .nav-btn.active { background: white; color: #667eea; }
         
-        .section { display: none; }
+        .section { display: none; animation: fadeIn 0.3s; }
         .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
-        .search-box input { flex: 1; padding: 15px; border: 2px solid rgba(255,255,255,0.3); border-radius: 10px; font-size: 1em; }
-        .search-btn { padding: 15px 30px; background: white; color: #667eea; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 15px; }
+        .search-box input { flex: 1; padding: 12px 15px; border: 2px solid rgba(255,255,255,0.3); border-radius: 10px; font-size: 1em; background: rgba(255,255,255,0.95); -webkit-appearance: none; }
+        .search-box input:focus { outline: none; border-color: white; }
+        .search-btn { padding: 12px 25px; background: white; color: #667eea; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1em; }
+        .search-btn:active { transform: scale(0.95); }
         
-        .results { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .results { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
         .track-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.3s; }
-        .track-card:hover { transform: translateY(-5px); }
-        .track-thumb { width: 100%; height: 180px; object-fit: cover; }
-        .track-info { padding: 15px; }
-        .track-title { font-weight: bold; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .track-artist { color: #999; font-size: 0.9em; margin-bottom: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .play-btn { width: 100%; padding: 10px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .track-card:active { transform: scale(0.98); }
+        .track-thumb { width: 100%; height: 160px; object-fit: cover; background: #f0f0f0; }
+        .track-info { padding: 12px; }
+        .track-title { font-weight: 600; margin-bottom: 5px; font-size: 0.9em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .track-artist { color: #999; font-size: 0.8em; margin-bottom: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .play-btn { width: 100%; padding: 8px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9em; }
+        .play-btn:active { opacity: 0.9; }
         
-        /* ПЛЕЕР ВНИЗУ */
-        .player { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 20px; box-shadow: 0 -5px 30px rgba(0,0,0,0.4); z-index: 1000; }
-        .player-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 20px; align-items: center; }
-        .player-thumb { width: 80px; height: 80px; border-radius: 10px; object-fit: cover; }
-        .player-info { flex: 1; }
-        .player-title { font-weight: bold; font-size: 1.2em; margin-bottom: 5px; }
-        .player-artist { opacity: 0.8; margin-bottom: 10px; }
-        .progress-container { display: flex; align-items: center; gap: 10px; }
-        .progress-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; cursor: pointer; -webkit-appearance: none; }
-        .progress-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: #667eea; border-radius: 50%; cursor: pointer; }
-        .time { font-size: 0.85em; opacity: 0.8; min-width: 45px; font-family: monospace; }
-        .controls { display: flex; gap: 10px; }
-        .ctrl-btn { width: 45px; height: 45px; border: none; background: rgba(255,255,255,0.2); color: white; border-radius: 50%; cursor: pointer; font-size: 1.3em; transition: all 0.2s; }
-        .ctrl-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
-        .ctrl-btn.play { background: linear-gradient(135deg, #667eea, #764ba2); width: 55px; height: 55px; font-size: 1.5em; }
+        .player { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 15px; box-shadow: 0 -5px 30px rgba(0,0,0,0.4); z-index: 1000; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+        .player-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 15px; align-items: center; }
+        .player-thumb { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+        .player-info { flex: 1; min-width: 0; }
+        .player-title { font-weight: 600; font-size: 1em; margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .player-artist { opacity: 0.8; font-size: 0.85em; margin-bottom: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .progress-container { display: flex; align-items: center; gap: 8px; }
+        .progress-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; cursor: pointer; -webkit-appearance: none; }
+        .progress-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: #667eea; border-radius: 50%; cursor: pointer; }
+        .time { font-size: 0.75em; opacity: 0.8; min-width: 40px; font-family: monospace; }
+        .controls { display: flex; gap: 8px; align-items: center; }
+        .ctrl-btn { width: 40px; height: 40px; border: none; background: rgba(255,255,255,0.15); color: white; border-radius: 50%; cursor: pointer; font-size: 1.2em; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .ctrl-btn:active { background: rgba(255,255,255,0.3); transform: scale(0.9); }
+        .ctrl-btn.play { background: linear-gradient(135deg, #667eea, #764ba2); width: 50px; height: 50px; font-size: 1.4em; }
         
-        .library-item { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; cursor: pointer; }
-        .library-item:hover { background: #f5f5f5; }
+        .library-item { background: white; padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .library-item:active { background: #f5f5f5; }
         
-        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
-        .game-card { background: white; padding: 25px; border-radius: 12px; text-align: center; cursor: pointer; }
-        .game-card:hover { transform: scale(1.05); }
-        .game-icon { font-size: 3em; margin-bottom: 10px; }
+        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+        .game-card { background: white; padding: 20px; border-radius: 12px; text-align: center; cursor: pointer; transition: transform 0.3s; }
+        .game-card:active { transform: scale(0.95); }
+        .game-icon { font-size: 2.5em; margin-bottom: 8px; }
+        .game-card h3 { font-size: 1em; margin-bottom: 5px; }
+        .game-card p { color: #999; font-size: 0.8em; }
         
-        .achievement { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; }
+        .achievement { background: white; padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
         .achievement.locked { opacity: 0.5; }
         
-        .auth-box { background: white; padding: 30px; border-radius: 15px; max-width: 400px; margin: 0 auto; }
-        .auth-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #ddd; border-radius: 8px; }
-        .auth-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .auth-box { background: white; padding: 25px; border-radius: 15px; max-width: 350px; margin: 0 auto; }
+        .auth-input { width: 100%; padding: 12px; margin-bottom: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1em; -webkit-appearance: none; }
+        .auth-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1em; }
+        .auth-btn:active { opacity: 0.9; }
         
-        #youtube-player { position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; }
+        #youtube-player { position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; opacity: 0; }
+        
+        @media (max-width: 480px) {
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .results { grid-template-columns: repeat(2, 1fr); }
+            .game-grid { grid-template-columns: repeat(2, 1fr); }
+            header h1 { font-size: 1.6em; }
+            .player-thumb { width: 50px; height: 50px; }
+            .ctrl-btn { width: 36px; height: 36px; }
+            .ctrl-btn.play { width: 45px; height: 45px; }
+        }
     </style>
 </head>
 <body>
@@ -107,48 +129,47 @@
         </div>
 
         <div id="library" class="section">
-            <h2 style="color: white; margin-bottom: 20px;">📚 Библиотека</h2>
+            <h2 style="color: white; margin-bottom: 15px;">📚 Библиотека</h2>
             <div id="library-list"></div>
         </div>
 
         <div id="games" class="section">
-            <h2 style="color: white; margin-bottom: 20px;">🎮 Игры</h2>
+            <h2 style="color: white; margin-bottom: 15px;">🎮 Игры</h2>
             <div class="game-grid">
-                <div class="game-card" onclick="startSnake()"><div class="game-icon">🐍</div><h3>Змейка</h3></div>
-                <div class="game-card" onclick="start2048()"><div class="game-icon">🔢</div><h3>2048</h3></div>
-                <div class="game-card" onclick="startGuess()"><div class="game-icon">🎵</div><h3>Угадай трек</h3></div>
+                <div class="game-card" onclick="startSnake()"><div class="game-icon">🐍</div><h3>Змейка</h3><p>+100 XP</p></div>
+                <div class="game-card" onclick="start2048()"><div class="game-icon">🔢</div><h3>2048</h3><p>+250 XP</p></div>
+                <div class="game-card" onclick="startGuess()"><div class="game-icon">🎵</div><h3>Угадай трек</h3><p>+150 XP</p></div>
             </div>
-            <div id="game-area" style="margin-top:20px;display:none;text-align:center">
-                <canvas id="game-canvas" width="400" height="400" style="background:#000;border-radius:10px;max-width:100%"></canvas>
+            <div id="game-area" style="margin-top:15px;display:none;text-align:center">
+                <canvas id="game-canvas" width="350" height="350" style="background:#000;border-radius:10px;max-width:100%"></canvas>
                 <br><br><button class="nav-btn" onclick="closeGame()">❌ Закрыть</button>
             </div>
         </div>
 
         <div id="achievements" class="section">
-            <h2 style="color: white; margin-bottom: 20px;">🏆 Достижения</h2>
+            <h2 style="color: white; margin-bottom: 15px;">🏆 Достижения</h2>
             <div id="achievements-list"></div>
         </div>
 
         <div id="profile" class="section">
             <div id="auth-form" class="auth-box">
-                <h2 style="margin-bottom:20px">🔐 Вход</h2>
-                <input type="text" id="username" class="auth-input" placeholder="Имя">
+                <h2 style="margin-bottom:15px;text-align:center">🔐 Вход</h2>
+                <input type="text" id="username" class="auth-input" placeholder="Имя пользователя">
                 <input type="password" id="password" class="auth-input" placeholder="Пароль">
                 <button class="auth-btn" onclick="login()">Войти</button>
                 <button class="auth-btn" onclick="register()" style="margin-top:10px;background:#28a745">Регистрация</button>
             </div>
-            <div id="profile-data" style="display:none;text-align:center;color:white">
-                <h2 id="profile-name"></h2>
-                <p>Уровень: <strong id="profile-level"></strong></p>
-                <button class="nav-btn" onclick="logout()" style="margin-top:20px">Выйти</button>
+            <div id="profile-data" style="display:none;text-align:center;color:white;padding:20px">
+                <h2 id="profile-name" style="margin-bottom:15px"></h2>
+                <p style="margin-bottom:10px">Уровень: <strong id="profile-level"></strong></p>
+                <p style="margin-bottom:20px">XP: <strong id="profile-xp"></strong></p>
+                <button class="nav-btn" onclick="logout()">Выйти</button>
             </div>
         </div>
     </div>
 
-    <!-- YOUTUBE PLAYER -->
     <div id="youtube-player"></div>
     
-    <!-- ПЛЕЕР ВНИЗУ -->
     <div class="player" id="player" style="display:none">
         <div class="player-inner">
             <img id="player-thumb" class="player-thumb" src="" alt="">
@@ -192,7 +213,6 @@
             {id:'3',title:'Despacito',artist:'Luis Fonsi',videoId:'kJQP7kiw5Fk',thumb:'https://i.ytimg.com/vi/kJQP7kiw5Fk/mqdefault.jpg'}
         ];
 
-        // YOUTUBE API
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('youtube-player', {
                 height: '1',
@@ -200,11 +220,14 @@
                 playerVars: {
                     'autoplay': 0,
                     'controls': 0,
-                    'playsinline': 1
+                    'playsinline': 1,
+                    'rel': 0,
+                    'modestbranding': 1
                 },
                 events: {
                     'onReady': onPlayerReady,
-                    'onStateChange': onPlayerStateChange
+                    'onStateChange': onPlayerStateChange,
+                    'onError': onPlayerError
                 }
             });
         }
@@ -228,7 +251,11 @@
             }
         }
 
-        // ПОИСК
+        function onPlayerError(event) {
+            console.error('YouTube error:', event.data);
+            alert('Ошибка воспроизведения. Попробуйте другой трек.');
+        }
+
         async function performSearch() {
             const q = document.getElementById('search-input').value.trim();
             if (!q || q.length < 2) { alert('Введите минимум 2 символа'); return; }
@@ -254,7 +281,7 @@
                     
                     html += `
                         <div class="track-card" onclick="playTrack('${videoId}', \`${title}\`, \`${artist}\`, '${thumb}')">
-                            <img src="${thumb}" class="track-thumb">
+                            <img src="${thumb}" class="track-thumb" loading="lazy">
                             <div class="track-info">
                                 <div class="track-title">${title}</div>
                                 <div class="track-artist">${artist}</div>
@@ -267,11 +294,11 @@
                 resultsDiv.innerHTML = html;
                 addXP(5);
             } catch (error) {
+                console.error('Search error:', error);
                 resultsDiv.innerHTML = '<div style="text-align:center;padding:40px;color:white">❌ Ошибка поиска</div>';
             }
         }
 
-        // ВОСПРОИЗВЕДЕНИЕ
         function playTrack(videoId, title, artist, thumb) {
             currentVideoId = videoId;
             
@@ -284,7 +311,6 @@
                 player.loadVideoById(videoId);
                 player.playVideo();
             } else {
-                // Если плеер ещё не готов - пробуем через 2 секунды
                 setTimeout(() => {
                     if (player && player.loadVideoById) {
                         player.loadVideoById(videoId);
@@ -339,7 +365,6 @@
             }, 1000);
         }
 
-        // Обработчик прогресс-бара
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('progress-bar').addEventListener('input', function() {
                 if (!player || !playerReady) return;
@@ -360,11 +385,10 @@
             document.getElementById('play-btn').textContent = isPlaying ? '⏸️' : '▶️';
         }
 
-        // БИБЛИОТЕКА
         function renderLibrary() {
             const list = document.getElementById('library-list');
             if (library.length === 0) {
-                list.innerHTML = '<p style="color:white;text-align:center">Библиотека пуста</p>';
+                list.innerHTML = '<p style="color:white;text-align:center;padding:20px">Библиотека пуста</p>';
                 return;
             }
             let html = '';
@@ -372,18 +396,17 @@
                 html += `
                     <div class="library-item" onclick="playTrack('${item.videoId}', '${escapeHtml(item.title)}', '${escapeHtml(item.artist)}', '${item.thumb}')">
                         <img src="${item.thumb}" style="width:60px;height:60px;border-radius:8px;object-fit:cover">
-                        <div style="flex:1">
-                            <div style="font-weight:bold">${escapeHtml(item.title)}</div>
-                            <div style="font-size:0.85em;color:#999">${escapeHtml(item.artist)}</div>
+                        <div style="flex:1;min-width:0">
+                            <div style="font-weight:600;font-size:0.95em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(item.title)}</div>
+                            <div style="font-size:0.8em;color:#999;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(item.artist)}</div>
                         </div>
-                        <div style="font-size:1.5em">▶️</div>
+                        <div style="font-size:1.5em;color:#667eea">▶️</div>
                     </div>
                 `;
             });
             list.innerHTML = html;
         }
 
-        // ИГРЫ
         function startSnake() {
             document.getElementById('game-area').style.display = 'block';
             const canvas = document.getElementById('game-canvas');
@@ -391,10 +414,10 @@
             let snake = [{x:10,y:10}], food = {x:15,y:15}, dx=1, dy=0, score=0;
             
             function draw() {
-                ctx.fillStyle = '#000'; ctx.fillRect(0,0,400,400);
-                ctx.fillStyle = '#0f0'; snake.forEach(s => ctx.fillRect(s.x*20, s.y*20, 18, 18));
-                ctx.fillStyle = '#f00'; ctx.fillRect(food.x*20, food.y*20, 18, 18);
-                ctx.fillStyle = '#fff'; ctx.font = '20px Arial'; ctx.fillText('Счёт: '+score, 10, 30);
+                ctx.fillStyle = '#000'; ctx.fillRect(0,0,350,350);
+                ctx.fillStyle = '#0f0'; snake.forEach(s => ctx.fillRect(s.x*17.5, s.y*17.5, 16, 16));
+                ctx.fillStyle = '#f00'; ctx.fillRect(food.x*17.5, food.y*17.5, 16, 16);
+                ctx.fillStyle = '#fff'; ctx.font = '18px Arial'; ctx.fillText('Счёт: '+score, 10, 25);
             }
             
             function update() {
@@ -432,15 +455,15 @@
             }
             
             function draw() {
-                ctx.fillStyle = '#000'; ctx.fillRect(0,0,400,400);
+                ctx.fillStyle = '#000'; ctx.fillRect(0,0,350,350);
                 const colors = {0:'#333',2:'#eee',4:'#ddd',8:'#f96',16:'#f63',32:'#f33',64:'#c33',128:'#ff0',256:'#ff0',512:'#ff0',1024:'#ff0',2048:'#ffd700'};
                 for(let i=0;i<4;i++) { for(let j=0;j<4;j++) {
                     const val = grid[i][j];
                     ctx.fillStyle = colors[val] || '#000';
-                    ctx.fillRect(j*100+5, i*100+5, 90, 90);
-                    if(val>0) { ctx.fillStyle = '#000'; ctx.font = 'bold 32px Arial'; ctx.textAlign = 'center'; ctx.fillText(val, j*100+50, i*100+60); }
+                    ctx.fillRect(j*87.5+2.5, i*87.5+2.5, 82.5, 82.5);
+                    if(val>0) { ctx.fillStyle = '#000'; ctx.font = 'bold 28px Arial'; ctx.textAlign = 'center'; ctx.fillText(val, j*87.5+43.75, i*87.5+55); }
                 }}
-                ctx.fillStyle = '#fff'; ctx.font = '20px Arial'; ctx.textAlign = 'left'; ctx.fillText('Счёт: '+score, 10, 30);
+                ctx.fillStyle = '#fff'; ctx.font = '18px Arial'; ctx.textAlign = 'left'; ctx.fillText('Счёт: '+score, 10, 25);
             }
             
             addTile(); addTile(); draw();
@@ -464,10 +487,10 @@
                 opts.sort(()=>Math.random()-0.5);
                 
                 const div = document.getElementById('game-area');
-                div.innerHTML = `<h3 style="color:white;margin-bottom:20px">Угадай трек #${current+1}/${tracks.length}</h3>
-                    <p style="color:white;margin-bottom:20px">Исполнитель: <strong>${track.artist}</strong></p>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:600px;margin:0 auto">
-                        ${opts.map(o=>`<button class="nav-btn" onclick="answer('${o.title.replace(/'/g,"\\'")}','${track.title.replace(/'/g,"\\'")}',${score})" style="padding:15px">${o.title}</button>`).join('')}
+                div.innerHTML = `<h3 style="color:white;margin-bottom:15px;font-size:1.2em">Угадай трек #${current+1}/${tracks.length}</h3>
+                    <p style="color:white;margin-bottom:15px;font-size:1em">Исполнитель: <strong>${track.artist}</strong></p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:350px;margin:0 auto">
+                        ${opts.map(o=>`<button class="nav-btn" onclick="answer('${o.title.replace(/'/g,"\\'")}','${track.title.replace(/'/g,"\\'")}',${score})" style="padding:12px;font-size:0.85em">${o.title}</button>`).join('')}
                     </div>`;
                 
                 window.answer = (sel, corr, sc) => { if(sel===corr) { sc+=50; alert('✅ Правильно! +50 XP'); } else alert('❌ Неправильно!'); current++; score=sc; showQ(); };
@@ -475,9 +498,8 @@
             showQ();
         }
 
-        function closeGame() { document.getElementById('game-area').style.display = 'none'; document.getElementById('game-area').innerHTML = `<canvas id="game-canvas" width="400" height="400" style="background:#000;border-radius:10px;max-width:100%"></canvas><br><br><button class="nav-btn" onclick="closeGame()">❌ Закрыть</button>`; }
+        function closeGame() { document.getElementById('game-area').style.display = 'none'; document.getElementById('game-area').innerHTML = `<canvas id="game-canvas" width="350" height="350" style="background:#000;border-radius:10px;max-width:100%"></canvas><br><br><button class="nav-btn" onclick="closeGame()">❌ Закрыть</button>`; }
 
-        // ДОСТИЖЕНИЯ
         const allAch = [
             {id:'first',name:'Первый трек',desc:'Сыграйте 1 трек',icon:'🎵',cond:()=>played>=1},
             {id:'ten',name:'Меломан',desc:'Сыграйте 10 треков',icon:'🎧',cond:()=>played>=10},
@@ -505,17 +527,16 @@
                 const unlocked = achievements.includes(ach.id);
                 html += `<div class="achievement ${unlocked?'':'locked'}">
                     <div style="font-size:2em">${ach.icon}</div>
-                    <div style="flex:1">
-                        <div style="font-weight:bold">${ach.name}</div>
-                        <div style="font-size:0.85em;color:#999">${ach.desc}</div>
+                    <div style="flex:1;min-width:0">
+                        <div style="font-weight:600;font-size:0.95em">${ach.name}</div>
+                        <div style="font-size:0.8em;color:#999">${ach.desc}</div>
                     </div>
-                    <div>${unlocked?'✅':'🔒'}</div>
+                    <div style="font-size:1.5em">${unlocked?'✅':'🔒'}</div>
                 </div>`;
             });
             list.innerHTML = html;
         }
 
-        // АВТОРИЗАЦИЯ
         function login() {
             const user = document.getElementById('username').value.trim();
             const pass = document.getElementById('password').value;
@@ -553,10 +574,10 @@
                 document.getElementById('profile-data').style.display = 'block';
                 document.getElementById('profile-name').textContent = currentUser;
                 document.getElementById('profile-level').textContent = level;
+                document.getElementById('profile-xp').textContent = xp;
             }
         }
 
-        // УТИЛИТЫ
         function addXP(amount) {
             xp += amount;
             const newLevel = Math.floor(xp/100) + 1;
@@ -587,7 +608,6 @@
 
         function escapeHtml(text) { if(!text) return ''; return text.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
 
-        // ИНИЦИАЛИЗАЦИЯ
         window.addEventListener('load', () => { updateStats(); console.log('✅ SoundScape Pro загружен!'); });
     </script>
 </body>
