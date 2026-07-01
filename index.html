@@ -6,7 +6,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="format-detection" content="telephone=no,address=no,email=no">
-<meta name="apple-itunes-app" content="app-id=0">
 <meta name="referrer" content="no-referrer">
 <title>SoundScape Pro 🇷🇺</title>
 <style>
@@ -38,6 +37,26 @@ body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:
 .ti{flex:1;min-width:0}
 .tt{font-weight:bold;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ta{font-size:11px;opacity:0.8}
+
+/* ===== НОВЫЙ YOUTUBE ПЛЕЕР ===== */
+.yt-player{position:fixed;bottom:50px;left:0;right:0;background:linear-gradient(135deg,rgba(26,26,46,0.98),rgba(15,52,96,0.98));padding:12px 15px;z-index:999;display:none;backdrop-filter:blur(15px);border-top:3px solid #667eea;box-shadow:0 -5px 30px rgba(0,0,0,0.5)}
+.yt-player.a{display:block}
+.yt-inner{display:flex;align-items:center;gap:12px;max-width:1200px;margin:0 auto}
+.yt-cover{width:60px;height:60px;border-radius:8px;object-fit:cover;background:rgba(255,255,255,0.1);flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+.yt-info{flex:1;min-width:0}
+.yt-title{font-weight:bold;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.yt-artist{font-size:12px;opacity:0.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.yt-controls{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.yt-btn{width:40px;height:40px;border:none;border-radius:50%;background:rgba(255,255,255,0.15);color:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.yt-btn:hover{background:rgba(255,255,255,0.25);transform:scale(1.1)}
+.yt-btn.play{width:50px;height:50px;background:linear-gradient(135deg,#667eea,#764ba2);font-size:20px}
+.yt-progress{flex:1;display:flex;align-items:center;gap:8px;min-width:150px;max-width:400px}
+.yt-time{font-size:11px;opacity:0.8;min-width:35px;text-align:center;font-variant-numeric:tabular-nums}
+.yt-bar{flex:1;-webkit-appearance:none;appearance:none;height:6px;background:rgba(255,255,255,0.2);border-radius:3px;cursor:pointer;outline:none}
+.yt-bar::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:#667eea;border-radius:50%;cursor:pointer;box-shadow:0 0 10px rgba(102,126,234,0.6)}
+.yt-bar::-moz-range-thumb{width:14px;height:14px;background:#667eea;border-radius:50%;cursor:pointer;border:none}
+.yt-close{background:rgba(255,68,68,0.6)!important}
+
 .mini-player{position:fixed;bottom:50px;left:0;right:0;background:linear-gradient(135deg,rgba(0,102,255,0.98),rgba(255,102,0,0.98));padding:10px;z-index:999;display:none;backdrop-filter:blur(10px)}
 .mini-player.a{display:block}
 .mini-info{display:flex;align-items:center;gap:10px}
@@ -125,14 +144,23 @@ body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:
 .battle-option{padding:12px;background:rgba(0,102,255,0.2);border:2px solid var(--b);border-radius:10px;cursor:pointer;text-align:center;margin:5px 0}
 .battle-option.correct{background:var(--success);border-color:var(--success)}
 .battle-option.wrong{background:var(--danger);border-color:var(--danger)}
-@media(max-width:768px){.header h1{font-size:20px}.sv{font-size:16px}.city-btn{width:55px;height:55px;font-size:20px}#city-canvas{height:320px}}
+@media(max-width:768px){
+.header h1{font-size:20px}
+.sv{font-size:16px}
+.city-btn{width:55px;height:55px;font-size:20px}
+#city-canvas{height:320px}
+.yt-inner{flex-wrap:wrap}
+.yt-progress{order:3;width:100%;max-width:100%;margin-top:8px}
+.yt-cover{width:50px;height:50px}
+.yt-title{font-size:13px}
+}
 </style>
 </head>
 <body>
 
 <div class="header">
 <h1>🦅 SoundScape Pro <span style="display:inline-block;background:var(--success);color:#000;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:bold;margin-left:8px">● ONLINE</span><span style="display:inline-block;background:linear-gradient(90deg,#fff,#0039a6,#d52b1e);color:#000;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:bold;margin-left:5px">🇷🇺 РФ</span></h1>
-<p>Федеральная Музыкальная Соцсеть России</p>
+<p>Федеральная Музыкальная Соцсеть России • YouTube + iTunes</p>
 </div>
 
 <div class="stats">
@@ -190,9 +218,9 @@ body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:
 <h2 style="margin-bottom:12px;text-align:center;font-size:18px">🔍 Поиск музыки</h2>
 <div class="search-box">
 <input type="text" class="search-input" id="search-q" placeholder="Название или исполнитель..." onkeypress="if(event.key==='Enter')sm()">
-<button class="btn-search" onclick="sm()">🔍 Найти (до 50 треков)</button>
+<button class="btn-search" onclick="sm()">🔍 Найти (YouTube + iTunes)</button>
 </div>
-<div class="ib">💡 Поиск: iTunes через backend + библиотека</div>
+<div class="ib">💡 Поиск: YouTube (полные версии) + iTunes + библиотека</div>
 <div id="search-results"></div>
 </div>
 
@@ -210,7 +238,7 @@ body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:
 
 <div id="charts" class="sec">
 <h2 style="margin-bottom:12px;text-align:center;font-size:18px">📊 Онлайн Чарты</h2>
-<div class="ib">🔥 <strong>Топ-25 Мировые Хиты</strong><br><small>Нажми ▶ чтобы слушать превью</small></div>
+<div class="ib">🔥 <strong>Топ-25 Мировые Хиты</strong><br><small>Нажми ▶ чтобы слушать</small></div>
 <div id="charts-list"><div style="text-align:center;padding:20px">Загрузка...</div></div>
 <button class="btn" onclick="loadCharts()" style="width:100%;margin-top:10px">🔄 Обновить чарты</button>
 </div>
@@ -286,42 +314,27 @@ body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:
 <div class="ib">🪙 <strong>У тебя: <span id="shop-coins">100</span> монет</strong></div>
 <div class="shop-item">
 <div class="shop-icon">🎨</div>
-<div class="shop-info">
-<div class="shop-name">Тема "Неон"</div>
-<div class="shop-desc">Яркий неоновый дизайн</div>
-</div>
+<div class="shop-info"><div class="shop-name">Тема "Неон"</div><div class="shop-desc">Яркий неоновый дизайн</div></div>
 <div class="shop-price" onclick="buyItem('neon',500)">500 🪙</div>
 </div>
 <div class="shop-item">
 <div class="shop-icon">👑</div>
-<div class="shop-info">
-<div class="shop-name">VIP Статус</div>
-<div class="shop-desc">Золотая рамка профиля</div>
-</div>
+<div class="shop-info"><div class="shop-name">VIP Статус</div><div class="shop-desc">Золотая рамка профиля</div></div>
 <div class="shop-price" onclick="buyItem('vip',1000)">1000 🪙</div>
 </div>
 <div class="shop-item">
 <div class="shop-icon">🎵</div>
-<div class="shop-info">
-<div class="shop-name">Пак треков (5 шт)</div>
-<div class="shop-desc">Дополнительные треки</div>
-</div>
+<div class="shop-info"><div class="shop-name">Пак треков (5 шт)</div><div class="shop-desc">Дополнительные треки</div></div>
 <div class="shop-price" onclick="buyItem('tracks',300)">300 🪙</div>
 </div>
 <div class="shop-item">
 <div class="shop-icon">⚡</div>
-<div class="shop-info">
-<div class="shop-name">Бустер XP x2</div>
-<div class="shop-desc">Двойной опыт на 1 час</div>
-</div>
+<div class="shop-info"><div class="shop-name">Бустер XP x2</div><div class="shop-desc">Двойной опыт на 1 час</div></div>
 <div class="shop-price" onclick="buyItem('boost',200)">200 🪙</div>
 </div>
 <div class="shop-item">
 <div class="shop-icon">🎁</div>
-<div class="shop-info">
-<div class="shop-name">Сундук с монетами</div>
-<div class="shop-desc">Случайно 100-1000 монет</div>
-</div>
+<div class="shop-info"><div class="shop-name">Сундук с монетами</div><div class="shop-desc">Случайно 100-1000 монет</div></div>
 <div class="shop-price" onclick="buyItem('chest',150)">150 🪙</div>
 </div>
 </div>
@@ -370,6 +383,32 @@ body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:
 </div>
 </div>
 
+<!-- ===== YOUTUBE ПЛЕЕР (ПОЛНАЯ ВЕРСИЯ + ПЕРЕМОТКА ±15 СЕК) ===== -->
+<div class="yt-player" id="yt-player-container">
+<div class="yt-inner">
+<img id="yt-cover" class="yt-cover" src="" alt="">
+<div class="yt-info">
+<div class="yt-title" id="yt-title">Выберите трек</div>
+<div class="yt-artist" id="yt-artist">Артист</div>
+</div>
+<div class="yt-progress">
+<span class="yt-time" id="yt-current">0:00</span>
+<input type="range" class="yt-bar" id="yt-bar" min="0" max="100" value="0" step="0.1">
+<span class="yt-time" id="yt-total">0:00</span>
+</div>
+<div class="yt-controls">
+<button class="yt-btn" onclick="ytSkip(-15)" title="-15 сек">⏪</button>
+<button class="yt-btn play" id="yt-play" onclick="ytToggle()">▶</button>
+<button class="yt-btn" onclick="ytSkip(15)" title="+15 сек">⏩</button>
+<button class="yt-btn yt-close" onclick="ytClose()" title="Закрыть">✕</button>
+</div>
+</div>
+</div>
+
+<!-- Скрытый YouTube iframe -->
+<div id="yt-iframe" style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0"></div>
+
+<!-- Мини-плеер для локальных треков -->
 <div class="mini-player" id="mini-player">
 <div class="mini-info">
 <div class="mini-cover">🎵</div>
@@ -398,9 +437,11 @@ body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:
 <audio id="audio" preload="none" playsinline webkit-playsinline></audio>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
+
 <script>
 // ============================================================
-// 🔥 URL BACKEND-ПРОКСИ (обход CORS Apple iTunes)
+// 🔥 URL BACKEND-ПРОКСИ
 // ============================================================
 const API_BASE = 'https://soundscape-api-9fng.onrender.com';
 
@@ -444,135 +485,226 @@ let gameCanvas=null;
 let gameCtx=null;
 
 // ============================================================
-// 🔍 ПОИСК МУЗЫКИ (через backend + fallback на локальные)
+// 🎵 YOUTUBE ПЛЕЕР (ПОЛНАЯ ВЕРСИЯ + ПЕРЕМОТКА ±15 СЕК)
 // ============================================================
-function sm(){
+let ytPlayer=null;
+let ytIsPlaying=false;
+let ytProgressInterval=null;
+
+function onYouTubeIframeAPIReady(){
+try{
+ytPlayer=new YT.Player('yt-iframe',{
+height:'1',width:'1',
+playerVars:{
+'autoplay':0,
+'controls':0,
+'showinfo':0,
+'rel':0,
+'modestbranding':1,
+'playsinline':1,
+'disablekb':1
+},
+events:{
+'onReady':()=>console.log('YouTube Player готов'),
+'onStateChange':onYtStateChange,
+'onError':(e)=>{console.error('YT Error:',e.data);sn('⚠️ Видео недоступно');}
+}
+});
+}catch(e){console.error('YT init error:',e);}
+}
+
+function onYtStateChange(event){
+if(event.data===YT.PlayerState.PLAYING){
+ytIsPlaying=true;
+document.getElementById('yt-play').textContent='⏸';
+startYtProgress();
+}else if(event.data===YT.PlayerState.PAUSED){
+ytIsPlaying=false;
+document.getElementById('yt-play').textContent='▶';
+stopYtProgress();
+}else if(event.data===YT.PlayerState.ENDED){
+ytIsPlaying=false;
+document.getElementById('yt-play').textContent='▶';
+stopYtProgress();
+}
+}
+
+function playYouTubeVideo(videoId,title,artist,thumbnail){
+if(!ytPlayer){sn('⚠️ Плеер загружается...');return;}
+// Закрываем локальный плеер если играет
+audio.pause();
+isPlaying=false;
+document.getElementById('mini-player').classList.remove('a');
+
+// Показываем YouTube плеер
+document.getElementById('yt-cover').src=thumbnail||'';
+document.getElementById('yt-title').textContent=title;
+document.getElementById('yt-artist').textContent=artist;
+document.getElementById('yt-player-container').classList.add('a');
+
+try{
+ytPlayer.loadVideoById(videoId);
+ytPlayer.playVideo();
+}catch(e){console.error(e);}
+
+pl++;
+localStorage.setItem('pl',pl);
+addXP(2);
+sn('▶ YouTube: '+title);
+}
+
+function ytToggle(){
+if(!ytPlayer)return;
+if(ytIsPlaying){ytPlayer.pauseVideo();}
+else{ytPlayer.playVideo();}
+}
+
+function ytSkip(seconds){
+if(!ytPlayer)return;
+const cur=ytPlayer.getCurrentTime()||0;
+const dur=ytPlayer.getDuration()||0;
+const newTime=Math.max(0,Math.min(dur,cur+seconds));
+ytPlayer.seekTo(newTime,true);
+}
+
+function startYtProgress(){
+stopYtProgress();
+ytProgressInterval=setInterval(()=>{
+if(!ytPlayer||!ytIsPlaying)return;
+try{
+const cur=ytPlayer.getCurrentTime()||0;
+const dur=ytPlayer.getDuration()||0;
+document.getElementById('yt-current').textContent=formatTime(cur);
+document.getElementById('yt-total').textContent=formatTime(dur);
+const bar=document.getElementById('yt-bar');
+if(dur>0){bar.max=dur;bar.value=cur;}
+}catch(e){}
+},500);
+}
+
+function stopYtProgress(){
+if(ytProgressInterval){clearInterval(ytProgressInterval);ytProgressInterval=null;}
+}
+
+function formatTime(seconds){
+if(!seconds||isNaN(seconds))return'0:00';
+seconds=Math.floor(seconds);
+const m=Math.floor(seconds/60);
+const s=seconds%60;
+return m+':'+(s<10?'0':'')+s;
+}
+
+function ytClose(){
+if(ytPlayer){try{ytPlayer.stopVideo();}catch(e){}}
+ytIsPlaying=false;
+stopYtProgress();
+document.getElementById('yt-player-container').classList.remove('a');
+}
+
+// Перемотка по ползунку
+document.addEventListener('DOMContentLoaded',function(){
+const bar=document.getElementById('yt-bar');
+if(bar){
+bar.addEventListener('input',function(){
+if(ytPlayer){
+ytPlayer.seekTo(parseFloat(this.value),true);
+}
+});
+}
+});
+
+// ============================================================
+// 🔍 ПОИСК МУЗЫКИ (YouTube + iTunes + библиотека)
+// ============================================================
+async function sm(){
 const q=document.getElementById('search-q').value.trim();
 if(!q){sn('⚠️ Введите запрос');return;}
 const r=document.getElementById('search-results');
 r.innerHTML='<div style="text-align:center;padding:15px">🔍 Поиск...</div>';
 
-// 1. Сначала ищем в локальной библиотеке
+// 1. Локальная библиотека
 const libResults=lib.filter(t=>t.t.toLowerCase().includes(q.toLowerCase())||t.a.toLowerCase().includes(q.toLowerCase()));
-
+let html='';
 if(libResults.length>0){
-let html='<div class="ib">🎵 Найдено в библиотеке: <strong>'+libResults.length+'</strong></div>';
+html='<div class="ib">🎵 Найдено в библиотеке: <strong>'+libResults.length+'</strong></div>';
 libResults.forEach((t)=>{
 const idx=lib.indexOf(t);
 html+=`<div class="trk" onclick="playTrack(${idx})"><div class="tc">🎵</div><div class="ti"><div class="tt">${t.t}</div><div class="ta">${t.a}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
 });
+}
 
-// Если есть backend — дополняем результатами из iTunes
+// 2. YouTube поиск (полные версии)
 if(API_BASE){
-r.innerHTML=html+'<div style="text-align:center;padding:10px">🔄 Загружаем ещё из iTunes...</div>';
-fetch(`${API_BASE}/api/search?term=${encodeURIComponent(q)}&limit=20&country=RU`)
-.then(res=>res.json())
-.then(d=>{
-if(d&&d.results&&d.results.length>0){
-html+='<div class="ib" style="margin-top:15px">🍎 <strong>iTunes:</strong> найдено '+d.results.length+'</div>';
-d.results.forEach(t=>{
+try{
+const response=await fetch(`${API_BASE}/api/youtube/search?q=${encodeURIComponent(q)}&limit=10`);
+const data=await response.json();
+if(data&&data.items&&data.items.length>0){
+html+='<div class="ib" style="margin-top:15px;background:linear-gradient(135deg,rgba(102,126,234,0.3),rgba(118,75,162,0.3));border-color:#667eea">🎬 <strong>YouTube:</strong> найдено '+data.items.length+' полных версий</div>';
+data.items.forEach(item=>{
+const tn=(item.title||'Без названия').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const an=(item.channelTitle||'Неизвестно').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const ar=item.thumbnail||'';
+html+=`<div class="trk" onclick="playYouTubeVideo('${item.videoId}','${tn}','${an}','${ar}')" style="border-color:#667eea"><div class="tc">${ar?'<img src="'+ar+'">':'🎬'}</div><div class="ti"><div class="tt">${tn}</div><div class="ta">${an}</div></div><div style="font-size:18px;color:#667eea">▶</div></div>`;
+});
+sn('🎵 YouTube: '+data.items.length+' полных версий');
+}else{
+if(libResults.length===0)html+='<div class="ib">😕 Ничего не найдено</div>';
+}
+}catch(e){
+console.error('YouTube search error:',e);
+if(libResults.length===0)html+='<div class="ib">⚠️ Ошибка поиска YouTube</div>';
+}
+}
+
+// 3. iTunes поиск (fallback)
+if(libResults.length===0&&API_BASE){
+try{
+const response=await fetch(`${API_BASE}/api/search?term=${encodeURIComponent(q)}&limit=10&country=RU`);
+const data=await response.json();
+if(data&&data.results&&data.results.length>0){
+html+='<div class="ib" style="margin-top:15px">🍎 <strong>iTunes:</strong> найдено '+data.results.length+' превью</div>';
+data.results.forEach(t=>{
 const pu=t.previewUrl||'';
 const tn=(t.trackName||'Без названия').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 const an=(t.artistName||'Неизвестно').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 const ar=t.artworkUrl100?t.artworkUrl100.replace('100x100','300x300'):'';
 html+=`<div class="trk" onclick="playPreview('${pu}','${tn}','${an}')"><div class="tc">${ar?'<img src="'+ar+'">':'🎵'}</div><div class="ti"><div class="tt">${tn}</div><div class="ta">${an}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
 });
-r.innerHTML=html;
-sn('🎵 Найдено: '+(libResults.length+d.results.length));
-}else{
-r.innerHTML=html;
-sn('🎵 Найдено в библиотеке: '+libResults.length);
 }
-})
-.catch(()=>{
-r.innerHTML=html;
-sn('🎵 Найдено в библиотеке: '+libResults.length);
-});
-}else{
-r.innerHTML=html;
-sn('🎵 Найдено: '+libResults.length);
+}catch(e){}
 }
+
+if(html==='')html='<div class="ib">😕 Ничего не найдено<br><br>💡 Попробуйте другой запрос</div>';
+r.innerHTML=html;
 addXP(1);
-return;
-}
-
-// 2. Если в библиотеке нет — ищем через backend
-if(API_BASE){
-r.innerHTML='<div style="text-align:center;padding:15px">🔍 Ищу в iTunes через backend...</div>';
-fetch(`${API_BASE}/api/search?term=${encodeURIComponent(q)}&limit=20&country=RU`)
-.then(res=>res.json())
-.then(d=>{
-if(d&&d.results&&d.results.length>0){
-let html='<div class="ib">🍎 <strong>iTunes:</strong> найдено '+d.results.length+'</div>';
-d.results.forEach(t=>{
-const pu=t.previewUrl||'';
-const tn=(t.trackName||'Без названия').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-const an=(t.artistName||'Неизвестно').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-const ar=t.artworkUrl100?t.artworkUrl100.replace('100x100','300x300'):'';
-html+=`<div class="trk" onclick="playPreview('${pu}','${tn}','${an}')"><div class="tc">${ar?'<img src="'+ar+'">':'🎵'}</div><div class="ti"><div class="tt">${tn}</div><div class="ta">${an}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
-});
-r.innerHTML=html;
-sn('🎵 iTunes: '+d.results.length);
-}else{
-showLocalFallback(r,q);
-}
-})
-.catch(()=>{
-showLocalFallback(r,q);
-});
-}else{
-showLocalFallback(r,q);
-}
-}
-
-// Fallback: если backend недоступен — показываем похожие треки из библиотеки
-function showLocalFallback(container,q){
-const similar=lib.filter(t=>{
-const words=q.toLowerCase().split(' ');
-return words.some(w=>t.t.toLowerCase().includes(w)||t.a.toLowerCase().includes(w));
-});
-let html='<div class="ib">⚠️ Backend недоступен — показываем похожие из библиотеки</div>';
-if(similar.length>0){
-similar.forEach((t)=>{
-const idx=lib.indexOf(t);
-html+=`<div class="trk" onclick="playTrack(${idx})"><div class="tc">🎵</div><div class="ti"><div class="tt">${t.t}</div><div class="ta">${t.a}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
-});
-}else{
-html+='<div class="ib">😕 Ничего не найдено<br><br>💡 Попробуйте другой запрос или загрузите свои MP3</div>';
-}
-container.innerHTML=html;
 }
 
 // ============================================================
-// 📊 ЧАРТЫ (через backend)
+// 📊 ЧАРТЫ (через YouTube)
 // ============================================================
-function loadCharts(){
+async function loadCharts(){
 const l=document.getElementById('charts-list');
 l.innerHTML='<div style="text-align:center;padding:20px">🔄 Загрузка...</div>';
 
 if(API_BASE){
-fetch(`${API_BASE}/api/search?term=top+hits+2024&limit=25&country=RU`)
-.then(res=>res.json())
-.then(d=>{
-if(d&&d.results&&d.results.length>0){
+try{
+const response=await fetch(`${API_BASE}/api/youtube/search?q=top+hits+2024&limit=25`);
+const data=await response.json();
+if(data&&data.items&&data.items.length>0){
 let html='';
-d.results.slice(0,25).forEach((t,i)=>{
-const pu=t.previewUrl||'';
-const tn=(t.trackName||'Без названия').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-const an=(t.artistName||'Неизвестно').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-const ar=t.artworkUrl100?t.artworkUrl100.replace('100x100','300x300'):'';
-html+=`<div class="trk" onclick="playPreview('${pu}','${tn}','${an}')"><div style="font-size:18px;font-weight:bold;color:var(--gold);min-width:30px">#${i+1}</div><div class="tc">${ar?'<img src="'+ar+'">':'🎵'}</div><div class="ti"><div class="tt">${tn}</div><div class="ta">${an}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
+data.items.forEach((item,i)=>{
+const tn=(item.title||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const an=(item.channelTitle||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const ar=item.thumbnail||'';
+html+=`<div class="trk" onclick="playYouTubeVideo('${item.videoId}','${tn}','${an}','${ar}')"><div style="font-size:18px;font-weight:bold;color:var(--gold);min-width:30px">#${i+1}</div><div class="tc">${ar?'<img src="'+ar+'">':'🎬'}</div><div class="ti"><div class="tt">${tn}</div><div class="ta">${an}</div></div><div style="font-size:18px;color:#667eea">▶</div></div>`;
 });
 l.innerHTML=html;
 sn('📊 Чарты загружены!');
-}else{
-showFallbackCharts();
+return;
 }
-})
-.catch(()=>showFallbackCharts());
-}else{
-showFallbackCharts();
+}catch(e){}
 }
+showFallbackCharts();
 }
 
 function showFallbackCharts(){
@@ -585,11 +717,12 @@ sn('📊 Топ из библиотеки');
 }
 
 // ============================================================
-// 🎵 ПЛЕЕР
+// 🎵 ЛОКАЛЬНЫЙ ПЛЕЕР (для встроенных треков)
 // ============================================================
 function playPreview(url,title,artist){
 if(!url){sn('⚠️ Нет превью');return;}
-currentTrack={t:title,a:artist,u:url,id:'preview_'+Date.now()};
+ytClose();
+currentTrack={t:title,a:artist,u:url,id:'preview'};
 audio.src=url;
 audio.play().then(()=>{isPlaying=true;updateMiniPlayer();sn('▶ Играет превью');}).catch(e=>sn('⚠️ '+e.message));
 }
@@ -597,6 +730,7 @@ audio.play().then(()=>{isPlaying=true;updateMiniPlayer();sn('▶ Играет п
 function playTrack(i){
 if(i<0||i>=lib.length)return;
 const t=lib[i];
+ytClose();
 currentTrack=t;
 audio.src=t.u;
 audio.play().then(()=>{
