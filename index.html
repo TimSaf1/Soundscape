@@ -4,57 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>SoundScape Pro 🎵</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            color: #333;
-            padding-bottom: 140px;
-            -webkit-font-smoothing: antialiased;
+            padding-bottom: 120px;
         }
         .container { max-width: 1200px; margin: 0 auto; padding: 15px; }
-        header { text-align: center; margin-bottom: 20px; color: white; padding: 20px 0; }
-        header h1 { font-size: 2em; margin-bottom: 5px; font-weight: 700; }
-        header p { font-size: 0.9em; opacity: 0.9; }
+        header { text-align: center; margin-bottom: 20px; color: white; }
+        header h1 { font-size: 2em; margin-bottom: 5px; }
         
-        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: rgba(255,255,255,0.15); padding: 15px; border-radius: 15px; margin-bottom: 15px; backdrop-filter: blur(10px); }
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: rgba(255,255,255,0.15); padding: 15px; border-radius: 15px; margin-bottom: 15px; }
         .stat { text-align: center; color: white; }
         .stat-value { font-size: 1.5em; font-weight: bold; }
-        .stat-label { font-size: 0.75em; opacity: 0.9; }
+        .stat-label { font-size: 0.75em; }
         
-        .nav { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-        .nav::-webkit-scrollbar { display: none; }
-        .nav-btn { padding: 10px 20px; background: rgba(255,255,255,0.25); border: none; border-radius: 20px; color: white; cursor: pointer; font-weight: 600; white-space: nowrap; font-size: 0.9em; transition: all 0.3s; }
-        .nav-btn:active { transform: scale(0.95); }
+        .nav { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; }
+        .nav-btn { padding: 10px 20px; background: rgba(255,255,255,0.25); border: none; border-radius: 20px; color: white; cursor: pointer; font-weight: 600; white-space: nowrap; }
         .nav-btn.active { background: white; color: #667eea; }
         
-        .section { display: none; animation: fadeIn 0.3s; }
+        .section { display: none; }
         .section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         .search-box { display: flex; gap: 10px; margin-bottom: 15px; }
-        .search-box input { flex: 1; padding: 12px 15px; border: 2px solid rgba(255,255,255,0.3); border-radius: 10px; font-size: 1em; background: rgba(255,255,255,0.95); -webkit-appearance: none; }
-        .search-box input:focus { outline: none; border-color: white; }
-        .search-btn { padding: 12px 25px; background: white; color: #667eea; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1em; }
-        .search-btn:active { transform: scale(0.95); }
+        .search-box input { flex: 1; padding: 12px 15px; border: 2px solid rgba(255,255,255,0.3); border-radius: 10px; font-size: 1em; }
+        .search-btn { padding: 12px 25px; background: white; color: #667eea; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
         
         .results { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-        .track-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.3s; }
+        .track-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer; }
         .track-card:active { transform: scale(0.98); }
-        .track-thumb { width: 100%; height: 160px; object-fit: cover; background: #f0f0f0; }
+        .track-thumb { width: 100%; height: 160px; object-fit: cover; }
         .track-info { padding: 12px; }
         .track-title { font-weight: 600; margin-bottom: 5px; font-size: 0.9em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .track-artist { color: #999; font-size: 0.8em; margin-bottom: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .play-btn { width: 100%; padding: 8px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9em; }
-        .play-btn:active { opacity: 0.9; }
+        .play-btn { width: 100%; padding: 8px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
         
-        .player { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 15px; box-shadow: 0 -5px 30px rgba(0,0,0,0.4); z-index: 1000; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+        /* СКРЫТЫЙ YOUTUBE - реклама не видна */
+        #yt-wrapper { position: fixed; left: -9999px; top: -9999px; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none; z-index: -1; }
+        
+        /* ВИДИМЫЙ ПЛЕЕР */
+        .player { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 15px; box-shadow: 0 -5px 30px rgba(0,0,0,0.4); z-index: 1000; }
         .player-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 15px; align-items: center; }
-        .player-thumb { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+        .player-thumb { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
         .player-info { flex: 1; min-width: 0; }
         .player-title { font-weight: 600; font-size: 1em; margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .player-artist { opacity: 0.8; font-size: 0.85em; margin-bottom: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -62,47 +56,32 @@
         .progress-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; cursor: pointer; -webkit-appearance: none; }
         .progress-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: #667eea; border-radius: 50%; cursor: pointer; }
         .time { font-size: 0.75em; opacity: 0.8; min-width: 40px; font-family: monospace; }
-        .controls { display: flex; gap: 8px; align-items: center; }
-        .ctrl-btn { width: 40px; height: 40px; border: none; background: rgba(255,255,255,0.15); color: white; border-radius: 50%; cursor: pointer; font-size: 1.2em; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .controls { display: flex; gap: 8px; }
+        .ctrl-btn { width: 40px; height: 40px; border: none; background: rgba(255,255,255,0.15); color: white; border-radius: 50%; cursor: pointer; font-size: 1.2em; transition: all 0.2s; }
         .ctrl-btn:active { background: rgba(255,255,255,0.3); transform: scale(0.9); }
         .ctrl-btn.play { background: linear-gradient(135deg, #667eea, #764ba2); width: 50px; height: 50px; font-size: 1.4em; }
+        .ctrl-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         
         .library-item { background: white; padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .library-item:active { background: #f5f5f5; }
-        
         .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
-        .game-card { background: white; padding: 20px; border-radius: 12px; text-align: center; cursor: pointer; transition: transform 0.3s; }
-        .game-card:active { transform: scale(0.95); }
+        .game-card { background: white; padding: 20px; border-radius: 12px; text-align: center; cursor: pointer; }
         .game-icon { font-size: 2.5em; margin-bottom: 8px; }
-        .game-card h3 { font-size: 1em; margin-bottom: 5px; }
-        .game-card p { color: #999; font-size: 0.8em; }
         
         .achievement { background: white; padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
         .achievement.locked { opacity: 0.5; }
         
         .auth-box { background: white; padding: 25px; border-radius: 15px; max-width: 350px; margin: 0 auto; }
-        .auth-input { width: 100%; padding: 12px; margin-bottom: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1em; -webkit-appearance: none; }
-        .auth-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1em; }
-        .auth-btn:active { opacity: 0.9; }
+        .auth-input { width: 100%; padding: 12px; margin-bottom: 12px; border: 2px solid #ddd; border-radius: 8px; }
+        .auth-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         
-        #youtube-player { position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; opacity: 0; }
-        
-        @media (max-width: 480px) {
-            .stats { grid-template-columns: repeat(2, 1fr); }
-            .results { grid-template-columns: repeat(2, 1fr); }
-            .game-grid { grid-template-columns: repeat(2, 1fr); }
-            header h1 { font-size: 1.6em; }
-            .player-thumb { width: 50px; height: 50px; }
-            .ctrl-btn { width: 36px; height: 36px; }
-            .ctrl-btn.play { width: 45px; height: 45px; }
-        }
+        .loading { text-align: center; padding: 40px; color: white; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>🎵 SoundScape Pro</h1>
-            <p>Музыка • Игры • Достижения</p>
+            <p>Чистая музыка без рекламы</p>
         </header>
 
         <div class="stats">
@@ -136,9 +115,9 @@
         <div id="games" class="section">
             <h2 style="color: white; margin-bottom: 15px;">🎮 Игры</h2>
             <div class="game-grid">
-                <div class="game-card" onclick="startSnake()"><div class="game-icon">🐍</div><h3>Змейка</h3><p>+100 XP</p></div>
-                <div class="game-card" onclick="start2048()"><div class="game-icon">🔢</div><h3>2048</h3><p>+250 XP</p></div>
-                <div class="game-card" onclick="startGuess()"><div class="game-icon">🎵</div><h3>Угадай трек</h3><p>+150 XP</p></div>
+                <div class="game-card" onclick="startSnake()"><div class="game-icon">🐍</div><h3>Змейка</h3></div>
+                <div class="game-card" onclick="start2048()"><div class="game-icon">🔢</div><h3>2048</h3></div>
+                <div class="game-card" onclick="startGuess()"><div class="game-icon">🎵</div><h3>Угадай трек</h3></div>
             </div>
             <div id="game-area" style="margin-top:15px;display:none;text-align:center">
                 <canvas id="game-canvas" width="350" height="350" style="background:#000;border-radius:10px;max-width:100%"></canvas>
@@ -154,7 +133,7 @@
         <div id="profile" class="section">
             <div id="auth-form" class="auth-box">
                 <h2 style="margin-bottom:15px;text-align:center">🔐 Вход</h2>
-                <input type="text" id="username" class="auth-input" placeholder="Имя пользователя">
+                <input type="text" id="username" class="auth-input" placeholder="Имя">
                 <input type="password" id="password" class="auth-input" placeholder="Пароль">
                 <button class="auth-btn" onclick="login()">Войти</button>
                 <button class="auth-btn" onclick="register()" style="margin-top:10px;background:#28a745">Регистрация</button>
@@ -168,8 +147,12 @@
         </div>
     </div>
 
-    <div id="youtube-player"></div>
+    <!-- СКРЫТЫЙ YOUTUBE IFRAME -->
+    <div id="yt-wrapper">
+        <div id="youtube-player"></div>
+    </div>
     
+    <!-- ВИДИМЫЙ ПЛЕЕР -->
     <div class="player" id="player" style="display:none">
         <div class="player-inner">
             <img id="player-thumb" class="player-thumb" src="" alt="">
@@ -183,9 +166,9 @@
                 </div>
             </div>
             <div class="controls">
-                <button class="ctrl-btn" onclick="skip(-15)" title="Назад 15 сек">⏪</button>
+                <button class="ctrl-btn" id="btn-back" onclick="skip(-15)" title="Назад 15 сек">⏪</button>
                 <button class="ctrl-btn play" id="play-btn" onclick="togglePlay()" title="Play/Pause">▶️</button>
-                <button class="ctrl-btn" onclick="skip(15)" title="Вперёд 15 сек">⏩</button>
+                <button class="ctrl-btn" id="btn-forward" onclick="skip(15)" title="Вперёд 15 сек">⏩</button>
                 <button class="ctrl-btn" onclick="closePlayer()" title="Закрыть">✕</button>
             </div>
         </div>
@@ -199,6 +182,10 @@
         let currentVideoId = null;
         let isPlaying = false;
         let progressInterval = null;
+        let isSeeking = false;
+        let seekTimeout = null;
+        let retryCount = 0;
+        const MAX_RETRIES = 3;
         
         let xp = parseInt(localStorage.getItem('ss_xp')) || 0;
         let level = parseInt(localStorage.getItem('ss_level')) || 1;
@@ -213,6 +200,7 @@
             {id:'3',title:'Despacito',artist:'Luis Fonsi',videoId:'kJQP7kiw5Fk',thumb:'https://i.ytimg.com/vi/kJQP7kiw5Fk/mqdefault.jpg'}
         ];
 
+        // YOUTUBE API С ПАРАМЕТРАМИ БЕЗ РЕКЛАМЫ
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('youtube-player', {
                 height: '1',
@@ -221,8 +209,11 @@
                     'autoplay': 0,
                     'controls': 0,
                     'playsinline': 1,
-                    'rel': 0,
-                    'modestbranding': 1
+                    'rel': 0,              // Не показывать похожие видео
+                    'modestbranding': 1,   // Минимум брендинга YouTube
+                    'iv_load_policy': 3,   // Не показывать аннотации
+                    'fs': 0,               // Скрыть кнопку fullscreen
+                    'disablekb': 1         // Отключить клавиатуру
                 },
                 events: {
                     'onReady': onPlayerReady,
@@ -235,6 +226,7 @@
         function onPlayerReady(event) {
             playerReady = true;
             console.log('✅ Плеер готов');
+            retryCount = 0;
         }
 
         function onPlayerStateChange(event) {
@@ -242,18 +234,37 @@
                 isPlaying = true;
                 updatePlayBtn();
                 startProgress();
+                retryCount = 0;
             } else if (event.data === YT.PlayerState.PAUSED) {
                 isPlaying = false;
                 updatePlayBtn();
             } else if (event.data === YT.PlayerState.ENDED) {
                 isPlaying = false;
                 updatePlayBtn();
+                retryCount = 0;
+            } else if (event.data === YT.PlayerState.BUFFERING) {
+                // Показываем что идёт загрузка
+                document.getElementById('play-btn').textContent = '⏳';
             }
         }
 
         function onPlayerError(event) {
             console.error('YouTube error:', event.data);
-            alert('Ошибка воспроизведения. Попробуйте другой трек.');
+            
+            // Пробуем перезагрузить трек
+            if (retryCount < MAX_RETRIES && currentVideoId) {
+                retryCount++;
+                console.log(`🔄 Попытка ${retryCount}/${MAX_RETRIES} перезагрузить трек...`);
+                setTimeout(() => {
+                    if (player && player.loadVideoById) {
+                        player.loadVideoById(currentVideoId);
+                        player.playVideo();
+                    }
+                }, 2000);
+            } else {
+                alert('Ошибка воспроизведения. Попробуйте другой трек.');
+                retryCount = 0;
+            }
         }
 
         async function performSearch() {
@@ -261,14 +272,14 @@
             if (!q || q.length < 2) { alert('Введите минимум 2 символа'); return; }
             
             const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '<div style="text-align:center;padding:40px;color:white">🔍 Поиск...</div>';
+            resultsDiv.innerHTML = '<div class="loading">🔍 Поиск...</div>';
             
             try {
                 const res = await fetch(`${API_BASE}/api/youtube/search?q=${encodeURIComponent(q)}&limit=12`);
                 const data = await res.json();
                 
                 if (!data.items || data.items.length === 0) {
-                    resultsDiv.innerHTML = '<div style="text-align:center;padding:40px;color:white">😔 Ничего не найдено</div>';
+                    resultsDiv.innerHTML = '<div class="loading">😔 Ничего не найдено</div>';
                     return;
                 }
                 
@@ -295,7 +306,7 @@
                 addXP(5);
             } catch (error) {
                 console.error('Search error:', error);
-                resultsDiv.innerHTML = '<div style="text-align:center;padding:40px;color:white">❌ Ошибка поиска</div>';
+                resultsDiv.innerHTML = '<div class="loading">❌ Ошибка поиска</div>';
             }
         }
 
@@ -307,16 +318,24 @@
             document.getElementById('player-artist').textContent = artist;
             document.getElementById('player').style.display = 'block';
             
+            // Блокируем кнопки на время загрузки
+            setButtonsDisabled(true);
+            
             if (playerReady && player && player.loadVideoById) {
-                player.loadVideoById(videoId);
-                player.playVideo();
+                loadAndPlay(videoId);
             } else {
-                setTimeout(() => {
-                    if (player && player.loadVideoById) {
-                        player.loadVideoById(videoId);
-                        player.playVideo();
+                // Ждём готовности плеера
+                const checkReady = setInterval(() => {
+                    if (playerReady && player && player.loadVideoById) {
+                        clearInterval(checkReady);
+                        loadAndPlay(videoId);
                     }
-                }, 2000);
+                }, 500);
+                
+                setTimeout(() => {
+                    clearInterval(checkReady);
+                    setButtonsDisabled(false);
+                }, 10000);
             }
             
             played++;
@@ -325,57 +344,162 @@
             addXP(10);
         }
 
-        function togglePlay() {
-            if (!player || !playerReady) return;
-            if (isPlaying) {
-                player.pauseVideo();
-            } else {
-                player.playVideo();
+        function loadAndPlay(videoId) {
+            try {
+                // Сначала останавливаем текущее
+                if (player.stopVideo) player.stopVideo();
+                
+                // Загружаем новое видео
+                player.loadVideoById({
+                    videoId: videoId,
+                    startSeconds: 0
+                });
+                
+                // Пробуем играть через 500мс
+                setTimeout(() => {
+                    if (player && player.playVideo) {
+                        player.playVideo();
+                        setButtonsDisabled(false);
+                    }
+                }, 500);
+                
+            } catch (error) {
+                console.error('Load error:', error);
+                setButtonsDisabled(false);
+                alert('Ошибка загрузки трека');
             }
         }
 
-        function skip(seconds) {
+        function togglePlay() {
             if (!player || !playerReady) return;
-            const current = player.getCurrentTime();
-            player.seekTo(current + seconds, true);
+            
+            setButtonsDisabled(true);
+            try {
+                if (isPlaying) {
+                    player.pauseVideo();
+                } else {
+                    player.playVideo();
+                }
+                setTimeout(() => setButtonsDisabled(false), 500);
+            } catch (error) {
+                console.error('Toggle error:', error);
+                setButtonsDisabled(false);
+            }
+        }
+
+        // ПЕРЕМОТКА С DEBOUNCE - НЕ ЗАВИСАЕТ!
+        function skip(seconds) {
+            if (!player || !playerReady || !currentVideoId) return;
+            
+            // Очищаем предыдущий таймер
+            if (seekTimeout) {
+                clearTimeout(seekTimeout);
+            }
+            
+            // Показываем что идёт перемотка
+            document.getElementById('play-btn').textContent = '⏳';
+            setButtonsDisabled(true);
+            
+            // Debounce - ждём 100мс перед выполнением
+            seekTimeout = setTimeout(() => {
+                try {
+                    const currentTime = player.getCurrentTime();
+                    const duration = player.getDuration();
+                    let newTime = currentTime + seconds;
+                    
+                    // Проверяем границы
+                    if (newTime < 0) newTime = 0;
+                    if (newTime > duration) newTime = duration;
+                    
+                    // Перемотка с флагом allowSeekAhead
+                    player.seekTo(newTime, true);
+                    
+                    // Возвращаем кнопки через 500мс
+                    setTimeout(() => {
+                        setButtonsDisabled(false);
+                        if (isPlaying) {
+                            document.getElementById('play-btn').textContent = '⏸️';
+                        } else {
+                            document.getElementById('play-btn').textContent = '▶️';
+                        }
+                    }, 500);
+                    
+                } catch (error) {
+                    console.error('Skip error:', error);
+                    setButtonsDisabled(false);
+                }
+            }, 100);
         }
 
         function closePlayer() {
             if (player && player.stopVideo) {
                 player.stopVideo();
             }
+            if (seekTimeout) {
+                clearTimeout(seekTimeout);
+            }
             isPlaying = false;
+            currentVideoId = null;
             document.getElementById('player').style.display = 'none';
             if (progressInterval) { clearInterval(progressInterval); progressInterval = null; }
+            setButtonsDisabled(false);
         }
 
         function startProgress() {
             if (progressInterval) clearInterval(progressInterval);
+            
             progressInterval = setInterval(() => {
-                if (!player || !playerReady) return;
+                if (!player || !playerReady || isSeeking) return;
+                
                 try {
                     const current = player.getCurrentTime();
                     const duration = player.getDuration();
-                    if (duration > 0) {
+                    
+                    if (duration > 0 && !isNaN(current)) {
                         document.getElementById('current-time').textContent = formatTime(current);
                         document.getElementById('total-time').textContent = formatTime(duration);
-                        document.getElementById('progress-bar').value = (current / duration) * 100;
+                        
+                        // Обновляем прогресс-бар только если не перематываем
+                        if (!isSeeking) {
+                            document.getElementById('progress-bar').value = (current / duration) * 100;
+                        }
                     }
-                } catch(e) {}
+                } catch(e) {
+                    console.error('Progress error:', e);
+                }
             }, 1000);
         }
 
+        // Обработчик прогресс-бара с debounce
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('progress-bar').addEventListener('input', function() {
+            const progressBar = document.getElementById('progress-bar');
+            
+            progressBar.addEventListener('mousedown', () => { isSeeking = true; });
+            progressBar.addEventListener('touchstart', () => { isSeeking = true; });
+            
+            progressBar.addEventListener('change', function() {
                 if (!player || !playerReady) return;
+                
+                isSeeking = true;
+                setButtonsDisabled(true);
+                
                 const duration = player.getDuration();
                 const seekTime = (this.value / 100) * duration;
+                
+                // Перемотка
                 player.seekTo(seekTime, true);
+                
+                // Возвращаем состояние
+                setTimeout(() => {
+                    isSeeking = false;
+                    setButtonsDisabled(false);
+                    if (isPlaying) player.playVideo();
+                }, 500);
             });
         });
 
         function formatTime(sec) {
-            if (isNaN(sec)) return '0:00';
+            if (isNaN(sec) || !isFinite(sec)) return '0:00';
             const m = Math.floor(sec / 60);
             const s = Math.floor(sec % 60);
             return `${m}:${s.toString().padStart(2,'0')}`;
@@ -383,6 +507,12 @@
 
         function updatePlayBtn() {
             document.getElementById('play-btn').textContent = isPlaying ? '⏸️' : '▶️';
+        }
+
+        function setButtonsDisabled(disabled) {
+            document.getElementById('btn-back').disabled = disabled;
+            document.getElementById('play-btn').disabled = disabled;
+            document.getElementById('btn-forward').disabled = disabled;
         }
 
         function renderLibrary() {
