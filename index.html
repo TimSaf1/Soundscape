@@ -34,7 +34,6 @@
             padding-bottom: 150px;
         }
 
-        /* ========== HEADER ========== */
         header {
             text-align: center;
             margin-bottom: 40px;
@@ -53,7 +52,6 @@
             opacity: 0.9;
         }
 
-        /* ========== SEARCH SECTION ========== */
         .search-section {
             background: white;
             border-radius: 15px;
@@ -112,7 +110,6 @@
             cursor: not-allowed;
         }
 
-        /* ========== RESULTS GRID ========== */
         .results-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -185,7 +182,6 @@
             transform: scale(0.95);
         }
 
-        /* ========== LOADING & NO RESULTS ========== */
         .loading {
             text-align: center;
             padding: 40px;
@@ -222,7 +218,6 @@
             margin-bottom: 20px;
         }
 
-        /* ========== PLAYER (FIXED BOTTOM) ========== */
         .player-container {
             position: fixed;
             bottom: 0;
@@ -371,7 +366,6 @@
             font-size: 1.1em;
         }
 
-        /* ========== HIDDEN YOUTUBE PLAYER ========== */
         #youtube-player {
             display: none !important;
             visibility: hidden;
@@ -379,27 +373,14 @@
             width: 0;
         }
 
-        /* ========== ANIMATIONS ========== */
         @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes fadeIn {
@@ -411,114 +392,47 @@
             to { transform: rotate(360deg); }
         }
 
-        /* ========== RESPONSIVE ========== */
         @media (max-width: 768px) {
-            header h1 {
-                font-size: 1.8em;
-            }
-
+            header h1 { font-size: 1.8em; }
             .results-container {
                 grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
                 gap: 12px;
             }
-
-            .player-inner {
-                flex-wrap: wrap;
-            }
-
+            .player-inner { flex-wrap: wrap; }
             .progress-bar-container {
                 width: 100%;
                 order: 2;
                 margin-top: 8px;
                 margin-bottom: 0;
             }
-
-            .player-info {
-                order: 1;
-                flex: 1;
-                min-width: 0;
-            }
-
-            .player-controls {
-                order: 1;
-            }
+            .player-info { order: 1; flex: 1; min-width: 0; }
+            .player-controls { order: 1; }
         }
 
         @media (max-width: 480px) {
-            .container {
-                padding: 12px;
-                padding-bottom: 130px;
-            }
-
-            header h1 {
-                font-size: 1.5em;
-            }
-
-            header p {
-                font-size: 0.9em;
-            }
-
-            .search-box {
-                flex-direction: column;
-            }
-
-            .search-btn {
-                width: 100%;
-            }
-
+            .container { padding: 12px; padding-bottom: 130px; }
+            header h1 { font-size: 1.5em; }
+            header p { font-size: 0.9em; }
+            .search-box { flex-direction: column; }
+            .search-btn { width: 100%; }
             .results-container {
                 grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
                 gap: 10px;
             }
-
-            .player-container {
-                padding: 8px 10px;
-            }
-
-            .player-thumbnail {
-                width: 55px;
-                height: 55px;
-            }
-
-            .control-btn {
-                width: 32px;
-                height: 32px;
-                font-size: 0.9em;
-            }
-
-            .play-btn {
-                width: 38px;
-                height: 38px;
-                font-size: 1.1em;
-            }
-
-            .player-title {
-                font-size: 0.8em;
-            }
-
-            .player-artist {
-                font-size: 0.7em;
-            }
-
-            .time-display {
-                font-size: 0.65em;
-                min-width: 32px;
-            }
+            .player-container { padding: 8px 10px; }
+            .player-thumbnail { width: 55px; height: 55px; }
+            .control-btn { width: 32px; height: 32px; font-size: 0.9em; }
+            .play-btn { width: 38px; height: 38px; font-size: 1.1em; }
+            .player-title { font-size: 0.8em; }
+            .player-artist { font-size: 0.7em; }
+            .time-display { font-size: 0.65em; min-width: 32px; }
         }
 
-        @media (max-width: 320px) {
-            .results-container {
-                grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
-            }
-        }
-
-        /* Safe area для iPhone notch */
         @supports (padding: max(0px)) {
             body {
                 padding-left: max(12px, env(safe-area-inset-left));
                 padding-right: max(12px, env(safe-area-inset-right));
             }
-
             .player-container {
                 padding-bottom: max(12px, env(safe-area-inset-bottom));
             }
@@ -548,10 +462,8 @@
         </div>
     </div>
 
-    <!-- YOUTUBE IFRAME PLAYER (СКРЫТЫЙ) -->
     <div id="youtube-player"></div>
 
-    <!-- PLAYER ВНИЗУ ЭКРАНА -->
     <div class="player-container hidden" id="playerContainer">
         <div class="player-inner">
             <img id="playerThumbnail" class="player-thumbnail" alt="Album Art">
@@ -584,7 +496,6 @@
         </div>
     </div>
 
-    <!-- YOUTUBE IFRAME API -->
     <script src="https://www.youtube.com/iframe_api"></script>
 
     <script>
@@ -594,6 +505,9 @@
         let isPlaying = false;
         let updateInterval = null;
         let playerReady = false;
+
+        // 🔥 ВАЖНО: Полный URL к твоему backend на Render!
+        const API_BASE = 'https://soundscape-api-9fng.onrender.com';
 
         // ========== ИНИЦИАЛИЗАЦИЯ YOUTUBE PLAYER ==========
         window.onYouTubeIframeAPIReady = function() {
@@ -651,19 +565,11 @@
             let errorMsg = 'Ошибка при загрузке видео';
             
             switch(event.data) {
-                case 2:
-                    errorMsg = 'Ошибка: неверный параметр';
-                    break;
-                case 5:
-                    errorMsg = 'Ошибка HTML5 плеера';
-                    break;
-                case 100:
-                    errorMsg = 'Видео не найдено или удалено';
-                    break;
+                case 2: errorMsg = 'Ошибка: неверный параметр'; break;
+                case 5: errorMsg = 'Ошибка HTML5 плеера'; break;
+                case 100: errorMsg = 'Видео не найдено или удалено'; break;
                 case 101:
-                case 150:
-                    errorMsg = 'Видеоролик не может быть воспроизведён здесь';
-                    break;
+                case 150: errorMsg = 'Видеоролик не может быть воспроизведён здесь'; break;
             }
             
             showError(errorMsg);
@@ -688,14 +594,14 @@
             try {
                 console.log(`🔍 Ищем: "${query}"`);
                 
+                // ✅ ИСПРАВЛЕНО: Полный URL к Render backend!
                 const response = await fetch(
-                    `/api/youtube/search?q=${encodeURIComponent(query)}&limit=12`,
+                    `${API_BASE}/api/youtube/search?q=${encodeURIComponent(query)}&limit=12`,
                     {
                         method: 'GET',
                         headers: {
                             'Accept': 'application/json'
-                        },
-                        timeout: 15000
+                        }
                     }
                 );
                 
@@ -711,7 +617,7 @@
                     return;
                 }
 
-                console.log(`✅ Найдено треков: ${data.items.length} (источник: ${data.source})`);
+                console.log(`✅ Найдено треков: ${data.items.length} (источник: ${data.source || 'unknown'})`);
 
                 // Отрисовка результатов
                 let html = '';
@@ -735,7 +641,7 @@
                                 <div class="track-artist">${artist}</div>
                                 <button 
                                     class="track-play-btn" 
-                                    onclick="playYouTubeVideo('${videoId}', \`${title}\`, \`${artist}\`, '${thumbnail}')"
+                                    onclick="playYouTubeVideo('${videoId}', \`${title.replace(/`/g, "'")}\`, \`${artist.replace(/`/g, "'")}\`, '${thumbnail}')"
                                 >
                                     ▶️ Включить
                                 </button>
@@ -758,7 +664,7 @@
         // ========== ВОСПРОИЗВЕДЕНИЕ ВИДЕО ==========
         function playYouTubeVideo(videoId, title, artist, thumbnail) {
             if (!playerReady || !youtubePlayer) {
-                showError('YouTube плеер не готов. Попробуй ещё раз');
+                showError('YouTube плеер не готов. Попробуй ещё раз через 3 секунды');
                 return;
             }
 
@@ -771,21 +677,20 @@
 
             currentVideoId = videoId;
 
-            // Обновляем информацию плеера
             document.getElementById('playerTitle').textContent = title;
             document.getElementById('playerArtist').textContent = artist;
             document.getElementById('playerThumbnail').src = thumbnail;
 
-            // Показываем плеер
             document.getElementById('playerContainer').classList.remove('hidden');
 
-            // Загружаем и воспроизводим видео
-            youtubePlayer.cueVideoById(videoId);
-            setTimeout(() => {
-                youtubePlayer.playVideo();
-            }, 500);
+            // ✅ Используем loadVideoById вместо cueVideoById - надёжнее!
+            try {
+                youtubePlayer.loadVideoById(videoId);
+            } catch (error) {
+                console.error('Error loading video:', error);
+                showError('Ошибка загрузки видео');
+            }
 
-            // Сбрасываем прогресс-бар
             document.getElementById('progressBar').value = 0;
             document.getElementById('currentTime').textContent = '0:00';
             
@@ -795,7 +700,6 @@
         // ========== УПРАВЛЕНИЕ ПЛЕЕРОМ ==========
         function togglePlay() {
             if (!playerReady || !youtubePlayer) return;
-
             try {
                 if (isPlaying) {
                     youtubePlayer.pauseVideo();
@@ -811,7 +715,7 @@
             if (!playerReady || !youtubePlayer) return;
             try {
                 const currentTime = youtubePlayer.getCurrentTime();
-                youtubePlayer.seekTo(Math.max(0, currentTime - 15));
+                youtubePlayer.seekTo(Math.max(0, currentTime - 15), true);
             } catch (error) {
                 console.error('Error seeking backward:', error);
             }
@@ -822,7 +726,7 @@
             try {
                 const currentTime = youtubePlayer.getCurrentTime();
                 const duration = youtubePlayer.getDuration();
-                youtubePlayer.seekTo(Math.min(duration, currentTime + 15));
+                youtubePlayer.seekTo(Math.min(duration, currentTime + 15), true);
             } catch (error) {
                 console.error('Error seeking forward:', error);
             }
@@ -832,7 +736,7 @@
             if (!playerReady || !youtubePlayer) return;
             try {
                 const duration = youtubePlayer.getDuration();
-                youtubePlayer.seekTo((value / 100) * duration);
+                youtubePlayer.seekTo((value / 100) * duration, true);
             } catch (error) {
                 console.error('Error seeking:', error);
             }
@@ -930,7 +834,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             const searchInput = document.getElementById('searchInput');
             
-            // Поиск по Enter
             searchInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     performSearch();
@@ -938,10 +841,9 @@
             });
 
             console.log('🎵 SoundScape Pro загружен успешно!');
-            console.log('📝 Подсказка: введи название трека и нажми Поиск или Enter');
+            console.log('📝 Backend:', API_BASE);
         });
 
-        // Остановка плеера при закрытии страницы
         window.addEventListener('beforeunload', () => {
             if (youtubePlayer) {
                 try {
