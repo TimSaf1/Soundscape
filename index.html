@@ -1142,5 +1142,164 @@ function sendAI(){const input=document.getElementById('ai-input');const msg=inpu
 
 window.addEventListener('load',()=>{updateStats();filterFeed('all');renderLibrary();if(user)renderProfile();sn('🌆 SoundScape Pro готов!');});
 </script>
+<script>
+        let audio = document.getElementById('audioElement');
+        let currentTrack = null;
+        let playedCount = parseInt(document.getElementById('played').textContent);
+
+        // Search music using iTunes API
+        async function searchMusic() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) {
+                alert('Введите запрос для поиска');
+                return;
+            }
+
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="loading">🔄 Поиск...</div>';
+
+            try {
+                // Search iTunes API
+                const response = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=20&country=RU`);
+                const data = await response.json();
+
+                if (data.resultCount === 0) {
+                    resultsDiv.innerHTML = '<div class="loading">😕 Ничего не найдено</div>';
+                    return;
+                }
+
+                let html = `<div style="margin-bottom: 15px; opacity: 0.8;">🎵 Найдено: ${data.resultCount} треков</div>`;
+                
+                data.results.forEach((track, index) => {
+                    html += `
+                        <div class="result-item" onclick="playTrack(${index})">
+                            <img src="${track.artworkUrl100 || 'https://via.placeholder.com/60'}" alt="${track.trackName}">
+                            <div class="result-info">
+                                <div class="result-title">${track.trackName || track.collectionName}</div>
+                                <div class="result-artist">${track.artistName || track.collectionArtistName}</div>
+                                <div class="result-preview">⏱ 30 сек превью • ${track.collectionName || 'Album'}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                resultsDiv.innerHTML = html;
+                
+                // Store results globally
+                window.searchResults = data.results;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                resultsDiv.innerHTML = '<div class="loading">❌ Ошибка поиска. Попробуйте позже.</div>';
+            }
+        }
+
+        // Play track
+        function playTrack(index) {
+            const track = window.searchResults[index];
+            if (!track || !track.previewUrl) {
+                alert('Для этого трека нет аудио превью');
+                return;
+            }
+
+            currentTrack = track;
+            
+            // Update player UI
+            document.getElementById('playerArt').src = track.artworkUrl100 || 'https://via.placeholder.com/50';
+            document.getElementById('playerTrackName').textContent = track.trackName || track.collectionName;
+            document.getElementById('playerArtistName').textContent = track.artistName || track.collectionArtistName;
+            
+            // Show player
+            document.getElementById('audioPlayer').classList.remove('hidden');
+            
+            // Load and play audio
+            audio.src = track.previewUrl;
+            audio.play().then(() => {
+                document.getElementById('playBtn').textContent = '⏸';
+                updatePlayedCount();
+            }).catch(err => {
+                console.error('Playback error:', err);
+                alert('Ошибка воспроизведения');
+            });
+        }
+
+        // Toggle play/pause
+        function togglePlay() {
+            if (audio.paused) {
+                audio.play();
+                document.getElementById('playBtn').textContent = '⏸';
+            } else {
+                audio.pause();
+                document.getElementById('playBtn').textContent = '▶';
+            }
+        }
+
+        // Skip backward 15 seconds
+        function skipBackward() {
+            audio.currentTime = Math.max(0, audio.currentTime - 15);
+        }
+
+        // Skip forward 15 seconds
+        function skipForward() {
+            audio.currentTime = Math.min(audio.duration, audio.currentTime + 15);
+        }
+
+        // Seek to position
+        function seekTo(event) {
+            const progressBar = event.currentTarget;
+            const clickX = event.offsetX;
+            const width = progressBar.offsetWidth;
+            const percent = clickX / width;
+            audio.currentTime = percent * audio.duration;
+        }
+
+        // Update progress bar
+        audio.addEventListener('timeupdate', () => {
+            const percent = (audio.currentTime / audio.duration) * 100;
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('currentTime').textContent = formatTime(audio.currentTime);
+            document.getElementById('duration').textContent = formatTime(audio.duration || 30);
+        });
+
+        // Format time
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Close player
+        function closePlayer() {
+            audio.pause();
+            audio.src = '';
+            document.getElementById('audioPlayer').classList.add('hidden');
+            document.getElementById('playBtn').textContent = '▶';
+        }
+
+        // Update played count
+        function updatePlayedCount() {
+            playedCount++;
+            document.getElementById('played').textContent = playedCount;
+            // Add XP
+            let xp = parseInt(document.getElementById('xp').textContent);
+            xp += 3;
+            document.getElementById('xp').textContent = xp;
+        }
+
+        // Enter key to search
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchMusic();
+            }
+        });
+
+        // Audio ended
+        audio.addEventListener('ended', () => {
+            document.getElementById('playBtn').textContent = '▶';
+        });
+    </script>
+</body>
+</html>
 </body>
 </html>
