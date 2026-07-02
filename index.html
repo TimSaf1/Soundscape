@@ -41,19 +41,24 @@
         .track-artist { color: #999; font-size: 0.8em; margin-bottom: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .play-btn { width: 100%; padding: 8px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
         
+        /* СКРЫТЫЙ YOUTUBE PLAYER */
+        #yt-container { position: fixed; left: -9999px; top: -9999px; width: 1px; height: 1px; opacity: 0; }
+        
+        /* ВИДИМЫЙ ПЛЕЕР ВНИЗУ */
         .player { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 15px; box-shadow: 0 -5px 30px rgba(0,0,0,0.4); z-index: 1000; display: none; }
         .player.active { display: block; }
         .player-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 15px; align-items: center; }
         .player-thumb { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
-        .player-info { flex: 1; }
-        .player-title { font-weight: 600; font-size: 1em; margin-bottom: 3px; }
-        .player-artist { opacity: 0.8; font-size: 0.85em; margin-bottom: 8px; }
+        .player-info { flex: 1; min-width: 0; }
+        .player-title { font-weight: 600; font-size: 1em; margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .player-artist { opacity: 0.8; font-size: 0.85em; margin-bottom: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .progress-container { display: flex; align-items: center; gap: 8px; }
         .progress-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; cursor: pointer; -webkit-appearance: none; }
         .progress-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: #667eea; border-radius: 50%; cursor: pointer; }
         .time { font-size: 0.75em; opacity: 0.8; min-width: 40px; font-family: monospace; }
         .controls { display: flex; gap: 8px; }
-        .ctrl-btn { width: 40px; height: 40px; border: none; background: rgba(255,255,255,0.15); color: white; border-radius: 50%; cursor: pointer; font-size: 1.2em; }
+        .ctrl-btn { width: 40px; height: 40px; border: none; background: rgba(255,255,255,0.15); color: white; border-radius: 50%; cursor: pointer; font-size: 1.2em; transition: all 0.2s; }
+        .ctrl-btn:active { background: rgba(255,255,255,0.3); transform: scale(0.9); }
         .ctrl-btn.play { background: linear-gradient(135deg, #667eea, #764ba2); width: 50px; height: 50px; font-size: 1.4em; }
         
         .library-item { background: white; padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
@@ -68,9 +73,7 @@
         .auth-input { width: 100%; padding: 12px; margin-bottom: 12px; border: 2px solid #ddd; border-radius: 8px; }
         .auth-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         
-        .fallback-link { display: inline-block; margin-top: 10px; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; }
-        
-        #youtube-player { position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; }
+        .loading { text-align: center; padding: 40px; color: white; }
     </style>
 </head>
 <body>
@@ -84,7 +87,7 @@
             <div class="stat"><div class="stat-value" id="xp">0</div><div class="stat-label">⭐ XP</div></div>
             <div class="stat"><div class="stat-value" id="level">1</div><div class="stat-label">📊 Уровень</div></div>
             <div class="stat"><div class="stat-value" id="coins">100</div><div class="stat-label">🪙 Монеты</div></div>
-            <div class="stat"><div class="stat-value" id="played">0</div><div class="stat-label"> Сыграно</div></div>
+            <div class="stat"><div class="stat-value" id="played">0</div><div class="stat-label">🎧 Сыграно</div></div>
         </div>
 
         <div class="nav">
@@ -112,7 +115,7 @@
             <h2 style="color: white; margin-bottom: 15px;">🎮 Игры</h2>
             <div class="game-grid">
                 <div class="game-card" onclick="startSnake()"><div class="game-icon">🐍</div><h3>Змейка</h3></div>
-                <div class="game-card" onclick="start2048()"><div class="game-icon"></div><h3>2048</h3></div>
+                <div class="game-card" onclick="start2048()"><div class="game-icon">🔢</div><h3>2048</h3></div>
                 <div class="game-card" onclick="startGuess()"><div class="game-icon">🎵</div><h3>Угадай трек</h3></div>
             </div>
             <div id="game-area" style="margin-top:15px;display:none;text-align:center">
@@ -142,8 +145,10 @@
         </div>
     </div>
 
-    <div id="youtube-player"></div>
+    <!-- СКРЫТЫЙ YOUTUBE PLAYER -->
+    <div id="yt-container"><div id="youtube-player"></div></div>
     
+    <!-- ВИДИМЫЙ ПЛЕЕР -->
     <div class="player" id="player">
         <div class="player-inner">
             <img id="player-thumb" class="player-thumb" src="" alt="">
@@ -157,14 +162,15 @@
                 </div>
             </div>
             <div class="controls">
-                <button class="ctrl-btn" onclick="skip(-15)">⏪</button>
-                <button class="ctrl-btn play" id="play-btn" onclick="togglePlay()">▶️</button>
-                <button class="ctrl-btn" onclick="skip(15)">⏩</button>
-                <button class="ctrl-btn" onclick="closePlayer()"></button>
+                <button class="ctrl-btn" id="btn-back" onclick="skip(-15)" title="Назад 15 сек">⏪</button>
+                <button class="ctrl-btn play" id="play-btn" onclick="togglePlay()" title="Play/Pause">▶️</button>
+                <button class="ctrl-btn" id="btn-forward" onclick="skip(15)" title="Вперёд 15 сек">⏩</button>
+                <button class="ctrl-btn" onclick="closePlayer()" title="Закрыть">✕</button>
             </div>
         </div>
     </div>
 
+    <!-- YOUTUBE IFRAME API -->
     <script>
         const API_BASE = 'https://soundscape-api-9fng.onrender.com';
         let player = null;
@@ -172,6 +178,7 @@
         let currentVideoId = null;
         let isPlaying = false;
         let progressInterval = null;
+        let isSeeking = false;
         
         let xp = parseInt(localStorage.getItem('ss_xp')) || 0;
         let level = parseInt(localStorage.getItem('ss_level')) || 1;
@@ -186,14 +193,15 @@
             {id:'3',title:'Despacito',artist:'Luis Fonsi',videoId:'kJQP7kiw5Fk',thumb:'https://i.ytimg.com/vi/kJQP7kiw5Fk/mqdefault.jpg'}
         ];
 
-        // ЗАГРУЗКА YOUTUBE API
+        // ЗАГРУЗКА YOUTUBE IFRAME API
         var tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
         var firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
+        // КОГДА API ГОТОВ
         window.onYouTubeIframeAPIReady = function() {
-            console.log('YouTube API готов, создаём плеер...');
+            console.log('✅ YouTube API загружен');
             try {
                 player = new YT.Player('youtube-player', {
                     height: '1',
@@ -203,83 +211,91 @@
                         'controls': 0,
                         'playsinline': 1,
                         'rel': 0,
-                        'modestbranding': 1
+                        'modestbranding': 1,
+                        'iv_load_policy': 3
                     },
                     events: {
-                        'onReady': function() {
+                        'onReady': function(event) {
                             playerReady = true;
-                            console.log('✅ Плеер готов!');
+                            console.log('✅ Плеер готов к работе!');
                         },
                         'onStateChange': function(event) {
                             if (event.data === YT.PlayerState.PLAYING) {
                                 isPlaying = true;
                                 updatePlayBtn();
                                 startProgress();
+                                console.log('▶️ Воспроизведение началось');
                             } else if (event.data === YT.PlayerState.PAUSED) {
                                 isPlaying = false;
                                 updatePlayBtn();
+                                console.log('⏸️ Пауза');
                             } else if (event.data === YT.PlayerState.ENDED) {
                                 isPlaying = false;
                                 updatePlayBtn();
+                                console.log('⏹️ Трек завершён');
+                            } else if (event.data === YT.PlayerState.BUFFERING) {
+                                console.log('⏳ Загрузка...');
                             }
                         },
                         'onError': function(event) {
-                            console.error('YouTube error:', event.data);
-                            alert('Ошибка воспроизведения. Открываем в новой вкладке...');
-                            if (currentVideoId) {
-                                window.open(`https://www.youtube.com/watch?v=${currentVideoId}`, '_blank');
+                            console.error('❌ YouTube ошибка:', event.data);
+                            let msg = 'Ошибка воспроизведения';
+                            if(event.data === 100) msg = 'Видео не найдено';
+                            if(event.data === 101 || event.data === 150) msg = 'Видео недоступно. Открываем в YouTube...';
+                            alert(msg);
+                            if(currentVideoId && (event.data === 101 || event.data === 150)) {
+                                window.open('https://www.youtube.com/watch?v=' + currentVideoId, '_blank');
                             }
                         }
                     }
                 });
             } catch (error) {
-                console.error('Ошибка создания плеера:', error);
+                console.error('❌ Ошибка создания плеера:', error);
             }
         };
 
+        // ПОИСК ТРЕКОВ
         async function performSearch() {
             const q = document.getElementById('search-input').value.trim();
             if (!q || q.length < 2) { alert('Введите минимум 2 символа'); return; }
             
             const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '<div style="text-align:center;padding:40px;color:white">🔍 Поиск...</div>';
+            resultsDiv.innerHTML = '<div class="loading">🔍 Поиск...</div>';
             
             try {
-                const res = await fetch(`${API_BASE}/api/youtube/search?q=${encodeURIComponent(q)}&limit=12`);
+                const res = await fetch(API_BASE + '/api/youtube/search?q=' + encodeURIComponent(q) + '&limit=12');
                 const data = await res.json();
                 
                 if (!data.items || data.items.length === 0) {
-                    resultsDiv.innerHTML = '<div style="text-align:center;padding:40px;color:white">😔 Ничего не найдено</div>';
+                    resultsDiv.innerHTML = '<div class="loading">😔 Ничего не найдено</div>';
                     return;
                 }
                 
                 let html = '';
-                data.items.forEach(item => {
+                data.items.forEach(function(item) {
                     const title = escapeHtml(item.title || 'Без названия');
                     const artist = escapeHtml(item.channelTitle || 'Неизвестно');
-                    const thumb = item.thumbnail || 'https://via.placeholder.com/300';
+                    const thumb = item.thumbnail || (item.snippet && item.snippet.thumbnails && item.snippet.thumbnails.medium ? item.snippet.thumbnails.medium.url : 'https://via.placeholder.com/300');
                     const videoId = item.videoId;
                     
-                    html += `
-                        <div class="track-card">
-                            <img src="${thumb}" class="track-thumb" loading="lazy">
-                            <div class="track-info">
-                                <div class="track-title">${title}</div>
-                                <div class="track-artist">${artist}</div>
-                                <button class="play-btn" onclick="playTrack('${videoId}', '${title.replace(/'/g, "\\'")}', '${artist.replace(/'/g, "\\'")}', '${thumb}')">▶️ Играть</button>
-                            </div>
-                        </div>
-                    `;
+                    html += '<div class="track-card" onclick="playTrack(\'' + videoId + '\', \'' + title.replace(/'/g, "\\'") + '\', \'' + artist.replace(/'/g, "\\'") + '\', \'' + thumb + '\')">' +
+                        '<img src="' + thumb + '" class="track-thumb" loading="lazy">' +
+                        '<div class="track-info">' +
+                        '<div class="track-title">' + title + '</div>' +
+                        '<div class="track-artist">' + artist + '</div>' +
+                        '<button class="play-btn" onclick="event.stopPropagation(); playTrack(\'' + videoId + '\', \'' + title.replace(/'/g, "\\'") + '\', \'' + artist.replace(/'/g, "\\'") + '\', \'' + thumb + '\')">▶️ Играть</button>' +
+                        '</div></div>';
                 });
                 
                 resultsDiv.innerHTML = html;
                 addXP(5);
             } catch (error) {
                 console.error('Search error:', error);
-                resultsDiv.innerHTML = '<div style="text-align:center;padding:40px;color:white">❌ Ошибка поиска</div>';
+                resultsDiv.innerHTML = '<div class="loading">❌ Ошибка поиска</div>';
             }
         }
 
+        // ВОСПРОИЗВЕДЕНИЕ ТРЕКА
         function playTrack(videoId, title, artist, thumb) {
             currentVideoId = videoId;
             
@@ -288,27 +304,30 @@
             document.getElementById('player-artist').textContent = artist;
             document.getElementById('player').classList.add('active');
             
-            // Пробуем играть через YouTube плеер
+            // Блокируем кнопки
+            setButtonsDisabled(true);
+            
+            // Ждём готовности плеера
             if (playerReady && player && player.loadVideoById) {
-                try {
-                    player.loadVideoById(videoId);
-                    player.playVideo();
-                } catch (error) {
-                    console.error('Play error:', error);
-                    // Fallback - открываем в новой вкладке
-                    window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
-                }
+                loadAndPlay(videoId);
             } else {
-                // Плеер не готов - открываем в новой вкладке
-                console.log('Плеер не готов, открываем в новой вкладке...');
-                setTimeout(() => {
+                console.log('⏳ Ждём готовности плеера...');
+                var checkReady = setInterval(function() {
                     if (playerReady && player && player.loadVideoById) {
-                        player.loadVideoById(videoId);
-                        player.playVideo();
-                    } else {
-                        window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+                        clearInterval(checkReady);
+                        loadAndPlay(videoId);
                     }
-                }, 2000);
+                }, 500);
+                
+                // Таймаут 10 секунд
+                setTimeout(function() {
+                    clearInterval(checkReady);
+                    setButtonsDisabled(false);
+                    if (!playerReady) {
+                        alert('Плеер не загрузился. Открываем в YouTube...');
+                        window.open('https://www.youtube.com/watch?v=' + videoId, '_blank');
+                    }
+                }, 10000);
             }
             
             played++;
@@ -317,60 +336,191 @@
             addXP(10);
         }
 
+        // ЗАГРУЗКА И ВОСПРОИЗВЕДЕНИЕ
+        function loadAndPlay(videoId) {
+            try {
+                console.log('🎵 Загрузка трека:', videoId);
+                
+                // Останавливаем текущее
+                if (player.stopVideo) player.stopVideo();
+                
+                // Загружаем новое видео
+                player.loadVideoById({
+                    videoId: videoId,
+                    startSeconds: 0
+                });
+                
+                // Пробуем играть через 500мс
+                setTimeout(function() {
+                    if (player && player.playVideo) {
+                        player.playVideo();
+                        setButtonsDisabled(false);
+                        console.log('▶️ Трек играет');
+                    }
+                }, 500);
+                
+            } catch (error) {
+                console.error('❌ Load error:', error);
+                setButtonsDisabled(false);
+                alert('Ошибка загрузки трека. Попробуйте другой.');
+            }
+        }
+
+        // PLAY/PAUSE
         function togglePlay() {
             if (!player || !playerReady) {
                 alert('Плеер загружается...');
                 return;
             }
-            if (isPlaying) {
-                player.pauseVideo();
-            } else {
-                player.playVideo();
+            
+            setButtonsDisabled(true);
+            try {
+                if (isPlaying) {
+                    player.pauseVideo();
+                    console.log('⏸️ Пауза');
+                } else {
+                    player.playVideo();
+                    console.log('▶️ Play');
+                }
+                setTimeout(function() { setButtonsDisabled(false); }, 500);
+            } catch (error) {
+                console.error('Toggle error:', error);
+                setButtonsDisabled(false);
             }
         }
 
+        // ПЕРЕМОТКА ±15 СЕКУНД
         function skip(seconds) {
-            if (!player || !playerReady) return;
-            const current = player.getCurrentTime();
-            player.seekTo(current + seconds, true);
+            if (!player || !playerReady || !currentVideoId) {
+                console.log('⚠️ Плеер не готов');
+                return;
+            }
+            
+            console.log('⏩ Перемотка на ' + seconds + ' сек');
+            
+            // Показываем загрузку
+            document.getElementById('play-btn').textContent = '⏳';
+            setButtonsDisabled(true);
+            
+            // Debounce 100мс
+            setTimeout(function() {
+                try {
+                    var currentTime = player.getCurrentTime();
+                    var duration = player.getDuration();
+                    var newTime = currentTime + seconds;
+                    
+                    // Проверяем границы
+                    if (newTime < 0) newTime = 0;
+                    if (newTime > duration) newTime = duration;
+                    
+                    console.log('⏱️ Перемотка с ' + formatTime(currentTime) + ' на ' + formatTime(newTime));
+                    
+                    // Перемотка
+                    player.seekTo(newTime, true);
+                    
+                    // Возвращаем кнопки
+                    setTimeout(function() {
+                        setButtonsDisabled(false);
+                        if (isPlaying) {
+                            document.getElementById('play-btn').textContent = '⏸️';
+                            player.playVideo();
+                        } else {
+                            document.getElementById('play-btn').textContent = '▶️';
+                        }
+                    }, 500);
+                    
+                } catch (error) {
+                    console.error('❌ Skip error:', error);
+                    setButtonsDisabled(false);
+                }
+            }, 100);
         }
 
+        // ЗАКРЫТЬ ПЛЕЕР
         function closePlayer() {
             if (player && player.stopVideo) {
                 player.stopVideo();
             }
             isPlaying = false;
+            currentVideoId = null;
             document.getElementById('player').classList.remove('active');
             if (progressInterval) { clearInterval(progressInterval); progressInterval = null; }
+            setButtonsDisabled(false);
         }
 
+        // ОБНОВЛЕНИЕ ПРОГРЕССА
         function startProgress() {
             if (progressInterval) clearInterval(progressInterval);
-            progressInterval = setInterval(() => {
-                if (!player || !playerReady) return;
+            
+            progressInterval = setInterval(function() {
+                if (!player || !playerReady || isSeeking) return;
+                
                 try {
-                    const current = player.getCurrentTime();
-                    const duration = player.getDuration();
-                    if (duration > 0) {
+                    var current = player.getCurrentTime();
+                    var duration = player.getDuration();
+                    
+                    if (duration > 0 && !isNaN(current)) {
                         document.getElementById('current-time').textContent = formatTime(current);
                         document.getElementById('total-time').textContent = formatTime(duration);
-                        document.getElementById('progress-bar').value = (current / duration) * 100;
+                        
+                        if (!isSeeking) {
+                            document.getElementById('progress-bar').value = (current / duration) * 100;
+                        }
                     }
-                } catch(e) {}
+                } catch(e) {
+                    console.error('Progress error:', e);
+                }
             }, 1000);
         }
 
+        // ОБРАБОТКА ПРОГРЕСС-БАРА
+        document.addEventListener('DOMContentLoaded', function() {
+            var progressBar = document.getElementById('progress-bar');
+            
+            progressBar.addEventListener('mousedown', function() { isSeeking = true; });
+            progressBar.addEventListener('touchstart', function() { isSeeking = true; });
+            
+            progressBar.addEventListener('change', function() {
+                if (!player || !playerReady) return;
+                
+                isSeeking = true;
+                setButtonsDisabled(true);
+                
+                var duration = player.getDuration();
+                var seekTime = (this.value / 100) * duration;
+                
+                console.log('📍 Перемотка на ' + formatTime(seekTime));
+                player.seekTo(seekTime, true);
+                
+                setTimeout(function() {
+                    isSeeking = false;
+                    setButtonsDisabled(false);
+                    if (isPlaying) player.playVideo();
+                }, 500);
+            });
+        });
+
+        // ФОРМАТИРОВАНИЕ ВРЕМЕНИ
         function formatTime(sec) {
-            if (isNaN(sec)) return '0:00';
-            const m = Math.floor(sec / 60);
-            const s = Math.floor(sec % 60);
-            return `${m}:${s.toString().padStart(2,'0')}`;
+            if (isNaN(sec) || !isFinite(sec)) return '0:00';
+            var m = Math.floor(sec / 60);
+            var s = Math.floor(sec % 60);
+            return m + ':' + (s < 10 ? '0' : '') + s;
         }
 
+        // ОБНОВЛЕНИЕ КНОПКИ PLAY
         function updatePlayBtn() {
             document.getElementById('play-btn').textContent = isPlaying ? '⏸️' : '▶️';
         }
 
+        // БЛОКИРОВКА КНОПОК
+        function setButtonsDisabled(disabled) {
+            document.getElementById('btn-back').disabled = disabled;
+            document.getElementById('play-btn').disabled = disabled;
+            document.getElementById('btn-forward').disabled = disabled;
+        }
+
+        // БИБЛИОТЕКА
         function renderLibrary() {
             const list = document.getElementById('library-list');
             if (library.length === 0) {
@@ -378,21 +528,18 @@
                 return;
             }
             let html = '';
-            library.forEach(item => {
-                html += `
-                    <div class="library-item" onclick="playTrack('${item.videoId}', '${escapeHtml(item.title)}', '${escapeHtml(item.artist)}', '${item.thumb}')">
-                        <img src="${item.thumb}" style="width:60px;height:60px;border-radius:8px;object-fit:cover">
-                        <div style="flex:1">
-                            <div style="font-weight:600">${escapeHtml(item.title)}</div>
-                            <div style="font-size:0.8em;color:#999">${escapeHtml(item.artist)}</div>
-                        </div>
-                        <div style="font-size:1.5em;color:#667eea">▶️</div>
-                    </div>
-                `;
+            library.forEach(function(item) {
+                html += '<div class="library-item" onclick="playTrack(\'' + item.videoId + '\', \'' + escapeHtml(item.title) + '\', \'' + escapeHtml(item.artist) + '\', \'' + item.thumb + '\')">' +
+                    '<img src="' + item.thumb + '" style="width:60px;height:60px;border-radius:8px;object-fit:cover">' +
+                    '<div style="flex:1;min-width:0">' +
+                    '<div style="font-weight:600;font-size:0.95em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escapeHtml(item.title) + '</div>' +
+                    '<div style="font-size:0.8em;color:#999;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escapeHtml(item.artist) + '</div>' +
+                    '</div><div style="font-size:1.5em;color:#667eea">▶️</div></div>';
             });
             list.innerHTML = html;
         }
 
+        // ИГРЫ
         function startSnake() {
             document.getElementById('game-area').style.display = 'block';
             const canvas = document.getElementById('game-canvas');
@@ -401,14 +548,14 @@
             
             function draw() {
                 ctx.fillStyle = '#000'; ctx.fillRect(0,0,350,350);
-                ctx.fillStyle = '#0f0'; snake.forEach(s => ctx.fillRect(s.x*17.5, s.y*17.5, 16, 16));
+                ctx.fillStyle = '#0f0'; snake.forEach(function(s) { ctx.fillRect(s.x*17.5, s.y*17.5, 16, 16); });
                 ctx.fillStyle = '#f00'; ctx.fillRect(food.x*17.5, food.y*17.5, 16, 16);
                 ctx.fillStyle = '#fff'; ctx.font = '18px Arial'; ctx.fillText('Счёт: '+score, 10, 25);
             }
             
             function update() {
                 const head = {x: snake[0].x+dx, y: snake[0].y+dy};
-                if (head.x<0 || head.x>=20 || head.y<0 || head.y>=20 || snake.some(s=>s.x===head.x && s.y===head.y)) {
+                if (head.x<0 || head.x>=20 || head.y<0 || head.y>=20 || snake.some(function(s){return s.x===head.x && s.y===head.y;})) {
                     alert('Игра окончена! Счёт: '+score); addXP(score); closeGame(); return;
                 }
                 snake.unshift(head);
@@ -419,20 +566,20 @@
             
             const interval = setInterval(update, 150);
             draw();
-            document.onkeydown = (e) => {
+            document.onkeydown = function(e) {
                 if (e.key==='ArrowUp' && dy===0) { dx=0; dy=-1; }
                 if (e.key==='ArrowDown' && dy===0) { dx=0; dy=1; }
                 if (e.key==='ArrowLeft' && dx===0) { dx=-1; dy=0; }
                 if (e.key==='ArrowRight' && dx===0) { dx=1; dy=0; }
             };
-            window.closeSnake = () => { clearInterval(interval); closeGame(); };
+            window.closeSnake = function() { clearInterval(interval); closeGame(); };
         }
 
         function start2048() {
             document.getElementById('game-area').style.display = 'block';
             const canvas = document.getElementById('game-canvas');
             const ctx = canvas.getContext('2d');
-            let grid = Array(4).fill().map(()=>Array(4).fill(0)), score=0;
+            let grid = Array(4).fill().map(function(){return Array(4).fill(0);}), score=0;
             
             function addTile() {
                 let empty = [];
@@ -453,7 +600,7 @@
             }
             
             addTile(); addTile(); draw();
-            document.onkeydown = (e) => {
+            document.onkeydown = function(e) {
                 let moved = false;
                 if(e.key==='ArrowLeft') { for(let i=0;i<4;i++) { for(let j=1;j<4;j++) { if(grid[i][j]!==0) { let k=j; while(k>0 && grid[i][k-1]===0) { grid[i][k-1]=grid[i][k]; grid[i][k]=0; k--; moved=true; } } } } }
                 if(moved) { addTile(); draw(); }
@@ -462,43 +609,47 @@
 
         function startGuess() {
             document.getElementById('game-area').style.display = 'block';
-            const tracks = library.sort(()=>Math.random()-0.5).slice(0,5);
+            const tracks = library.sort(function(){return Math.random()-0.5;}).slice(0,5);
             let current=0, score=0;
             
             function showQ() {
                 if(current>=tracks.length) { alert('Игра окончена! Счёт: '+score); addXP(score*3); closeGame(); return; }
                 const track = tracks[current];
                 const opts = [track];
-                while(opts.length<4) { const r = library[Math.floor(Math.random()*library.length)]; if(!opts.find(o=>o.title===r.title)) opts.push(r); }
-                opts.sort(()=>Math.random()-0.5);
+                while(opts.length<4) { const r = library[Math.floor(Math.random()*library.length)]; if(!opts.find(function(o){return o.title===r.title;})) opts.push(r); }
+                opts.sort(function(){return Math.random()-0.5;});
                 
                 const div = document.getElementById('game-area');
-                div.innerHTML = `<h3 style="color:white;margin-bottom:15px">Угадай трек #${current+1}/${tracks.length}</h3>
-                    <p style="color:white;margin-bottom:15px">Исполнитель: <strong>${track.artist}</strong></p>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:350px;margin:0 auto">
-                        ${opts.map(o=>`<button class="nav-btn" onclick="answer('${o.title.replace(/'/g,"\\'")}','${track.title.replace(/'/g,"\\'")}',${score})" style="padding:12px">${o.title}</button>`).join('')}
-                    </div>`;
+                let html = '<h3 style="color:white;margin-bottom:15px">Угадай трек #'+(current+1)+'/'+tracks.length+'</h3>' +
+                    '<p style="color:white;margin-bottom:15px">Исполнитель: <strong>'+track.artist+'</strong></p>' +
+                    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:350px;margin:0 auto">';
+                opts.forEach(function(o) {
+                    html += '<button class="nav-btn" onclick="answer(\''+o.title.replace(/'/g,"\\'")+'\',\''+track.title.replace(/'/g,"\\'")+'\','+score+')" style="padding:12px">'+o.title+'</button>';
+                });
+                html += '</div>';
+                div.innerHTML = html;
                 
-                window.answer = (sel, corr, sc) => { if(sel===corr) { sc+=50; alert('✅ Правильно! +50 XP'); } else alert('❌ Неправильно!'); current++; score=sc; showQ(); };
+                window.answer = function(sel, corr, sc) { if(sel===corr) { sc+=50; alert('✅ Правильно! +50 XP'); } else alert('❌ Неправильно!'); current++; score=sc; showQ(); };
             }
             showQ();
         }
 
-        function closeGame() { document.getElementById('game-area').style.display = 'none'; document.getElementById('game-area').innerHTML = `<canvas id="game-canvas" width="350" height="350" style="background:#000;border-radius:10px;max-width:100%"></canvas><br><br><button class="nav-btn" onclick="closeGame()">❌ Закрыть</button>`; }
+        function closeGame() { document.getElementById('game-area').style.display = 'none'; document.getElementById('game-area').innerHTML = '<canvas id="game-canvas" width="350" height="350" style="background:#000;border-radius:10px;max-width:100%"></canvas><br><br><button class="nav-btn" onclick="closeGame()">❌ Закрыть</button>'; }
 
+        // ДОСТИЖЕНИЯ
         const allAch = [
-            {id:'first',name:'Первый трек',desc:'Сыграйте 1 трек',icon:'',cond:()=>played>=1},
-            {id:'ten',name:'Меломан',desc:'Сыграйте 10 треков',icon:'🎧',cond:()=>played>=10},
-            {id:'hundred',name:'Сотка',desc:'100 XP',icon:'💯',cond:()=>xp>=100},
-            {id:'level5',name:'Уровень 5',desc:'Достигните 5 уровня',icon:'⭐',cond:()=>level>=5}
+            {id:'first',name:'Первый трек',desc:'Сыграйте 1 трек',icon:'🎵',cond:function(){return played>=1;}},
+            {id:'ten',name:'Меломан',desc:'Сыграйте 10 треков',icon:'🎧',cond:function(){return played>=10;}},
+            {id:'hundred',name:'Сотка',desc:'100 XP',icon:'💯',cond:function(){return xp>=100;}},
+            {id:'level5',name:'Уровень 5',desc:'Достигните 5 уровня',icon:'⭐',cond:function(){return level>=5;}}
         ];
 
         function checkAchievements() {
-            allAch.forEach(ach => {
+            allAch.forEach(function(ach) {
                 if(!achievements.includes(ach.id) && ach.cond()) {
                     achievements.push(ach.id);
                     coins += 50;
-                    alert(`🏆 Достижение: ${ach.name}! +50 `);
+                    alert('🏆 Достижение: '+ach.name+'! +50 🪙');
                 }
             });
             localStorage.setItem('ss_achievements', JSON.stringify(achievements));
@@ -509,20 +660,19 @@
         function renderAchievements() {
             const list = document.getElementById('achievements-list');
             let html = '';
-            allAch.forEach(ach => {
+            allAch.forEach(function(ach) {
                 const unlocked = achievements.includes(ach.id);
-                html += `<div class="achievement ${unlocked?'':'locked'}">
-                    <div style="font-size:2em">${ach.icon}</div>
-                    <div style="flex:1">
-                        <div style="font-weight:600">${ach.name}</div>
-                        <div style="font-size:0.8em;color:#999">${ach.desc}</div>
-                    </div>
-                    <div>${unlocked?'✅':'🔒'}</div>
-                </div>`;
+                html += '<div class="achievement '+(unlocked?'':'locked')+'">' +
+                    '<div style="font-size:2em">'+ach.icon+'</div>' +
+                    '<div style="flex:1;min-width:0">' +
+                    '<div style="font-weight:600;font-size:0.95em">'+ach.name+'</div>' +
+                    '<div style="font-size:0.8em;color:#999">'+ach.desc+'</div>' +
+                    '</div><div style="font-size:1.5em">'+(unlocked?'✅':'🔒')+'</div></div>';
             });
             list.innerHTML = html;
         }
 
+        // АВТОРИЗАЦИЯ
         function login() {
             const user = document.getElementById('username').value.trim();
             const pass = document.getElementById('password').value;
@@ -563,10 +713,11 @@
             }
         }
 
+        // XP И СТАТИСТИКА
         function addXP(amount) {
             xp += amount;
             const newLevel = Math.floor(xp/100) + 1;
-            if(newLevel > level) { level = newLevel; coins += 100; alert(`🎉 Уровень повышен! Теперь ${level}! +100 🪙`); }
+            if(newLevel > level) { level = newLevel; coins += 100; alert('🎉 Уровень повышен! Теперь '+level+'! +100 🪙'); }
             localStorage.setItem('ss_xp', xp);
             localStorage.setItem('ss_level', level);
             localStorage.setItem('ss_coins', coins);
@@ -581,19 +732,20 @@
             document.getElementById('played').textContent = played;
         }
 
+        // НАВИГАЦИЯ
         function showSection(id) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
             document.getElementById(id).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
             event.target.classList.add('active');
             if(id==='library') renderLibrary();
             if(id==='achievements') renderAchievements();
             if(id==='profile') showProfile();
         }
 
-        function escapeHtml(text) { if(!text) return ''; return text.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
+        function escapeHtml(text) { if(!text) return ''; return text.replace(/[&<>"']/g, function(c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]); }); }
 
-        window.addEventListener('load', () => { updateStats(); console.log('✅ SoundScape Pro загружен!'); });
+        window.addEventListener('load', function() { updateStats(); console.log('✅ SoundScape Pro загружен!'); });
     </script>
 </body>
 </html>
