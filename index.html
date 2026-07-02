@@ -37,8 +37,6 @@ body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:
 .ti{flex:1;min-width:0}
 .tt{font-weight:bold;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ta{font-size:11px;opacity:0.8}
-
-/* ===== YOUTUBE ПЛЕЕР (ПОЛНАЯ ВЕРСИЯ + ПЕРЕМОТКА) ===== */
 .yt-player{position:fixed;bottom:50px;left:0;right:0;background:linear-gradient(135deg,rgba(26,26,46,0.98),rgba(15,52,96,0.98));padding:12px 15px;z-index:999;display:none;backdrop-filter:blur(15px);border-top:3px solid #667eea;box-shadow:0 -5px 30px rgba(0,0,0,0.5)}
 .yt-player.a{display:block}
 .yt-inner{display:flex;align-items:center;gap:12px;max-width:1200px;margin:0 auto;flex-wrap:wrap}
@@ -57,8 +55,6 @@ body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:
 .yt-bar::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:#667eea;border-radius:50%;cursor:pointer;box-shadow:0 0 10px rgba(102,126,234,0.6)}
 .yt-bar::-moz-range-thumb{width:14px;height:14px;background:#667eea;border-radius:50%;cursor:pointer;border:none}
 .yt-close{background:rgba(255,68,68,0.6)!important}
-
-/* Мини-плеер для локальных треков */
 .mini-player{position:fixed;bottom:50px;left:0;right:0;background:linear-gradient(135deg,rgba(0,102,255,0.98),rgba(255,102,0,0.98));padding:10px;z-index:999;display:none;backdrop-filter:blur(10px)}
 .mini-player.a{display:block}
 .mini-info{display:flex;align-items:center;gap:10px}
@@ -152,7 +148,7 @@ body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:
 <body>
 
 <div class="header">
-<h1>🦅 SoundScape Pro <span style="display:inline-block;background:var(--success);color:#000;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:bold;margin-left:8px">● ONLINE</span><span style="display:inline-block;background:linear-gradient(90deg,#fff,#0039a6,#d52b1e);color:#000;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:bold;margin-left:5px">🇷🇺 РФ</span></h1>
+<h1>🦅 SoundScape Pro <span style="display:inline-block;background:var(--success);color:#000;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:bold;margin-left:8px">● ONLINE</span><span style="display:inline-block;background:linear-gradient(90deg,#fff,#0039a6,#d52b1e);color:#000;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:bold;margin-left:5px">🇷 РФ</span></h1>
 <p>Федеральная Музыкальная Соцсеть России • YouTube + iTunes</p>
 </div>
 
@@ -335,7 +331,7 @@ body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:
 <div id="ai" class="sec">
 <h2 style="margin-bottom:12px;text-align:center;font-size:18px">🤖 AI Ассистент</h2>
 <div class="ai-container">
-<div class="ai-message">Привет! Я AI-ассистент SoundScape Pro 🇷🇺<br>Чем могу помочь?</div>
+<div class="ai-message">Привет! Я AI-ассистент SoundScape Pro 🇷<br>Чем могу помочь?</div>
 <div id="ai-messages"></div>
 <input type="text" class="ai-input" id="ai-input" placeholder="Задай вопрос..." onkeypress="if(event.key==='Enter')sendAI()">
 <button class="btn" onclick="sendAI()" style="width:100%;margin-top:10px">📤 Отправить</button>
@@ -376,7 +372,6 @@ body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:
 </div>
 </div>
 
-<!-- ===== YOUTUBE ПЛЕЕР (ПОЛНАЯ ВЕРСИЯ + ПЕРЕМОТКА ±15 СЕК) ===== -->
 <div class="yt-player" id="yt-player-container">
 <div class="yt-inner">
 <img id="yt-cover" class="yt-cover" src="" alt="">
@@ -398,10 +393,8 @@ body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:
 </div>
 </div>
 
-<!-- Скрытый YouTube iframe -->
 <div id="yt-iframe" style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0"></div>
 
-<!-- Мини-плеер для локальных треков -->
 <div class="mini-player" id="mini-player">
 <div class="mini-info">
 <div class="mini-cover">🎵</div>
@@ -433,14 +426,8 @@ body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:
 <script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
-// ============================================================
-// 🔥 URL BACKEND-ПРОКСИ
-// ============================================================
 const API_BASE = 'https://soundscape-api-9fng.onrender.com';
 
-// ============================================================
-// 📚 ВСТРОЕННЫЕ ТРЕКИ
-// ============================================================
 const tracks=[
 {id:'1',t:'Ты не бойся ночи',a:'ENZRO',u:'https://cdn.jsdelivr.net/gh/melnikovvitalij02-hub/Soundscape2@main/ENZRO_-_Ty_ne_bojjsya_nochi_81423717.mp3',g:'electronic'},
 {id:'2',t:'А красивых женщин много',a:'Igor Malinin',u:'https://cdn.jsdelivr.net/gh/melnikovvitalij02-hub/Soundscape2@main/Igor_Malinin_-_A_krasivykh_zhenshhin_mnogo_81681758.mp3',g:'pop'},
@@ -477,14 +464,11 @@ let gameScore=0;
 let gameCanvas=null;
 let gameCtx=null;
 
-// ============================================================
-// 🎵 YOUTUBE ПЛЕЕР (ПОЛНАЯ ВЕРСИЯ + ПЕРЕМОТКА ±15 СЕК)
-// ============================================================
 let ytPlayer=null;
 let ytIsPlaying=false;
 let ytProgressInterval=null;
 let ytPlayerReady=false;
-let ytLoadAttempts=0;
+let currentVideoId=null;
 
 function onYouTubeIframeAPIReady(){
 console.log('✅ YouTube API загружен');
@@ -493,12 +477,7 @@ tryCreateYTPlayer();
 
 function tryCreateYTPlayer(){
 if(typeof YT==='undefined'||!YT.Player){
-ytLoadAttempts++;
-if(ytLoadAttempts<10){
 setTimeout(tryCreateYTPlayer,1000);
-}else{
-console.error('❌ YouTube API не загрузился');
-}
 return;
 }
 try{
@@ -519,15 +498,11 @@ events:{
 'onReady':function(){
 ytPlayerReady=true;
 console.log('✅ YouTube плеер готов');
-sn('✅ Плеер готов');
 },
 'onStateChange':onYtStateChange,
 'onError':function(e){
 console.error('❌ YouTube ошибка:',e.data);
-let msg='Ошибка воспроизведения';
-if(e.data===100)msg='Видео не найдено';
-if(e.data===101||e.data===150)msg='Видео недоступно';
-sn('⚠️ '+msg);
+sn('⚠️ Ошибка воспроизведения');
 }
 }
 });
@@ -554,18 +529,16 @@ stopYtProgress();
 }
 
 function playYouTubeVideo(videoId,title,artist,thumbnail){
-// Закрываем локальный плеер
 audio.pause();
 isPlaying=false;
 document.getElementById('mini-player').classList.remove('a');
 
-// Показываем YouTube плеер
+currentVideoId=videoId;
 document.getElementById('yt-cover').src=thumbnail||'';
 document.getElementById('yt-title').textContent=title;
 document.getElementById('yt-artist').textContent=artist;
 document.getElementById('yt-player-container').classList.add('a');
 
-// Блокируем кнопки на время загрузки
 disableYTButtons();
 
 if(ytPlayerReady&&ytPlayer&&ytPlayer.loadVideoById){
@@ -578,7 +551,6 @@ sn('⚠️ Ошибка загрузки');
 enableYTButtons();
 }
 }else{
-// Ждём готовности плеера
 let waitCount=0;
 const waitInterval=setInterval(()=>{
 waitCount++;
@@ -593,7 +565,7 @@ enableYTButtons();
 }
 }else if(waitCount>20){
 clearInterval(waitInterval);
-sn('⚠️ Плеер загружается... подождите');
+sn('⚠️ Плеер не загрузился');
 enableYTButtons();
 }
 },500);
@@ -605,7 +577,7 @@ addXP(2);
 }
 
 function ytToggle(){
-if(!ytPlayer||!ytPlayerReady)return;
+if(!ytPlayer||!ytPlayerReady){sn('⚠️ Плеер не готов');return;}
 disableYTButtons();
 try{
 if(ytIsPlaying){ytPlayer.pauseVideo();}
@@ -615,20 +587,33 @@ setTimeout(enableYTButtons,500);
 }
 
 function ytSkip(seconds){
-if(!ytPlayer||!ytPlayerReady)return;
+if(!ytPlayer||!ytPlayerReady){sn('⚠️ Плеер не готов');return;}
+if(!currentVideoId){sn('⚠️ Трек не выбран');return;}
+
 disableYTButtons();
+console.log('⏩ Перемотка на '+seconds+' сек');
+
 try{
 const cur=ytPlayer.getCurrentTime()||0;
 const dur=ytPlayer.getDuration()||0;
 const newTime=Math.max(0,Math.min(dur,cur+seconds));
+
+console.log('⏱️ С '+formatTime(cur)+' на '+formatTime(newTime));
+
 ytPlayer.seekTo(newTime,true);
+
 setTimeout(()=>{
 enableYTButtons();
 if(ytIsPlaying){
 try{ytPlayer.playVideo();}catch(e){}
 }
-},500);
-}catch(e){console.error(e);enableYTButtons();}
+},800);
+
+}catch(e){
+console.error('Skip error:',e);
+sn('⚠️ Ошибка перемотки');
+enableYTButtons();
+}
 }
 
 function startYtProgress(){
@@ -643,7 +628,7 @@ document.getElementById('yt-total').textContent=formatTime(dur);
 const bar=document.getElementById('yt-bar');
 if(dur>0){bar.max=dur;bar.value=cur;}
 }catch(e){}
-},500);
+},1000);
 }
 
 function stopYtProgress(){
@@ -661,6 +646,7 @@ return m+':'+(s<10?'0':'')+s;
 function ytClose(){
 if(ytPlayer){try{ytPlayer.stopVideo();}catch(e){}}
 ytIsPlaying=false;
+currentVideoId=null;
 stopYtProgress();
 document.getElementById('yt-player-container').classList.remove('a');
 enableYTButtons();
@@ -678,7 +664,6 @@ document.getElementById('yt-play').disabled=false;
 document.getElementById('yt-btn-fwd').disabled=false;
 }
 
-// Перемотка по ползунку
 document.addEventListener('DOMContentLoaded',function(){
 const bar=document.getElementById('yt-bar');
 if(bar){
@@ -701,16 +686,12 @@ isSeeking=false;
 }
 });
 
-// ============================================================
-// 🔍 ПОИСК МУЗЫКИ (YouTube + iTunes + библиотека)
-// ============================================================
 async function sm(){
 const q=document.getElementById('search-q').value.trim();
 if(!q){sn('⚠️ Введите запрос');return;}
 const r=document.getElementById('search-results');
 r.innerHTML='<div style="text-align:center;padding:15px">🔍 Поиск...</div>';
 
-// 1. Локальная библиотека
 const libResults=lib.filter(t=>t.t.toLowerCase().includes(q.toLowerCase())||t.a.toLowerCase().includes(q.toLowerCase()));
 let html='';
 if(libResults.length>0){
@@ -721,7 +702,6 @@ html+=`<div class="trk" onclick="playTrack(${idx})"><div class="tc">🎵</div><d
 });
 }
 
-// 2. YouTube поиск (ПОЛНЫЕ ВЕРСИИ)
 if(API_BASE){
 try{
 const response=await fetch(`${API_BASE}/api/youtube/search?q=${encodeURIComponent(q)}&limit=10`);
@@ -744,7 +724,6 @@ if(libResults.length===0)html+='<div class="ib">⚠️ Ошибка поиска
 }
 }
 
-// 3. iTunes поиск (fallback)
 if(libResults.length===0&&API_BASE){
 try{
 const response=await fetch(`${API_BASE}/api/search?term=${encodeURIComponent(q)}&limit=10&country=RU`);
@@ -767,9 +746,6 @@ r.innerHTML=html;
 addXP(1);
 }
 
-// ============================================================
-// 📊 ЧАРТЫ (через YouTube)
-// ============================================================
 async function loadCharts(){
 const l=document.getElementById('charts-list');
 l.innerHTML='<div style="text-align:center;padding:20px">🔄 Загрузка...</div>';
@@ -804,9 +780,6 @@ document.getElementById('charts-list').innerHTML=html;
 sn('📊 Топ из библиотеки');
 }
 
-// ============================================================
-// 🎵 ЛОКАЛЬНЫЙ ПЛЕЕР (для встроенных треков)
-// ============================================================
 function playPreview(url,title,artist){
 if(!url){sn('⚠️ Нет превью');return;}
 ytClose();
@@ -874,9 +847,6 @@ audio.addEventListener('ended',()=>{isPlaying=false;updateMiniPlayer();nextTrack
 audio.addEventListener('play',()=>{isPlaying=true;updateMiniPlayer();});
 audio.addEventListener('pause',()=>{isPlaying=false;updateMiniPlayer();});
 
-// ============================================================
-// 📚 БИБЛИОТЕКА
-// ============================================================
 function renderLibrary(){
 document.getElementById('lib-count').textContent=lib.length+' трека';
 let html='';
@@ -907,9 +877,6 @@ reader.readAsDataURL(f);
 e.target.value='';
 }
 
-// ============================================================
-// 🧭 НАВИГАЦИЯ
-// ============================================================
 function ss(id){
 document.querySelectorAll('.sec').forEach(s=>s.classList.remove('a'));
 document.getElementById(id).classList.add('a');
@@ -955,9 +922,6 @@ const names={rock:'🎸 Рок',hiphop:'🎤 Хип-Хоп',electronic:'🎧 Э�
 return names[g]||g;
 }
 
-// ============================================================
-// 🎮 ИГРЫ
-// ============================================================
 function filterGames(type){
 document.querySelectorAll('#games .feed-tab').forEach((t,i)=>{
 const types=['all','music','action','puzzle'];
@@ -967,9 +931,9 @@ const games=document.querySelectorAll('.game-card');
 games.forEach(g=>{
 const icon=g.querySelector('.game-icon').textContent;
 if(type==='all')g.style.display='block';
-else if(type==='music'&&['🎵','🎯','🧠'].includes(icon))g.style.display='block';
-else if(type==='action'&&['🐍','🐉','🐦','🌀'].includes(icon))g.style.display='block';
-else if(type==='puzzle'&&['🔢','🟦'].includes(icon))g.style.display='block';
+else if(type==='music'&&['🎵','','🧠'].includes(icon))g.style.display='block';
+else if(type==='action'&&['🐍','','🐦','🌀'].includes(icon))g.style.display='block';
+else if(type==='puzzle'&&['🔢',''].includes(icon))g.style.display='block';
 else g.style.display='none';
 });
 }
@@ -1044,7 +1008,7 @@ function startRhythm(){if(rhythmRunning)return;rhythmRunning=true;rhythmLoop();}
 function rhythmLoop(){if(!rhythmRunning)return;const circle=document.getElementById('rhythm-circle');if(!circle)return;circle.style.background='linear-gradient(135deg,var(--p),var(--s))';setTimeout(()=>{if(!rhythmRunning)return;circle.style.background='linear-gradient(135deg,#00ff88,#00cc66)';setTimeout(()=>{if(!rhythmRunning)return;rhythmLoop();},500+Math.random()*1000);},1000+Math.random()*2000);}
 
 let memoryCards=[],memoryFlipped=[],memoryMatched=0,memoryRunning=false;
-function initMemory(){const icons=['🎵','🎸','🎤','🎧','🎹','🎺'];memoryCards=[...icons,...icons].sort(()=>Math.random()-0.5);memoryFlipped=[];memoryMatched=0;memoryRunning=false;drawMemory();}
+function initMemory(){const icons=['🎵','','🎤','','🎹',''];memoryCards=[...icons,...icons].sort(()=>Math.random()-0.5);memoryFlipped=[];memoryMatched=0;memoryRunning=false;drawMemory();}
 function startMemory(){if(memoryRunning)return;memoryRunning=true;}
 function drawMemory(){let html='<div id="memory-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:400px;margin:0 auto">';memoryCards.forEach((card,i)=>{html+=`<div class="battle-option" data-idx="${i}" style="height:80px;display:flex;align-items:center;justify-content:center;font-size:32px">?</div>`;});html+='</div><div style="margin-top:15px;font-size:18px">Пар: '+memoryMatched+'/6</div>';const container=document.querySelector('.game-container');const existing=document.getElementById('memory-grid');if(existing)existing.parentElement.remove();container.insertAdjacentHTML('beforeend',html);document.querySelectorAll('#memory-grid .battle-option').forEach(el=>{el.onclick=()=>flipMemory(parseInt(el.dataset.idx));});}
 function flipMemory(i){if(!memoryRunning||memoryFlipped.includes(i)||memoryCards[i]==='x')return;const el=document.querySelector(`#memory-grid .battle-option[data-idx="${i}"]`);el.textContent=memoryCards[i];memoryFlipped.push(i);if(memoryFlipped.length===2){const [a,b]=memoryFlipped;if(memoryCards[a]===memoryCards[b]){memoryCards[a]=memoryCards[b]='x';memoryMatched++;gameScore+=25;document.getElementById('game-score').textContent=gameScore;if(memoryMatched===6){sn('🎉 Победа! Счёт: '+gameScore);addXP(gameScore);memoryRunning=false;}}setTimeout(()=>{if(memoryCards[a]!=='x')document.querySelector(`#memory-grid .battle-option[data-idx="${a}"]`).textContent='?';if(memoryCards[b]!=='x')document.querySelector(`#memory-grid .battle-option[data-idx="${b}"]`).textContent='?';memoryFlipped=[];},1000);}}
@@ -1074,9 +1038,6 @@ function startPong(){if(pongRunning)return;pongRunning=true;gameInterval=setInte
 function drawPong(){gameCtx.fillStyle='#000';gameCtx.fillRect(0,0,400,400);gameCtx.fillStyle='#fff';gameCtx.fillRect(10,pongPaddle.y,10,50);gameCtx.fillRect(380,pongAI.y,10,50);gameCtx.beginPath();gameCtx.arc(pongBall.x,pongBall.y,8,0,Math.PI*2);gameCtx.fill();}
 document.addEventListener('mousemove',e=>{if(currentGame==='pong'&&pongRunning){const rect=gameCanvas.getBoundingClientRect();pongPaddle.y=e.clientY-rect.top-25;}});
 
-// ============================================================
-// 🌆 ГОРОД 3D
-// ============================================================
 function initCity(){
 if(typeof THREE==='undefined'){sn('⚠️ Three.js не загружен');return;}
 const cv=document.getElementById('city-canvas');
@@ -1148,9 +1109,6 @@ cityRenderer.render(cityScene,cityCamera);
 function showNPCBubble(pos,text){const bubble=document.createElement('div');bubble.className='npc-bubble';bubble.textContent=text;bubble.style.left='50%';bubble.style.top='100px';document.querySelector('#city-container').appendChild(bubble);setTimeout(()=>bubble.remove(),3000);}
 function updateCityHUD(){document.getElementById('city-score').textContent=cityPlayer.score;document.getElementById('city-mush').textContent=cityPlayer.mush;document.getElementById('city-ber').textContent=cityPlayer.ber;document.getElementById('city-hp').textContent=cityPlayer.hp;document.getElementById('city-lvl').textContent=cityPlayer.lvl;}
 
-// ============================================================
-// 👤 ПРОФИЛЬ
-// ============================================================
 function renderProfile(){
 if(!user){document.getElementById('profile-auth').style.display='block';document.getElementById('profile-data').style.display='none';return;}
 document.getElementById('profile-auth').style.display='none';document.getElementById('profile-data').style.display='block';
