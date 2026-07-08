@@ -7,29 +7,35 @@ const app = express();
 
 // ========== MIDDLEWARE ==========
 app.use(cors({
-    origin: [
-        'http://localhost:3000', 
-        'http://localhost:5000',
-        'http://127.0.0.1:3000',
-        'http://127.0.0.1:5000',
-        /^https:\/\/.*\.github\.io$/,
-        'https://melnikovvitalij02-hub.github.io'
-    ],
+    origin: function (origin, callback) {
+        const allowed = [
+            'http://localhost:3000',
+            'http://localhost:5000',
+            'http://127.0.0.1:3000',
+            'http://127.0.0.1:5000',
+            /^https:\/\/.*\.github\.io$/,
+            'https://melnikovvitalij02-hub.github.io'
+        ];
+        if (!origin || allowed.some(a => (typeof a === 'string' ? a === origin : a.test(origin)))) {
+            callback(null, true);
+        } else {
+            callback(null, true);
+        }
+    },
     methods: ['GET', 'POST', 'OPTIONS'],
     credentials: true
 }));
 
-app.use(express.static('public'));
+app.use(express.static(__dirname));
 app.use(express.json());
 
 // ========== КОНСТАНТЫ ==========
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 const YOUTUBE_SEARCH_URL = 'https://www.googleapis.com/youtube/v3/search';
 const INVIDIOUS_INSTANCES = [
-    'https://invidious.io',
-    'https://inv.riverside.rocks',
-    'https://invidious.snopyta.org',
-    'https://iv.melmac.space'
+    'https://inv.nadeko.net',
+    'https://invidious.privacydev.net',
+    'https://invidious.lunar.icu'
 ];
 
 // ========== ЛОГИРОВАНИЕ ==========
@@ -44,6 +50,38 @@ if (YOUTUBE_API_KEY) {
     log.info(`YouTube API Key загружен: ${YOUTUBE_API_KEY.substring(0, 10)}...`);
 } else {
     log.warn('YouTube API Key НЕ найден. Используется Invidious API как fallback');
+}
+
+// ========== ПОИСК ЧЕРЕЗ I TUNES (FALLBACK) ==========
+async function searchITunes(query, limit) {
+    try {
+        const response = await axios.get('https://itunes.apple.com/search', {
+            params: {
+                term: query,
+                media: 'music',
+                limit: Math.min(limit, 20),
+                country: 'RU'
+            },
+            timeout: 5000
+        });
+
+        if (!response.data || !response.data.results || response.data.results.length === 0) {
+            return null;
+        }
+
+        return response.data.results.map(item => ({
+            videoId: item.trackId.toString(),
+            title: item.trackName || item.collectionName || 'Unknown',
+            channelTitle: item.artistName || 'Unknown Artist',
+            thumbnail: item.artworkUrl100 ? item.artworkUrl100.replace('100x100', '300x300') : 'https://via.placeholder.com/320x180?text=No+Image',
+            publishedAt: item.releaseDate || new Date().toISOString(),
+            source: 'itunes',
+            previewUrl: item.previewUrl
+        }));
+    } catch (error) {
+        log.warn(`iTunes API failed: ${error.message}`);
+        return null;
+    }
 }
 
 // ========== ПОИСК МУЗЫКИ ЧЕРЕЗ YOUTUBE API ==========
@@ -92,40 +130,45 @@ async function searchYouTubeOfficial(query, limit) {
 
 // ========== ПОИСК ЧЕРЕЗ INVIDIOUS (FALLBACK) ==========
 async function searchInvidious(query, limit) {
-    for (const instance of INVIDIOUS_INSTANCES) {
-        try {
+    try {
+        const results = await Promise.any(INVIDIOUS_INSTANCES.map(async (instance) => {
             const response = await axios.get(`${instance}/api/v1/search`, {
                 params: {
                     q: query,
                     type: 'video',
                     limit: limit,
-                    sort_by: 'relevance',
-                    duration: 'long'
+                    sort_by: 'relevance'
                 },
-                timeout: 6000,
-                headers: {
+            timeout: 2500,
+            headers: {
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
                 }
             });
 
-            if (!response.data || response.data.length === 0) {
-                continue;
+            if (!response.data) {
+                throw new Error('No data');
             }
 
-            return response.data.map(item => ({
+            const items = Array.isArray(response.data) ? response.data : (response.data.items || response.data.videos || []);
+            if (items.length === 0) {
+                throw new Error('Empty results');
+            }
+
+            return items.map(item => ({
                 videoId: item.videoId,
                 title: item.title,
                 channelTitle: item.author || 'Unknown Artist',
                 thumbnail: `https://img.youtube.com/vi/${item.videoId}/mqdefault.jpg`,
-                publishedAt: new Date(item.publishedDate * 1000).toISOString(),
-                source: `invidious_${instance}`
+                publishedAt: item.publishedDate ? new Date(item.publishedDate * 1000).toISOString() : new Date().toISOString(),
+                source: `invidious_${instance.replace('https://', '')}`
             }));
-        } catch (error) {
-            log.warn(`Invidious instance ${instance} failed: ${error.message}`);
-            continue;
-        }
+        }));
+
+        return results.length > 0 ? results : null;
+    } catch (error) {
+        log.warn(`All Invidious instances failed`);
+        return null;
     }
-    return null;
 }
 
 // ========== ГЛАВНЫЙ ПОИСК ENDPOINT ==========
@@ -171,6 +214,20 @@ app.get('/api/youtube/search', async (req, res) => {
                 success: true,
                 items: results,
                 source: 'invidious',
+                totalResults: results.length
+            });
+        }
+
+        // Fallback на iTunes
+        log.info('Falling back to iTunes API...');
+        results = await searchITunes(query, limit);
+
+        if (results) {
+            log.info(`Found ${results.length} results via iTunes API`);
+            return res.json({
+                success: true,
+                items: results,
+                source: 'itunes',
                 totalResults: results.length
             });
         }

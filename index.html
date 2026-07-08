@@ -426,7 +426,9 @@ body{background:linear-gradient(135deg,var(--bg),#060818);color:#fff;min-height:
 <script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
-const API_BASE = 'https://soundscape-api-9fng.onrender.com';
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.match(/^192\.168\.|^10\.|^172\.(1[6-9]|2\d|3[01])\./)
+    ? window.location.origin
+    : 'https://soundscape-api-9fng.onrender.com';
 
 const tracks=[
 {id:'1',t:'Ты не бойся ночи',a:'ENZRO',u:'https://cdn.jsdelivr.net/gh/melnikovvitalij02-hub/Soundscape2@main/ENZRO_-_Ty_ne_bojjsya_nochi_81423717.mp3',g:'electronic'},
@@ -706,14 +708,18 @@ if(API_BASE){
 try{
 const response=await fetch(`${API_BASE}/api/youtube/search?q=${encodeURIComponent(q)}&limit=10`);
 const data=await response.json();
-if(data&&data.items&&data.items.length>0){
-html+='<div class="ib" style="margin-top:15px;background:linear-gradient(135deg,rgba(102,126,234,0.3),rgba(118,75,162,0.3));border-color:#667eea">🎬 <strong>YouTube:</strong> найдено '+data.items.length+' полных версий</div>';
-data.items.forEach(item=>{
-const tn=(item.title||'Без названия').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-const an=(item.channelTitle||'Неизвестно').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-const ar=item.thumbnail||'';
-html+=`<div class="trk" onclick="playYouTubeVideo('${item.videoId}','${tn}','${an}','${ar}')" style="border-color:#667eea"><div class="tc">${ar?'<img src="'+ar+'">':'🎬'}</div><div class="ti"><div class="tt">${tn}</div><div class="ta">${an}</div></div><div style="font-size:18px;color:#667eea">▶</div></div>`;
-});
+        if(data&&data.items&&data.items.length>0){
+            html+='<div class="ib" style="margin-top:15px;background:linear-gradient(135deg,rgba(102,126,234,0.3),rgba(118,75,162,0.3));border-color:#667eea">🎬 <strong>YouTube/iTunes:</strong> найдено '+data.items.length+' результатов</div>';
+            data.items.forEach(item=>{
+                const tn=(item.title||'Без названия').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+                const an=(item.channelTitle||'Неизвестно').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+                const ar=item.thumbnail||'';
+                const isITunes=item.source==='itunes'||item.previewUrl;
+                const onclick=isITunes
+                    ? `playPreview('${item.previewUrl||''}','${tn}','${an}')`
+                    : `playYouTubeVideo('${item.videoId}','${tn}','${an}','${ar}')`;
+                html+=`<div class="trk" onclick="${onclick}" style="border-color:${isITunes?'var(--success)':'#667eea'}"><div class="tc">${ar?'<img src="'+ar+'">':(isITunes?'🍎':'🎬')}</div><div class="ti"><div class="tt">${tn}</div><div class="ta">${an}</div></div><div style="font-size:18px;color:${isITunes?'var(--success)':'#667eea'}">▶</div></div>`;
+            });
 sn('🎵 YouTube: '+data.items.length+' полных версий');
 }else{
 if(libResults.length===0)html+='<div class="ib">😕 Ничего не найдено</div>';
@@ -754,14 +760,18 @@ if(API_BASE){
 try{
 const response=await fetch(`${API_BASE}/api/youtube/search?q=top+hits+2024&limit=25`);
 const data=await response.json();
-if(data&&data.items&&data.items.length>0){
-let html='';
-data.items.forEach((item,i)=>{
-const tn=(item.title||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-const an=(item.channelTitle||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-const ar=item.thumbnail||'';
-html+=`<div class="trk" onclick="playYouTubeVideo('${item.videoId}','${tn}','${an}','${ar}')"><div style="font-size:18px;font-weight:bold;color:var(--gold);min-width:30px">#${i+1}</div><div class="tc">${ar?'<img src="'+ar+'">':'🎬'}</div><div class="ti"><div class="tt">${tn}</div><div class="ta">${an}</div></div><div style="font-size:18px;color:#667eea">▶</div></div>`;
-});
+        if(data&&data.items&&data.items.length>0){
+            let html='';
+            data.items.forEach((item,i)=>{
+                const tn=(item.title||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+                const an=(item.channelTitle||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+                const ar=item.thumbnail||'';
+                const isITunes=item.source==='itunes'||item.previewUrl;
+                const onclick=isITunes
+                    ? `playPreview('${item.previewUrl||''}','${tn}','${an}')`
+                    : `playYouTubeVideo('${item.videoId}','${tn}','${an}','${ar}')`;
+                html+=`<div class="trk" onclick="${onclick}"><div style="font-size:18px;font-weight:bold;color:var(--gold);min-width:30px">#${i+1}</div><div class="tc">${ar?'<img src="'+ar+'">':(isITunes?'🍎':'🎬')}</div><div class="ti"><div class="tt">${tn}</div><div class="ta">${an}</div></div><div style="font-size:18px;color:${isITunes?'var(--success)':'#667eea'}">▶</div></div>`;
+            });
 l.innerHTML=html;
 sn('📊 Чарты загружены!');
 return;
