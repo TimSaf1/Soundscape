@@ -430,6 +430,11 @@ const API_BASE = window.location.hostname === 'localhost' || window.location.hos
     ? window.location.origin
     : 'https://soundscape-api-9fng.onrender.com';
 
+// HTML-escape for text / double-quoted attribute contexts
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+// Escape for a single-quoted JS string embedded inside a double-quoted HTML attribute
+function escJs(s){return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/[\r\n]/g,' ').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
 const tracks=[
 {id:'1',t:'Ты не бойся ночи',a:'ENZRO',u:'https://cdn.jsdelivr.net/gh/melnikovvitalij02-hub/Soundscape2@main/ENZRO_-_Ty_ne_bojjsya_nochi_81423717.mp3',g:'electronic'},
 {id:'2',t:'А красивых женщин много',a:'Igor Malinin',u:'https://cdn.jsdelivr.net/gh/melnikovvitalij02-hub/Soundscape2@main/Igor_Malinin_-_A_krasivykh_zhenshhin_mnogo_81681758.mp3',g:'pop'},
@@ -700,7 +705,7 @@ if(libResults.length>0){
 html='<div class="ib">🎵 Найдено в библиотеке: <strong>'+libResults.length+'</strong></div>';
 libResults.forEach((t)=>{
 const idx=lib.indexOf(t);
-html+=`<div class="trk" onclick="playTrack(${idx})"><div class="tc">🎵</div><div class="ti"><div class="tt">${t.t}</div><div class="ta">${t.a}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
+html+=`<div class="trk" onclick="playTrack(${idx})"><div class="tc">🎵</div><div class="ti"><div class="tt">${esc(t.t)}</div><div class="ta">${esc(t.a)}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
 });
 }
 
@@ -711,14 +716,14 @@ const data=await response.json();
         if(data&&data.items&&data.items.length>0){
             html+='<div class="ib" style="margin-top:15px;background:linear-gradient(135deg,rgba(102,126,234,0.3),rgba(118,75,162,0.3));border-color:#667eea">🎬 <strong>YouTube/iTunes:</strong> найдено '+data.items.length+' результатов</div>';
             data.items.forEach(item=>{
-                const tn=(item.title||'Без названия').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-                const an=(item.channelTitle||'Неизвестно').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+                const tn=item.title||'Без названия';
+                const an=item.channelTitle||'Неизвестно';
                 const ar=item.thumbnail||'';
                 const isITunes=item.source==='itunes'||item.previewUrl;
                 const onclick=isITunes
-                    ? `playPreview('${item.previewUrl||''}','${tn}','${an}')`
-                    : `playYouTubeVideo('${item.videoId}','${tn}','${an}','${ar}')`;
-                html+=`<div class="trk" onclick="${onclick}" style="border-color:${isITunes?'var(--success)':'#667eea'}"><div class="tc">${ar?'<img src="'+ar+'">':(isITunes?'🍎':'🎬')}</div><div class="ti"><div class="tt">${tn}</div><div class="ta">${an}</div></div><div style="font-size:18px;color:${isITunes?'var(--success)':'#667eea'}">▶</div></div>`;
+                    ? `playPreview('${escJs(item.previewUrl||'')}','${escJs(tn)}','${escJs(an)}')`
+                    : `playYouTubeVideo('${escJs(item.videoId)}','${escJs(tn)}','${escJs(an)}','${escJs(ar)}')`;
+                html+=`<div class="trk" onclick="${onclick}" style="border-color:${isITunes?'var(--success)':'#667eea'}"><div class="tc">${ar?'<img src="'+esc(ar)+'">':(isITunes?'🍎':'🎬')}</div><div class="ti"><div class="tt">${esc(tn)}</div><div class="ta">${esc(an)}</div></div><div style="font-size:18px;color:${isITunes?'var(--success)':'#667eea'}">▶</div></div>`;
             });
 sn('🎵 YouTube: '+data.items.length+' полных версий');
 }else{
@@ -738,10 +743,10 @@ if(data&&data.results&&data.results.length>0){
 html+='<div class="ib" style="margin-top:15px">🍎 <strong>iTunes:</strong> найдено '+data.results.length+' превью</div>';
 data.results.forEach(t=>{
 const pu=t.previewUrl||'';
-const tn=(t.trackName||'Без названия').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-const an=(t.artistName||'Неизвестно').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const tn=t.trackName||'Без названия';
+const an=t.artistName||'Неизвестно';
 const ar=t.artworkUrl100?t.artworkUrl100.replace('100x100','300x300'):'';
-html+=`<div class="trk" onclick="playPreview('${pu}','${tn}','${an}')"><div class="tc">${ar?'<img src="'+ar+'">':'🎵'}</div><div class="ti"><div class="tt">${tn}</div><div class="ta">${an}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
+html+=`<div class="trk" onclick="playPreview('${escJs(pu)}','${escJs(tn)}','${escJs(an)}')"><div class="tc">${ar?'<img src="'+esc(ar)+'">':'🎵'}</div><div class="ti"><div class="tt">${esc(tn)}</div><div class="ta">${esc(an)}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
 });
 }
 }catch(e){}
@@ -763,14 +768,14 @@ const data=await response.json();
         if(data&&data.items&&data.items.length>0){
             let html='';
             data.items.forEach((item,i)=>{
-                const tn=(item.title||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-                const an=(item.channelTitle||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+                const tn=item.title||'';
+                const an=item.channelTitle||'';
                 const ar=item.thumbnail||'';
                 const isITunes=item.source==='itunes'||item.previewUrl;
                 const onclick=isITunes
-                    ? `playPreview('${item.previewUrl||''}','${tn}','${an}')`
-                    : `playYouTubeVideo('${item.videoId}','${tn}','${an}','${ar}')`;
-                html+=`<div class="trk" onclick="${onclick}"><div style="font-size:18px;font-weight:bold;color:var(--gold);min-width:30px">#${i+1}</div><div class="tc">${ar?'<img src="'+ar+'">':(isITunes?'🍎':'🎬')}</div><div class="ti"><div class="tt">${tn}</div><div class="ta">${an}</div></div><div style="font-size:18px;color:${isITunes?'var(--success)':'#667eea'}">▶</div></div>`;
+                    ? `playPreview('${escJs(item.previewUrl||'')}','${escJs(tn)}','${escJs(an)}')`
+                    : `playYouTubeVideo('${escJs(item.videoId)}','${escJs(tn)}','${escJs(an)}','${escJs(ar)}')`;
+                html+=`<div class="trk" onclick="${onclick}"><div style="font-size:18px;font-weight:bold;color:var(--gold);min-width:30px">#${i+1}</div><div class="tc">${ar?'<img src="'+esc(ar)+'">':(isITunes?'🍎':'🎬')}</div><div class="ti"><div class="tt">${esc(tn)}</div><div class="ta">${esc(an)}</div></div><div style="font-size:18px;color:${isITunes?'var(--success)':'#667eea'}">▶</div></div>`;
             });
 l.innerHTML=html;
 sn('📊 Чарты загружены!');
@@ -784,7 +789,7 @@ showFallbackCharts();
 function showFallbackCharts(){
 let html='<div class="ib">📊 <strong>Топ из библиотеки</strong></div>';
 lib.slice(0,12).forEach((t,i)=>{
-html+=`<div class="trk" onclick="playTrack(${i})"><div style="font-size:18px;font-weight:bold;color:var(--gold);min-width:30px">#${i+1}</div><div class="tc">🔥</div><div class="ti"><div class="tt">${t.t}</div><div class="ta">${t.a}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
+html+=`<div class="trk" onclick="playTrack(${i})"><div style="font-size:18px;font-weight:bold;color:var(--gold);min-width:30px">#${i+1}</div><div class="tc">🔥</div><div class="ti"><div class="tt">${esc(t.t)}</div><div class="ta">${esc(t.a)}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
 });
 document.getElementById('charts-list').innerHTML=html;
 sn('📊 Топ из библиотеки');
@@ -863,7 +868,7 @@ let html='';
 lib.forEach((t,i)=>{
 const playing=currentTrack&&currentTrack.id===t.id?'p':'';
 const icon=currentTrack&&currentTrack.id===t.id&&isPlaying?'⏸':'▶';
-html+=`<div class="trk ${playing}" onclick="playTrack(${i})"><div class="tc">🎵</div><div class="ti"><div class="tt">${t.t}</div><div class="ta">${t.a}</div></div><div style="font-size:18px;color:var(--a)">${icon}</div></div>`;
+html+=`<div class="trk ${playing}" onclick="playTrack(${i})"><div class="tc">🎵</div><div class="ti"><div class="tt">${esc(t.t)}</div><div class="ta">${esc(t.a)}</div></div><div style="font-size:18px;color:var(--a)">${icon}</div></div>`;
 });
 document.getElementById('library-list').innerHTML=html;
 }
@@ -908,7 +913,7 @@ const posts=[
 ];
 let html='';
 posts.forEach(p=>{
-html+=`<div class="post"><div class="post-header"><div class="post-avatar">${p.author[0]}</div><div><div class="post-author">${p.author}</div><div class="post-time">${p.time}</div></div></div><div class="post-content">${p.text}</div><div class="post-actions-main"><div class="post-action">👍 ${p.likes}</div><div class="post-action">💬 ${p.comments}</div><div class="post-action">🔗 Поделиться</div></div></div>`;
+html+=`<div class="post"><div class="post-header"><div class="post-avatar">${esc(p.author[0])}</div><div><div class="post-author">${esc(p.author)}</div><div class="post-time">${esc(p.time)}</div></div></div><div class="post-content">${esc(p.text)}</div><div class="post-actions-main"><div class="post-action">👍 ${p.likes}</div><div class="post-action">💬 ${p.comments}</div><div class="post-action">🔗 Поделиться</div></div></div>`;
 });
 document.getElementById('feed-posts').innerHTML=html;
 }
@@ -921,7 +926,7 @@ html+='<div class="ib">😕 В этом жанре пока нет треков<
 }else{
 filtered.forEach((t)=>{
 const idx=lib.indexOf(t);
-html+=`<div class="trk" onclick="playTrack(${idx})"><div class="tc">🎵</div><div class="ti"><div class="tt">${t.t}</div><div class="ta">${t.a}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
+html+=`<div class="trk" onclick="playTrack(${idx})"><div class="tc">🎵</div><div class="ti"><div class="tt">${esc(t.t)}</div><div class="ta">${esc(t.a)}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
 });
 }
 document.getElementById('planet-tracks').innerHTML=html;
@@ -1136,7 +1141,7 @@ let html='';
 if(tab==='stats'){html=`<div class="post"><h3>📊 Статистика</h3><p>🎧 Треков: ${pl}</p><p>⭐ XP: ${xp}</p><p>🪙 Монет: ${cn}</p></div>`;}
 else if(tab==='ach'){const achievements=[{id:'a1',i:'🎵',n:'Первый трек',d:'Прослушай 1 трек',u:pl>=1},{id:'a2',i:'🎧',n:'Меломан',d:'Прослушай 10 треков',u:pl>=10},{id:'a3',i:'⭐',n:'Уровень 5',d:'Достигни 5 уровня',u:Math.floor(xp/100)>=5},{id:'a4',i:'💯',n:'Сотка',d:'100 XP',u:xp>=100},{id:'a5',i:'🔥',n:'Огонь',d:'500 XP',u:xp>=500},{id:'a6',i:'💎',n:'Бриллиант',d:'1000 XP',u:xp>=1000}];achievements.forEach(a=>{html+=`<div class="ach ${a.u?'u':'l'}"><div style="font-size:28px">${a.i}</div><div style="flex:1"><div style="font-weight:bold;font-size:12px">${a.n}</div><div style="font-size:10px;opacity:0.7">${a.d}</div></div><div>${a.u?'✅':'🔒'}</div></div>`;});}
 else if(tab==='quests'){const quests=[{t:'🎧 Послушай 5 треков',d:'Включи музыку',tg:5,c:Math.min(pl,5),r:50},{t:'🎮 Сыграй в игру',d:'Любую игру',tg:1,c:1,r:100}];quests.forEach(q=>{const p=(q.c/q.tg)*100;html+=`<div class="quest"><div class="qt"><span>${q.t}</span><span style="color:var(--gold)">+${q.r} 🪙</span></div><div class="qd">${q.d}</div><div class="qp"><div class="qpf" style="width:${Math.min(100,p)}%"></div></div><div style="font-size:11px;opacity:0.7">${q.c}/${q.tg}${q.c>=q.tg?' ✅':''}</div></div>`;});}
-else if(tab==='rating'){const leaders=[{n:'Степа',s:2500},{n:'Дима',s:1800},{n:user?user.name:'Гость',s:xp},{n:'AI',s:999}];leaders.sort((a,b)=>b.s-a.s);leaders.forEach((l,i)=>{html+=`<div class="shop-item"><div style="font-size:20px;font-weight:bold;color:var(--gold);min-width:30px">#${i+1}</div><div class="shop-info"><div class="shop-name">${l.n}</div><div class="shop-desc">${l.s} XP</div></div></div>`;});}
+else if(tab==='rating'){const leaders=[{n:'Степа',s:2500},{n:'Дима',s:1800},{n:user?user.name:'Гость',s:xp},{n:'AI',s:999}];leaders.sort((a,b)=>b.s-a.s);leaders.forEach((l,i)=>{html+=`<div class="shop-item"><div style="font-size:20px;font-weight:bold;color:var(--gold);min-width:30px">#${i+1}</div><div class="shop-info"><div class="shop-name">${esc(l.n)}</div><div class="shop-desc">${l.s} XP</div></div></div>`;});}
 document.getElementById('profile-content').innerHTML=html;
 }
 
