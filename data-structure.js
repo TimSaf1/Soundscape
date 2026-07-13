@@ -81,7 +81,13 @@ const Database = {
 };
 
 // Инициализация при загрузке
-window.addEventListener('load', () => {
-    Database.init();
-    console.log("✅ SoundScape DB ready");
-});
+if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    window.addEventListener('load', () => {
+        Database.init();
+        console.log("✅ SoundScape DB ready");
+    });
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { Database, DB_SCHEMA };
+}
