@@ -356,12 +356,18 @@ app.use((err, req, res, next) => {
 
 // ========== START SERVER ==========
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    log.info(`🎵 SoundScape Pro Server запущен на http://localhost:${PORT}`);
-    log.info(`📝 Endpoints:`);
-    log.info(`   - GET /api/youtube/search?q=...&limit=10`);
-    log.info(`   - GET /api/youtube/info/:videoId`);
-    log.info(`   - GET /api/health`);
-});
+if (require.main === module) {
+    app.listen(PORT, () => {
+        log.info(`🎵 SoundScape Pro Server запущен на http://localhost:${PORT}`);
+        log.info(`📝 Endpoints:`);
+        log.info(`   - GET /api/youtube/search?q=...&limit=10`);
+        log.info(`   - GET /api/youtube/info/:videoId`);
+        log.info(`   - GET /api/health`);
+    });
+}
 
 module.exports = app;
+module.exports.searchITunes = searchITunes;
+module.exports.searchYouTubeOfficial = searchYouTubeOfficial;
+module.exports.searchInvidious = searchInvidious;
+module.exports.parseDuration = parseDuration;
