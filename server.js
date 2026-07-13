@@ -37,6 +37,20 @@ const INVIDIOUS_INSTANCES = [
     'https://invidious.privacydev.net',
     'https://invidious.lunar.icu'
 ];
+const NO_IMAGE = 'https://via.placeholder.com/320x180?text=No+Image';
+const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
+const ytThumb = (videoId) => `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+
+// Единый успешный ответ поиска для всех источников
+function sendResults(res, results, source, label) {
+    log.info(`Found ${results.length} results via ${label}`);
+    return res.json({
+        success: true,
+        items: results,
+        source,
+        totalResults: results.length
+    });
+}
 
 // ========== ЛОГИРОВАНИЕ ==========
 const log = {
@@ -73,7 +87,7 @@ async function searchITunes(query, limit) {
             videoId: item.trackId.toString(),
             title: item.trackName || item.collectionName || 'Unknown',
             channelTitle: item.artistName || 'Unknown Artist',
-            thumbnail: item.artworkUrl100 ? item.artworkUrl100.replace('100x100', '300x300') : 'https://via.placeholder.com/320x180?text=No+Image',
+            thumbnail: item.artworkUrl100 ? item.artworkUrl100.replace('100x100', '300x300') : NO_IMAGE,
             publishedAt: item.releaseDate || new Date().toISOString(),
             source: 'itunes',
             previewUrl: item.previewUrl
@@ -104,7 +118,7 @@ async function searchYouTubeOfficial(query, limit) {
             },
             timeout: 8000,
             headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                'User-Agent': BROWSER_UA
             }
         });
 
@@ -118,7 +132,7 @@ async function searchYouTubeOfficial(query, limit) {
             channelTitle: item.snippet.channelTitle || 'Unknown Artist',
             thumbnail: item.snippet.thumbnails.medium?.url || 
                        item.snippet.thumbnails.default?.url ||
-                       'https://via.placeholder.com/320x180?text=No+Image',
+                       NO_IMAGE,
             publishedAt: item.snippet.publishedAt,
             source: 'youtube_official'
         }));
@@ -141,7 +155,7 @@ async function searchInvidious(query, limit) {
                 },
             timeout: 2500,
             headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    'User-Agent': BROWSER_UA
                 }
             });
 
@@ -158,7 +172,7 @@ async function searchInvidious(query, limit) {
                 videoId: item.videoId,
                 title: item.title,
                 channelTitle: item.author || 'Unknown Artist',
-                thumbnail: `https://img.youtube.com/vi/${item.videoId}/mqdefault.jpg`,
+                thumbnail: ytThumb(item.videoId),
                 publishedAt: item.publishedDate ? new Date(item.publishedDate * 1000).toISOString() : new Date().toISOString(),
                 source: `invidious_${instance.replace('https://', '')}`
             }));
@@ -194,13 +208,7 @@ app.get('/api/youtube/search', async (req, res) => {
         if (YOUTUBE_API_KEY) {
             results = await searchYouTubeOfficial(query, limit);
             if (results) {
-                log.info(`Found ${results.length} results via YouTube Official API`);
-                return res.json({
-                    success: true,
-                    items: results,
-                    source: 'youtube_official',
-                    totalResults: results.length
-                });
+                return sendResults(res, results, 'youtube_official', 'YouTube Official API');
             }
         }
 
@@ -209,13 +217,7 @@ app.get('/api/youtube/search', async (req, res) => {
         results = await searchInvidious(query, limit);
 
         if (results) {
-            log.info(`Found ${results.length} results via Invidious API`);
-            return res.json({
-                success: true,
-                items: results,
-                source: 'invidious',
-                totalResults: results.length
-            });
+            return sendResults(res, results, 'invidious', 'Invidious API');
         }
 
         // Fallback на iTunes
@@ -223,13 +225,7 @@ app.get('/api/youtube/search', async (req, res) => {
         results = await searchITunes(query, limit);
 
         if (results) {
-            log.info(`Found ${results.length} results via iTunes API`);
-            return res.json({
-                success: true,
-                items: results,
-                source: 'itunes',
-                totalResults: results.length
-            });
+            return sendResults(res, results, 'itunes', 'iTunes API');
         }
 
         // Если ничего не найдено
@@ -307,7 +303,7 @@ app.get('/api/youtube/info/:videoId', async (req, res) => {
         res.json({
             success: true,
             videoId: videoId,
-            thumbnail: `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`,
+            thumbnail: ytThumb(videoId),
             source: 'youtube_web'
         });
 
