@@ -69,15 +69,19 @@ async function searchITunes(query, limit) {
             return null;
         }
 
-        return response.data.results.map(item => ({
-            videoId: item.trackId.toString(),
-            title: item.trackName || item.collectionName || 'Unknown',
-            channelTitle: item.artistName || 'Unknown Artist',
-            thumbnail: item.artworkUrl100 ? item.artworkUrl100.replace('100x100', '300x300') : 'https://via.placeholder.com/320x180?text=No+Image',
-            publishedAt: item.releaseDate || new Date().toISOString(),
-            source: 'itunes',
-            previewUrl: item.previewUrl
-        }));
+        const mapped = response.data.results
+            .filter(item => item && item.trackId != null)
+            .map(item => ({
+                videoId: item.trackId.toString(),
+                title: item.trackName || item.collectionName || 'Unknown',
+                channelTitle: item.artistName || 'Unknown Artist',
+                thumbnail: item.artworkUrl100 ? item.artworkUrl100.replace('100x100', '300x300') : 'https://via.placeholder.com/320x180?text=No+Image',
+                publishedAt: item.releaseDate || new Date().toISOString(),
+                source: 'itunes',
+                previewUrl: item.previewUrl
+            }));
+
+        return mapped.length > 0 ? mapped : null;
     } catch (error) {
         log.warn(`iTunes API failed: ${error.message}`);
         return null;
@@ -166,7 +170,8 @@ async function searchInvidious(query, limit) {
 
         return results.length > 0 ? results : null;
     } catch (error) {
-        log.warn(`All Invidious instances failed`);
+        const reason = error?.errors ? error.errors.map(e => e.message).join('; ') : error.message;
+        log.warn(`All Invidious instances failed: ${reason}`);
         return null;
     }
 }
@@ -299,7 +304,7 @@ app.get('/api/youtube/info/:videoId', async (req, res) => {
                     });
                 }
             } catch (error) {
-                log.warn(`YouTube info API failed for ${videoId}`);
+                log.warn(`YouTube info API failed for ${videoId}: ${error.message}`);
             }
         }
 
@@ -323,7 +328,13 @@ app.get('/api/youtube/info/:videoId', async (req, res) => {
 // ========== УТИЛИТЫ ==========
 function parseDuration(duration) {
     // Преобразует ISO 8601 duration в секунды
+    if (!duration || typeof duration !== 'string') {
+        return 0;
+    }
     const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+    if (!match) {
+        return 0;
+    }
     const hours = parseInt(match[1]) || 0;
     const minutes = parseInt(match[2]) || 0;
     const seconds = parseInt(match[3]) || 0;
