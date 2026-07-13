@@ -3,7 +3,6 @@ import {
   AUDIUS_HOST,
   APP_NAME,
   normalizeTrack,
-  buildStreamUrl,
   buildProxyUrl,
   type Track,
 } from '@/lib/audius'
@@ -88,8 +87,11 @@ async function searchITunes(query: string): Promise<Track[]> {
       genre: t.primaryGenreName ?? '',
       artwork: itunesArt(t.artworkUrl100, 300),
       artworkLarge: itunesArt(t.artworkUrl100, 1000),
+      // Preview URL kept as a fallback; primary playback is the full track via
+      // YouTube's official IFrame player (resolved lazily on play).
       streamUrl: buildProxyUrl(t.previewUrl as string),
-      full: false,
+      full: true,
+      source: 'youtube',
     }))
 }
 
@@ -126,45 +128,18 @@ export async function GET(request: Request) {
       const query = (searchParams.get('query') ?? '').trim()
       if (!query) return NextResponse.json({ tracks: [] })
 
-      // Run both catalogs in parallel.
+      // Run both catalogs in parallel. iTunes gives us the whole mainstream
+      // catalog + clean metadata/artwork; each result plays in full via the
+      // YouTube IFrame player. Audius is a fallback for underground queries.
       const [itunes, audius] = await Promise.all([
         searchITunes(query).catch(() => [] as Track[]),
         searchAudius(query).catch(() => [] as Track[]),
       ])
 
-      // Index Audius tracks by "artist – title". We only upgrade an iTunes
-      // result to a full stream when BOTH artist and title match, otherwise we
-      // would mislabel random covers/re-uploads as the real song.
-      const audiusByKey = new Map<string, Track>()
-      for (const a of audius) {
-        audiusByKey.set(`${norm(a.artist)}|${norm(a.title)}`, a)
-      }
-
-      const usedAudiusIds = new Set<string>()
-
-      // Upgrade each iTunes result to a full Audius stream when we find a match.
-      // iTunes is our reliable base (correct artist + always-playable preview);
-      // a full Audius version only replaces it on a strict artist+title match.
-      const merged: Track[] = itunes.map((t) => {
-        const key = `${norm(t.artist)}|${norm(t.title)}`
-        const match = audiusByKey.get(key)
-        if (match) {
-          usedAudiusIds.add(match.id)
-          return {
-            ...t,
-            duration: match.duration,
-            streamUrl: buildStreamUrl(match.id),
-            full: true,
-          }
-        }
-        return t
-      })
-
-      // If iTunes returned nothing (e.g. a pure-underground query), fall back to
-      // the Audius catalog so the search still yields playable results.
-      if (merged.length === 0) {
-        merged.push(...audius)
-      }
+      // iTunes is the trusted base (correct artist, plays full via YouTube).
+      // Only fall back to the Audius catalog when iTunes has nothing, so random
+      // covers/re-uploads never pollute a mainstream search.
+      const merged: Track[] = itunes.length > 0 ? [...itunes] : [...audius]
 
       // Rank: exact matches first, then full versions above previews.
       const q = norm(query)

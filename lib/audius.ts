@@ -1,3 +1,5 @@
+export type TrackSource = 'audius' | 'youtube' | 'preview'
+
 export type Track = {
   id: string
   title: string
@@ -8,8 +10,32 @@ export type Track = {
   artwork: string | null
   artworkLarge: string | null
   streamUrl: string
-  /** true = full track (Audius), false = 30s preview (iTunes/Deezer) */
+  /** true = full track, false = 30s preview */
   full: boolean
+  /** Which engine plays this track. */
+  source: TrackSource
+  /** Resolved lazily for YouTube tracks (see resolveYouTubeId). */
+  youtubeId?: string | null
+}
+
+/** Resolve a YouTube video id for a track by "artist title" query. Cached in
+ *  memory per session so re-playing the same track is instant. */
+const ytCache = new Map<string, string | null>()
+
+export async function resolveYouTubeId(track: Track): Promise<string | null> {
+  if (track.youtubeId) return track.youtubeId
+  const key = `${track.artist} ${track.title}`.toLowerCase()
+  if (ytCache.has(key)) return ytCache.get(key) ?? null
+  try {
+    const res = await fetch(`/api/youtube?q=${encodeURIComponent(`${track.artist} ${track.title}`)}`)
+    if (!res.ok) throw new Error(String(res.status))
+    const json = (await res.json()) as { videoId: string | null }
+    ytCache.set(key, json.videoId ?? null)
+    return json.videoId ?? null
+  } catch {
+    ytCache.set(key, null)
+    return null
+  }
 }
 
 export const AUDIUS_HOST = 'https://api.audius.co'
@@ -55,6 +81,7 @@ export function normalizeTrack(raw: AudiusRawTrack): Track {
     artworkLarge: raw.artwork?.['1000x1000'] ?? raw.artwork?.['480x480'] ?? null,
     streamUrl: buildStreamUrl(raw.id),
     full: true,
+    source: 'audius',
   }
 }
 
