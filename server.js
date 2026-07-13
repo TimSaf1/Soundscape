@@ -19,7 +19,7 @@ app.use(cors({
         if (!origin || allowed.some(a => (typeof a === 'string' ? a === origin : a.test(origin)))) {
             callback(null, true);
         } else {
-            callback(null, true);
+            callback(new Error('Not allowed by CORS'));
         }
     },
     methods: ['GET', 'POST', 'OPTIONS'],
@@ -47,7 +47,7 @@ const log = {
 
 log.info('SoundScape Pro Backend инициализирован');
 if (YOUTUBE_API_KEY) {
-    log.info(`YouTube API Key загружен: ${YOUTUBE_API_KEY.substring(0, 10)}...`);
+    log.info('YouTube API Key загружен');
 } else {
     log.warn('YouTube API Key НЕ найден. Используется Invidious API как fallback');
 }
