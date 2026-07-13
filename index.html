@@ -430,6 +430,20 @@ const API_BASE = window.location.hostname === 'localhost' || window.location.hos
     ? window.location.origin
     : 'https://soundscape-api-9fng.onrender.com';
 
+// Безопасное чтение JSON из localStorage: битые данные не должны рушить приложение
+function safeParse(key,fallback){
+try{
+const raw=localStorage.getItem(key);
+if(raw===null)return fallback;
+const parsed=JSON.parse(raw);
+return parsed===null?fallback:parsed;
+}catch(e){
+console.error(`localStorage: не удалось разобрать "${key}", используется значение по умолчанию`,e);
+try{localStorage.removeItem(key);}catch(_){}
+return fallback;
+}
+}
+
 const tracks=[
 {id:'1',t:'Ты не бойся ночи',a:'ENZRO',u:'https://cdn.jsdelivr.net/gh/melnikovvitalij02-hub/Soundscape2@main/ENZRO_-_Ty_ne_bojjsya_nochi_81423717.mp3',g:'electronic'},
 {id:'2',t:'А красивых женщин много',a:'Igor Malinin',u:'https://cdn.jsdelivr.net/gh/melnikovvitalij02-hub/Soundscape2@main/Igor_Malinin_-_A_krasivykh_zhenshhin_mnogo_81681758.mp3',g:'pop'},
@@ -447,11 +461,12 @@ const tracks=[
 
 const npcPhrases=["Привет!","Здарова!","Красивый город!","Музыка — это жизнь!","SoundScape лучший!","Как дела?","Все отлично!","Работаю!","Иду гулять!","Сегодня солнечно!","Сейчас утро!","SoundScape лучший!","Загружаю свои треки!","Коллекционирую винил!"];
 
-let lib=JSON.parse(localStorage.getItem('sl'))||[...tracks];
+let lib=safeParse('sl',null)||[...tracks];
+if(!Array.isArray(lib))lib=[...tracks];
 let xp=parseInt(localStorage.getItem('xp'))||0;
 let cn=parseInt(localStorage.getItem('cn'))||100;
 let pl=parseInt(localStorage.getItem('pl'))||0;
-let user=JSON.parse(localStorage.getItem('user'))||null;
+let user=safeParse('user',null);
 let currentTrack=null;
 let isPlaying=false;
 let audio=document.getElementById('audio');
@@ -707,6 +722,7 @@ html+=`<div class="trk" onclick="playTrack(${idx})"><div class="tc">🎵</div><d
 if(API_BASE){
 try{
 const response=await fetch(`${API_BASE}/api/youtube/search?q=${encodeURIComponent(q)}&limit=10`);
+if(!response.ok)throw new Error(`HTTP ${response.status}`);
 const data=await response.json();
         if(data&&data.items&&data.items.length>0){
             html+='<div class="ib" style="margin-top:15px;background:linear-gradient(135deg,rgba(102,126,234,0.3),rgba(118,75,162,0.3));border-color:#667eea">🎬 <strong>YouTube/iTunes:</strong> найдено '+data.items.length+' результатов</div>';
@@ -733,6 +749,7 @@ if(libResults.length===0)html+='<div class="ib">⚠️ Ошибка поиска
 if(libResults.length===0&&API_BASE){
 try{
 const response=await fetch(`${API_BASE}/api/search?term=${encodeURIComponent(q)}&limit=10&country=RU`);
+if(!response.ok)throw new Error(`HTTP ${response.status}`);
 const data=await response.json();
 if(data&&data.results&&data.results.length>0){
 html+='<div class="ib" style="margin-top:15px">🍎 <strong>iTunes:</strong> найдено '+data.results.length+' превью</div>';
@@ -744,7 +761,7 @@ const ar=t.artworkUrl100?t.artworkUrl100.replace('100x100','300x300'):'';
 html+=`<div class="trk" onclick="playPreview('${pu}','${tn}','${an}')"><div class="tc">${ar?'<img src="'+ar+'">':'🎵'}</div><div class="ti"><div class="tt">${tn}</div><div class="ta">${an}</div></div><div style="font-size:18px;color:var(--a)">▶</div></div>`;
 });
 }
-}catch(e){}
+}catch(e){console.error('iTunes search error:',e);}
 }
 
 if(html==='')html='<div class="ib">😕 Ничего не найдено<br><br>💡 Попробуйте другой запрос</div>';
@@ -759,6 +776,7 @@ l.innerHTML='<div style="text-align:center;padding:20px">🔄 Загрузка..
 if(API_BASE){
 try{
 const response=await fetch(`${API_BASE}/api/youtube/search?q=top+hits+2024&limit=25`);
+if(!response.ok)throw new Error(`HTTP ${response.status}`);
 const data=await response.json();
         if(data&&data.items&&data.items.length>0){
             let html='';
@@ -776,7 +794,7 @@ l.innerHTML=html;
 sn('📊 Чарты загружены!');
 return;
 }
-}catch(e){}
+}catch(e){console.error('Charts load error:',e);}
 }
 showFallbackCharts();
 }
