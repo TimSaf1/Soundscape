@@ -8,6 +8,8 @@ export type Track = {
   artwork: string | null
   artworkLarge: string | null
   streamUrl: string
+  /** true = full track (Audius), false = 30s preview (iTunes/Deezer) */
+  full: boolean
 }
 
 export const AUDIUS_HOST = 'https://api.audius.co'
@@ -17,6 +19,12 @@ export const APP_NAME = 'Orbita'
  *  single, reachable origin and forwards Range requests so <audio> can scrub. */
 export function buildStreamUrl(id: string): string {
   return `/api/stream?id=${encodeURIComponent(id)}`
+}
+
+/** Proxy an arbitrary audio URL (e.g. a 30s iTunes/Deezer preview) through our
+ *  own domain so it plays even on networks that block the origin host. */
+export function buildProxyUrl(src: string): string {
+  return `/api/stream?src=${encodeURIComponent(src)}`
 }
 
 export function formatTime(seconds: number): string {
@@ -46,6 +54,7 @@ export function normalizeTrack(raw: AudiusRawTrack): Track {
     artwork: raw.artwork?.['480x480'] ?? raw.artwork?.['150x150'] ?? null,
     artworkLarge: raw.artwork?.['1000x1000'] ?? raw.artwork?.['480x480'] ?? null,
     streamUrl: buildStreamUrl(raw.id),
+    full: true,
   }
 }
 

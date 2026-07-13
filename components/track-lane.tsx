@@ -72,7 +72,16 @@ function TrackCard({
         <p className="truncate text-xs text-muted-foreground">{track.artist}</p>
       </div>
       <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-        <span className="truncate">{track.genre || '—'}</span>
+        <span
+          className={cn(
+            'rounded-full px-1.5 py-0.5 font-medium',
+            track.full
+              ? 'bg-primary/15 text-primary'
+              : 'bg-secondary text-muted-foreground',
+          )}
+        >
+          {track.full ? 'Полная' : '30 сек'}
+        </span>
         <span className="tabular-nums">{formatTime(track.duration)}</span>
       </div>
     </button>

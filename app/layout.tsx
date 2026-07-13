@@ -38,7 +38,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ru" className={`${inter.variable} ${spaceGrotesk.variable} bg-background`}>
+    <html
+      lang="ru"
+      className={`${inter.variable} ${spaceGrotesk.variable} bg-background`}
+      suppressHydrationWarning
+    >
       <head>
         {/* Telegram Mini App SDK */}
         <Script src="https://telegram.org/js/telegram-web-app.js" strategy="beforeInteractive" />
