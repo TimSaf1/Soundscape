@@ -70,8 +70,18 @@ export function OrbitaApp() {
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-3xl flex-col gap-6 px-4 pb-32 pt-5">
-      {/* Search */}
-      <div className="relative">
+      {/* Search — a real <form> so iOS Safari's "Search"/"Go" key submits
+          reliably, plus an explicit button for tap. */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          runSearch(query)
+          // Blur to dismiss the iOS keyboard after submitting.
+          ;(document.activeElement as HTMLElement | null)?.blur()
+        }}
+        className="relative"
+        role="search"
+      >
         <Search
           className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
           size={18}
@@ -81,33 +91,36 @@ export function OrbitaApp() {
           onChange={(e) => setQuery(e.target.value)}
           onCompositionStart={() => (composingRef.current = true)}
           onCompositionEnd={() => (composingRef.current = false)}
-          onKeyDown={(e) => {
-            if (
-              e.key === 'Enter' &&
-              !composingRef.current &&
-              e.nativeEvent.isComposing !== true &&
-              e.keyCode !== 229
-            ) {
-              runSearch(query)
-            }
-          }}
+          type="search"
+          inputMode="search"
+          enterKeyHint="search"
+          autoCapitalize="off"
+          autoCorrect="off"
           placeholder="Поиск треков и исполнителей…"
-          className="h-12 w-full rounded-full border border-border bg-card/70 pl-11 pr-11 text-sm outline-none transition placeholder:text-muted-foreground focus:border-primary/60 focus:ring-2 focus:ring-primary/25"
+          className="h-12 w-full rounded-full border border-border bg-card/70 pl-11 pr-20 text-sm outline-none transition placeholder:text-muted-foreground focus:border-primary/60 focus:ring-2 focus:ring-primary/25"
           aria-label="Поиск треков"
         />
         {query && (
           <button
+            type="button"
             onClick={() => {
               setQuery('')
               loadGenre(DEFAULT_PLANET)
             }}
-            className="absolute right-3 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+            className="absolute right-14 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full text-muted-foreground transition hover:bg-secondary hover:text-foreground"
             aria-label="Очистить поиск"
           >
             <X size={16} />
           </button>
         )}
-      </div>
+        <button
+          type="submit"
+          className="absolute right-2 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-primary text-primary-foreground transition hover:opacity-90 active:scale-95"
+          aria-label="Найти"
+        >
+          <Search size={16} />
+        </button>
+      </form>
 
       {/* Cosmic genre map */}
       <CosmicMap activeGenre={activeGenre} onSelect={loadGenre} />

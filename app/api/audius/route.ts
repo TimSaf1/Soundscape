@@ -1,28 +1,10 @@
 import { NextResponse } from 'next/server'
-import {
-  AUDIUS_HOST,
-  APP_NAME,
-  normalizeTrack,
-  buildProxyUrl,
-  type Track,
-} from '@/lib/audius'
+import { AUDIUS_HOST, APP_NAME, normalizeTrack, type Track } from '@/lib/audius'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 /* ---------------------------------------------------------------- helpers */
-
-/** Normalize a string for fuzzy matching: lowercase, strip punctuation,
- *  collapse whitespace, drop common noise like "feat.", "(remix)" etc. */
-function norm(s: string): string {
-  return s
-    .toLowerCase()
-    .replace(/\(.*?\)|\[.*?\]/g, ' ') // remove bracketed extras
-    .replace(/feat\.?|ft\.?|prod\.?/g, ' ')
-    .replace(/[^\p{L}\p{N}\s]/gu, ' ') // drop punctuation (unicode-aware)
-    .replace(/\s+/g, ' ')
-    .trim()
-}
 
 type AudiusRaw = {
   id: string
@@ -33,22 +15,95 @@ type AudiusRaw = {
   artwork?: Record<string, string>
 }
 
-type ITunesRaw = {
-  trackId: number
-  trackName?: string
-  artistName?: string
-  collectionName?: string
-  primaryGenreName?: string
-  previewUrl?: string
-  trackTimeMillis?: number
-  releaseDate?: string
-  artworkUrl100?: string
+/** Parse a YouTube duration label ("3:46", "1:02:33") into seconds. */
+function parseDuration(text: string | undefined): number {
+  if (!text) return 0
+  const parts = text.split(':').map((n) => parseInt(n, 10))
+  if (parts.some(Number.isNaN)) return 0
+  return parts.reduce((acc, n) => acc * 60 + n, 0)
 }
 
-/** Turn an iTunes hi-res artwork URL into a larger variant. */
-function itunesArt(url: string | undefined, size: number): string | null {
-  if (!url) return null
-  return url.replace(/\/\d+x\d+bb\.(jpg|png)/, `/${size}x${size}bb.$1`)
+const UA =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36'
+
+type YtVideo = {
+  videoId?: string
+  title?: { runs?: { text?: string }[] }
+  ownerText?: { runs?: { text?: string }[] }
+  longBylineText?: { runs?: { text?: string }[] }
+  lengthText?: { simpleText?: string }
+}
+
+/** Primary search: scrape YouTube (video filter) for real, popular results.
+ *  YouTube covers virtually every artist/track worldwide — mainstream, RU rap,
+ *  underground, brand-new 2026 releases — already ranked by relevance. We only
+ *  read public metadata + a video id to embed the official IFrame player. */
+async function searchYouTube(query: string): Promise<Track[]> {
+  const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(
+    query,
+  )}&sp=EgIQAQ%253D%253D` // filter: type = video
+
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 6000)
+  const res = await fetch(url, {
+    headers: { 'User-Agent': UA, 'Accept-Language': 'en-US,en;q=0.9' },
+    cache: 'no-store',
+    signal: controller.signal,
+  }).finally(() => clearTimeout(timeout))
+  if (!res.ok) return []
+
+  const html = await res.text()
+  const m = html.match(/var ytInitialData = (\{.+?\});<\/script>/s)
+  if (!m) return []
+
+  let data: unknown
+  try {
+    data = JSON.parse(m[1])
+  } catch {
+    return []
+  }
+
+  const sections =
+    (data as any)?.contents?.twoColumnSearchResultsRenderer?.primaryContents
+      ?.sectionListRenderer?.contents ?? []
+
+  const out: Track[] = []
+  const seen = new Set<string>()
+
+  for (const sec of sections) {
+    const list = sec?.itemSectionRenderer?.contents ?? []
+    for (const it of list) {
+      const v: YtVideo | undefined = it?.videoRenderer
+      if (!v?.videoId || seen.has(v.videoId)) continue
+
+      const title = v.title?.runs?.[0]?.text ?? ''
+      const artist =
+        v.ownerText?.runs?.[0]?.text ?? v.longBylineText?.runs?.[0]?.text ?? 'YouTube'
+      const duration = parseDuration(v.lengthText?.simpleText)
+
+      // Keep music-length results only: drop live streams (no duration) and
+      // long-form noise like concerts, mixes, reactions and compilations.
+      if (duration < 30 || duration > 780) continue
+
+      seen.add(v.videoId)
+      out.push({
+        id: `yt-${v.videoId}`,
+        title,
+        artist: artist.replace(/\s*-\s*Topic$/i, ''), // clean "Artist - Topic"
+        artistHandle: '',
+        duration,
+        genre: '',
+        // hqdefault always exists (maxres often 404s), so use it for both.
+        artwork: `https://i.ytimg.com/vi/${v.videoId}/hqdefault.jpg`,
+        artworkLarge: `https://i.ytimg.com/vi/${v.videoId}/hqdefault.jpg`,
+        streamUrl: '',
+        full: true,
+        source: 'youtube',
+        youtubeId: v.videoId, // set up-front → playback is instant, no re-lookup
+      })
+    }
+  }
+  return out
 }
 
 async function searchAudius(query: string): Promise<Track[]> {
@@ -63,36 +118,6 @@ async function searchAudius(query: string): Promise<Track[]> {
   const json = (await res.json()) as { data?: AudiusRaw[] }
   const raw = Array.isArray(json.data) ? json.data : []
   return raw.map((t) => normalizeTrack(t as never)).filter((t) => t.duration > 0)
-}
-
-async function searchITunes(query: string): Promise<Track[]> {
-  const url = `https://itunes.apple.com/search?term=${encodeURIComponent(
-    query,
-  )}&media=music&entity=song&limit=40`
-  const res = await fetch(url, {
-    headers: { Accept: 'application/json' },
-    cache: 'no-store',
-  })
-  if (!res.ok) return []
-  const json = (await res.json()) as { results?: ITunesRaw[] }
-  const raw = Array.isArray(json.results) ? json.results : []
-  return raw
-    .filter((t) => t.previewUrl && t.trackName)
-    .map<Track>((t) => ({
-      id: `itunes-${t.trackId}`,
-      title: t.trackName ?? 'Unknown',
-      artist: t.artistName ?? 'Unknown artist',
-      artistHandle: '',
-      duration: t.trackTimeMillis ? Math.round(t.trackTimeMillis / 1000) : 30,
-      genre: t.primaryGenreName ?? '',
-      artwork: itunesArt(t.artworkUrl100, 300),
-      artworkLarge: itunesArt(t.artworkUrl100, 1000),
-      // Preview URL kept as a fallback; primary playback is the full track via
-      // YouTube's official IFrame player (resolved lazily on play).
-      streamUrl: buildProxyUrl(t.previewUrl as string),
-      full: true,
-      source: 'youtube',
-    }))
 }
 
 /* ------------------------------------------------------------------ route */
@@ -123,39 +148,23 @@ export async function GET(request: Request) {
       return NextResponse.json({ tracks })
     }
 
-    /* ---- SEARCH: hybrid iTunes (whole catalog) + Audius (full versions) ---- */
+    /* ---- SEARCH: YouTube-first (finds anything, ranked by popularity) ---- */
     if (type === 'search') {
       const query = (searchParams.get('query') ?? '').trim()
       if (!query) return NextResponse.json({ tracks: [] })
 
-      // Run both catalogs in parallel. iTunes gives us the whole mainstream
-      // catalog + clean metadata/artwork; each result plays in full via the
-      // YouTube IFrame player. Audius is a fallback for underground queries.
-      const [itunes, audius] = await Promise.all([
-        searchITunes(query).catch(() => [] as Track[]),
-        searchAudius(query).catch(() => [] as Track[]),
-      ])
+      // YouTube is the primary catalog: it has virtually every track (RU rap,
+      // underground, brand-new 2026 releases) and returns them ranked by
+      // popularity/relevance, so we PRESERVE its order instead of re-sorting.
+      let tracks = await searchYouTube(query).catch(() => [] as Track[])
 
-      // iTunes is the trusted base (correct artist, plays full via YouTube).
-      // Only fall back to the Audius catalog when iTunes has nothing, so random
-      // covers/re-uploads never pollute a mainstream search.
-      const merged: Track[] = itunes.length > 0 ? [...itunes] : [...audius]
-
-      // Rank: exact matches first, then full versions above previews.
-      const q = norm(query)
-      const score = (t: Track) => {
-        const title = norm(t.title)
-        const artist = norm(t.artist)
-        let s = 0
-        if (title === q || artist === q) s += 40
-        else if (title.startsWith(q) || artist.startsWith(q)) s += 25
-        else if (title.includes(q) || artist.includes(q)) s += 12
-        if (t.full) s += 5 // slight boost so playable-in-full ranks higher
-        return s
+      // Safety net: if YouTube scraping ever fails, fall back to Audius so the
+      // search still returns something playable rather than an empty screen.
+      if (tracks.length === 0) {
+        tracks = await searchAudius(query).catch(() => [] as Track[])
       }
-      merged.sort((a, b) => score(b) - score(a))
 
-      return NextResponse.json({ tracks: merged.slice(0, 40) })
+      return NextResponse.json({ tracks: tracks.slice(0, 40) })
     }
 
     return NextResponse.json({ error: 'Invalid type' }, { status: 400 })
