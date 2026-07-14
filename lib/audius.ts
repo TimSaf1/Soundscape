@@ -18,24 +18,48 @@ export type Track = {
   youtubeId?: string | null
 }
 
-/** Resolve a YouTube video id for a track by "artist title" query. Cached in
- *  memory per session so re-playing the same track is instant. */
+/** Resolve a YouTube video id for a track by "artist title" query. Results are
+ *  cached per session and in-flight requests are de-duped so prefetch + click
+ *  never fire the same lookup twice. */
 const ytCache = new Map<string, string | null>()
+const ytInFlight = new Map<string, Promise<string | null>>()
 
 export async function resolveYouTubeId(track: Track): Promise<string | null> {
   if (track.youtubeId) return track.youtubeId
   const key = `${track.artist} ${track.title}`.toLowerCase()
   if (ytCache.has(key)) return ytCache.get(key) ?? null
-  try {
-    const res = await fetch(`/api/youtube?q=${encodeURIComponent(`${track.artist} ${track.title}`)}`)
-    if (!res.ok) throw new Error(String(res.status))
-    const json = (await res.json()) as { videoId: string | null }
-    ytCache.set(key, json.videoId ?? null)
-    return json.videoId ?? null
-  } catch {
-    ytCache.set(key, null)
-    return null
-  }
+
+  const existing = ytInFlight.get(key)
+  if (existing) return existing
+
+  const promise = (async () => {
+    try {
+      const res = await fetch(
+        `/api/youtube?q=${encodeURIComponent(`${track.artist} ${track.title}`)}`,
+      )
+      if (!res.ok) throw new Error(String(res.status))
+      const json = (await res.json()) as { videoId: string | null }
+      ytCache.set(key, json.videoId ?? null)
+      return json.videoId ?? null
+    } catch {
+      ytCache.set(key, null)
+      return null
+    } finally {
+      ytInFlight.delete(key)
+    }
+  })()
+
+  ytInFlight.set(key, promise)
+  return promise
+}
+
+/** Fire-and-forget warmup so a track's video id is ready before the user taps
+ *  play. Safe to call repeatedly; caching/dedup make extra calls free. */
+export function prefetchYouTubeId(track: Track): void {
+  if (track.source !== 'youtube') return
+  const key = `${track.artist} ${track.title}`.toLowerCase()
+  if (ytCache.has(key) || ytInFlight.has(key)) return
+  void resolveYouTubeId(track)
 }
 
 export const AUDIUS_HOST = 'https://api.audius.co'

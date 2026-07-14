@@ -1,9 +1,10 @@
 'use client'
 
+import { useEffect } from 'react'
 import Image from 'next/image'
 import { Play, Pause, Music, Loader } from 'lucide-react'
 import type { Track } from '@/lib/audius'
-import { formatTime } from '@/lib/audius'
+import { formatTime, prefetchYouTubeId } from '@/lib/audius'
 import { usePlayer } from '@/components/player-context'
 import { cn } from '@/lib/utils'
 
@@ -20,6 +21,12 @@ function TrackCard({
   const isCurrent = current?.id === track.id
   const showPause = isCurrent && isPlaying
 
+  // Warm up the YouTube video id for the first few cards so tapping play is
+  // instant instead of waiting on a live lookup.
+  useEffect(() => {
+    if (index < 6) prefetchYouTubeId(track)
+  }, [track, index])
+
   const onClick = () => {
     if (isCurrent) toggle()
     else playQueue(tracks, index)
@@ -28,6 +35,8 @@ function TrackCard({
   return (
     <button
       onClick={onClick}
+      onMouseEnter={() => prefetchYouTubeId(track)}
+      onFocus={() => prefetchYouTubeId(track)}
       className={cn(
         'group flex w-40 shrink-0 flex-col gap-2 rounded-2xl border p-2.5 text-left transition',
         isCurrent

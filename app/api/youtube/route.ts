@@ -8,45 +8,60 @@ const UA =
 
 type YtResult = { videoId: string; title: string; durationSeconds: number }
 
+// In-memory cache (persists per warm serverless instance) so repeated lookups
+// for the same track are instant and we hit YouTube far less often.
+const cache = new Map<string, { videoId: string | null; ts: number }>()
+const CACHE_TTL = 1000 * 60 * 60 * 12 // 12h
+
 /** Resolve a search query to the best matching YouTube video by scraping the
  *  public results page. We only extract a video id so we can embed YouTube's
  *  official IFrame player — nothing is downloaded or re-hosted. */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
-  const q = (searchParams.get('q') ?? '').trim()
+  const q = (searchParams.get('q') ?? '').trim().toLowerCase()
   if (!q) return NextResponse.json({ error: 'Missing q' }, { status: 400 })
+
+  const cached = cache.get(q)
+  if (cached && Date.now() - cached.ts < CACHE_TTL) {
+    return NextResponse.json(
+      { videoId: cached.videoId, cached: true },
+      { headers: { 'Cache-Control': 'public, max-age=43200' } },
+    )
+  }
 
   try {
     const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(
       q,
     )}&sp=EgIQAQ%253D%253D` // filter: type = video
+    // Abort slow YouTube responses so the client never hangs on a spinner.
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 4500)
     const res = await fetch(url, {
       headers: {
         'User-Agent': UA,
         'Accept-Language': 'en-US,en;q=0.9',
       },
       cache: 'no-store',
-    })
+      signal: controller.signal,
+    }).finally(() => clearTimeout(timeout))
+
     if (!res.ok) {
       return NextResponse.json({ error: `YouTube ${res.status}` }, { status: 502 })
     }
     const html = await res.text()
-    const results = extractResults(html)
-    if (results.length === 0) {
-      return NextResponse.json({ videoId: null, results: [] })
-    }
-    const best = results[0]
-    return NextResponse.json({
-      videoId: best.videoId,
-      durationSeconds: best.durationSeconds,
-      title: best.title,
-      results: results.slice(0, 5),
-    })
-  } catch (e) {
+
+    // Fast path: the video-filtered results page lists the top match first, so
+    // a direct regex grab avoids parsing the entire (~1MB) ytInitialData blob.
+    const fast = html.match(/"videoId":"([\w-]{11})"/)
+    const videoId = fast?.[1] ?? extractResults(html)[0]?.videoId ?? null
+
+    cache.set(q, { videoId, ts: Date.now() })
     return NextResponse.json(
-      { error: (e as Error).message },
-      { status: 500 },
+      { videoId },
+      { headers: { 'Cache-Control': 'public, max-age=43200' } },
     )
+  } catch (e) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 500 })
   }
 }
 
