@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Search, X, Loader } from 'lucide-react'
 import { CosmicMap } from '@/components/cosmic-map'
 import { TrackLane } from '@/components/track-lane'
-import { searchTracks, trendingByGenre, type Track } from '@/lib/audius'
+import { searchTracks, trendingByGenre, chartTracks, type Track } from '@/lib/audius'
 import type { Planet } from '@/lib/genres'
 import { PLANETS } from '@/lib/genres'
 
@@ -14,12 +14,17 @@ type LaneState = {
   loading: boolean
 }
 
-const DEFAULT_PLANET = PLANETS.find((p) => p.genre === 'Electronic') ?? PLANETS[0]
+// Start on the Russian hits chart so it's the first thing users hear.
+const DEFAULT_PLANET = PLANETS.find((p) => p.chart) ?? PLANETS[0]
+
+function laneTitle(planet: Planet) {
+  return planet.chart ? `Чарт «${planet.label} 2026»` : `Планета «${planet.label}»`
+}
 
 export function OrbitaApp() {
   const [activeGenre, setActiveGenre] = useState<string | null>(DEFAULT_PLANET.genre)
   const [lane, setLane] = useState<LaneState>({
-    title: `Планета «${DEFAULT_PLANET.label}»`,
+    title: laneTitle(DEFAULT_PLANET),
     tracks: [],
     loading: true,
   })
@@ -29,17 +34,20 @@ export function OrbitaApp() {
 
   async function loadGenre(planet: Planet) {
     const reqId = ++reqIdRef.current
+    const title = laneTitle(planet)
     setActiveGenre(planet.genre)
     setQuery('')
-    setLane((l) => ({ ...l, title: `Планета «${planet.label}»`, loading: true }))
+    setLane((l) => ({ ...l, title, loading: true }))
     try {
-      const tracks = await trendingByGenre(planet.genre)
+      const tracks = planet.chart
+        ? await chartTracks(planet.chart)
+        : await trendingByGenre(planet.genre)
       if (reqId === reqIdRef.current) {
-        setLane({ title: `Планета «${planet.label}»`, tracks, loading: false })
+        setLane({ title, tracks, loading: false })
       }
     } catch {
       if (reqId === reqIdRef.current) {
-        setLane({ title: `Планета «${planet.label}»`, tracks: [], loading: false })
+        setLane({ title, tracks: [], loading: false })
       }
     }
   }

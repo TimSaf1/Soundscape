@@ -1,6 +1,9 @@
 export type Planet = {
-  /** exact Audius genre string used for the trending query */
+  /** exact Audius genre string used for the trending query, OR a unique id when
+   *  `chart` is set (a curated YouTube chart instead of an Audius genre). */
   genre: string
+  /** when set, this planet loads a curated YouTube chart, not an Audius genre */
+  chart?: string
   /** short display name */
   label: string
   /** two-stop surface gradient for the planet body */
@@ -19,14 +22,26 @@ export type Planet = {
 // not UI chrome, so each planet gets its own identity.
 export const PLANETS: Planet[] = [
   {
+    genre: 'ru-hits',
+    chart: 'ru-2026',
+    label: 'Хиты РФ',
+    from: '#ff5f6d',
+    to: '#a01029',
+    glow: '#ff5f6d',
+    size: 116,
+    x: 50,
+    y: 52,
+    hasRing: true,
+  },
+  {
     genre: 'Hip-Hop/Rap',
     label: 'Рэп',
     from: '#ff7a3c',
     to: '#c02f1d',
     glow: '#ff8a4c',
-    size: 108,
-    x: 20,
-    y: 58,
+    size: 96,
+    x: 18,
+    y: 62,
     hasRing: true,
   },
   {

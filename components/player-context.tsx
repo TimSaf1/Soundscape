@@ -22,8 +22,9 @@ type PlayerContextValue = {
   /** true when the YouTube video stage should be shown large (expanded view). */
   videoExpanded: boolean
   setVideoExpanded: (v: boolean) => void
-  /** Ask the browser to put the YouTube video into native fullscreen. */
-  enterVideoFullscreen: () => void
+  /** true when the video/cover fills the whole viewport (in-app fullscreen). */
+  videoFullscreen: boolean
+  setVideoFullscreen: (v: boolean) => void
   /** true when the current track has no playable source at all */
   unavailable: boolean
   currentTime: number
@@ -34,7 +35,11 @@ type PlayerContextValue = {
   next: () => void
   prev: () => void
   seek: (time: number) => void
+  /** Jump forward/backward by `delta` seconds (works for both engines). */
+  skipBy: (delta: number) => void
   setVolume: (v: number) => void
+  /** Stop playback and clear the current track (hides the player bar). */
+  closePlayer: () => void
 }
 
 const PlayerContext = createContext<PlayerContextValue | null>(null)
@@ -112,6 +117,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const [activeEngine, setActiveEngine] = useState<'audio' | 'youtube'>('audio')
   // Drives whether the video stage is shown large (in the expanded player).
   const [videoExpanded, setVideoExpanded] = useState(false)
+  // Drives the in-app fullscreen overlay (covers the whole viewport).
+  const [videoFullscreen, setVideoFullscreen] = useState(false)
 
   const current = currentIndex >= 0 ? (queue[currentIndex] ?? null) : null
 
@@ -405,12 +412,45 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     setVolumeState(v)
   }, [])
 
-  const enterVideoFullscreen = useCallback(() => {
-    const el = document.getElementById('orbita-yt-stage')
-    // Standard + iOS Safari webkit fallback.
-    const anyEl = el as (HTMLElement & { webkitRequestFullscreen?: () => void }) | null
-    if (anyEl?.requestFullscreen) anyEl.requestFullscreen().catch(() => {})
-    else anyEl?.webkitRequestFullscreen?.()
+  // Skip forward/back. Reads the live position from whichever engine is active
+  // so ±15s is accurate for both Audius audio and the YouTube player.
+  const skipBy = useCallback(
+    (delta: number) => {
+      let base = 0
+      if (engineRef.current === 'youtube' && ytRef.current) {
+        base = ytRef.current.getCurrentTime() ?? 0
+      } else if (audioRef.current) {
+        base = audioRef.current.currentTime
+      }
+      seekInternal(Math.max(0, base + delta))
+    },
+    [seekInternal],
+  )
+
+  // Fully stop and clear the current track so the player bar disappears.
+  const closePlayer = useCallback(() => {
+    playTokenRef.current++ // invalidate any in-flight resolves
+    try {
+      ytRef.current?.stopVideo()
+    } catch {}
+    const audio = audioRef.current
+    if (audio) {
+      audio.pause()
+      audio.removeAttribute('src')
+      audio.load()
+    }
+    if (watchdogRef.current !== null) {
+      window.clearTimeout(watchdogRef.current)
+      watchdogRef.current = null
+    }
+    engineRef.current = 'audio'
+    setIsPlaying(false)
+    setIsLoading(false)
+    setVideoFullscreen(false)
+    setVideoExpanded(false)
+    setActiveEngine('audio')
+    setQueue([])
+    setCurrentIndex(-1)
   }, [])
 
   const value = useMemo<PlayerContextValue>(
@@ -423,7 +463,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       activeEngine,
       videoExpanded,
       setVideoExpanded,
-      enterVideoFullscreen,
+      videoFullscreen,
+      setVideoFullscreen,
       unavailable,
       currentTime,
       duration,
@@ -433,7 +474,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       next,
       prev,
       seek,
+      skipBy,
       setVolume,
+      closePlayer,
     }),
     [
       queue,
@@ -444,7 +487,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       activeEngine,
       videoExpanded,
       setVideoExpanded,
-      enterVideoFullscreen,
+      videoFullscreen,
+      setVideoFullscreen,
       unavailable,
       currentTime,
       duration,
@@ -454,55 +498,62 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       next,
       prev,
       seek,
+      skipBy,
       setVolume,
+      closePlayer,
     ],
   )
 
-  return (
-    <PlayerContext.Provider value={value}>
-      {/*
-        The YouTube IFrame player must stay mounted and on-screen (a 0x0 or
-        off-screen player is blocked from playing). Three visual states:
-          - audio engine  → 1x1, effectively invisible
-          - youtube small → docked mini window above the player bar
-          - youtube large → big centered stage (expanded player / fullscreen)
-      */}
-      <div
-        id="orbita-yt-stage"
-        style={{
+  // The YouTube IFrame player must stay mounted and on-screen (a 0x0 or
+  // off-screen player is blocked from playing). Four visual states:
+  //   - audio engine → 1x1, effectively invisible
+  //   - mini         → docked window above the player bar
+  //   - expanded     → big centered stage (expanded player)
+  //   - fullscreen   → covers the whole viewport, in-app (no YouTube redirect)
+  const stageMode: 'hidden' | 'mini' | 'expanded' | 'full' =
+    activeEngine !== 'youtube'
+      ? 'hidden'
+      : videoFullscreen
+        ? 'full'
+        : videoExpanded
+          ? 'expanded'
+          : 'mini'
+
+  const ytStageStyle: React.CSSProperties =
+    stageMode === 'full'
+      ? {
           position: 'fixed',
-          left:
-            activeEngine !== 'youtube' ? 1 : videoExpanded ? '50%' : 8,
-          bottom: activeEngine !== 'youtube' ? 1 : videoExpanded ? 'auto' : 88,
-          top: activeEngine === 'youtube' && videoExpanded ? '84px' : 'auto',
-          transform:
-            activeEngine === 'youtube' && videoExpanded
-              ? 'translateX(-50%)'
-              : 'none',
+          inset: 0,
+          width: '100vw',
+          height: '100dvh',
+          opacity: 1,
+          zIndex: 70,
+          background: '#000',
+          borderRadius: 0,
+          pointerEvents: 'auto',
+        }
+      : {
+          position: 'fixed',
+          left: stageMode === 'hidden' ? 1 : stageMode === 'expanded' ? '50%' : 8,
+          bottom: stageMode === 'hidden' ? 1 : stageMode === 'expanded' ? 'auto' : 88,
+          top: stageMode === 'expanded' ? '84px' : 'auto',
+          transform: stageMode === 'expanded' ? 'translateX(-50%)' : 'none',
           width:
-            activeEngine !== 'youtube'
-              ? 1
-              : videoExpanded
-                ? 'min(92vw, 760px)'
-                : 200,
+            stageMode === 'hidden' ? 1 : stageMode === 'expanded' ? 'min(92vw, 760px)' : 200,
           height:
-            activeEngine !== 'youtube'
-              ? 1
-              : videoExpanded
-                ? 'min(42vh, 428px)'
-                : 112,
-          opacity: activeEngine === 'youtube' ? 1 : 0.01,
-          zIndex: activeEngine === 'youtube' ? (videoExpanded ? 60 : 45) : -1,
+            stageMode === 'hidden' ? 1 : stageMode === 'expanded' ? 'min(42vh, 428px)' : 112,
+          opacity: stageMode === 'hidden' ? 0.01 : 1,
+          zIndex: stageMode === 'hidden' ? -1 : stageMode === 'expanded' ? 60 : 45,
           overflow: 'hidden',
           borderRadius: 14,
-          boxShadow:
-            activeEngine === 'youtube'
-              ? '0 10px 40px -8px rgba(0,0,0,0.6)'
-              : 'none',
-          pointerEvents: activeEngine === 'youtube' ? 'auto' : 'none',
+          boxShadow: stageMode === 'hidden' ? 'none' : '0 10px 40px -8px rgba(0,0,0,0.6)',
+          pointerEvents: stageMode === 'hidden' ? 'none' : 'auto',
           transition: 'width 0.25s, height 0.25s, opacity 0.2s',
-        }}
-      >
+        }
+
+  return (
+    <PlayerContext.Provider value={value}>
+      <div id="orbita-yt-stage" style={ytStageStyle}>
         <div id="orbita-yt-target" className="h-full w-full" />
       </div>
       {children}
