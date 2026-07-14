@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from 'react'
-import { resolveYouTubeId, type Track } from '@/lib/audius'
+import { resolveYouTubeId, getCachedYouTubeId, type Track } from '@/lib/audius'
 
 type PlayerContextValue = {
   queue: Track[]
@@ -17,6 +17,8 @@ type PlayerContextValue = {
   currentIndex: number
   isPlaying: boolean
   isLoading: boolean
+  /** Which engine is currently active (youtube shows a video iframe). */
+  activeEngine: 'audio' | 'youtube'
   /** true when the current track has no playable source at all */
   unavailable: boolean
   currentTime: number
@@ -97,6 +99,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [volume, setVolumeState] = useState(1)
+  // Drives whether the YouTube iframe is shown in the UI.
+  const [activeEngine, setActiveEngine] = useState<'audio' | 'youtube'>('audio')
 
   const current = currentIndex >= 0 ? (queue[currentIndex] ?? null) : null
 
@@ -157,9 +161,17 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       const target = document.getElementById('orbita-yt-target')
       if (!target) return
       ytRef.current = new window.YT.Player('orbita-yt-target', {
-        height: '0',
-        width: '0',
-        playerVars: { autoplay: 1, controls: 0, disablekb: 1, playsinline: 1 },
+        height: '180',
+        width: '320',
+        playerVars: {
+          autoplay: 1,
+          controls: 1,
+          disablekb: 1,
+          playsinline: 1,
+          rel: 0,
+          modestbranding: 1,
+          origin: window.location.origin,
+        },
         events: {
           onReady: () => {
             ytReadyRef.current = true
@@ -169,6 +181,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
             if (pending && pending.token === playTokenRef.current) {
               pendingYtRef.current = null
               ytRef.current?.loadVideoById(pending.videoId)
+              ytRef.current?.playVideo()
             }
           },
           onStateChange: (e: { data: number }) => {
@@ -223,6 +236,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     const goPreview = () => {
       if (track.streamUrl && audio) {
         engineRef.current = 'audio'
+        setActiveEngine('audio')
         try {
           ytRef.current?.stopVideo()
         } catch {}
@@ -238,26 +252,49 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
     if (track.source === 'youtube') {
       engineRef.current = 'youtube'
+      setActiveEngine('youtube')
       audio?.pause()
+
+      // Helper that actually starts a resolved video on the YT player.
+      const startVideo = (videoId: string) => {
+        if (token !== playTokenRef.current) return
+        if (!ytRef.current || !ytReadyRef.current) {
+          pendingYtRef.current = { videoId, token }
+          return
+        }
+        ytRef.current.setVolume(Math.round(volumeRef.current * 100))
+        ytRef.current.loadVideoById(videoId)
+        ytRef.current.playVideo()
+      }
+
+      // Fast path: id already warmed by prefetch → start inside the click so
+      // the browser keeps the user gesture (required for autoplay on mobile).
+      const cached = getCachedYouTubeId(track)
+      if (cached) {
+        startVideo(cached)
+        return
+      }
+      if (cached === null) {
+        // Known "no match" → go straight to preview.
+        goPreview()
+        return
+      }
+
+      // Not warmed yet → resolve, then start.
       resolveYouTubeId(track).then((videoId) => {
-        if (token !== playTokenRef.current) return // superseded
+        if (token !== playTokenRef.current) return
         if (!videoId) {
           goPreview()
           return
         }
-        if (!ytRef.current || !ytReadyRef.current) {
-          // Player still initializing — queue it; onReady will flush.
-          pendingYtRef.current = { videoId, token }
-          return
-        }
-        ytRef.current.loadVideoById(videoId)
-        ytRef.current.setVolume(Math.round(volumeRef.current * 100))
+        startVideo(videoId)
       })
       return
     }
 
     // Audius / preview → HTML5 audio.
     engineRef.current = 'audio'
+    setActiveEngine('audio')
     try {
       ytRef.current?.stopVideo()
     } catch {}
@@ -342,6 +379,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       currentIndex,
       isPlaying,
       isLoading,
+      activeEngine,
       unavailable,
       currentTime,
       duration,
@@ -359,6 +397,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       currentIndex,
       isPlaying,
       isLoading,
+      activeEngine,
       unavailable,
       currentTime,
       duration,
@@ -374,8 +413,28 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <PlayerContext.Provider value={value}>
-      {/* Hidden YouTube player target (audio-only usage). */}
-      <div className="pointer-events-none fixed -left-[9999px] top-0 h-0 w-0 overflow-hidden" aria-hidden>
+      {/*
+        The YouTube IFrame player must stay mounted and on-screen (a 0x0 or
+        off-screen player is blocked from playing). We keep it 1x1 and nearly
+        invisible while audio plays, and let YouTubeStage (in the player bar)
+        portal it into view for video tracks.
+      */}
+      <div
+        aria-hidden
+        style={{
+          position: 'fixed',
+          left: activeEngine === 'youtube' ? 8 : 1,
+          bottom: activeEngine === 'youtube' ? 88 : 1,
+          width: activeEngine === 'youtube' ? 320 : 1,
+          height: activeEngine === 'youtube' ? 180 : 1,
+          opacity: activeEngine === 'youtube' ? 1 : 0.01,
+          zIndex: activeEngine === 'youtube' ? 45 : -1,
+          overflow: 'hidden',
+          borderRadius: 12,
+          pointerEvents: activeEngine === 'youtube' ? 'auto' : 'none',
+          transition: 'opacity 0.2s',
+        }}
+      >
         <div id="orbita-yt-target" />
       </div>
       {children}

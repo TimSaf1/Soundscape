@@ -62,6 +62,15 @@ export function prefetchYouTubeId(track: Track): void {
   void resolveYouTubeId(track)
 }
 
+/** Synchronous cache read. Returns the id if warmed, `null` if we know there's
+ *  no match, or `undefined` if not looked up yet. Used to start playback inside
+ *  the click handler (no await) so browsers keep the autoplay gesture. */
+export function getCachedYouTubeId(track: Track): string | null | undefined {
+  if (track.youtubeId) return track.youtubeId
+  const key = `${track.artist} ${track.title}`.toLowerCase()
+  return ytCache.get(key)
+}
+
 export const AUDIUS_HOST = 'https://api.audius.co'
 export const APP_NAME = 'Orbita'
 
