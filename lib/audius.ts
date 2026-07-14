@@ -133,3 +133,8 @@ export function searchTracks(query: string): Promise<Track[]> {
 export function trendingByGenre(genre: string): Promise<Track[]> {
   return fetchFromApi({ type: 'trending', genre })
 }
+
+/** Curated YouTube chart (e.g. Russian hits 2026) for a chart planet. */
+export function chartTracks(chart: string): Promise<Track[]> {
+  return fetchFromApi({ type: 'chart', chart })
+}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import {
   Play,
@@ -13,6 +13,12 @@ import {
   ChevronUp,
   Loader,
   Music,
+  Maximize2,
+  Minimize2,
+  Video,
+  RotateCcw,
+  RotateCw,
+  X,
 } from 'lucide-react'
 import { usePlayer } from '@/components/player-context'
 import { formatTime } from '@/lib/audius'
@@ -88,6 +94,28 @@ function Cover({
   )
 }
 
+/** A circular "replay/forward N seconds" button with the number in the middle. */
+function SkipSecondsButton({
+  dir,
+  seconds = 15,
+}: {
+  dir: 'back' | 'fwd'
+  seconds?: number
+}) {
+  const { skipBy } = usePlayer()
+  const Icon = dir === 'back' ? RotateCcw : RotateCw
+  return (
+    <button
+      onClick={() => skipBy(dir === 'back' ? -seconds : seconds)}
+      className="relative grid h-11 w-11 place-items-center rounded-full text-foreground/80 transition hover:bg-secondary hover:text-foreground"
+      aria-label={dir === 'back' ? `Назад ${seconds} секунд` : `Вперёд ${seconds} секунд`}
+    >
+      <Icon size={30} />
+      <span className="absolute text-[9px] font-bold tabular-nums">{seconds}</span>
+    </button>
+  )
+}
+
 function Controls({ big }: { big?: boolean }) {
   const { isPlaying, isLoading, toggle, next, prev } = usePlayer()
   const iconSize = big ? 26 : 20
@@ -100,6 +128,7 @@ function Controls({ big }: { big?: boolean }) {
       >
         <SkipBack size={iconSize} />
       </button>
+      {big && <SkipSecondsButton dir="back" />}
       <button
         onClick={toggle}
         className={cn(
@@ -116,6 +145,7 @@ function Controls({ big }: { big?: boolean }) {
           <Play className="translate-x-0.5" size={big ? 30 : 24} />
         )}
       </button>
+      {big && <SkipSecondsButton dir="fwd" />}
       <button
         onClick={next}
         className="grid h-9 w-9 place-items-center rounded-full text-foreground/80 transition hover:bg-secondary hover:text-foreground"
@@ -160,13 +190,57 @@ function VolumeControl() {
 }
 
 export function PlayerBar() {
-  const { current, isPlaying } = usePlayer()
+  const {
+    current,
+    isPlaying,
+    activeEngine,
+    setVideoExpanded,
+    videoFullscreen,
+    setVideoFullscreen,
+    closePlayer,
+  } = usePlayer()
   const [expanded, setExpanded] = useState(false)
+  const isVideo = activeEngine === 'youtube'
+
+  // Show the large video stage only while the player is expanded on a video
+  // track; collapse it back to the mini window otherwise.
+  useEffect(() => {
+    setVideoExpanded(expanded && isVideo)
+  }, [expanded, isVideo, setVideoExpanded])
 
   if (!current) return null
 
   return (
     <>
+      {/* In-app fullscreen overlay controls (video fills the viewport behind
+          this layer via the fixed #orbita-yt-stage). Everything stays inside
+          the app — we never hand off to the YouTube site. */}
+      {videoFullscreen && (
+        <div className="fixed inset-0 z-[80] flex flex-col justify-between p-4 pointer-events-none">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => setVideoFullscreen(false)}
+              className="pointer-events-auto grid h-11 w-11 place-items-center rounded-full bg-black/55 text-white backdrop-blur transition hover:bg-black/70"
+              aria-label="Выйти из полноэкранного режима"
+            >
+              <Minimize2 size={22} />
+            </button>
+            <button
+              onClick={closePlayer}
+              className="pointer-events-auto grid h-11 w-11 place-items-center rounded-full bg-black/55 text-white backdrop-blur transition hover:bg-black/70"
+              aria-label="Закрыть трек"
+            >
+              <X size={22} />
+            </button>
+          </div>
+          <div className="pointer-events-auto mx-auto flex items-center gap-4 rounded-full bg-black/55 px-4 py-2 backdrop-blur">
+            <div className="text-white [&_button]:text-white/90 [&_button:hover]:text-white">
+              <Controls big />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Full-screen expanded player */}
       {expanded && (
         <div className="fixed inset-0 z-50 flex flex-col bg-background/95 backdrop-blur-xl">
@@ -181,25 +255,57 @@ export function PlayerBar() {
             <span className="font-display text-sm uppercase tracking-widest text-muted-foreground">
               Сейчас играет
             </span>
-            <div className="w-10" />
+            <button
+              onClick={() => {
+                closePlayer()
+                setExpanded(false)
+              }}
+              className="grid h-10 w-10 place-items-center rounded-full text-foreground/80 transition hover:bg-secondary"
+              aria-label="Закрыть трек"
+            >
+              <X size={22} />
+            </button>
           </div>
 
-          <div className="flex flex-1 flex-col items-center justify-center gap-8 px-6">
-            <div className="relative">
-              <div
-                className="absolute -inset-6 rounded-full opacity-40 blur-3xl"
-                style={{ background: 'var(--color-primary)' }}
-                aria-hidden
-              />
-              <div className="relative">
-                <Cover
-                  src={current.artworkLarge}
-                  alt={`Обложка: ${current.title}`}
-                  size={280}
-                  spinning={isPlaying}
+          <div
+            className={cn(
+              'flex flex-1 flex-col items-center gap-6 px-6',
+              isVideo ? 'justify-end pb-10' : 'justify-center gap-8',
+            )}
+          >
+            {isVideo ? (
+              <>
+                {/* Space reserved for the fixed video stage rendered above. */}
+                <div
+                  style={{ height: 'min(42vh, 428px)' }}
+                  className="w-full"
+                  aria-hidden
                 />
+                <button
+                  onClick={() => setVideoFullscreen(true)}
+                  className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-4 py-2 text-sm font-medium text-foreground transition hover:bg-secondary"
+                >
+                  <Maximize2 size={16} />
+                  На весь экран
+                </button>
+              </>
+            ) : (
+              <div className="relative">
+                <div
+                  className="absolute -inset-6 rounded-full opacity-40 blur-3xl"
+                  style={{ background: 'var(--color-primary)' }}
+                  aria-hidden
+                />
+                <div className="relative">
+                  <Cover
+                    src={current.artworkLarge}
+                    alt={`Обложка: ${current.title}`}
+                    size={280}
+                    spinning={isPlaying}
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="w-full max-w-md text-center">
               <h2 className="text-balance font-display text-2xl font-semibold leading-tight">
@@ -229,10 +335,22 @@ export function PlayerBar() {
             onClick={() => setExpanded(true)}
             aria-label="Открыть плеер"
           >
-            <Cover src={current.artwork} alt="" size={48} spinning={isPlaying} />
+            <div className="relative shrink-0">
+              <Cover src={current.artwork} alt="" size={48} spinning={isPlaying && !isVideo} />
+              {isVideo && (
+                <span
+                  className="absolute -bottom-1 -right-1 grid h-5 w-5 place-items-center rounded-full bg-primary text-primary-foreground"
+                  aria-hidden
+                >
+                  <Video size={12} />
+                </span>
+              )}
+            </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium">{current.title}</p>
-              <p className="truncate text-xs text-muted-foreground">{current.artist}</p>
+              <p className="truncate text-xs text-muted-foreground">
+                {isVideo ? 'Видео · нажми, чтобы развернуть' : current.artist}
+              </p>
             </div>
           </button>
 
@@ -248,6 +366,14 @@ export function PlayerBar() {
             aria-label="Развернуть плеер"
           >
             <ChevronUp size={20} />
+          </button>
+
+          <button
+            onClick={closePlayer}
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+            aria-label="Закрыть трек"
+          >
+            <X size={18} />
           </button>
         </div>
       </div>

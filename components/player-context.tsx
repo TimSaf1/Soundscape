@@ -19,6 +19,12 @@ type PlayerContextValue = {
   isLoading: boolean
   /** Which engine is currently active (youtube shows a video iframe). */
   activeEngine: 'audio' | 'youtube'
+  /** true when the YouTube video stage should be shown large (expanded view). */
+  videoExpanded: boolean
+  setVideoExpanded: (v: boolean) => void
+  /** true when the video/cover fills the whole viewport (in-app fullscreen). */
+  videoFullscreen: boolean
+  setVideoFullscreen: (v: boolean) => void
   /** true when the current track has no playable source at all */
   unavailable: boolean
   currentTime: number
@@ -29,7 +35,11 @@ type PlayerContextValue = {
   next: () => void
   prev: () => void
   seek: (time: number) => void
+  /** Jump forward/backward by `delta` seconds (works for both engines). */
+  skipBy: (delta: number) => void
   setVolume: (v: number) => void
+  /** Stop playback and clear the current track (hides the player bar). */
+  closePlayer: () => void
 }
 
 const PlayerContext = createContext<PlayerContextValue | null>(null)
@@ -90,6 +100,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const engineRef = useRef<'audio' | 'youtube'>('audio')
   // Token to ignore stale async resolves when the user skips quickly.
   const playTokenRef = useRef(0)
+  // Watchdog timer: fires if an Audius stream stalls (0:00 forever).
+  const watchdogRef = useRef<number | null>(null)
+  // Called on <audio> error/stall to fall back to YouTube for the same track.
+  const audioErrorRef = useRef<() => void>(() => {})
 
   const [queue, setQueue] = useState<Track[]>([])
   const [currentIndex, setCurrentIndex] = useState(-1)
@@ -101,6 +115,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const [volume, setVolumeState] = useState(1)
   // Drives whether the YouTube iframe is shown in the UI.
   const [activeEngine, setActiveEngine] = useState<'audio' | 'youtube'>('audio')
+  // Drives whether the video stage is shown large (in the expanded player).
+  const [videoExpanded, setVideoExpanded] = useState(false)
+  // Drives the in-app fullscreen overlay (covers the whole viewport).
+  const [videoFullscreen, setVideoFullscreen] = useState(false)
 
   const current = currentIndex >= 0 ? (queue[currentIndex] ?? null) : null
 
@@ -128,6 +146,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     const onPlaying = () => engineRef.current === 'audio' && setIsLoading(false)
     const onCanPlay = () => engineRef.current === 'audio' && setIsLoading(false)
     const onEnded = () => engineRef.current === 'audio' && nextRef.current()
+    // Network/decode error on the Audius stream → let YouTube take over.
+    const onError = () => {
+      if (engineRef.current === 'audio') audioErrorRef.current()
+    }
 
     audio.addEventListener('timeupdate', onTime)
     audio.addEventListener('loadedmetadata', onDuration)
@@ -138,6 +160,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     audio.addEventListener('playing', onPlaying)
     audio.addEventListener('canplay', onCanPlay)
     audio.addEventListener('ended', onEnded)
+    audio.addEventListener('error', onError)
 
     return () => {
       audio.pause()
@@ -150,6 +173,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       audio.removeEventListener('playing', onPlaying)
       audio.removeEventListener('canplay', onCanPlay)
       audio.removeEventListener('ended', onEnded)
+      audio.removeEventListener('error', onError)
     }
   }, [])
 
@@ -161,14 +185,15 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       const target = document.getElementById('orbita-yt-target')
       if (!target) return
       ytRef.current = new window.YT.Player('orbita-yt-target', {
-        height: '180',
-        width: '320',
+        height: '100%',
+        width: '100%',
         playerVars: {
           autoplay: 1,
           controls: 1,
           disablekb: 1,
           playsinline: 1,
           rel: 0,
+          fs: 1, // allow the native fullscreen button
           modestbranding: 1,
           origin: window.location.origin,
         },
@@ -232,30 +257,19 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     setUnavailable(false)
     setIsLoading(true)
 
-    // Reusable fallback to the 30s preview (used on resolve failure / YT error).
-    const goPreview = () => {
-      if (track.streamUrl && audio) {
-        engineRef.current = 'audio'
-        setActiveEngine('audio')
-        try {
-          ytRef.current?.stopVideo()
-        } catch {}
-        audio.src = track.streamUrl
-        audio.volume = volumeRef.current
-        audio.play().catch(() => setIsLoading(false))
-      } else {
-        setIsLoading(false)
-        setUnavailable(true)
-      }
+    // Clear any pending stall watchdog from a previous track.
+    if (watchdogRef.current !== null) {
+      window.clearTimeout(watchdogRef.current)
+      watchdogRef.current = null
     }
-    fallbackToPreviewRef.current = goPreview
 
-    if (track.source === 'youtube') {
+    // Play `track` in full via the YouTube IFrame player. `onFail` runs when
+    // there is no embeddable match (e.g. resolve returns null).
+    const playViaYouTube = (onFail: () => void) => {
       engineRef.current = 'youtube'
       setActiveEngine('youtube')
       audio?.pause()
 
-      // Helper that actually starts a resolved video on the YT player.
       const startVideo = (videoId: string) => {
         if (token !== playTokenRef.current) return
         if (!ytRef.current || !ytReadyRef.current) {
@@ -270,41 +284,67 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       // Fast path: id already warmed by prefetch → start inside the click so
       // the browser keeps the user gesture (required for autoplay on mobile).
       const cached = getCachedYouTubeId(track)
-      if (cached) {
-        startVideo(cached)
-        return
-      }
-      if (cached === null) {
-        // Known "no match" → go straight to preview.
-        goPreview()
-        return
-      }
+      if (cached) return startVideo(cached)
+      if (cached === null) return onFail()
 
-      // Not warmed yet → resolve, then start.
       resolveYouTubeId(track).then((videoId) => {
         if (token !== playTokenRef.current) return
-        if (!videoId) {
-          goPreview()
-          return
-        }
+        if (!videoId) return onFail()
         startVideo(videoId)
       })
+    }
+
+    // When all sources fail, either play the 30s preview or mark unavailable.
+    const giveUp = () => {
+      setIsLoading(false)
+      setUnavailable(true)
+    }
+    fallbackToPreviewRef.current = () => playViaYouTube(giveUp)
+
+    // Search results (YouTube-native) → straight to the IFrame player.
+    if (track.source === 'youtube') {
+      playViaYouTube(giveUp)
       return
     }
 
-    // Audius / preview → HTML5 audio.
+    // Audius planet track → HTML5 audio, with a YouTube safety net. If the
+    // stream stalls (0:00 for 5s) or errors, we transparently switch to the
+    // full track on YouTube so playback never silently hangs.
     engineRef.current = 'audio'
     setActiveEngine('audio')
     try {
       ytRef.current?.stopVideo()
     } catch {}
     if (!audio) return
+
+    const fallbackToYouTube = () => {
+      if (token !== playTokenRef.current) return
+      if (watchdogRef.current !== null) {
+        window.clearTimeout(watchdogRef.current)
+        watchdogRef.current = null
+      }
+      setIsLoading(true)
+      playViaYouTube(giveUp)
+    }
+    audioErrorRef.current = fallbackToYouTube
+
     audio.src = track.streamUrl
     audio.volume = volumeRef.current
     audio.play().catch((e) => {
       console.log('[v0] audio play() rejected:', (e as Error).message)
-      setIsLoading(false)
+      fallbackToYouTube()
     })
+
+    // Stall watchdog: if the stream produced no audio after 5s, use YouTube.
+    watchdogRef.current = window.setTimeout(() => {
+      if (token !== playTokenRef.current || engineRef.current !== 'audio') return
+      const stalled =
+        audio.currentTime === 0 && (!audio.duration || Number.isNaN(audio.duration))
+      if (stalled) {
+        console.log('[v0] Audius stream stalled → YouTube fallback')
+        fallbackToYouTube()
+      }
+    }, 5000)
   }, [])
 
   const playQueue = useCallback(
@@ -372,6 +412,47 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     setVolumeState(v)
   }, [])
 
+  // Skip forward/back. Reads the live position from whichever engine is active
+  // so ±15s is accurate for both Audius audio and the YouTube player.
+  const skipBy = useCallback(
+    (delta: number) => {
+      let base = 0
+      if (engineRef.current === 'youtube' && ytRef.current) {
+        base = ytRef.current.getCurrentTime() ?? 0
+      } else if (audioRef.current) {
+        base = audioRef.current.currentTime
+      }
+      seekInternal(Math.max(0, base + delta))
+    },
+    [seekInternal],
+  )
+
+  // Fully stop and clear the current track so the player bar disappears.
+  const closePlayer = useCallback(() => {
+    playTokenRef.current++ // invalidate any in-flight resolves
+    try {
+      ytRef.current?.stopVideo()
+    } catch {}
+    const audio = audioRef.current
+    if (audio) {
+      audio.pause()
+      audio.removeAttribute('src')
+      audio.load()
+    }
+    if (watchdogRef.current !== null) {
+      window.clearTimeout(watchdogRef.current)
+      watchdogRef.current = null
+    }
+    engineRef.current = 'audio'
+    setIsPlaying(false)
+    setIsLoading(false)
+    setVideoFullscreen(false)
+    setVideoExpanded(false)
+    setActiveEngine('audio')
+    setQueue([])
+    setCurrentIndex(-1)
+  }, [])
+
   const value = useMemo<PlayerContextValue>(
     () => ({
       queue,
@@ -380,6 +461,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       isPlaying,
       isLoading,
       activeEngine,
+      videoExpanded,
+      setVideoExpanded,
+      videoFullscreen,
+      setVideoFullscreen,
       unavailable,
       currentTime,
       duration,
@@ -389,7 +474,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       next,
       prev,
       seek,
+      skipBy,
       setVolume,
+      closePlayer,
     }),
     [
       queue,
@@ -398,6 +485,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       isPlaying,
       isLoading,
       activeEngine,
+      videoExpanded,
+      setVideoExpanded,
+      videoFullscreen,
+      setVideoFullscreen,
       unavailable,
       currentTime,
       duration,
@@ -407,35 +498,63 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       next,
       prev,
       seek,
+      skipBy,
       setVolume,
+      closePlayer,
     ],
   )
 
+  // The YouTube IFrame player must stay mounted and on-screen (a 0x0 or
+  // off-screen player is blocked from playing). Four visual states:
+  //   - audio engine → 1x1, effectively invisible
+  //   - mini         → docked window above the player bar
+  //   - expanded     → big centered stage (expanded player)
+  //   - fullscreen   → covers the whole viewport, in-app (no YouTube redirect)
+  const stageMode: 'hidden' | 'mini' | 'expanded' | 'full' =
+    activeEngine !== 'youtube'
+      ? 'hidden'
+      : videoFullscreen
+        ? 'full'
+        : videoExpanded
+          ? 'expanded'
+          : 'mini'
+
+  const ytStageStyle: React.CSSProperties =
+    stageMode === 'full'
+      ? {
+          position: 'fixed',
+          inset: 0,
+          width: '100vw',
+          height: '100dvh',
+          opacity: 1,
+          zIndex: 70,
+          background: '#000',
+          borderRadius: 0,
+          pointerEvents: 'auto',
+        }
+      : {
+          position: 'fixed',
+          left: stageMode === 'hidden' ? 1 : stageMode === 'expanded' ? '50%' : 8,
+          bottom: stageMode === 'hidden' ? 1 : stageMode === 'expanded' ? 'auto' : 88,
+          top: stageMode === 'expanded' ? '84px' : 'auto',
+          transform: stageMode === 'expanded' ? 'translateX(-50%)' : 'none',
+          width:
+            stageMode === 'hidden' ? 1 : stageMode === 'expanded' ? 'min(92vw, 760px)' : 200,
+          height:
+            stageMode === 'hidden' ? 1 : stageMode === 'expanded' ? 'min(42vh, 428px)' : 112,
+          opacity: stageMode === 'hidden' ? 0.01 : 1,
+          zIndex: stageMode === 'hidden' ? -1 : stageMode === 'expanded' ? 60 : 45,
+          overflow: 'hidden',
+          borderRadius: 14,
+          boxShadow: stageMode === 'hidden' ? 'none' : '0 10px 40px -8px rgba(0,0,0,0.6)',
+          pointerEvents: stageMode === 'hidden' ? 'none' : 'auto',
+          transition: 'width 0.25s, height 0.25s, opacity 0.2s',
+        }
+
   return (
     <PlayerContext.Provider value={value}>
-      {/*
-        The YouTube IFrame player must stay mounted and on-screen (a 0x0 or
-        off-screen player is blocked from playing). We keep it 1x1 and nearly
-        invisible while audio plays, and let YouTubeStage (in the player bar)
-        portal it into view for video tracks.
-      */}
-      <div
-        aria-hidden
-        style={{
-          position: 'fixed',
-          left: activeEngine === 'youtube' ? 8 : 1,
-          bottom: activeEngine === 'youtube' ? 88 : 1,
-          width: activeEngine === 'youtube' ? 320 : 1,
-          height: activeEngine === 'youtube' ? 180 : 1,
-          opacity: activeEngine === 'youtube' ? 1 : 0.01,
-          zIndex: activeEngine === 'youtube' ? 45 : -1,
-          overflow: 'hidden',
-          borderRadius: 12,
-          pointerEvents: activeEngine === 'youtube' ? 'auto' : 'none',
-          transition: 'opacity 0.2s',
-        }}
-      >
-        <div id="orbita-yt-target" />
+      <div id="orbita-yt-stage" style={ytStageStyle}>
+        <div id="orbita-yt-target" className="h-full w-full" />
       </div>
       {children}
     </PlayerContext.Provider>

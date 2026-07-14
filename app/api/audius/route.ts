@@ -106,6 +106,57 @@ async function searchYouTube(query: string): Promise<Track[]> {
   return out
 }
 
+// Curated Russian hits 2026 lineup. Each entry is a focused query so YouTube
+// returns the right artist's popular track (not a random remix). Includes the
+// artists the user asked for plus a broad set of current RU rap/pop names.
+const RU_HITS_QUERIES = [
+  'Баста новый трек',
+  'Rocket рэп трек',
+  'Макан рэпер трек',
+  'Егор Крид',
+  'Инстасамка',
+  'Три дня дождя',
+  'MAYOT',
+  'GONE.Fludd',
+  'ANNA ASTI',
+  'Miyagi Andy Panda',
+  'Скриптонит',
+  'HammAli Navai',
+  'Джиган',
+  'Zivert',
+  'Люся Чеботина',
+  'Мот песня',
+  'SODA LUV',
+  'OG Buda',
+]
+
+// Small in-memory cache so a chart planet doesn't re-scrape YouTube on every
+// visit (the queries fan out to ~18 requests).
+let ruChartCache: { at: number; tracks: Track[] } | null = null
+const RU_CHART_TTL = 60 * 60 * 1000 // 1 hour
+
+async function chartRuHits(): Promise<Track[]> {
+  if (ruChartCache && Date.now() - ruChartCache.at < RU_CHART_TTL) {
+    return ruChartCache.tracks
+  }
+  const results = await Promise.allSettled(
+    RU_HITS_QUERIES.map((q) => searchYouTube(q)),
+  )
+  const tracks: Track[] = []
+  const seen = new Set<string>()
+  for (const r of results) {
+    if (r.status !== 'fulfilled') continue
+    // Take the top music-length result for each artist query.
+    const top = r.value[0]
+    if (top?.youtubeId && !seen.has(top.youtubeId)) {
+      seen.add(top.youtubeId)
+      tracks.push(top)
+    }
+  }
+  if (tracks.length > 0) ruChartCache = { at: Date.now(), tracks }
+  return tracks
+}
+
 async function searchAudius(query: string): Promise<Track[]> {
   const url = `${AUDIUS_HOST}/v1/tracks/search?query=${encodeURIComponent(
     query,
@@ -145,6 +196,12 @@ export async function GET(request: Request) {
         .map((t) => normalizeTrack(t as never))
         .filter((t) => t.duration > 0)
         .slice(0, 30)
+      return NextResponse.json({ tracks })
+    }
+
+    /* ---- CHART: curated YouTube chart (Russian hits 2026) ---- */
+    if (type === 'chart') {
+      const tracks = await chartRuHits().catch(() => [] as Track[])
       return NextResponse.json({ tracks })
     }
 
