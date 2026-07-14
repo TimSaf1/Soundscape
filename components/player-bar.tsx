@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import {
   Play,
@@ -13,6 +13,8 @@ import {
   ChevronUp,
   Loader,
   Music,
+  Maximize2,
+  Video,
 } from 'lucide-react'
 import { usePlayer } from '@/components/player-context'
 import { formatTime } from '@/lib/audius'
@@ -160,8 +162,21 @@ function VolumeControl() {
 }
 
 export function PlayerBar() {
-  const { current, isPlaying } = usePlayer()
+  const {
+    current,
+    isPlaying,
+    activeEngine,
+    setVideoExpanded,
+    enterVideoFullscreen,
+  } = usePlayer()
   const [expanded, setExpanded] = useState(false)
+  const isVideo = activeEngine === 'youtube'
+
+  // Show the large video stage only while the player is expanded on a video
+  // track; collapse it back to the mini window otherwise.
+  useEffect(() => {
+    setVideoExpanded(expanded && isVideo)
+  }, [expanded, isVideo, setVideoExpanded])
 
   if (!current) return null
 
@@ -184,22 +199,45 @@ export function PlayerBar() {
             <div className="w-10" />
           </div>
 
-          <div className="flex flex-1 flex-col items-center justify-center gap-8 px-6">
-            <div className="relative">
-              <div
-                className="absolute -inset-6 rounded-full opacity-40 blur-3xl"
-                style={{ background: 'var(--color-primary)' }}
-                aria-hidden
-              />
-              <div className="relative">
-                <Cover
-                  src={current.artworkLarge}
-                  alt={`Обложка: ${current.title}`}
-                  size={280}
-                  spinning={isPlaying}
+          <div
+            className={cn(
+              'flex flex-1 flex-col items-center gap-6 px-6',
+              isVideo ? 'justify-end pb-10' : 'justify-center gap-8',
+            )}
+          >
+            {isVideo ? (
+              <>
+                {/* Space reserved for the fixed video stage rendered above. */}
+                <div
+                  style={{ height: 'min(42vh, 428px)' }}
+                  className="w-full"
+                  aria-hidden
                 />
+                <button
+                  onClick={enterVideoFullscreen}
+                  className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-4 py-2 text-sm font-medium text-foreground transition hover:bg-secondary"
+                >
+                  <Maximize2 size={16} />
+                  На весь экран
+                </button>
+              </>
+            ) : (
+              <div className="relative">
+                <div
+                  className="absolute -inset-6 rounded-full opacity-40 blur-3xl"
+                  style={{ background: 'var(--color-primary)' }}
+                  aria-hidden
+                />
+                <div className="relative">
+                  <Cover
+                    src={current.artworkLarge}
+                    alt={`Обложка: ${current.title}`}
+                    size={280}
+                    spinning={isPlaying}
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="w-full max-w-md text-center">
               <h2 className="text-balance font-display text-2xl font-semibold leading-tight">
@@ -229,10 +267,22 @@ export function PlayerBar() {
             onClick={() => setExpanded(true)}
             aria-label="Открыть плеер"
           >
-            <Cover src={current.artwork} alt="" size={48} spinning={isPlaying} />
+            <div className="relative shrink-0">
+              <Cover src={current.artwork} alt="" size={48} spinning={isPlaying && !isVideo} />
+              {isVideo && (
+                <span
+                  className="absolute -bottom-1 -right-1 grid h-5 w-5 place-items-center rounded-full bg-primary text-primary-foreground"
+                  aria-hidden
+                >
+                  <Video size={12} />
+                </span>
+              )}
+            </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium">{current.title}</p>
-              <p className="truncate text-xs text-muted-foreground">{current.artist}</p>
+              <p className="truncate text-xs text-muted-foreground">
+                {isVideo ? 'Видео · нажми, чтобы развернуть' : current.artist}
+              </p>
             </div>
           </button>
 
