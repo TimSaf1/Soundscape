@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌌 Soundscape | Игровая социальная сеть</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+    --space-dark: #050510;
+    --nebula-purple: #1a1b3a;
+    --neon-cyan: #00f3ff;
+    --neon-purple: #bc13fe;
+    --neon-gold: #ffd700;
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background: radial-gradient(ellipse at bottom, var(--nebula-purple) 0%, var(--space-dark) 100%);
+    color: #fff;
+    font-family: 'Exo 2', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-image:
+        radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 90px 40px, #fff, transparent);
+    background-size: 200px 200px;
+    animation: twinkle 5s infinite alternate;
+    z-index: -1; pointer-events: none;
+}
+
+@keyframes twinkle { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+
+h1, h2, h3, .stat-value, .game-title, .nav-btn { font-family: 'Orbitron', sans-serif; }
+
+.header {
+    background: linear-gradient(135deg, rgba(0, 243, 255, 0.1), rgba(188, 19, 254, 0.1));
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 25px 20px; text-align: center;
+    box-shadow: 0 0 30px rgba(0, 243, 255, 0.1);
+}
+
+.header h1 {
+    font-size: 36px;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+    margin-bottom: 8px; letter-spacing: 2px;
+}
+
+.header p { color: rgba(255,255,255,0.7); font-size: 14px; letter-spacing: 1px; }
+
+.stats { display: flex; justify-content: center; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
+
+.stat {
+    background: var(--glass-bg); border: 1px solid var(--glass-border);
+    padding: 12px 24px; border-radius: 12px; backdrop-filter: blur(5px);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.stat:hover { transform: translateY(-3px); box-shadow: 0 5px 20px rgba(0, 243, 255, 0.2); }
+.stat-value { font-size: 26px; font-weight: 900; color: var(--neon-gold); text-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
+.stat-label { font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+.nav {
+    display: flex; justify-content: center; gap: 12px; padding: 20px;
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(5, 5, 16, 0.8); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.nav-btn {
+    padding: 12px 28px; border: 1px solid var(--glass-border);
+    border-radius: 30px; background: var(--glass-bg);
+    color: rgba(255,255,255,0.8); cursor: pointer; font-size: 13px; font-weight: 700;
+    transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px;
+}
+
+.nav-btn:hover { background: rgba(0, 243, 255, 0.1); border-color: var(--neon-cyan); color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0, 243, 255, 0.3); }
+.nav-btn.active { background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); color: #fff; border-color: transparent; box-shadow: 0 0 20px rgba(188, 19, 254, 0.4); }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+.section { display: none; animation: fadeIn 0.5s ease-out; }
+.section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+.games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; margin-top: 20px; }
+
+.game-card {
+    background: var(--glass-bg); border: 1px solid var(--glass-border);
+    border-radius: 20px; padding: 30px 25px; text-align: center; cursor: pointer;
+    transition: all 0.4s; position: relative; overflow: hidden; backdrop-filter: blur(5px);
+}
+
+.game-card::before {
+    content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.5s;
+}
+.game-card:hover::before { left: 100%; }
+.game-card:hover { transform: translateY(-8px); border-color: var(--neon-cyan); box-shadow: 0 10px 40px rgba(0, 243, 255, 0.15); }
+
+.game-icon { font-size: 50px; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.3)); }
+.game-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; color: #fff; }
+.game-desc { font-size: 13px; opacity: 0.7; margin-bottom: 15px; line-height: 1.4; }
+.game-reward {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.2));
+    color: var(--neon-gold); border: 1px solid rgba(255, 215, 0, 0.3);
+    padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 12px; display: inline-block;
+}
+.game-badge {
+    position: absolute; top: 15px; right: 15px;
+    background: linear-gradient(135deg, var(--neon-purple), #ff0055);
+    color: #fff; padding: 4px 12px; border-radius: 8px; font-size: 10px; font-weight: 900; letter-spacing: 1px;
+}
+
+.game-container {
+    background: rgba(0, 0, 0, 0.6); border: 1px solid var(--glass-border);
+    border-radius: 20px; padding: 25px; margin-top: 30px; display: none;
+    box-shadow: 0 0 50px rgba(0, 243, 255, 0.05);
+}
+
+.game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+.game-title-large { font-size: 28px; color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0, 243, 255, 0.5); }
+.score-board {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.2));
+    color: var(--neon-gold); border: 1px solid rgba(255, 215, 0, 0.3);
+    padding: 10px 25px; border-radius: 12px; font-weight: 900; font-size: 20px; font-family: 'Orbitron', sans-serif;
+}
+
+.canvas-wrapper {
+    background: #000; border-radius: 15px; overflow: hidden;
+    display: flex; justify-content: center; margin: 20px 0; position: relative; height: 500px;
+    border: 1px solid var(--glass-border); box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
+}
+canvas { display: block; width: 100%; height: 100%; }
+
+.controls { display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+.btn {
+    padding: 12px 30px; border: none; border-radius: 8px; cursor: pointer;
+    font-size: 14px; font-weight: 700; font-family: 'Orbitron', sans-serif;
+    transition: all 0.2s; text-transform: uppercase; letter-spacing: 1px;
+}
+.btn-primary { background: linear-gradient(135deg, var(--neon-cyan), #0088ff); color: #000; box-shadow: 0 0 15px rgba(0, 243, 255, 0.3); }
+.btn-secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid var(--glass-border); }
+.btn:hover { transform: scale(1.05); filter: brightness(1.2); }
+.btn:active { transform: scale(0.95); }
+
+.game-info { text-align: center; margin-top: 15px; padding: 12px; background: rgba(0, 243, 255, 0.05); border-radius: 10px; font-size: 13px; color: var(--neon-cyan); border: 1px solid rgba(0, 243, 255, 0.1); }
+
+.leaderboard-item, .shop-item, .achievement {
+    background: var(--glass-bg); border: 1px solid var(--glass-border);
+    border-radius: 12px; padding: 15px 20px; margin-bottom: 10px;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: all 0.3s;
+}
+.leaderboard-item:hover, .shop-item:hover { border-color: var(--neon-purple); transform: translateX(5px); }
+.leaderboard-item:nth-child(1) { border-color: var(--neon-gold); background: rgba(255, 215, 0, 0.05); }
+.leaderboard-item:nth-child(2) { border-color: #c0c0c0; background: rgba(192, 192, 192, 0.05); }
+.leaderboard-item:nth-child(3) { border-color: #cd7f32; background: rgba(205, 127, 50, 0.05); }
+
+.achievement { flex-direction: column; text-align: center; gap: 10px; }
+.achievement.locked { opacity: 0.4; filter: grayscale(1); }
+.achievement-icon { font-size: 36px; }
+.achievement-name { font-weight: 700; color: var(--neon-cyan); }
+.achievement-desc { font-size: 12px; opacity: 0.7; }
+
+.profile-card {
+    background: linear-gradient(135deg, rgba(0, 243, 255, 0.05), rgba(188, 19, 254, 0.05));
+    border: 1px solid var(--glass-border); border-radius: 20px; padding: 40px; text-align: center;
+}
+.avatar {
+    width: 120px; height: 120px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+    display: flex; align-items: center; justify-content: center; font-size: 60px;
+    margin: 0 auto 20px; border: 3px solid #fff; box-shadow: 0 0 30px rgba(0, 243, 255, 0.4);
+}
+.username { font-size: 32px; font-weight: 900; margin-bottom: 10px; font-family: 'Orbitron', sans-serif; }
+.user-level {
+    background: linear-gradient(90deg, var(--neon-gold), #ff8c00); color: #000;
+    padding: 6px 24px; border-radius: 20px; font-weight: 900; display: inline-block; margin-bottom: 25px;
+    font-family: 'Orbitron', sans-serif;
+}
+.user-stats { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }
+.user-stat-value { font-size: 36px; font-weight: 900; color: var(--neon-cyan); font-family: 'Orbitron', sans-serif; }
+.user-stat-label { font-size: 12px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
+
+.shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+.shop-item { flex-direction: column; text-align: center; padding: 25px; }
+.shop-icon { font-size: 40px; margin-bottom: 15px; }
+.shop-name { font-weight: 700; font-size: 16px; margin-bottom: 10px; }
+.shop-price {
+    background: linear-gradient(135deg, var(--neon-gold), #ff8c00); color: #000;
+    padding: 8px 20px; border-radius: 20px; font-weight: 900; cursor: pointer;
+    transition: all 0.3s; font-family: 'Orbitron', sans-serif;
+}
+.shop-price:hover { transform: scale(1.1); box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
+
+.notification {
+    position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-150px);
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+    color: #fff; padding: 15px 35px; border-radius: 30px; font-weight: 700;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 1000; box-shadow: 0 10px 40px rgba(0, 243, 255, 0.3);
+    font-family: 'Orbitron', sans-serif; letter-spacing: 1px;
+}
+.notification.show { transform: translateX(-50%) translateY(0); }
+
+.section-title { text-align: center; font-size: 32px; margin-bottom: 10px; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.2); }
+.section-subtitle { text-align: center; opacity: 0.6; margin-bottom: 30px; font-size: 14px; letter-spacing: 1px; }
+
+@media(max-width: 768px) {
+    .header h1 { font-size: 24px; }
+    .games-grid { grid-template-columns: 1fr; }
+    .user-stats { flex-direction: column; gap: 20px; }
+    .nav { flex-wrap: wrap; }
+    .nav-btn { padding: 10px 15px; font-size: 11px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>🌌 SOUNDSCAPE</h1>
+    <p>ИГРОВАЯ СОЦИАЛЬНАЯ СЕТЬ • ПОКОРИ КОСМОС • ЗАРАБАТЫВАЙ XP</p>
+    <div class="stats">
+        <div class="stat"><div class="stat-value" id="totalXP">0</div><div class="stat-label">⭐ Энергия (XP)</div></div>
+        <div class="stat"><div class="stat-value" id="level">1</div><div class="stat-label">📊 Уровень</div></div>
+        <div class="stat"><div class="stat-value" id="coins">100</div><div class="stat-label">🪙 Кредиты</div></div>
+        <div class="stat"><div class="stat-value" id="gamesPlayed">0</div><div class="stat-label">🚀 Миссий</div></div>
+    </div>
+</div>
+
+<div class="nav">
+    <button class="nav-btn active" onclick="showSection('games')">🎮 Миссии</button>
+    <button class="nav-btn" onclick="showSection('leaderboard')">🏆 Галактика</button>
+    <button class="nav-btn" onclick="showSection('achievements')">🏅 Награды</button>
+    <button class="nav-btn" onclick="showSection('shop')">🛒 Верфь</button>
+    <button class="nav-btn" onclick="showSection('profile')">👤 Пилот</button>
+</div>
+
+<div class="container">
+
+<div id="games" class="section active">
+    <h2 class="section-title">Центр управления полётами</h2>
+    <p class="section-subtitle">Выбери миссию и начни зарабатывать космическую энергию!</p>
+
+    <div class="games-grid">
+        <div class="game-card" onclick="startGame('spaceDodge')">
+            <div class="game-icon">🚀</div>
+            <div class="game-title">Космический уклон</div>
+            <div class="game-desc">2D • Управляй кораблём мышью • Уклоняйся от астероидов</div>
+            <div class="game-reward">+10 XP за астероид</div>
+        </div>
+
+        <div class="game-card" onclick="startGame('spaceSnake')">
+            <div class="game-icon">🌌</div>
+            <div class="game-title">Звёздная змейка</div>
+            <div class="game-desc">2D • Классика в неоновом стиле • Собирай звёзды</div>
+            <div class="game-reward">+15 XP за звезду</div>
+        </div>
+
+        <div class="game-card" onclick="startGame('spaceFlight3D')">
+            <div class="game-icon">🛸</div>
+            <div class="game-title">3D Гиперпространство</div>
+            <div class="game-desc">3D • Летай сквозь туннель астероидов • Реагируй молниеносно</div>
+            <div class="game-reward">+50 XP за препятствие</div>
+            <div class="game-badge">3D</div>
+        </div>
+
+        <div class="game-card" onclick="startGame('crystalCollector3D')">
+            <div class="game-icon">💎</div>
+            <div class="game-title">3D Сбор кристаллов</div>
+            <div class="game-desc">3D • Исследуй сектор • Собирай парящие кристаллы</div>
+            <div class="game-reward">+100 XP за кристалл</div>
+            <div class="game-badge">3D NEW</div>
+        </div>
+    </div>
+
+    <div id="activeGame" class="game-container">
+        <div class="game-header">
+            <div class="game-title-large" id="currentGameTitle">Миссия</div>
+            <div class="score-board">Счёт: <span id="currentScore">0</span></div>
+        </div>
+        <div class="canvas-wrapper">
+            <!-- Два отдельных canvas для предотвращения конфликтов контекстов -->
+            <canvas id="gameCanvas2D" width="800" height="500" style="display:none;"></canvas>
+            <canvas id="gameCanvas3D" width="800" height="500" style="display:none;"></canvas>
+        </div>
+        <div class="controls">
+            <button class="btn btn-primary" onclick="launchGame()">▶ Старт</button>
+            <button class="btn btn-secondary" onclick="pauseGame()">⏸ Пауза</button>
+            <button class="btn btn-secondary" onclick="resumeGame()">⏯ Продолжить</button>
+            <button class="btn btn-secondary" onclick="closeGame()">❌ Отмена</button>
+        </div>
+        <div class="game-info" id="gameInstructions"></div>
+    </div>
+</div>
+
+<div id="leaderboard" class="section">
+    <h2 class="section-title">🏆 Галактическая таблица лидеров</h2>
+    <div class="leaderboard" id="leaderboardList"></div>
+</div>
+
+<div id="achievements" class="section">
+    <h2 class="section-title">🏅 Зал славы</h2>
+    <div id="achievementsList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;"></div>
+</div>
+
+<div id="shop" class="section">
+    <h2 class="section-title">🛒 Космическая верфь</h2>
+    <p style="text-align:center;opacity:0.8;margin-bottom:25px">Твои кредиты: <strong id="shopCoins" style="color:var(--neon-gold);font-size:24px;font-family:'Orbitron'">100</strong> 🪙</p>
+    <div class="shop-grid" id="shopItems"></div>
+</div>
+
+<div id="profile" class="section">
+    <div class="profile-card">
+        <div class="avatar" id="userAvatar">👨‍🚀</div>
+        <div class="username" id="userName">Пилот</div>
+        <div class="user-level">Уровень <span id="userLevel">1</span></div>
+        <div class="user-stats">
+            <div class="user-stat"><div class="user-stat-value" id="profileXP">0</div><div class="user-stat-label">Энергия (XP)</div></div>
+            <div class="user-stat"><div class="user-stat-value" id="profileGames">0</div><div class="user-stat-label">Миссий</div></div>
+            <div class="user-stat"><div class="user-stat-value" id="profileAchievements">0</div><div class="user-stat-label">Наград</div></div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<div class="notification" id="notification"></div>
+
+<script>
+// ============ ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ============
+let currentGame = null;
+let gameInterval = null;
+let animationId = null;
+let gameScore = 0;
+let isPaused = false;
+let keys = {};
+
+// Canvas и контексты
+const canvas2D = document.getElementById('gameCanvas2D');
+const canvas3D = document.getElementById('gameCanvas3D');
+let ctx2D = null;
+
+// Three.js переменные
+let renderer3D = null;
+let scene3D = null;
+let camera3D = null;
+let player = null;
+let obstacles = [];
+let crystals = [];
+
+let userData = {
+    username: 'Пилот-' + Math.floor(Math.random() * 9999),
+    xp: parseInt(localStorage.getItem('ss_xp')) || 0,
+    coins: parseInt(localStorage.getItem('ss_coins')) || 100,
+    gamesPlayed: parseInt(localStorage.getItem('ss_games')) || 0,
+    achievements: JSON.parse(localStorage.getItem('ss_achievements')) || [],
+    inventory: JSON.parse(localStorage.getItem('ss_inventory')) || []
+};
+
+let leaderboard = JSON.parse(localStorage.getItem('ss_leaderboard')) || [
+    {name: 'NeonRider', xp: 8500},
+    {name: 'CosmoKing', xp: 6200},
+    {name: 'StarWalker', xp: 4100}
+];
+
+const achievements = [
+    {id: 'first_mission', name: 'Первый полёт', desc: 'Заверши любую миссию', icon: '🚀', unlocked: false},
+    {id: 'xp_500', name: 'Новичок космоса', desc: 'Достигни 500 XP', icon: '⭐', unlocked: false},
+    {id: 'xp_2000', name: 'Ветеран галактики', desc: 'Достигни 2000 XP', icon: '🌌', unlocked: false},
+    {id: 'games_20', name: 'Легенда', desc: 'Сыграй 20 миссий', icon: '👑', unlocked: false},
+    {id: 'dodge_50', name: 'Манёвренный', desc: 'Набери 50 в уклоне', icon: '☄️', unlocked: false},
+    {id: 'snake_30', name: 'Звёздный змей', desc: 'Собери 30 звёзд за игру', icon: '🐍', unlocked: false}
+];
+
+const shopItems = [
+    {id: 'avatar_astro', name: 'Шлем астронавта', price: 300, type: 'avatar', icon: '👨‍🚀'},
+    {id: 'avatar_alien', name: 'Инопланетянин', price: 300, type: 'avatar', icon: '👽'},
+    {id: 'avatar_robot', name: 'Дроид', price: 500, type: 'avatar', icon: '🤖'},
+    {id: 'credits_200', name: '200 кредитов', price: 250, type: 'coins', amount: 200, icon: '🪙'},
+    {id: 'xp_boost', name: 'Гипер-бустер XP x2', price: 400, type: 'boost', duration: 3600, icon: '⚡'}
+];
+
+// ============ ИНИЦИАЛИЗАЦИЯ ============
+window.onload = function() {
+    updateStats();
+    renderLeaderboard();
+    renderAchievements();
+    renderShop();
+    showNotification('🌌 Soundscape готов к полёту!');
+};
+
+function showSection(sectionId) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
+    event.target.classList.add('active');
+
+    if (sectionId === 'leaderboard') renderLeaderboard();
+    if (sectionId === 'achievements') renderAchievements();
+    if (sectionId === 'shop') renderShop();
+    if (sectionId === 'profile') renderProfile();
+}
+
+// ============ УПРАВЛЕНИЕ ИГРАМИ ============
+function stopAllGames() {
+    currentGame = null;
+    isPaused = false;
+    if (gameInterval) { clearInterval(gameInterval); gameInterval = null; }
+    if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
+
+    if (renderer3D) {
+        renderer3D.dispose();
+        renderer3D = null;
+    }
+    scene3D = null;
+    camera3D = null;
+    player = null;
+    obstacles = [];
+    crystals = [];
+    keys = {};
+}
+
+function startGame(gameType) {
+    stopAllGames(); // Гарантированная очистка перед стартом
+    currentGame = gameType;
+    gameScore = 0;
+    document.getElementById('currentScore').textContent = '0';
+    document.getElementById('activeGame').style.display = 'block';
+
+    const games = {
+        'spaceDodge': {title: '🚀 Космический уклон', instructions: 'Управление: мышь или ← → • Уклоняйся от красных астероидов • Собирай жёлтую энергию'},
+        'spaceSnake': {title: '🌌 Звёздная змейка', instructions: 'Управление: стрелки ↑↓←→ • Собирай звёзды • Не врезайся в стены и хвост'},
+        'spaceFlight3D': {title: '🛸 3D Гиперпространство', instructions: 'Управление: ← → • Уклоняйся от астероидов • Скорость растёт!'},
+        'crystalCollector3D': {title: '💎 3D Сбор кристаллов', instructions: 'Управление: ← → ↑ ↓ • Собирай вращающиеся кристаллы • Не падай в бездну'}
+    };
+
+    document.getElementById('currentGameTitle').textContent = games[gameType].title;
+    document.getElementById('gameInstructions').textContent = games[gameType].instructions;
+
+    if (gameType === 'spaceFlight3D' || gameType === 'crystalCollector3D') {
+        if (typeof THREE === 'undefined') {
+            showNotification('⚠️ Ошибка загрузки 3D движка. Проверьте интернет.');
+            closeGame();
+            return;
+        }
+        canvas2D.style.display = 'none';
+        canvas3D.style.display = 'block';
+        initThreeJS();
+    } else {
+        canvas3D.style.display = 'none';
+        canvas2D.style.display = 'block';
+        ctx2D = canvas2D.getContext('2d');
+    }
+
+    initGame(gameType);
+    document.getElementById('activeGame').scrollIntoView({behavior: 'smooth', block: 'center'});
+}
+
+function initThreeJS() {
+    scene3D = new THREE.Scene();
+    scene3D.fog = new THREE.FogExp2(0x050510, 0.03);
+
+    camera3D = new THREE.PerspectiveCamera(75, 800 / 500, 0.1, 1000);
+
+    renderer3D = new THREE.WebGLRenderer({ canvas: canvas3D, antialias: true, alpha: true });
+    renderer3D.setSize(800, 500);
+    renderer3D.setPixelRatio(window.devicePixelRatio);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene3D.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(5, 10, 7);
+    scene3D.add(dirLight);
+}
+
+function launchGame() {
+    if (gameInterval) clearInterval(gameInterval);
+    if (animationId) cancelAnimationFrame(animationId);
+    isPaused = false;
+    startGameLogic(currentGame);
+    showNotification('🚀 Миссия началась!');
+}
+
+function pauseGame() {
+    isPaused = true;
+    if (gameInterval) clearInterval(gameInterval);
+    if (animationId) cancelAnimationFrame(animationId);
+    showNotification('⏸ Системы на паузе');
+}
+
+function resumeGame() {
+    if (isPaused) {
+        isPaused = false;
+        startGameLogic(currentGame);
+        showNotification('▶ Двигатели запущены!');
+    }
+}
+
+function closeGame() {
+    stopAllGames();
+    document.getElementById('activeGame').style.display = 'none';
+    canvas2D.style.display = 'none';
+    canvas3D.style.display = 'none';
+    window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function initGame(gameType) {
+    if (gameType === 'spaceDodge') initSpaceDodge();
+    else if (gameType === 'spaceSnake') initSpaceSnake();
+    else if (gameType === 'spaceFlight3D') initSpaceFlight3D();
+    else if (gameType === 'crystalCollector3D') initCrystalCollector3D();
+}
+
+function startGameLogic(gameType) {
+    if (gameType === 'spaceDodge') startSpaceDodge();
+    else if (gameType === 'spaceSnake') startSpaceSnake();
+    else if (gameType === 'spaceFlight3D') startSpaceFlight3D();
+    else if (gameType === 'crystalCollector3D') startCrystalCollector3D();
+}
+
+// ============ 2D ИГРА: КОСМИЧЕСКИЙ УКЛОН ============
+let dodgeShip = {x: 400, y: 450, width: 30, height: 30};
+let dodgeAsteroids = [], dodgeStars = [], dodgeRunning = false, dodgeFrame = 0;
+
+function initSpaceDodge() {
+    dodgeShip = {x: 400, y: 450, width: 30, height: 30};
+    dodgeAsteroids = [];
+    dodgeStars = [];
+    dodgeRunning = false;
+    dodgeFrame = 0;
+    drawSpaceDodge();
+}
+
+function startSpaceDodge() {
+    if (dodgeRunning) return;
+    dodgeRunning = true;
+    gameInterval = setInterval(() => {
+        if (isPaused || currentGame !== 'spaceDodge') return;
+        dodgeFrame++;
+
+        if (dodgeFrame % 40 === 0) {
+            dodgeAsteroids.push({x: Math.random() * 760, y: -30, size: 15 + Math.random() * 20, speed: 3 + Math.random() * 3});
+        }
+        if (dodgeFrame % 120 === 0) {
+            dodgeStars.push({x: Math.random() * 760, y: -30, size: 10, speed: 4});
+        }
+
+        for (let i = dodgeAsteroids.length - 1; i >= 0; i--) {
+            let a = dodgeAsteroids[i];
+            a.y += a.speed;
+
+            if (dodgeShip.x < a.x + a.size && dodgeShip.x + dodgeShip.width > a.x &&
+                dodgeShip.y < a.y + a.size && dodgeShip.y + dodgeShip.height > a.y) {
+                endGame('spaceDodge');
+                return;
+            }
+
+            if (a.y > 500) {
+                dodgeAsteroids.splice(i, 1);
+                gameScore += 10;
+                addXP(10);
+                checkAchievement('dodge_50', gameScore >= 50);
+                document.getElementById('currentScore').textContent = gameScore;
+            }
+        }
+
+        for (let i = dodgeStars.length - 1; i >= 0; i--) {
+            let s = dodgeStars[i];
+            s.y += s.speed;
+
+            if (dodgeShip.x < s.x + s.size && dodgeShip.x + dodgeShip.width > s.x &&
+                dodgeShip.y < s.y + s.size && dodgeShip.y + dodgeShip.height > s.y) {
+                dodgeStars.splice(i, 1);
+                gameScore += 50;
+                addXP(50);
+                document.getElementById('currentScore').textContent = gameScore;
+                showNotification('⚡ Энергия получена! +50 XP');
+            } else if (s.y > 500) {
+                dodgeStars.splice(i, 1);
+            }
+        }
+        drawSpaceDodge();
+    }, 16);
+}
+
+function drawSpaceDodge() {
+    if (!ctx2D) return;
+    ctx2D.fillStyle = '#050510';
+    ctx2D.fillRect(0, 0, 800, 500);
+
+    ctx2D.fillStyle = '#fff';
+    for(let i=0; i<50; i++) {
+        ctx2D.fillRect((i*137 + dodgeFrame*0.5)%800, (i*241)%500, 1, 1);
+    }
+
+    ctx2D.fillStyle = '#00f3ff';
+    ctx2D.shadowBlur = 15;
+    ctx2D.shadowColor = '#00f3ff';
+    ctx2D.beginPath();
+    ctx2D.moveTo(dodgeShip.x + 15, dodgeShip.y);
+    ctx2D.lineTo(dodgeShip.x + 30, dodgeShip.y + 30);
+    ctx2D.lineTo(dodgeShip.x, dodgeShip.y + 30);
+    ctx2D.closePath();
+    ctx2D.fill();
+    ctx2D.shadowBlur = 0;
+
+    ctx2D.fillStyle = '#ff2a6d';
+    dodgeAsteroids.forEach(a => {
+        ctx2D.beginPath();
+        ctx2D.arc(a.x + a.size/2, a.y + a.size/2, a.size/2, 0, Math.PI*2);
+        ctx2D.fill();
+    });
+
+    ctx2D.fillStyle = '#ffd700';
+    ctx2D.shadowBlur = 10;
+    ctx2D.shadowColor = '#ffd700';
+    dodgeStars.forEach(s => {
+        ctx2D.beginPath();
+        ctx2D.arc(s.x + 5, s.y + 5, 5, 0, Math.PI*2);
+        ctx2D.fill();
+    });
+    ctx2D.shadowBlur = 0;
+}
+
+// ============ 2D ИГРА: ЗВЁЗДНАЯ ЗМЕЙКА ============
+let snake = [], snakeDir = {x:1, y:0}, snakeNextDir = {x:1, y:0}, snakeFood = {}, snakeRunning = false;
+
+function initSpaceSnake() {
+    snake = [{x:10, y:10}];
+    snakeDir = {x:1, y:0};
+    snakeNextDir = {x:1, y:0};
+    snakeFood = {x:15, y:15};
+    snakeRunning = false;
+    drawSpaceSnake();
+}
+
+function startSpaceSnake() {
+    if (snakeRunning) return;
+    snakeRunning = true;
+    gameInterval = setInterval(() => {
+        if (isPaused || currentGame !== 'spaceSnake') return;
+        snakeDir = snakeNextDir;
+        const head = {x: snake[0].x + snakeDir.x, y: snake[0].y + snakeDir.y};
+
+        if (head.x < 0 || head.x >= 40 || head.y < 0 || head.y >= 25 || snake.some(s => s.x === head.x && s.y === head.y)) {
+            endGame('spaceSnake');
+            return;
+        }
+
+        snake.unshift(head);
+        if (head.x === snakeFood.x && head.y === snakeFood.y) {
+            gameScore += 15;
+            addXP(15);
+            checkAchievement('snake_30', snake.length >= 30);
+            snakeFood = {x: Math.floor(Math.random()*40), y: Math.floor(Math.random()*25)};
+            document.getElementById('currentScore').textContent = gameScore;
+        } else {
+            snake.pop();
+        }
+        drawSpaceSnake();
+    }, 100);
+}
+
+function drawSpaceSnake() {
+    if (!ctx2D) return;
+    ctx2D.fillStyle = '#050510';
+    ctx2D.fillRect(0, 0, 800, 500);
+
+    ctx2D.strokeStyle = 'rgba(0, 243, 255, 0.1)';
+    ctx2D.lineWidth = 1;
+    for(let i=0; i<40; i++) { ctx2D.beginPath(); ctx2D.moveTo(i*20,0); ctx2D.lineTo(i*20,500); ctx2D.stroke(); }
+    for(let i=0; i<25; i++) { ctx2D.beginPath(); ctx2D.moveTo(0,i*20); ctx2D.lineTo(800,i*20); ctx2D.stroke(); }
+
+    ctx2D.shadowBlur = 10;
+    ctx2D.shadowColor = '#00f3ff';
+    snake.forEach((s, i) => {
+        ctx2D.fillStyle = i === 0 ? '#fff' : '#00f3ff';
+        ctx2D.fillRect(s.x*20 + 1, s.y*20 + 1, 18, 18);
+    });
+
+    ctx2D.shadowColor = '#ffd700';
+    ctx2D.fillStyle = '#ffd700';
+    ctx2D.beginPath();
+    ctx2D.arc(snakeFood.x*20 + 10, snakeFood.y*20 + 10, 8, 0, Math.PI*2);
+    ctx2D.fill();
+    ctx2D.shadowBlur = 0;
+}
+
+// ============ 3D ИГРА: ГИПЕРПРОСТРАНСТВО ============
+function initSpaceFlight3D() {
+    camera3D.position.set(0, 3, 8);
+    camera3D.lookAt(0, 0, -10);
+
+    const geometry = new THREE.ConeGeometry(0.5, 1.5, 8);
+    const material = new THREE.MeshPhongMaterial({color: 0x00f3ff, emissive: 0x0044aa, emissiveIntensity: 0.5});
+    player = new THREE.Mesh(geometry, material);
+    player.rotation.x = Math.PI / 2;
+    player.position.set(0, 0.5, 0);
+    scene3D.add(player);
+
+    const gridHelper = new THREE.GridHelper(100, 50, 0xbc13fe, 0x1a1b3a);
+    gridHelper.position.set(0, -1, -25);
+    scene3D.add(gridHelper);
+
+    obstacles = [];
+    gameScore = 0;
+}
+
+function startSpaceFlight3D() {
+    let speed = 0.5;
+    let frame = 0;
+
+    function animate() {
+        if (!currentGame || currentGame !== 'spaceFlight3D') return;
+        if (isPaused) {
+            animationId = requestAnimationFrame(animate);
+            return;
+        }
+
+        frame++;
+
+        if (keys['ArrowLeft'] && player.position.x > -8) player.position.x -= 0.2;
+        if (keys['ArrowRight'] && player.position.x < 8) player.position.x += 0.2;
+
+        player.rotation.z = (keys['ArrowLeft'] ? 0.4 : (keys['ArrowRight'] ? -0.4 : 0));
+        player.rotation.y = (keys['ArrowLeft'] ? 0.2 : (keys['ArrowRight'] ? -0.2 : 0));
+
+        if (frame % 30 === 0) {
+            const geo = new THREE.IcosahedronGeometry(0.8, 0);
+            const mat = new THREE.MeshPhongMaterial({color: 0xff2a6d, emissive: 0x550022});
+            const obs = new THREE.Mesh(geo, mat);
+            obs.position.x = (Math.random() - 0.5) * 14;
+            obs.position.y = 0;
+            obs.position.z = -60;
+            scene3D.add(obs);
+            obstacles.push(obs);
+        }
+
+        for (let i = obstacles.length - 1; i >= 0; i--) {
+            let obs = obstacles[i];
+            obs.position.z += speed;
+            obs.rotation.x += 0.05;
+            obs.rotation.y += 0.05;
+
+            let dx = obs.position.x - player.position.x;
+            let dz = obs.position.z - player.position.z;
+            let dist = Math.sqrt(dx*dx + dz*dz);
+
+            if (dist < 1.5) {
+                endGame('spaceFlight3D');
+                return;
+            }
+
+            if (obs.position.z > 10) {
+                scene3D.remove(obs);
+                obs.geometry.dispose();
+                obs.material.dispose();
+                obstacles.splice(i, 1);
+                gameScore += 50;
+                addXP(50);
+                document.getElementById('currentScore').textContent = gameScore;
+                speed += 0.01;
+            }
+        }
+
+        camera3D.position.x += (player.position.x * 0.3 - camera3D.position.x) * 0.1;
+        renderer3D.render(scene3D, camera3D);
+        animationId = requestAnimationFrame(animate);
+    }
+    animate();
+}
+
+// ============ 3D ИГРА: СБОР КРИСТАЛЛОВ ============
+function initCrystalCollector3D() {
+    camera3D.position.set(0, 10, 10);
+    camera3D.lookAt(0, 0, 0);
+
+    const geometry = new THREE.SphereGeometry(0.6, 16, 16);
+    const material = new THREE.MeshPhongMaterial({color: 0x00ff88, emissive: 0x004422, emissiveIntensity: 0.5});
+    player = new THREE.Mesh(geometry, material);
+    player.position.set(0, 0.6, 0);
+    scene3D.add(player);
+
+    const planeGeo = new THREE.PlaneGeometry(30, 30);
+    const planeMat = new THREE.MeshPhongMaterial({color: 0x1a1b3a, side: THREE.DoubleSide});
+    const plane = new THREE.Mesh(planeGeo, planeMat);
+    plane.rotation.x = -Math.PI / 2;
+    plane.position.y = 0;
+    scene3D.add(plane);
+
+    const gridHelper = new THREE.GridHelper(30, 30, 0x00f3ff, 0x1a1b3a);
+    gridHelper.position.y = 0.01;
+    scene3D.add(gridHelper);
+
+    crystals = [];
+    spawnCrystal();
+    gameScore = 0;
+}
+
+function spawnCrystal() {
+    const geo = new THREE.OctahedronGeometry(0.6, 0);
+    const mat = new THREE.MeshPhongMaterial({color: 0xffd700, emissive: 0xaa6600, emissiveIntensity: 0.8});
+    const crystal = new THREE.Mesh(geo, mat);
+    crystal.position.x = (Math.random() - 0.5) * 26;
+    crystal.position.z = (Math.random() - 0.5) * 26;
+    crystal.position.y = 1.5;
+    scene3D.add(crystal);
+    crystals.push(crystal);
+}
+
+function startCrystalCollector3D() {
+    function animate() {
+        if (!currentGame || currentGame !== 'crystalCollector3D') return;
+        if (isPaused) {
+            animationId = requestAnimationFrame(animate);
+            return;
+        }
+
+        if (keys['ArrowLeft'] && player.position.x > -14) player.position.x -= 0.2;
+        if (keys['ArrowRight'] && player.position.x < 14) player.position.x += 0.2;
+        if (keys['ArrowUp'] && player.position.z > -14) player.position.z -= 0.2;
+        if (keys['ArrowDown'] && player.position.z < 14) player.position.z += 0.2;
+
+        for (let i = crystals.length - 1; i >= 0; i--) {
+            let c = crystals[i];
+            c.rotation.y += 0.05;
+            c.rotation.x += 0.02;
+            c.position.y = 1.5 + Math.sin(Date.now() * 0.005 + i) * 0.5;
+
+            let dx = c.position.x - player.position.x;
+            let dz = c.position.z - player.position.z;
+            let dist = Math.sqrt(dx*dx + dz*dz);
+
+            if (dist < 1.5) {
+                scene3D.remove(c);
+                c.geometry.dispose();
+                c.material.dispose();
+                crystals.splice(i, 1);
+                gameScore += 100;
+                addXP(100);
+                document.getElementById('currentScore').textContent = gameScore;
+                showNotification('💎 Кристалл собран! +100 XP');
+                spawnCrystal();
+                if (Math.random() > 0.6) spawnCrystal();
+            }
+        }
+
+        camera3D.position.x += (player.position.x - camera3D.position.x) * 0.1;
+        camera3D.position.z += (player.position.z + 10 - camera3D.position.z) * 0.1;
+        camera3D.lookAt(player.position);
+
+        renderer3D.render(scene3D, camera3D);
+        animationId = requestAnimationFrame(animate);
+    }
+    animate();
+}
+
+function endGame(gameType) {
+    if (gameInterval) clearInterval(gameInterval);
+    if (animationId) cancelAnimationFrame(animationId);
+    showNotification('💥 Миссия завершена! Счёт: ' + gameScore);
+    userData.gamesPlayed++;
+    localStorage.setItem('ss_games', userData.gamesPlayed);
+    updateStats();
+    checkAchievement('first_mission', true);
+    setTimeout(() => closeGame(), 2000);
+}
+
+// ============ УПРАВЛЕНИЕ ВВОДОМ ============
+document.addEventListener('keydown', e => {
+    if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].indexOf(e.code) > -1) {
+        e.preventDefault();
+    }
+    keys[e.code] = true;
+
+    if (currentGame === 'spaceSnake' && !isPaused) {
+        if (e.key === 'ArrowUp' && snakeDir.y === 0) snakeNextDir = {x:0, y:-1};
+        if (e.key === 'ArrowDown' && snakeDir.y === 0) snakeNextDir = {x:0, y:1};
+        if (e.key === 'ArrowLeft' && snakeDir.x === 0) snakeNextDir = {x:-1, y:0};
+        if (e.key === 'ArrowRight' && snakeDir.x === 0) snakeNextDir = {x:1, y:0};
+    }
+});
+
+document.addEventListener('keyup', e => { keys[e.code] = false; });
+
+document.addEventListener('mousemove', e => {
+    if (currentGame === 'spaceDodge' && !isPaused && canvas2D.style.display !== 'none') {
+        const rect = canvas2D.getBoundingClientRect();
+        const scaleX = 800 / rect.width;
+        const mouseX = (e.clientX - rect.left) * scaleX;
+        dodgeShip.x = Math.max(0, Math.min(770, mouseX - 15));
+    }
+});
+
+// ============ ПРОГРЕСС И СИСТЕМА ============
+function addXP(amount) {
+    const boost = userData.inventory.includes('xp_boost') ? 2 : 1;
+    userData.xp += amount * boost;
+    localStorage.setItem('ss_xp', userData.xp);
+    updateStats();
+    checkAchievement('xp_500', userData.xp >= 500);
+    checkAchievement('xp_2000', userData.xp >= 2000);
+    checkAchievement('games_20', userData.gamesPlayed >= 20);
+}
+
+function updateStats() {
+    document.getElementById('totalXP').textContent = userData.xp;
+    document.getElementById('level').textContent = Math.floor(userData.xp / 500) + 1;
+    document.getElementById('coins').textContent = userData.coins;
+    document.getElementById('gamesPlayed').textContent = userData.gamesPlayed;
+}
+
+function checkAchievement(id, condition) {
+    const achievement = achievements.find(a => a.id === id);
+    if (achievement && condition && !achievement.unlocked && !userData.achievements.includes(id)) {
+        achievement.unlocked = true;
+        userData.achievements.push(id);
+        localStorage.setItem('ss_achievements', JSON.stringify(userData.achievements));
+        showNotification(`🏅 Награда: ${achievement.name}!`);
+        userData.coins += 100;
+        localStorage.setItem('ss_coins', userData.coins);
+        updateStats();
+    }
+}
+
+function renderLeaderboard() {
+    leaderboard.sort((a, b) => b.xp - a.xp);
+    const myIndex = leaderboard.findIndex(p => p.name === userData.username);
+    if (myIndex === -1) {
+        leaderboard.push({name: userData.username, xp: userData.xp});
+    } else {
+        leaderboard[myIndex].xp = userData.xp;
+    }
+    leaderboard.sort((a, b) => b.xp - a.xp);
+    localStorage.setItem('ss_leaderboard', JSON.stringify(leaderboard));
+
+    let html = '';
+    leaderboard.slice(0, 10).forEach((player, i) => {
+        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`;
+        const isMe = player.name === userData.username ? ' <span style="color:var(--neon-cyan)">(ты)</span>' : '';
+        html += `<div class="leaderboard-item"><span style="font-weight:700">${medal} ${player.name}${isMe}</span><span style="color:var(--neon-gold);font-family:'Orbitron'">${player.xp} XP</span></div>`;
+    });
+    document.getElementById('leaderboardList').innerHTML = html;
+}
+
+function renderAchievements() {
+    let html = '';
+    achievements.forEach(a => {
+        const unlocked = userData.achievements.includes(a.id);
+        html += `<div class="achievement ${unlocked ? '' : 'locked'}">
+            <div class="achievement-icon">${a.icon}</div>
+            <div class="achievement-name">${a.name}</div>
+            <div class="achievement-desc">${a.desc}</div>
+            <div style="font-size:20px;margin-top:5px">${unlocked ? '✅' : '🔒'}</div>
+        </div>`;
+    });
+    document.getElementById('achievementsList').innerHTML = html;
+    document.getElementById('profileAchievements').textContent = userData.achievements.length;
+}
+
+function renderShop() {
+    document.getElementById('shopCoins').textContent = userData.coins;
+    let html = '';
+    shopItems.forEach(item => {
+        html += `<div class="shop-item">
+            <div class="shop-icon">${item.icon}</div>
+            <div class="shop-name">${item.name}</div>
+            <div class="shop-price" onclick="buyItem('${item.id}')">${item.price} 🪙</div>
+        </div>`;
+    });
+    document.getElementById('shopItems').innerHTML = html;
+}
+
+function buyItem(itemId) {
+    const item = shopItems.find(i => i.id === itemId);
+    if (userData.coins < item.price) {
+        showNotification('⚠️ Недостаточно кредитов!');
+        return;
+    }
+    userData.coins -= item.price;
+
+    if (item.type === 'coins') {
+        userData.coins += item.amount;
+    } else if (item.type === 'avatar') {
+        document.getElementById('userAvatar').textContent = item.icon;
+    } else if (item.type === 'boost') {
+        if (!userData.inventory.includes('xp_boost')) {
+            userData.inventory.push('xp_boost');
+            setTimeout(() => {
+                userData.inventory = userData.inventory.filter(i => i !== 'xp_boost');
+                localStorage.setItem('ss_inventory', JSON.stringify(userData.inventory));
+                showNotification('⚡ Гипер-бустер истёк!');
+            }, item.duration * 1000);
+        }
+    }
+
+    localStorage.setItem('ss_coins', userData.coins);
+    localStorage.setItem('ss_inventory', JSON.stringify(userData.inventory));
+    renderShop();
+    updateStats();
+    showNotification(`✅ Приобретено: ${item.name}!`);
+}
+
+function renderProfile() {
+    document.getElementById('userName').textContent = userData.username;
+    document.getElementById('userLevel').textContent = Math.floor(userData.xp / 500) + 1;
+    document.getElementById('profileXP').textContent = userData.xp;
+    document.getElementById('profileGames').textContent = userData.gamesPlayed;
+    document.getElementById('profileAchievements').textContent = userData.achievements.length;
+}
+
+function showNotification(text) {
+    const n = document.getElementById('notification');
+    n.textContent = text;
+    n.classList.add('show');
+    setTimeout(() => n.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
