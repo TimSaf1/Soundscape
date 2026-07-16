@@ -31,7 +31,7 @@ body {
 body::before {
     content: '';
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-image:
+    background-image: 
         radial-gradient(2px 2px at 20px 30px, #fff, transparent),
         radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
         radial-gradient(1px 1px at 90px 40px, #fff, transparent);
@@ -411,7 +411,7 @@ function showSection(sectionId) {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(sectionId).classList.add('active');
     event.target.classList.add('active');
-
+    
     if (sectionId === 'leaderboard') renderLeaderboard();
     if (sectionId === 'achievements') renderAchievements();
     if (sectionId === 'shop') renderShop();
@@ -424,7 +424,7 @@ function stopAllGames() {
     isPaused = false;
     if (gameInterval) { clearInterval(gameInterval); gameInterval = null; }
     if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
-
+    
     if (renderer3D) {
         renderer3D.dispose();
         renderer3D = null;
@@ -443,17 +443,17 @@ function startGame(gameType) {
     gameScore = 0;
     document.getElementById('currentScore').textContent = '0';
     document.getElementById('activeGame').style.display = 'block';
-
+    
     const games = {
         'spaceDodge': {title: '🚀 Космический уклон', instructions: 'Управление: мышь или ← → • Уклоняйся от красных астероидов • Собирай жёлтую энергию'},
         'spaceSnake': {title: '🌌 Звёздная змейка', instructions: 'Управление: стрелки ↑↓←→ • Собирай звёзды • Не врезайся в стены и хвост'},
         'spaceFlight3D': {title: '🛸 3D Гиперпространство', instructions: 'Управление: ← → • Уклоняйся от астероидов • Скорость растёт!'},
         'crystalCollector3D': {title: '💎 3D Сбор кристаллов', instructions: 'Управление: ← → ↑ ↓ • Собирай вращающиеся кристаллы • Не падай в бездну'}
     };
-
+    
     document.getElementById('currentGameTitle').textContent = games[gameType].title;
     document.getElementById('gameInstructions').textContent = games[gameType].instructions;
-
+    
     if (gameType === 'spaceFlight3D' || gameType === 'crystalCollector3D') {
         if (typeof THREE === 'undefined') {
             showNotification('⚠️ Ошибка загрузки 3D движка. Проверьте интернет.');
@@ -468,7 +468,7 @@ function startGame(gameType) {
         canvas2D.style.display = 'block';
         ctx2D = canvas2D.getContext('2d');
     }
-
+    
     initGame(gameType);
     document.getElementById('activeGame').scrollIntoView({behavior: 'smooth', block: 'center'});
 }
@@ -476,16 +476,16 @@ function startGame(gameType) {
 function initThreeJS() {
     scene3D = new THREE.Scene();
     scene3D.fog = new THREE.FogExp2(0x050510, 0.03);
-
+    
     camera3D = new THREE.PerspectiveCamera(75, 800 / 500, 0.1, 1000);
-
+    
     renderer3D = new THREE.WebGLRenderer({ canvas: canvas3D, antialias: true, alpha: true });
     renderer3D.setSize(800, 500);
     renderer3D.setPixelRatio(window.devicePixelRatio);
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene3D.add(ambientLight);
-
+    
     const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
     dirLight.position.set(5, 10, 7);
     scene3D.add(dirLight);
@@ -555,24 +555,24 @@ function startSpaceDodge() {
     gameInterval = setInterval(() => {
         if (isPaused || currentGame !== 'spaceDodge') return;
         dodgeFrame++;
-
+        
         if (dodgeFrame % 40 === 0) {
             dodgeAsteroids.push({x: Math.random() * 760, y: -30, size: 15 + Math.random() * 20, speed: 3 + Math.random() * 3});
         }
         if (dodgeFrame % 120 === 0) {
             dodgeStars.push({x: Math.random() * 760, y: -30, size: 10, speed: 4});
         }
-
+        
         for (let i = dodgeAsteroids.length - 1; i >= 0; i--) {
             let a = dodgeAsteroids[i];
             a.y += a.speed;
-
+            
             if (dodgeShip.x < a.x + a.size && dodgeShip.x + dodgeShip.width > a.x &&
                 dodgeShip.y < a.y + a.size && dodgeShip.y + dodgeShip.height > a.y) {
                 endGame('spaceDodge');
                 return;
             }
-
+            
             if (a.y > 500) {
                 dodgeAsteroids.splice(i, 1);
                 gameScore += 10;
@@ -581,11 +581,11 @@ function startSpaceDodge() {
                 document.getElementById('currentScore').textContent = gameScore;
             }
         }
-
+        
         for (let i = dodgeStars.length - 1; i >= 0; i--) {
             let s = dodgeStars[i];
             s.y += s.speed;
-
+            
             if (dodgeShip.x < s.x + s.size && dodgeShip.x + dodgeShip.width > s.x &&
                 dodgeShip.y < s.y + s.size && dodgeShip.y + dodgeShip.height > s.y) {
                 dodgeStars.splice(i, 1);
@@ -605,12 +605,12 @@ function drawSpaceDodge() {
     if (!ctx2D) return;
     ctx2D.fillStyle = '#050510';
     ctx2D.fillRect(0, 0, 800, 500);
-
+    
     ctx2D.fillStyle = '#fff';
     for(let i=0; i<50; i++) {
         ctx2D.fillRect((i*137 + dodgeFrame*0.5)%800, (i*241)%500, 1, 1);
     }
-
+    
     ctx2D.fillStyle = '#00f3ff';
     ctx2D.shadowBlur = 15;
     ctx2D.shadowColor = '#00f3ff';
@@ -621,14 +621,14 @@ function drawSpaceDodge() {
     ctx2D.closePath();
     ctx2D.fill();
     ctx2D.shadowBlur = 0;
-
+    
     ctx2D.fillStyle = '#ff2a6d';
     dodgeAsteroids.forEach(a => {
         ctx2D.beginPath();
         ctx2D.arc(a.x + a.size/2, a.y + a.size/2, a.size/2, 0, Math.PI*2);
         ctx2D.fill();
     });
-
+    
     ctx2D.fillStyle = '#ffd700';
     ctx2D.shadowBlur = 10;
     ctx2D.shadowColor = '#ffd700';
@@ -659,12 +659,12 @@ function startSpaceSnake() {
         if (isPaused || currentGame !== 'spaceSnake') return;
         snakeDir = snakeNextDir;
         const head = {x: snake[0].x + snakeDir.x, y: snake[0].y + snakeDir.y};
-
+        
         if (head.x < 0 || head.x >= 40 || head.y < 0 || head.y >= 25 || snake.some(s => s.x === head.x && s.y === head.y)) {
             endGame('spaceSnake');
             return;
         }
-
+        
         snake.unshift(head);
         if (head.x === snakeFood.x && head.y === snakeFood.y) {
             gameScore += 15;
@@ -683,19 +683,19 @@ function drawSpaceSnake() {
     if (!ctx2D) return;
     ctx2D.fillStyle = '#050510';
     ctx2D.fillRect(0, 0, 800, 500);
-
+    
     ctx2D.strokeStyle = 'rgba(0, 243, 255, 0.1)';
     ctx2D.lineWidth = 1;
     for(let i=0; i<40; i++) { ctx2D.beginPath(); ctx2D.moveTo(i*20,0); ctx2D.lineTo(i*20,500); ctx2D.stroke(); }
     for(let i=0; i<25; i++) { ctx2D.beginPath(); ctx2D.moveTo(0,i*20); ctx2D.lineTo(800,i*20); ctx2D.stroke(); }
-
+    
     ctx2D.shadowBlur = 10;
     ctx2D.shadowColor = '#00f3ff';
     snake.forEach((s, i) => {
         ctx2D.fillStyle = i === 0 ? '#fff' : '#00f3ff';
         ctx2D.fillRect(s.x*20 + 1, s.y*20 + 1, 18, 18);
     });
-
+    
     ctx2D.shadowColor = '#ffd700';
     ctx2D.fillStyle = '#ffd700';
     ctx2D.beginPath();
@@ -708,18 +708,18 @@ function drawSpaceSnake() {
 function initSpaceFlight3D() {
     camera3D.position.set(0, 3, 8);
     camera3D.lookAt(0, 0, -10);
-
+    
     const geometry = new THREE.ConeGeometry(0.5, 1.5, 8);
     const material = new THREE.MeshPhongMaterial({color: 0x00f3ff, emissive: 0x0044aa, emissiveIntensity: 0.5});
     player = new THREE.Mesh(geometry, material);
     player.rotation.x = Math.PI / 2;
     player.position.set(0, 0.5, 0);
     scene3D.add(player);
-
+    
     const gridHelper = new THREE.GridHelper(100, 50, 0xbc13fe, 0x1a1b3a);
     gridHelper.position.set(0, -1, -25);
     scene3D.add(gridHelper);
-
+    
     obstacles = [];
     gameScore = 0;
 }
@@ -727,22 +727,22 @@ function initSpaceFlight3D() {
 function startSpaceFlight3D() {
     let speed = 0.5;
     let frame = 0;
-
+    
     function animate() {
         if (!currentGame || currentGame !== 'spaceFlight3D') return;
         if (isPaused) {
             animationId = requestAnimationFrame(animate);
             return;
         }
-
+        
         frame++;
-
+        
         if (keys['ArrowLeft'] && player.position.x > -8) player.position.x -= 0.2;
         if (keys['ArrowRight'] && player.position.x < 8) player.position.x += 0.2;
-
+        
         player.rotation.z = (keys['ArrowLeft'] ? 0.4 : (keys['ArrowRight'] ? -0.4 : 0));
         player.rotation.y = (keys['ArrowLeft'] ? 0.2 : (keys['ArrowRight'] ? -0.2 : 0));
-
+        
         if (frame % 30 === 0) {
             const geo = new THREE.IcosahedronGeometry(0.8, 0);
             const mat = new THREE.MeshPhongMaterial({color: 0xff2a6d, emissive: 0x550022});
@@ -753,22 +753,22 @@ function startSpaceFlight3D() {
             scene3D.add(obs);
             obstacles.push(obs);
         }
-
+        
         for (let i = obstacles.length - 1; i >= 0; i--) {
             let obs = obstacles[i];
             obs.position.z += speed;
             obs.rotation.x += 0.05;
             obs.rotation.y += 0.05;
-
+            
             let dx = obs.position.x - player.position.x;
             let dz = obs.position.z - player.position.z;
             let dist = Math.sqrt(dx*dx + dz*dz);
-
+            
             if (dist < 1.5) {
                 endGame('spaceFlight3D');
                 return;
             }
-
+            
             if (obs.position.z > 10) {
                 scene3D.remove(obs);
                 obs.geometry.dispose();
@@ -780,7 +780,7 @@ function startSpaceFlight3D() {
                 speed += 0.01;
             }
         }
-
+        
         camera3D.position.x += (player.position.x * 0.3 - camera3D.position.x) * 0.1;
         renderer3D.render(scene3D, camera3D);
         animationId = requestAnimationFrame(animate);
@@ -792,24 +792,24 @@ function startSpaceFlight3D() {
 function initCrystalCollector3D() {
     camera3D.position.set(0, 10, 10);
     camera3D.lookAt(0, 0, 0);
-
+    
     const geometry = new THREE.SphereGeometry(0.6, 16, 16);
     const material = new THREE.MeshPhongMaterial({color: 0x00ff88, emissive: 0x004422, emissiveIntensity: 0.5});
     player = new THREE.Mesh(geometry, material);
     player.position.set(0, 0.6, 0);
     scene3D.add(player);
-
+    
     const planeGeo = new THREE.PlaneGeometry(30, 30);
     const planeMat = new THREE.MeshPhongMaterial({color: 0x1a1b3a, side: THREE.DoubleSide});
     const plane = new THREE.Mesh(planeGeo, planeMat);
     plane.rotation.x = -Math.PI / 2;
     plane.position.y = 0;
     scene3D.add(plane);
-
+    
     const gridHelper = new THREE.GridHelper(30, 30, 0x00f3ff, 0x1a1b3a);
     gridHelper.position.y = 0.01;
     scene3D.add(gridHelper);
-
+    
     crystals = [];
     spawnCrystal();
     gameScore = 0;
@@ -833,22 +833,22 @@ function startCrystalCollector3D() {
             animationId = requestAnimationFrame(animate);
             return;
         }
-
+        
         if (keys['ArrowLeft'] && player.position.x > -14) player.position.x -= 0.2;
         if (keys['ArrowRight'] && player.position.x < 14) player.position.x += 0.2;
         if (keys['ArrowUp'] && player.position.z > -14) player.position.z -= 0.2;
         if (keys['ArrowDown'] && player.position.z < 14) player.position.z += 0.2;
-
+        
         for (let i = crystals.length - 1; i >= 0; i--) {
             let c = crystals[i];
             c.rotation.y += 0.05;
             c.rotation.x += 0.02;
             c.position.y = 1.5 + Math.sin(Date.now() * 0.005 + i) * 0.5;
-
+            
             let dx = c.position.x - player.position.x;
             let dz = c.position.z - player.position.z;
             let dist = Math.sqrt(dx*dx + dz*dz);
-
+            
             if (dist < 1.5) {
                 scene3D.remove(c);
                 c.geometry.dispose();
@@ -862,11 +862,11 @@ function startCrystalCollector3D() {
                 if (Math.random() > 0.6) spawnCrystal();
             }
         }
-
+        
         camera3D.position.x += (player.position.x - camera3D.position.x) * 0.1;
         camera3D.position.z += (player.position.z + 10 - camera3D.position.z) * 0.1;
         camera3D.lookAt(player.position);
-
+        
         renderer3D.render(scene3D, camera3D);
         animationId = requestAnimationFrame(animate);
     }
@@ -890,7 +890,7 @@ document.addEventListener('keydown', e => {
         e.preventDefault();
     }
     keys[e.code] = true;
-
+    
     if (currentGame === 'spaceSnake' && !isPaused) {
         if (e.key === 'ArrowUp' && snakeDir.y === 0) snakeNextDir = {x:0, y:-1};
         if (e.key === 'ArrowDown' && snakeDir.y === 0) snakeNextDir = {x:0, y:1};
@@ -951,7 +951,7 @@ function renderLeaderboard() {
     }
     leaderboard.sort((a, b) => b.xp - a.xp);
     localStorage.setItem('ss_leaderboard', JSON.stringify(leaderboard));
-
+    
     let html = '';
     leaderboard.slice(0, 10).forEach((player, i) => {
         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`;
@@ -996,7 +996,7 @@ function buyItem(itemId) {
         return;
     }
     userData.coins -= item.price;
-
+    
     if (item.type === 'coins') {
         userData.coins += item.amount;
     } else if (item.type === 'avatar') {
@@ -1011,7 +1011,7 @@ function buyItem(itemId) {
             }, item.duration * 1000);
         }
     }
-
+    
     localStorage.setItem('ss_coins', userData.coins);
     localStorage.setItem('ss_inventory', JSON.stringify(userData.inventory));
     renderShop();
