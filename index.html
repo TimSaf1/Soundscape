@@ -6,9 +6,9 @@
 <title>🌌 Soundscape Gaming</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; touch-action:none; }
-body {
-    background: radial-gradient(ellipse at bottom, #1a1b3a 0%, #050510 100%);
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { 
+    background: radial-gradient(ellipse at bottom, #1a1b3a 0%, #050510 100%); 
     color:#fff; font-family:'Segoe UI',sans-serif; overflow-x:hidden;
 }
 .header { padding:15px; text-align:center; background:rgba(0,0,0,0.3); }
@@ -19,7 +19,7 @@ body {
 .nav { display:flex; justify-content:center; gap:8px; padding:10px; flex-wrap:wrap; position:sticky; top:0; background:rgba(5,5,16,0.95); backdrop-filter:blur(10px); z-index:100; }
 .nav-btn { padding:8px 16px; border:1px solid rgba(255,255,255,0.2); border-radius:20px; background:rgba(255,255,255,0.05); color:#fff; font-size:12px; cursor:pointer; }
 .nav-btn.active { background:linear-gradient(135deg,#00f3ff,#bc13fe); }
-.container { padding:15px; padding-bottom:250px; max-width:1200px; margin:0 auto; }
+.container { padding:15px; padding-bottom:20px; max-width:1200px; margin:0 auto; }
 .section { display:none; }
 .section.active { display:block; animation:fadeIn 0.3s; }
 @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
@@ -37,53 +37,49 @@ body {
 .game-title-large { color:#00f3ff; font-size:20px; font-weight:bold; }
 .score-board { background:rgba(255,215,0,0.2); color:#ffd700; padding:8px 16px; border-radius:10px; font-weight:bold; font-size:16px; }
 .canvas-wrapper { background:#000; border-radius:10px; overflow:hidden; position:relative; width:100%; aspect-ratio:8/5; margin:15px 0; }
-canvas { width:100%; height:100%; display:block; }
+canvas { width:100%; height:100%; display:block; touch-action:none; }
 .controls { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:15px; }
 .btn { padding:12px 24px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:13px; }
 .btn-primary { background:linear-gradient(135deg,#00f3ff,#0088ff); color:#000; }
 .btn-secondary { background:rgba(255,255,255,0.1); color:#fff; }
 .game-info { text-align:center; padding:12px; background:rgba(0,243,255,0.05); border-radius:10px; font-size:12px; color:#00f3ff; margin-top:10px; border:1px solid rgba(0,243,255,0.1); }
 
-/* === МОБИЛЬНОЕ УПРАВЛЕНИЕ - ВИДИМЫЕ КНОПКИ === */
+/* === МОБИЛЬНОЕ УПРАВЛЕНИЕ - СКРЫТО ПО УМОЛЧАНИЮ === */
 .mobile-controls {
-    position:fixed;
-    bottom:10px;
-    left:0;
-    right:0;
+    position:fixed; 
+    bottom:10px; 
+    left:0; 
+    right:0; 
     height:220px;
-    display:none;
-    z-index:1000;
+    display:none !important; /* СКРЫТО ПО УМОЛЧАНИЮ */
+    z-index:1000; 
     pointer-events:none;
     padding:0 20px 20px 20px;
 }
-.mobile-controls.active { display:flex; }
+.mobile-controls.active { display:flex !important; } /* ПОКАЗЫВАЕМ ТОЛЬКО КОГДА АКТИВНО */
 
-/* D-PAD слева */
-.dpad {
-    position:relative;
-    width:160px;
-    height:160px;
-    pointer-events:auto;
-    flex-shrink:0;
-}
+.dpad { position:relative; width:160px; height:160px; pointer-events:auto; flex-shrink:0; }
 .dpad-btn {
-    position:absolute;
-    width:55px;
+    position:absolute; 
+    width:55px; 
     height:55px;
-    background:rgba(0,243,255,0.3);
+    background:rgba(0,243,255,0.3); 
     border:3px solid #00f3ff;
-    border-radius:12px;
-    display:flex;
-    align-items:center;
+    border-radius:12px; 
+    display:flex; 
+    align-items:center; 
     justify-content:center;
-    font-size:28px;
-    color:#00f3ff;
+    font-size:28px; 
+    color:#00f3ff; 
     font-weight:bold;
     pointer-events:auto;
     box-shadow:0 4px 10px rgba(0,0,0,0.3);
+    user-select:none;
+    -webkit-user-select:none;
+    touch-action:none;
 }
-.dpad-btn:active, .dpad-btn.pressed {
-    background:rgba(0,243,255,0.7);
+.dpad-btn:active, .dpad-btn.pressed { 
+    background:rgba(0,243,255,0.7); 
     transform:scale(0.9);
     box-shadow:0 0 20px rgba(0,243,255,0.6);
 }
@@ -92,44 +88,33 @@ canvas { width:100%; height:100%; display:block; }
 .dpad-left { top:52px; left:0; }
 .dpad-right { top:52px; right:0; }
 
-/* Кнопки действий справа */
-.action-area {
-    flex:1;
-    display:flex;
-    justify-content:flex-end;
-    align-items:center;
-    pointer-events:auto;
-}
+.action-area { flex:1; display:flex; justify-content:flex-end; align-items:center; pointer-events:auto; }
 .action-btn {
-    width:80px;
-    height:80px;
+    width:80px; 
+    height:80px; 
     border-radius:50%;
-    background:rgba(188,19,254,0.3);
+    background:rgba(188,19,254,0.3); 
     border:4px solid #bc13fe;
-    display:flex;
-    align-items:center;
+    display:flex; 
+    align-items:center; 
     justify-content:center;
-    font-size:32px;
-    color:#bc13fe;
+    font-size:32px; 
+    color:#bc13fe; 
     font-weight:bold;
     pointer-events:auto;
     box-shadow:0 4px 15px rgba(0,0,0,0.3);
     margin:10px;
+    user-select:none;
+    -webkit-user-select:none;
+    touch-action:none;
 }
-.action-btn:active, .action-btn.pressed {
-    background:rgba(188,19,254,0.7);
+.action-btn:active, .action-btn.pressed { 
+    background:rgba(188,19,254,0.7); 
     transform:scale(0.9);
     box-shadow:0 0 25px rgba(188,19,254,0.6);
 }
-.action-btn.jump {
-    background:rgba(0,255,136,0.3);
-    border-color:#00ff88;
-    color:#00ff88;
-}
-.action-btn.jump:active, .action-btn.jump.pressed {
-    background:rgba(0,255,136,0.7);
-    box-shadow:0 0 25px rgba(0,255,136,0.6);
-}
+.action-btn.jump { background:rgba(0,255,136,0.3); border-color:#00ff88; color:#00ff88; }
+.action-btn.jump:active, .action-btn.jump.pressed { background:rgba(0,255,136,0.7); box-shadow:0 0 25px rgba(0,255,136,0.6); }
 
 .notification {
     position:fixed; top:20px; left:50%; transform:translateX(-50%) translateY(-100px);
@@ -137,6 +122,7 @@ canvas { width:100%; height:100%; display:block; }
     padding:14px 28px; border-radius:25px; font-weight:bold; z-index:2000;
     transition:transform 0.3s; font-size:14px; text-align:center; max-width:90%;
     box-shadow:0 5px 20px rgba(0,243,255,0.3);
+    pointer-events:none;
 }
 .notification.show { transform:translateX(-50%) translateY(0); }
 
@@ -164,16 +150,15 @@ canvas { width:100%; height:100%; display:block; }
 .shop-name { font-weight:bold; font-size:13px; margin-bottom:10px; }
 .shop-price { background:linear-gradient(135deg,#ffd700,#ff8c00); color:#000; padding:8px 16px; border-radius:18px; font-weight:bold; cursor:pointer; font-size:12px; display:inline-block; }
 
-/* Адаптация для телефонов */
 @media(max-width:600px) {
     .header h1 { font-size:20px; }
     .games-grid { grid-template-columns:1fr; }
     .mobile-controls { height:200px; padding:0 15px 15px 15px; }
     .dpad { width:140px; height:140px; }
     .dpad-btn { width:50px; height:50px; font-size:24px; border-width:2px; }
-    .dpad-up { left:45px; }
+    .dpad-up { left:45px; } 
     .dpad-down { left:45px; }
-    .dpad-left { top:45px; }
+    .dpad-left { top:45px; } 
     .dpad-right { top:45px; }
     .action-btn { width:70px; height:70px; font-size:28px; border-width:3px; }
 }
@@ -187,16 +172,16 @@ canvas { width:100%; height:100%; display:block; }
         <div class="stat">⭐ <b id="totalXP">0</b></div>
         <div class="stat">LVL <b id="level">1</b></div>
         <div class="stat">🪙 <b id="coins">100</b></div>
-        <div class="stat">🚀 <b id="gamesPlayed">0</b></div>
+        <div class="stat"> <b id="gamesPlayed">0</b></div>
     </div>
 </div>
 
 <div class="nav">
-    <button class="nav-btn active" onclick="showSection('games')">🎮 Игры</button>
+    <button class="nav-btn active" onclick="showSection('games')"> Игры</button>
     <button class="nav-btn" onclick="showSection('leaderboard')">🏆 Топ</button>
     <button class="nav-btn" onclick="showSection('achievements')">🏅</button>
     <button class="nav-btn" onclick="showSection('shop')">🛒</button>
-    <button class="nav-btn" onclick="showSection('profile')">👤</button>
+    <button class="nav-btn" onclick="showSection('profile')"></button>
 </div>
 
 <div class="container">
@@ -211,7 +196,7 @@ canvas { width:100%; height:100%; display:block; }
             <div class="game-reward">+10 XP</div>
         </div>
         <div class="game-card" onclick="startGame('spaceSnake')">
-            <div class="game-icon">🌌</div>
+            <div class="game-icon"></div>
             <div class="game-title">Звёздная змейка</div>
             <div class="game-desc">2D • Кнопки ← → ↑ ↓</div>
             <div class="game-reward">+15 XP</div>
@@ -239,13 +224,13 @@ canvas { width:100%; height:100%; display:block; }
         </div>
         <div class="canvas-wrapper">
             <canvas id="gameCanvas2D" width="800" height="500" style="display:none;"></canvas>
-            <canvas id="gameCanvas3D" width="800" height="500" style="display:none;"></canvas>
+            <canvas id="gameCanvas3D" width="800" height="500" style="display:none; touch-action:none; pointer-events:auto;"></canvas>
         </div>
         <div class="controls">
             <button class="btn btn-primary" onclick="launchGame()">▶ Старт</button>
-            <button class="btn btn-secondary" onclick="pauseGame()">⏸</button>
+            <button class="btn btn-secondary" onclick="pauseGame()"></button>
             <button class="btn btn-secondary" onclick="resumeGame()">▶</button>
-            <button class="btn btn-secondary" onclick="closeGame()"></button>
+            <button class="btn btn-secondary" onclick="closeGame()">❌</button>
         </div>
         <div class="game-info" id="gameInstructions"></div>
     </div>
@@ -282,7 +267,7 @@ canvas { width:100%; height:100%; display:block; }
 
 </div>
 
-<!-- === МОБИЛЬНОЕ УПРАВЛЕНИЕ - ВИДИМЫЕ КНОПКИ === -->
+<!-- === МОБИЛЬНОЕ УПРАВЛЕНИЕ === -->
 <div class="mobile-controls" id="mobileControls">
     <div class="dpad" id="dpad">
         <div class="dpad-btn dpad-up" data-key="ArrowUp">↑</div>
@@ -291,7 +276,7 @@ canvas { width:100%; height:100%; display:block; }
         <div class="dpad-btn dpad-right" data-key="ArrowRight">→</div>
     </div>
     <div class="action-area">
-        <div class="action-btn jump" data-key="Space">⬆</div>
+        <div class="action-btn jump" data-key="Space"></div>
     </div>
 </div>
 
@@ -305,6 +290,7 @@ let animationId = null;
 let gameScore = 0;
 let isPaused = false;
 let keys = {};
+let gameLaunched = false; // Флаг: игра запущена или нет
 
 const canvas2D = document.getElementById('gameCanvas2D');
 const canvas3D = document.getElementById('gameCanvas3D');
@@ -331,14 +317,14 @@ let leaderboard = JSON.parse(localStorage.getItem('ss_leaderboard')) || [
 ];
 
 const achievements = [
-    {id: 'first_mission', name: 'Первый полёт', desc: 'Заверши любую миссию', icon: '🚀'},
+    {id: 'first_mission', name: 'Первый полёт', desc: 'Заверши любую миссию', icon: ''},
     {id: 'xp_500', name: 'Новичок', desc: '500 XP', icon: '⭐'},
     {id: 'dodge_50', name: 'Манёвренный', desc: '50 в уклоне', icon: '☄️'},
-    {id: 'snake_30', name: 'Змей', desc: '30 звёзд', icon: ''}
+    {id: 'snake_30', name: 'Змей', desc: '30 звёзд', icon: '🐍'}
 ];
 
 const shopItems = [
-    {id: 'avatar_astro', name: 'Астронавт', price: 300, type: 'avatar', icon: '👨🚀'},
+    {id: 'avatar_astro', name: 'Астронавт', price: 300, type: 'avatar', icon: '👨‍🚀'},
     {id: 'credits_200', name: '200 кредитов', price: 250, type: 'coins', amount: 200, icon: '🪙'},
     {id: 'xp_boost', name: 'x2 XP', price: 400, type: 'boost', duration: 3600, icon: '⚡'}
 ];
@@ -349,30 +335,31 @@ window.onload = function() {
     renderLeaderboard();
     renderAchievements();
     renderShop();
-    showNotification('🌌 Soundscape готов!');
+    showNotification(' Soundscape готов!');
     initTouchControls();
 };
 
-// ============ ТАЧ-УПРАВЛЕНИЕ - РАБОЧЕЕ ===
+// ============ ТАЧ-УПРАВЛЕНИЕ ===
 function initTouchControls() {
     const dpadBtns = document.querySelectorAll('.dpad-btn');
     const actionBtns = document.querySelectorAll('.action-btn');
-
-    // Обработка кнопок D-PAD
+    
     dpadBtns.forEach(btn => {
         const key = btn.dataset.key;
-
-        const press = (e) => {
-            e.preventDefault();
-            keys[key] = true;
+        
+        const press = (e) => { 
+            e.preventDefault(); 
+            e.stopPropagation();
+            keys[key] = true; 
             btn.classList.add('pressed');
         };
-        const release = (e) => {
-            e.preventDefault();
-            keys[key] = false;
+        const release = (e) => { 
+            e.preventDefault(); 
+            e.stopPropagation();
+            keys[key] = false; 
             btn.classList.remove('pressed');
         };
-
+        
         btn.addEventListener('touchstart', press, {passive:false});
         btn.addEventListener('touchend', release, {passive:false});
         btn.addEventListener('touchcancel', release, {passive:false});
@@ -380,22 +367,23 @@ function initTouchControls() {
         btn.addEventListener('mouseup', release);
         btn.addEventListener('mouseleave', release);
     });
-
-    // Обработка кнопок действий
+    
     actionBtns.forEach(btn => {
         const key = btn.dataset.key;
-
-        const press = (e) => {
-            e.preventDefault();
-            keys[key] = true;
+        
+        const press = (e) => { 
+            e.preventDefault(); 
+            e.stopPropagation();
+            keys[key] = true; 
             btn.classList.add('pressed');
         };
-        const release = (e) => {
-            e.preventDefault();
-            keys[key] = false;
+        const release = (e) => { 
+            e.preventDefault(); 
+            e.stopPropagation();
+            keys[key] = false; 
             btn.classList.remove('pressed');
         };
-
+        
         btn.addEventListener('touchstart', press, {passive:false});
         btn.addEventListener('touchend', release, {passive:false});
         btn.addEventListener('touchcancel', release, {passive:false});
@@ -419,12 +407,14 @@ function showSection(sectionId) {
 function stopAllGames() {
     currentGame = null;
     isPaused = false;
+    gameLaunched = false;
     if (gameInterval) { clearInterval(gameInterval); gameInterval = null; }
     if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
     if (renderer3D) { renderer3D.dispose(); renderer3D = null; }
     scene3D = null; camera3D = null; player = null;
     obstacles = []; crystals = [];
     keys = {};
+    // СКРЫВАЕМ КНОПКИ
     document.getElementById('mobileControls').classList.remove('active');
 }
 
@@ -432,19 +422,20 @@ function startGame(gameType) {
     stopAllGames();
     currentGame = gameType;
     gameScore = 0;
+    gameLaunched = false; // Игра еще не запущена (ждет кнопку Старт)
     document.getElementById('currentScore').textContent = '0';
     document.getElementById('activeGame').style.display = 'block';
-
+    
     const games = {
         'spaceDodge': {title: '🚀 Уклон', instructions: isMobile ? '👆 Жми кнопки ← → на экране' : '← → или мышь'},
-        'spaceSnake': {title: '🌌 Змейка', instructions: isMobile ? '👆 Жми кнопки ← → ↑ ↓' : 'Стрелки'},
+        'spaceSnake': {title: '🌌 Змейка', instructions: isMobile ? ' Жми кнопки ← → ↑ ↓' : 'Стрелки'},
         'spaceFlight3D': {title: '🛸 3D Полёт', instructions: isMobile ? '👆 Жми кнопки ← →' : '← →'},
-        'crystalCollector3D': {title: ' 3D Кристаллы', instructions: isMobile ? '👆 Жми все 4 кнопки' : 'Стрелки'}
+        'crystalCollector3D': {title: '💎 3D Кристаллы', instructions: isMobile ? '👆 Жми все 4 кнопки' : 'Стрелки'}
     };
-
+    
     document.getElementById('currentGameTitle').textContent = games[gameType].title;
     document.getElementById('gameInstructions').textContent = games[gameType].instructions;
-
+    
     if (gameType === 'spaceFlight3D' || gameType === 'crystalCollector3D') {
         canvas2D.style.display = 'none';
         canvas3D.style.display = 'block';
@@ -454,11 +445,10 @@ function startGame(gameType) {
         canvas2D.style.display = 'block';
         ctx2D = canvas2D.getContext('2d');
     }
-
-    if (isMobile) {
-        document.getElementById('mobileControls').classList.add('active');
-    }
-
+    
+    // НЕ ПОКАЗЫВАЕМ кнопки пока игра не запущена
+    // Кнопки появятся только после launchGame()
+    
     initGame(gameType);
     document.getElementById('activeGame').scrollIntoView({behavior:'smooth',block:'center'});
 }
@@ -481,6 +471,13 @@ function launchGame() {
     if (gameInterval) clearInterval(gameInterval);
     if (animationId) cancelAnimationFrame(animationId);
     isPaused = false;
+    gameLaunched = true; // Игра запущена!
+    
+    // ПОКАЗЫВАЕМ кнопки только сейчас
+    if (isMobile) {
+        document.getElementById('mobileControls').classList.add('active');
+    }
+    
     startGameLogic(currentGame);
     showNotification('🚀 Старт!');
 }
@@ -493,11 +490,15 @@ function pauseGame() {
 }
 
 function resumeGame() {
-    if (isPaused) { isPaused = false; startGameLogic(currentGame); showNotification('▶ Поехали!'); }
+    if (isPaused) { 
+        isPaused = false; 
+        startGameLogic(currentGame); 
+        showNotification('▶ Поехали!'); 
+    }
 }
 
 function closeGame() {
-    stopAllGames();
+    stopAllGames(); // Тут кнопки скроются
     document.getElementById('activeGame').style.display = 'none';
     canvas2D.style.display = 'none';
     canvas3D.style.display = 'none';
@@ -537,7 +538,7 @@ function startSpaceDodge() {
         dodgeFrame++;
         if (dodgeFrame % 40 === 0) dodgeAsteroids.push({x:Math.random()*760, y:-30, size:15+Math.random()*20, speed:3+Math.random()*3});
         if (dodgeFrame % 120 === 0) dodgeStars.push({x:Math.random()*760, y:-30, size:10, speed:4});
-
+        
         for (let i = dodgeAsteroids.length-1; i >= 0; i--) {
             let a = dodgeAsteroids[i];
             a.y += a.speed;
@@ -728,7 +729,7 @@ function startCrystalCollector3D() {
 function endGame(gameType) {
     if (gameInterval) clearInterval(gameInterval);
     if (animationId) cancelAnimationFrame(animationId);
-    showNotification(' Счёт: ' + gameScore);
+    showNotification('💥 Счёт: ' + gameScore);
     userData.gamesPlayed++; localStorage.setItem('ss_games', userData.gamesPlayed);
     updateStats();
     checkAchievement('first_mission', true);
@@ -785,7 +786,7 @@ function renderLeaderboard() {
     localStorage.setItem('ss_leaderboard', JSON.stringify(leaderboard));
     let html = '';
     leaderboard.slice(0,10).forEach((p,i) => {
-        const medal = i===0 ? '🥇' : i===1 ? '🥈' : i===2 ? '🥉' : (i+1)+'.';
+        const medal = i===0 ? '🥇' : i===1 ? '' : i===2 ? '🥉' : (i+1)+'.';
         const isMe = p.name === userData.username ? ' <span style="color:#00f3ff">(ты)</span>' : '';
         html += '<div class="leaderboard-item" style="display:flex;justify-content:space-between;"><span>'+medal+' '+p.name+isMe+'</span><span style="color:#ffd700;font-weight:bold">'+p.xp+'</span></div>';
     });
@@ -813,14 +814,14 @@ function renderShop() {
 
 function buyItem(itemId) {
     const item = shopItems.find(i => i.id === itemId);
-    if (userData.coins < item.price) { showNotification('️ Мало кредитов!'); return; }
+    if (userData.coins < item.price) { showNotification('⚠️ Мало кредитов!'); return; }
     userData.coins -= item.price;
     if (item.type === 'coins') userData.coins += item.amount;
     else if (item.type === 'avatar') document.getElementById('userAvatar').textContent = item.icon;
     else if (item.type === 'boost') {
         if (!userData.inventory.includes('xp_boost')) {
             userData.inventory.push('xp_boost');
-            setTimeout(() => { userData.inventory = userData.inventory.filter(i => i !== 'xp_boost'); localStorage.setItem('ss_inventory', JSON.stringify(userData.inventory)); showNotification(' Бустер истёк!'); }, item.duration*1000);
+            setTimeout(() => { userData.inventory = userData.inventory.filter(i => i !== 'xp_boost'); localStorage.setItem('ss_inventory', JSON.stringify(userData.inventory)); showNotification('⚡ Бустер истёк!'); }, item.duration*1000);
         }
     }
     localStorage.setItem('ss_coins', userData.coins);
