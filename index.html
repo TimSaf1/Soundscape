@@ -4,11 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>🌌 Soundscape Gaming</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-html, body { 
-    background: radial-gradient(ellipse at bottom, #1a1b3a 0%, #050510 100%); 
+html, body {
+    background: radial-gradient(ellipse at bottom, #1a1b3a 0%, #050510 100%);
     color:#fff; font-family:'Segoe UI',sans-serif; overflow-x:hidden;
     width:100%; height:100%; touch-action:none; overscroll-behavior:none;
 }
@@ -32,7 +31,6 @@ html, body {
 .game-title { font-size:17px; font-weight:bold; margin:10px 0; color:#fff; }
 .game-desc { font-size:12px; opacity:0.7; margin-bottom:10px; }
 .game-reward { display:inline-block; background:rgba(255,215,0,0.2); color:#ffd700; padding:5px 12px; border-radius:12px; font-size:11px; font-weight:bold; }
-.game-badge { position:absolute; top:10px; right:10px; background:linear-gradient(135deg,#bc13fe,#ff0055); color:#fff; padding:4px 10px; border-radius:8px; font-size:10px; font-weight:bold; }
 .game-container { background:rgba(0,0,0,0.6); border:1px solid rgba(0,243,255,0.3); border-radius:15px; padding:20px; margin-top:20px; display:none; }
 .game-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px; }
 .game-title-large { color:#00f3ff; font-size:20px; font-weight:bold; }
@@ -45,85 +43,44 @@ canvas { width:100%; height:100%; display:block; touch-action:none; }
 .btn-secondary { background:rgba(255,255,255,0.1); color:#fff; }
 .game-info { text-align:center; padding:12px; background:rgba(0,243,255,0.05); border-radius:10px; font-size:12px; color:#00f3ff; margin-top:10px; border:1px solid rgba(0,243,255,0.1); }
 
-/* === МОБИЛЬНОЕ УПРАВЛЕНИЕ === */
+/* МОБИЛЬНОЕ УПРАВЛЕНИЕ */
 .mobile-controls {
-    position:fixed; 
-    bottom:10px; 
-    left:0; 
-    right:0; 
-    height:220px;
-    display:none !important;
-    z-index:1000; 
-    pointer-events:none;
+    position:fixed; bottom:10px; left:0; right:0; height:220px;
+    display:none !important; z-index:1000; pointer-events:none;
     padding:0 20px 20px 20px;
 }
 .mobile-controls.active { display:flex !important; }
-
 .dpad { position:relative; width:160px; height:160px; pointer-events:auto; flex-shrink:0; }
 .dpad-btn {
-    position:absolute; 
-    width:55px; 
-    height:55px;
-    background:rgba(0,243,255,0.3); 
-    border:3px solid #00f3ff;
-    border-radius:12px; 
-    display:flex; 
-    align-items:center; 
-    justify-content:center;
-    font-size:28px; 
-    color:#00f3ff; 
-    font-weight:bold;
-    pointer-events:auto;
-    box-shadow:0 4px 10px rgba(0,0,0,0.3);
-    user-select:none;
-    -webkit-user-select:none;
-    touch-action:none;
+    position:absolute; width:55px; height:55px;
+    background:rgba(0,243,255,0.3); border:3px solid #00f3ff;
+    border-radius:12px; display:flex; align-items:center; justify-content:center;
+    font-size:28px; color:#00f3ff; font-weight:bold;
+    pointer-events:auto; box-shadow:0 4px 10px rgba(0,0,0,0.3);
 }
-.dpad-btn:active, .dpad-btn.pressed { 
-    background:rgba(0,243,255,0.7); 
-    transform:scale(0.9);
-    box-shadow:0 0 20px rgba(0,243,255,0.6);
-}
+.dpad-btn:active, .dpad-btn.pressed { background:rgba(0,243,255,0.7); transform:scale(0.9); }
 .dpad-up { top:0; left:52px; }
 .dpad-down { bottom:0; left:52px; }
 .dpad-left { top:52px; left:0; }
 .dpad-right { top:52px; right:0; }
-
 .action-area { flex:1; display:flex; justify-content:flex-end; align-items:center; pointer-events:auto; }
 .action-btn {
-    width:80px; 
-    height:80px; 
-    border-radius:50%;
-    background:rgba(188,19,254,0.3); 
-    border:4px solid #bc13fe;
-    display:flex; 
-    align-items:center; 
-    justify-content:center;
-    font-size:32px; 
-    color:#bc13fe; 
-    font-weight:bold;
-    pointer-events:auto;
-    box-shadow:0 4px 15px rgba(0,0,0,0.3);
-    margin:10px;
-    user-select:none;
-    -webkit-user-select:none;
-    touch-action:none;
+    width:80px; height:80px; border-radius:50%;
+    background:rgba(188,19,254,0.3); border:4px solid #bc13fe;
+    display:flex; align-items:center; justify-content:center;
+    font-size:32px; color:#bc13fe; font-weight:bold;
+    pointer-events:auto; box-shadow:0 4px 15px rgba(0,0,0,0.3); margin:10px;
 }
-.action-btn:active, .action-btn.pressed { 
-    background:rgba(188,19,254,0.7); 
-    transform:scale(0.9);
-    box-shadow:0 0 25px rgba(188,19,254,0.6);
-}
-.action-btn.jump { background:rgba(0,255,136,0.3); border-color:#00ff88; color:#00ff88; }
-.action-btn.jump:active, .action-btn.jump.pressed { background:rgba(0,255,136,0.7); box-shadow:0 0 25px rgba(0,255,136,0.6); }
+.action-btn:active, .action-btn.pressed { background:rgba(188,19,254,0.7); transform:scale(0.9); }
+.action-btn.fire { background:rgba(255,69,0,0.3); border-color:#ff4500; color:#ff4500; }
+.action-btn.fire:active { background:rgba(255,69,0,0.7); }
 
 .notification {
     position:fixed; top:20px; left:50%; transform:translateX(-50%) translateY(-100px);
     background:linear-gradient(135deg,#00f3ff,#bc13fe);
     padding:14px 28px; border-radius:25px; font-weight:bold; z-index:2000;
     transition:transform 0.3s; font-size:14px; text-align:center; max-width:90%;
-    box-shadow:0 5px 20px rgba(0,243,255,0.3);
-    pointer-events:none;
+    box-shadow:0 5px 20px rgba(0,243,255,0.3); pointer-events:none;
 }
 .notification.show { transform:translateX(-50%) translateY(0); }
 
@@ -156,12 +113,10 @@ canvas { width:100%; height:100%; display:block; touch-action:none; }
     .games-grid { grid-template-columns:1fr; }
     .mobile-controls { height:200px; padding:0 15px 15px 15px; }
     .dpad { width:140px; height:140px; }
-    .dpad-btn { width:50px; height:50px; font-size:24px; border-width:2px; }
-    .dpad-up { left:45px; } 
-    .dpad-down { left:45px; }
-    .dpad-left { top:45px; } 
-    .dpad-right { top:45px; }
-    .action-btn { width:70px; height:70px; font-size:28px; border-width:3px; }
+    .dpad-btn { width:50px; height:50px; font-size:24px; }
+    .dpad-up { left:45px; } .dpad-down { left:45px; }
+    .dpad-left { top:45px; } .dpad-right { top:45px; }
+    .action-btn { width:70px; height:70px; font-size:28px; }
 }
 </style>
 </head>
@@ -178,10 +133,10 @@ canvas { width:100%; height:100%; display:block; touch-action:none; }
 </div>
 
 <div class="nav">
-    <button class="nav-btn active" onclick="showSection('games')"> Игры</button>
-    <button class="nav-btn" onclick="showSection('leaderboard')"> Топ</button>
+    <button class="nav-btn active" onclick="showSection('games')">🎮 Игры</button>
+    <button class="nav-btn" onclick="showSection('leaderboard')">🏆 Топ</button>
     <button class="nav-btn" onclick="showSection('achievements')">🏅</button>
-    <button class="nav-btn" onclick="showSection('shop')"></button>
+    <button class="nav-btn" onclick="showSection('shop')">🛒</button>
     <button class="nav-btn" onclick="showSection('profile')">👤</button>
 </div>
 
@@ -193,28 +148,26 @@ canvas { width:100%; height:100%; display:block; touch-action:none; }
         <div class="game-card" onclick="startGame('spaceDodge')">
             <div class="game-icon">🚀</div>
             <div class="game-title">Космический уклон</div>
-            <div class="game-desc">2D • Кнопки на экране</div>
+            <div class="game-desc">2D • Уклоняйся от астероидов</div>
             <div class="game-reward">+10 XP</div>
         </div>
         <div class="game-card" onclick="startGame('spaceSnake')">
             <div class="game-icon">🌌</div>
             <div class="game-title">Звёздная змейка</div>
-            <div class="game-desc">2D • Кнопки ← → ↑ ↓</div>
+            <div class="game-desc">2D • Собирай звёзды</div>
             <div class="game-reward">+15 XP</div>
         </div>
-        <div class="game-card" onclick="startGame('spaceFlight3D')" style="position:relative;">
-            <div class="game-icon">🛸</div>
-            <div class="game-title">3D Гиперпространство</div>
-            <div class="game-desc">3D • Кнопки ← →</div>
-            <div class="game-reward">+50 XP</div>
-            <div class="game-badge">3D</div>
+        <div class="game-card" onclick="startGame('pacman')">
+            <div class="game-icon">👻</div>
+            <div class="game-title">Space Pac-Man</div>
+            <div class="game-desc">2D • Собирай точки, избегай призраков</div>
+            <div class="game-reward">+20 XP</div>
         </div>
-        <div class="game-card" onclick="startGame('crystalCollector3D')" style="position:relative;">
-            <div class="game-icon">💎</div>
-            <div class="game-title">3D Кристаллы</div>
-            <div class="game-desc">3D • Все 4 кнопки</div>
-            <div class="game-reward">+100 XP</div>
-            <div class="game-badge">3D</div>
+        <div class="game-card" onclick="startGame('angrybirds')">
+            <div class="game-icon">🐦</div>
+            <div class="game-title">Space Birds</div>
+            <div class="game-desc">2D • Стреляй по мишеням</div>
+            <div class="game-reward">+50 XP</div>
         </div>
     </div>
 
@@ -224,21 +177,20 @@ canvas { width:100%; height:100%; display:block; touch-action:none; }
             <div class="score-board">Счёт: <span id="currentScore">0</span></div>
         </div>
         <div class="canvas-wrapper" id="canvasWrapper">
-            <canvas id="gameCanvas2D" width="800" height="500" style="display:none;"></canvas>
-            <canvas id="gameCanvas3D" width="800" height="500" style="display:none;"></canvas>
+            <canvas id="gameCanvas" width="800" height="500"></canvas>
         </div>
         <div class="controls">
             <button class="btn btn-primary" onclick="launchGame()">▶ Старт</button>
             <button class="btn btn-secondary" onclick="pauseGame()">⏸</button>
             <button class="btn btn-secondary" onclick="resumeGame()">▶</button>
-            <button class="btn btn-secondary" onclick="closeGame()">❌</button>
+            <button class="btn btn-secondary" onclick="closeGame()"></button>
         </div>
         <div class="game-info" id="gameInstructions"></div>
     </div>
 </div>
 
 <div id="leaderboard" class="section">
-    <h2 style="text-align:center;margin:20px 0;font-size:24px">🏆 Топ игроков</h2>
+    <h2 style="text-align:center;margin:20px 0;font-size:24px"> Топ игроков</h2>
     <div id="leaderboardList"></div>
 </div>
 
@@ -255,7 +207,7 @@ canvas { width:100%; height:100%; display:block; touch-action:none; }
 
 <div id="profile" class="section">
     <div class="profile-card">
-        <div class="avatar" id="userAvatar">👨🚀</div>
+        <div class="avatar" id="userAvatar">👨‍🚀</div>
         <div class="username" id="userName">Пилот</div>
         <div class="user-level">Уровень <span id="userLevel">1</span></div>
         <div class="user-stats">
@@ -268,7 +220,7 @@ canvas { width:100%; height:100%; display:block; touch-action:none; }
 
 </div>
 
-<!-- === МОБИЛЬНОЕ УПРАВЛЕНИЕ === -->
+<!-- МОБИЛЬНОЕ УПРАВЛЕНИЕ -->
 <div class="mobile-controls" id="mobileControls">
     <div class="dpad" id="dpad">
         <div class="dpad-btn dpad-up" data-key="ArrowUp">↑</div>
@@ -277,30 +229,23 @@ canvas { width:100%; height:100%; display:block; touch-action:none; }
         <div class="dpad-btn dpad-right" data-key="ArrowRight">→</div>
     </div>
     <div class="action-area">
-        <div class="action-btn jump" data-key="Space">⬆</div>
+        <div class="action-btn fire" data-key="Space">🔥</div>
     </div>
 </div>
 
 <div class="notification" id="notification"></div>
 
 <script>
-// ============ ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ============
+// ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
 let currentGame = null;
 let gameInterval = null;
-let animationId = null;
 let gameScore = 0;
 let isPaused = false;
 let keys = {};
 let gameLaunched = false;
-
-const canvas2D = document.getElementById('gameCanvas2D');
-const canvas3D = document.getElementById('gameCanvas3D');
+let ctx = null;
+const canvas = document.getElementById('gameCanvas');
 const canvasWrapper = document.getElementById('canvasWrapper');
-let ctx2D = null;
-
-let renderer3D = null, scene3D = null, camera3D = null, player = null;
-let obstacles = [], crystals = [], particles = [];
-let crystalLight;
 
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
@@ -320,10 +265,10 @@ let leaderboard = JSON.parse(localStorage.getItem('ss_leaderboard')) || [
 ];
 
 const achievements = [
-    {id: 'first_mission', name: 'Первый полёт', desc: 'Заверши любую миссию', icon: '🚀'},
+    {id: 'first_mission', name: 'Первый полёт', desc: 'Заверши любую миссию', icon: ''},
     {id: 'xp_500', name: 'Новичок', desc: '500 XP', icon: '⭐'},
-    {id: 'dodge_50', name: 'Манёвренный', desc: '50 в уклоне', icon: '☄️'},
-    {id: 'snake_30', name: 'Змей', desc: '30 звёзд', icon: '🐍'}
+    {id: 'pacman_100', name: 'Pac-Man', desc: '100 в Pac-Man', icon: '👻'},
+    {id: 'birds_50', name: 'Птица', desc: '50 в Birds', icon: '🐦'}
 ];
 
 const shopItems = [
@@ -332,7 +277,17 @@ const shopItems = [
     {id: 'xp_boost', name: 'x2 XP', price: 400, type: 'boost', duration: 3600, icon: '⚡'}
 ];
 
-// ============ ИНИЦИАЛИЗАЦИЯ ============
+// ИГРОВЫЕ ПЕРЕМЕННЫЕ
+let pacman = {x:1, y:1, dir:{x:0,y:0}, nextDir:{x:0,y:0}, mouthOpen:0};
+let ghosts = [];
+let dots = [];
+let maze = [];
+
+let bird = {x:100, y:400, vx:0, vy:0, state:'idle'};
+let slingshot = {x:100, y:400, active:true};
+let targets = [];
+let particles = [];
+
 window.onload = function() {
     updateStats();
     renderLeaderboard();
@@ -340,79 +295,35 @@ window.onload = function() {
     renderShop();
     showNotification('🌌 Soundscape готов!');
     initTouchControls();
+    ctx = canvas.getContext('2d');
 };
 
-// ============ ТАЧ-УПРАВЛЕНИЕ (ИСПРАВЛЕНО) ============
 function initTouchControls() {
     const dpadBtns = document.querySelectorAll('.dpad-btn');
     const actionBtns = document.querySelectorAll('.action-btn');
-    
+
     dpadBtns.forEach(btn => {
         const key = btn.dataset.key;
-        
-        const press = (e) => { 
-            e.preventDefault(); 
-            e.stopPropagation();
-            keys[key] = true; 
-            btn.classList.add('pressed');
-            return false;
-        };
-        const release = (e) => { 
-            e.preventDefault(); 
-            e.stopPropagation();
-            keys[key] = false; 
-            btn.classList.remove('pressed');
-            return false;
-        };
-        
+        const press = (e) => { e.preventDefault(); e.stopPropagation(); keys[key] = true; btn.classList.add('pressed'); };
+        const release = (e) => { e.preventDefault(); e.stopPropagation(); keys[key] = false; btn.classList.remove('pressed'); };
         btn.addEventListener('touchstart', press, {passive:false});
         btn.addEventListener('touchend', release, {passive:false});
-        btn.addEventListener('touchcancel', release, {passive:false});
         btn.addEventListener('mousedown', press);
         btn.addEventListener('mouseup', release);
-        btn.addEventListener('mouseleave', release);
     });
-    
+
     actionBtns.forEach(btn => {
         const key = btn.dataset.key;
-        
-        const press = (e) => { 
-            e.preventDefault(); 
-            e.stopPropagation();
-            keys[key] = true; 
-            btn.classList.add('pressed');
-            return false;
-        };
-        const release = (e) => { 
-            e.preventDefault(); 
-            e.stopPropagation();
-            keys[key] = false; 
-            btn.classList.remove('pressed');
-            return false;
-        };
-        
+        const press = (e) => { e.preventDefault(); e.stopPropagation(); keys[key] = true; btn.classList.add('pressed'); };
+        const release = (e) => { e.preventDefault(); e.stopPropagation(); keys[key] = false; btn.classList.remove('pressed'); };
         btn.addEventListener('touchstart', press, {passive:false});
         btn.addEventListener('touchend', release, {passive:false});
-        btn.addEventListener('touchcancel', release, {passive:false});
         btn.addEventListener('mousedown', press);
         btn.addEventListener('mouseup', release);
-        btn.addEventListener('mouseleave', release);
     });
-    
-    // Блокируем скролл и зум на canvas
-    canvasWrapper.addEventListener('touchmove', (e) => {
-        if (currentGame && gameLaunched) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-    }, {passive:false});
-    
-    canvasWrapper.addEventListener('touchstart', (e) => {
-        if (currentGame && gameLaunched) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-    }, {passive:false});
+
+    canvasWrapper.addEventListener('touchmove', (e) => { if (currentGame && gameLaunched) { e.preventDefault(); e.stopPropagation(); } }, {passive:false});
+    canvasWrapper.addEventListener('touchstart', (e) => { if (currentGame && gameLaunched) { e.preventDefault(); e.stopPropagation(); } }, {passive:false});
 }
 
 function showSection(sectionId) {
@@ -431,10 +342,6 @@ function stopAllGames() {
     isPaused = false;
     gameLaunched = false;
     if (gameInterval) { clearInterval(gameInterval); gameInterval = null; }
-    if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
-    if (renderer3D) { renderer3D.dispose(); renderer3D = null; }
-    scene3D = null; camera3D = null; player = null;
-    obstacles = []; crystals = []; particles = [];
     keys = {};
     document.getElementById('mobileControls').classList.remove('active');
 }
@@ -446,63 +353,30 @@ function startGame(gameType) {
     gameLaunched = false;
     document.getElementById('currentScore').textContent = '0';
     document.getElementById('activeGame').style.display = 'block';
-    
+
     const games = {
-        'spaceDodge': {title: '🚀 Уклон', instructions: isMobile ? '👆 Жми кнопки ← → на экране' : '← → или мышь'},
-        'spaceSnake': {title: '🌌 Змейка', instructions: isMobile ? ' Жми кнопки ← → ↑ ↓' : 'Стрелки'},
-        'spaceFlight3D': {title: '🛸 3D Полёт', instructions: isMobile ? '👆 Жми кнопки ← →' : '← →'},
-        'crystalCollector3D': {title: '💎 3D Кристаллы', instructions: isMobile ? '👆 Жми все 4 кнопки' : 'Стрелки'}
+        'spaceDodge': {title: '🚀 Уклон', instructions: isMobile ? '👆 Кнопки ← →' : '← → или мышь'},
+        'spaceSnake': {title: '🌌 Змейка', instructions: isMobile ? ' Кнопки ← → ↑ ↓' : 'Стрелки'},
+        'pacman': {title: '👻 Pac-Man', instructions: isMobile ? '👆 Кнопки для движения' : 'Стрелки'},
+        'angrybirds': {title: '🐦 Space Birds', instructions: isMobile ? '👆 Кнопка 🔥 для выстрела' : 'Пробел для выстрела'}
     };
-    
+
     document.getElementById('currentGameTitle').textContent = games[gameType].title;
     document.getElementById('gameInstructions').textContent = games[gameType].instructions;
-    
-    if (gameType === 'spaceFlight3D' || gameType === 'crystalCollector3D') {
-        canvas2D.style.display = 'none';
-        canvas3D.style.display = 'block';
-        initThreeJS();
-    } else {
-        canvas3D.style.display = 'none';
-        canvas2D.style.display = 'block';
-        ctx2D = canvas2D.getContext('2d');
-    }
-    
+
+    ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 800, 500);
+
     initGame(gameType);
     document.getElementById('activeGame').scrollIntoView({behavior:'smooth',block:'center'});
 }
 
-function initThreeJS() {
-    scene3D = new THREE.Scene();
-    scene3D.fog = new THREE.FogExp2(0x050510, 0.02);
-    camera3D = new THREE.PerspectiveCamera(75, 800/500, 0.1, 1000);
-    renderer3D = new THREE.WebGLRenderer({canvas:canvas3D, antialias:true, alpha:true});
-    renderer3D.setSize(800, 500);
-    renderer3D.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    
-    // Улучшенное освещение
-    const ambientLight = new THREE.AmbientLight(0x404040, 1);
-    scene3D.add(ambientLight);
-    
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-    dirLight.position.set(5, 10, 7);
-    scene3D.add(dirLight);
-    
-    // Добавляем точечный свет для кристаллов
-    crystalLight = new THREE.PointLight(0xffd700, 2, 50);
-    crystalLight.position.set(0, 5, 0);
-    scene3D.add(crystalLight);
-}
-
 function launchGame() {
     if (gameInterval) clearInterval(gameInterval);
-    if (animationId) cancelAnimationFrame(animationId);
     isPaused = false;
     gameLaunched = true;
-    
-    if (isMobile) {
-        document.getElementById('mobileControls').classList.add('active');
-    }
-    
+    if (isMobile) document.getElementById('mobileControls').classList.add('active');
     startGameLogic(currentGame);
     showNotification('🚀 Старт!');
 }
@@ -510,41 +384,34 @@ function launchGame() {
 function pauseGame() {
     isPaused = true;
     if (gameInterval) clearInterval(gameInterval);
-    if (animationId) cancelAnimationFrame(animationId);
     showNotification('⏸ Пауза');
 }
 
 function resumeGame() {
-    if (isPaused) { 
-        isPaused = false; 
-        startGameLogic(currentGame); 
-        showNotification('▶ Поехали!'); 
-    }
+    if (isPaused) { isPaused = false; startGameLogic(currentGame); showNotification('▶ Поехали!'); }
 }
 
 function closeGame() {
     stopAllGames();
     document.getElementById('activeGame').style.display = 'none';
-    canvas2D.style.display = 'none';
-    canvas3D.style.display = 'none';
     window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function initGame(gameType) {
     if (gameType === 'spaceDodge') initSpaceDodge();
     else if (gameType === 'spaceSnake') initSpaceSnake();
-    else if (gameType === 'spaceFlight3D') initSpaceFlight3D();
-    else if (gameType === 'crystalCollector3D') initCrystalCollector3D();
+    else if (gameType === 'pacman') initPacman();
+    else if (gameType === 'angrybirds') initAngryBirds();
 }
 
 function startGameLogic(gameType) {
     if (gameType === 'spaceDodge') startSpaceDodge();
     else if (gameType === 'spaceSnake') startSpaceSnake();
-    else if (gameType === 'spaceFlight3D') startSpaceFlight3D();
-    else if (gameType === 'crystalCollector3D') startCrystalCollector3D();
+    else if (gameType === 'pacman') startPacman();
+    else if (gameType === 'angrybirds') startAngryBirds();
 }
 
-// ============ 2D: КОСМИЧЕСКИЙ УКЛОН ============
+// ИГРА 1: КОСМИЧЕСКИЙ УКЛОН
 let dodgeShip = {x:400, y:450, width:30, height:30};
 let dodgeAsteroids = [], dodgeStars = [], dodgeRunning = false, dodgeFrame = 0;
 
@@ -552,7 +419,6 @@ function initSpaceDodge() {
     dodgeShip = {x:400, y:450, width:30, height:30};
     dodgeAsteroids = []; dodgeStars = [];
     dodgeRunning = false; dodgeFrame = 0;
-    drawSpaceDodge();
 }
 
 function startSpaceDodge() {
@@ -563,47 +429,44 @@ function startSpaceDodge() {
         dodgeFrame++;
         if (dodgeFrame % 40 === 0) dodgeAsteroids.push({x:Math.random()*760, y:-30, size:15+Math.random()*20, speed:3+Math.random()*3});
         if (dodgeFrame % 120 === 0) dodgeStars.push({x:Math.random()*760, y:-30, size:10, speed:4});
-        
+
         for (let i = dodgeAsteroids.length-1; i >= 0; i--) {
-            let a = dodgeAsteroids[i];
-            a.y += a.speed;
+            let a = dodgeAsteroids[i]; a.y += a.speed;
             if (dodgeShip.x < a.x+a.size && dodgeShip.x+dodgeShip.width > a.x && dodgeShip.y < a.y+a.size && dodgeShip.y+dodgeShip.height > a.y) { endGame('spaceDodge'); return; }
-            if (a.y > 500) { dodgeAsteroids.splice(i,1); gameScore += 10; addXP(10); checkAchievement('dodge_50', gameScore>=50); document.getElementById('currentScore').textContent = gameScore; }
+            if (a.y > 500) { dodgeAsteroids.splice(i,1); gameScore += 10; addXP(10); document.getElementById('currentScore').textContent = gameScore; }
         }
         for (let i = dodgeStars.length-1; i >= 0; i--) {
-            let s = dodgeStars[i];
-            s.y += s.speed;
-            if (dodgeShip.x < s.x+s.size && dodgeShip.x+dodgeShip.width > s.x && dodgeShip.y < s.y+s.size && dodgeShip.y+dodgeShip.height > s.y) { dodgeStars.splice(i,1); gameScore += 50; addXP(50); document.getElementById('currentScore').textContent = gameScore; }
-            else if (s.y > 500) dodgeStars.splice(i,1);
+            let s = dodgeStars[i]; s.y += s.speed;
+            if (dodgeShip.x < s.x+s.size && dodgeShip.x+dodgeShip.width > s.x && dodgeShip.y < s.y+s.size && dodgeShip.y+dodgeShip.height > s.y) {
+                dodgeStars.splice(i,1); gameScore += 50; addXP(50); document.getElementById('currentScore').textContent = gameScore;
+            } else if (s.y > 500) dodgeStars.splice(i,1);
         }
         drawSpaceDodge();
     }, 16);
 }
 
 function drawSpaceDodge() {
-    if (!ctx2D) return;
-    ctx2D.fillStyle = '#050510'; ctx2D.fillRect(0,0,800,500);
-    ctx2D.fillStyle = '#fff';
-    for(let i=0; i<50; i++) ctx2D.fillRect((i*137+dodgeFrame*0.5)%800, (i*241)%500, 1, 1);
+    ctx.fillStyle = '#050510'; ctx.fillRect(0,0,800,500);
+    ctx.fillStyle = '#fff';
+    for(let i=0; i<50; i++) ctx.fillRect((i*137+dodgeFrame*0.5)%800, (i*241)%500, 1, 1);
     if (keys['ArrowLeft'] && dodgeShip.x > 0) dodgeShip.x -= 5;
     if (keys['ArrowRight'] && dodgeShip.x < 770) dodgeShip.x += 5;
-    ctx2D.fillStyle = '#00f3ff'; ctx2D.shadowBlur = 15; ctx2D.shadowColor = '#00f3ff';
-    ctx2D.beginPath(); ctx2D.moveTo(dodgeShip.x+15, dodgeShip.y); ctx2D.lineTo(dodgeShip.x+30, dodgeShip.y+30); ctx2D.lineTo(dodgeShip.x, dodgeShip.y+30); ctx2D.closePath(); ctx2D.fill();
-    ctx2D.shadowBlur = 0;
-    ctx2D.fillStyle = '#ff2a6d';
-    dodgeAsteroids.forEach(a => { ctx2D.beginPath(); ctx2D.arc(a.x+a.size/2, a.y+a.size/2, a.size/2, 0, Math.PI*2); ctx2D.fill(); });
-    ctx2D.fillStyle = '#ffd700'; ctx2D.shadowBlur = 10; ctx2D.shadowColor = '#ffd700';
-    dodgeStars.forEach(s => { ctx2D.beginPath(); ctx2D.arc(s.x+5, s.y+5, 5, 0, Math.PI*2); ctx2D.fill(); });
-    ctx2D.shadowBlur = 0;
+    ctx.fillStyle = '#00f3ff'; ctx.shadowBlur = 15; ctx.shadowColor = '#00f3ff';
+    ctx.beginPath(); ctx.moveTo(dodgeShip.x+15, dodgeShip.y); ctx.lineTo(dodgeShip.x+30, dodgeShip.y+30); ctx.lineTo(dodgeShip.x, dodgeShip.y+30); ctx.closePath(); ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#ff2a6d';
+    dodgeAsteroids.forEach(a => { ctx.beginPath(); ctx.arc(a.x+a.size/2, a.y+a.size/2, a.size/2, 0, Math.PI*2); ctx.fill(); });
+    ctx.fillStyle = '#ffd700'; ctx.shadowBlur = 10; ctx.shadowColor = '#ffd700';
+    dodgeStars.forEach(s => { ctx.beginPath(); ctx.arc(s.x+5, s.y+5, 5, 0, Math.PI*2); ctx.fill(); });
+    ctx.shadowBlur = 0;
 }
 
-// ============ 2D: ЗВЁЗДНАЯ ЗМЕЙКА ============
+// ИГРА 2: ЗВЁЗДНАЯ ЗМЕЙКА
 let snake = [], snakeDir = {x:1,y:0}, snakeNextDir = {x:1,y:0}, snakeFood = {}, snakeRunning = false;
 
 function initSpaceSnake() {
     snake = [{x:10, y:10}]; snakeDir = {x:1,y:0}; snakeNextDir = {x:1,y:0};
     snakeFood = {x:15, y:15}; snakeRunning = false;
-    drawSpaceSnake();
 }
 
 function startSpaceSnake() {
@@ -616,7 +479,7 @@ function startSpaceSnake() {
         if (head.x<0 || head.x>=40 || head.y<0 || head.y>=25 || snake.some(s=>s.x===head.x && s.y===head.y)) { endGame('spaceSnake'); return; }
         snake.unshift(head);
         if (head.x===snakeFood.x && head.y===snakeFood.y) {
-            gameScore += 15; addXP(15); checkAchievement('snake_30', snake.length>=30);
+            gameScore += 15; addXP(15);
             snakeFood = {x:Math.floor(Math.random()*40), y:Math.floor(Math.random()*25)};
             document.getElementById('currentScore').textContent = gameScore;
         } else snake.pop();
@@ -625,291 +488,342 @@ function startSpaceSnake() {
 }
 
 function drawSpaceSnake() {
-    if (!ctx2D) return;
-    ctx2D.fillStyle = '#050510'; ctx2D.fillRect(0,0,800,500);
-    ctx2D.strokeStyle = 'rgba(0,243,255,0.1)'; ctx2D.lineWidth = 1;
-    for(let i=0; i<40; i++) { ctx2D.beginPath(); ctx2D.moveTo(i*20,0); ctx2D.lineTo(i*20,500); ctx2D.stroke(); }
-    for(let i=0; i<25; i++) { ctx2D.beginPath(); ctx2D.moveTo(0,i*20); ctx2D.lineTo(800,i*20); ctx2D.stroke(); }
+    ctx.fillStyle = '#050510'; ctx.fillRect(0,0,800,500);
+    ctx.strokeStyle = 'rgba(0,243,255,0.1)'; ctx.lineWidth = 1;
+    for(let i=0; i<40; i++) { ctx.beginPath(); ctx.moveTo(i*20,0); ctx.lineTo(i*20,500); ctx.stroke(); }
+    for(let i=0; i<25; i++) { ctx.beginPath(); ctx.moveTo(0,i*20); ctx.lineTo(800,i*20); ctx.stroke(); }
     if (keys['ArrowUp'] && snakeDir.y===0) snakeNextDir = {x:0,y:-1};
     if (keys['ArrowDown'] && snakeDir.y===0) snakeNextDir = {x:0,y:1};
     if (keys['ArrowLeft'] && snakeDir.x===0) snakeNextDir = {x:-1,y:0};
     if (keys['ArrowRight'] && snakeDir.x===0) snakeNextDir = {x:1,y:0};
-    ctx2D.shadowBlur = 10; ctx2D.shadowColor = '#00f3ff';
-    snake.forEach((s,i) => { ctx2D.fillStyle = i===0 ? '#fff' : '#00f3ff'; ctx2D.fillRect(s.x*20+1, s.y*20+1, 18, 18); });
-    ctx2D.shadowColor = '#ffd700'; ctx2D.fillStyle = '#ffd700';
-    ctx2D.beginPath(); ctx2D.arc(snakeFood.x*20+10, snakeFood.y*20+10, 8, 0, Math.PI*2); ctx2D.fill();
-    ctx2D.shadowBlur = 0;
+    ctx.shadowBlur = 10; ctx.shadowColor = '#00f3ff';
+    snake.forEach((s,i) => { ctx.fillStyle = i===0 ? '#fff' : '#00f3ff'; ctx.fillRect(s.x*20+1, s.y*20+1, 18, 18); });
+    ctx.shadowColor = '#ffd700'; ctx.fillStyle = '#ffd700';
+    ctx.beginPath(); ctx.arc(snakeFood.x*20+10, snakeFood.y*20+10, 8, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0;
 }
 
-// ============ 3D: ГИПЕРПРОСТРАНСТВО ============
-function initSpaceFlight3D() {
-    camera3D.position.set(0,3,8); camera3D.lookAt(0,0,-10);
-    const geometry = new THREE.ConeGeometry(0.5,1.5,8);
-    const material = new THREE.MeshPhongMaterial({color:0x00f3ff, emissive:0x0044aa, emissiveIntensity:0.5});
-    player = new THREE.Mesh(geometry, material);
-    player.rotation.x = Math.PI/2; player.position.set(0,0.5,0);
-    scene3D.add(player);
-    const gridHelper = new THREE.GridHelper(100,50,0xbc13fe,0x1a1b3a);
-    gridHelper.position.set(0,-1,-25); scene3D.add(gridHelper);
-    obstacles = []; gameScore = 0;
-}
+// ИГРА 3: PAC-MAN
+function initPacman() {
+    // Создаём лабиринт (1=стена, 0=точка, 2=пусто)
+    maze = [
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
+        [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,1,0,1],
+        [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,1,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,0,1],
+        [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,1],
+        [1,1,1,1,0,1,1,1,2,1,2,1,1,1,0,1,1,1,1,1],
+        [2,2,2,1,0,1,2,2,2,2,2,2,2,1,0,1,2,2,2,2],
+        [1,1,1,1,0,1,2,1,1,2,1,1,2,1,0,1,1,1,1,1],
+        [2,2,2,2,0,2,2,1,2,2,2,1,2,2,0,2,2,2,2,2],
+        [1,1,1,1,0,1,2,1,1,1,1,1,2,1,0,1,1,1,1,1],
+        [2,2,2,1,0,1,2,2,2,2,2,2,2,1,0,1,2,2,2,2],
+        [1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
+        [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,1,0,1],
+        [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1],
+        [1,1,0,1,0,1,0,1,1,1,1,1,0,1,0,1,0,1,1,1],
+        [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+    ];
 
-function startSpaceFlight3D() {
-    let speed = 0.5, frame = 0;
-    function animate() {
-        if (!currentGame || currentGame !== 'spaceFlight3D') return;
-        if (isPaused) { animationId = requestAnimationFrame(animate); return; }
-        frame++;
-        if (keys['ArrowLeft'] && player.position.x > -8) player.position.x -= 0.2;
-        if (keys['ArrowRight'] && player.position.x < 8) player.position.x += 0.2;
-        player.rotation.z = (keys['ArrowLeft'] ? 0.4 : (keys['ArrowRight'] ? -0.4 : 0));
-        player.rotation.y = (keys['ArrowLeft'] ? 0.2 : (keys['ArrowRight'] ? -0.2 : 0));
-        if (frame % 30 === 0) {
-            const geo = new THREE.IcosahedronGeometry(0.8,0);
-            const mat = new THREE.MeshPhongMaterial({color:0xff2a6d, emissive:0x550022});
-            const obs = new THREE.Mesh(geo, mat);
-            obs.position.x = (Math.random()-0.5)*14; obs.position.y = 0; obs.position.z = -60;
-            scene3D.add(obs); obstacles.push(obs);
+    pacman = {x:1, y:1, dir:{x:0,y:0}, nextDir:{x:0,y:0}, mouthOpen:0};
+    ghosts = [
+        {x:9, y:8, color:'#ff0000', dir:{x:0,y:0}},
+        {x:10, y:8, color:'#ffb8ff', dir:{x:0,y:0}},
+        {x:9, y:9, color:'#00ffff', dir:{x:0,y:0}},
+        {x:10, y:9, color:'#ffb852', dir:{x:0,y:0}}
+    ];
+
+    // Считаем точки
+    dots = [];
+    for(let y=0; y<20; y++) {
+        for(let x=0; x<20; x++) {
+            if(maze[y][x] === 0) dots.push({x,y});
         }
-        for (let i=obstacles.length-1; i>=0; i--) {
-            let obs = obstacles[i];
-            obs.position.z += speed; obs.rotation.x += 0.05; obs.rotation.y += 0.05;
-            let dx = obs.position.x - player.position.x;
-            let dz = obs.position.z - player.position.z;
-            let dist = Math.sqrt(dx*dx + dz*dz);
-            if (dist < 1.5) { endGame('spaceFlight3D'); return; }
-            if (obs.position.z > 10) {
-                scene3D.remove(obs); obs.geometry.dispose(); obs.material.dispose();
-                obstacles.splice(i,1); gameScore += 50; addXP(50);
+    }
+}
+
+function startPacman() {
+    if (gameInterval) return;
+    gameInterval = setInterval(() => {
+        if (isPaused || currentGame !== 'pacman') return;
+
+        // Движение Pac-Man
+        if (keys['ArrowUp']) pacman.nextDir = {x:0,y:-1};
+        if (keys['ArrowDown']) pacman.nextDir = {x:0,y:1};
+        if (keys['ArrowLeft']) pacman.nextDir = {x:-1,y:0};
+        if (keys['ArrowRight']) pacman.nextDir = {x:1,y:0};
+
+        // Пробуем изменить направление
+        let newX = pacman.x + pacman.nextDir.x;
+        let newY = pacman.y + pacman.nextDir.y;
+        if (maze[newY] && maze[newY][newX] !== 1) {
+            pacman.dir = pacman.nextDir;
+        }
+
+        // Двигаемся
+        newX = pacman.x + pacman.dir.x;
+        newY = pacman.y + pacman.dir.y;
+        if (maze[newY] && maze[newY][newX] !== 1) {
+            pacman.x = newX;
+            pacman.y = newY;
+        }
+
+        // Едим точки
+        for (let i = dots.length - 1; i >= 0; i--) {
+            if (dots[i].x === pacman.x && dots[i].y === pacman.y) {
+                dots.splice(i, 1);
+                gameScore += 20;
+                addXP(20);
                 document.getElementById('currentScore').textContent = gameScore;
-                speed += 0.01;
+                checkAchievement('pacman_100', gameScore >= 100);
             }
         }
-        camera3D.position.x += (player.position.x*0.3 - camera3D.position.x)*0.1;
-        renderer3D.render(scene3D, camera3D);
-        animationId = requestAnimationFrame(animate);
-    }
-    animate();
+
+        // Движение призраков
+        ghosts.forEach(ghost => {
+            const dirs = [{x:0,y:-1},{x:0,y:1},{x:-1,y:0},{x:1,y:0}];
+            const validDirs = dirs.filter(d => {
+                let nx = ghost.x + d.x;
+                let ny = ghost.y + d.y;
+                return maze[ny] && maze[ny][nx] !== 1;
+            });
+            if (validDirs.length > 0) {
+                const dir = validDirs[Math.floor(Math.random() * validDirs.length)];
+                ghost.x += dir.x;
+                ghost.y += dir.y;
+            }
+
+            // Столкновение с призраком
+            if (ghost.x === pacman.x && ghost.y === pacman.y) {
+                endGame('pacman');
+            }
+        });
+
+        // Победа
+        if (dots.length === 0) {
+            showNotification(' Победа! Все точки собраны!');
+            setTimeout(() => initPacman(), 2000);
+        }
+
+        drawPacman();
+    }, 150);
 }
 
-// ============ 3D: СБОР КРИСТАЛЛОВ (УЛУЧШЕННЫЙ ВИЗУАЛ) ============
-function initCrystalCollector3D() {
-    camera3D.position.set(0,10,10); camera3D.lookAt(0,0,0);
-    
-    // Игрок с улучшенным материалом
-    const geometry = new THREE.SphereGeometry(0.6, 32, 32);
-    const material = new THREE.MeshPhongMaterial({
-        color: 0x00ff88, 
-        emissive: 0x004422, 
-        emissiveIntensity: 0.5,
-        shininess: 100
-    });
-    player = new THREE.Mesh(geometry, material);
-    player.position.set(0,0.6,0);
-    
-    // Добавляем свечение вокруг игрока
-    const glowGeometry = new THREE.SphereGeometry(0.8, 32, 32);
-    const glowMaterial = new THREE.MeshBasicMaterial({
-        color: 0x00ff88,
-        transparent: true,
-        opacity: 0.3,
-        side: THREE.BackSide
-    });
-    const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-    player.add(glow);
-    
-    scene3D.add(player);
-    
-    // Улучшенная платформа
-    const planeGeo = new THREE.PlaneGeometry(30,30);
-    const planeMat = new THREE.MeshPhongMaterial({
-        color: 0x1a1b3a, 
-        side: THREE.DoubleSide,
-        shininess: 100
-    });
-    const plane = new THREE.Mesh(planeGeo, planeMat);
-    plane.rotation.x = -Math.PI/2; plane.position.y = 0;
-    scene3D.add(plane);
-    
-    // Сетка с неоновым эффектом
-    const gridHelper = new THREE.GridHelper(30,30,0x00f3ff,0x1a1b3a);
-    gridHelper.position.y = 0.01;
-    scene3D.add(gridHelper);
-    
-    // Звёзды на фоне
-    const starsGeometry = new THREE.BufferGeometry();
-    const starsMaterial = new THREE.PointsMaterial({
-        color: 0xffffff,
-        size: 0.1,
-        transparent: true
-    });
-    const starsVertices = [];
-    for (let i = 0; i < 1000; i++) {
-        starsVertices.push(
-            (Math.random() - 0.5) * 100,
-            (Math.random() - 0.5) * 100,
-            (Math.random() - 0.5) * 100
-        );
+function drawPacman() {
+    ctx.fillStyle = '#000'; ctx.fillRect(0,0,800,500);
+    const cellSize = 40;
+
+    // Рисуем лабиринт
+    for(let y=0; y<20; y++) {
+        for(let x=0; x<20; x++) {
+            if (maze[y][x] === 1) {
+                ctx.fillStyle = '#00f3ff';
+                ctx.fillRect(x*cellSize, y*cellSize, cellSize-1, cellSize-1);
+            }
+        }
     }
-    starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
-    const stars = new THREE.Points(starsGeometry, starsMaterial);
-    scene3D.add(stars);
-    
-    crystals = []; 
+
+    // Точки
+    ctx.fillStyle = '#ffd700';
+    dots.forEach(dot => {
+        ctx.beginPath();
+        ctx.arc(dot.x*cellSize + cellSize/2, dot.y*cellSize + cellSize/2, 4, 0, Math.PI*2);
+        ctx.fill();
+    });
+
+    // Pac-Man
+    ctx.fillStyle = '#ffff00';
+    ctx.beginPath();
+    let startAngle = 0.2 * Math.PI;
+    let endAngle = 1.8 * Math.PI;
+    if (pacman.dir.x === 1) { startAngle = 0.2*Math.PI; endAngle = 1.8*Math.PI; }
+    else if (pacman.dir.x === -1) { startAngle = 1.2*Math.PI; endAngle = 0.8*Math.PI; }
+    else if (pacman.dir.y === -1) { startAngle = 1.7*Math.PI; endAngle = 1.3*Math.PI; }
+    else if (pacman.dir.y === 1) { startAngle = 0.7*Math.PI; endAngle = 0.3*Math.PI; }
+    ctx.arc(pacman.x*cellSize + cellSize/2, pacman.y*cellSize + cellSize/2, cellSize/2-2, startAngle, endAngle);
+    ctx.lineTo(pacman.x*cellSize + cellSize/2, pacman.y*cellSize + cellSize/2);
+    ctx.fill();
+
+    // Призраки
+    ghosts.forEach(ghost => {
+        ctx.fillStyle = ghost.color;
+        ctx.beginPath();
+        ctx.arc(ghost.x*cellSize + cellSize/2, ghost.y*cellSize + cellSize/2, cellSize/2-2, Math.PI, 0);
+        ctx.lineTo(ghost.x*cellSize + cellSize-2, ghost.y*cellSize + cellSize-2);
+        ctx.lineTo(ghost.x*cellSize + 2, ghost.y*cellSize + cellSize-2);
+        ctx.fill();
+    });
+}
+
+// ИГРА 4: ANGRY BIRDS
+function initAngryBirds() {
+    bird = {x:100, y:400, vx:0, vy:0, state:'idle', radius:15};
+    slingshot = {x:100, y:400, active:true, pulling:false, pullX:100, pullY:400};
+    targets = [];
     particles = [];
-    spawnCrystal();
-    gameScore = 0;
-}
 
-function createExplosion(position, color) {
-    // Создаём частицы взрыва
-    const particleCount = 20;
-    const geometry = new THREE.BufferGeometry();
-    const positions = [];
-    const velocities = [];
-    
-    for (let i = 0; i < particleCount; i++) {
-        positions.push(position.x, position.y, position.z);
-        velocities.push(
-            (Math.random() - 0.5) * 0.3,
-            (Math.random() - 0.5) * 0.3,
-            (Math.random() - 0.5) * 0.3
-        );
+    // Создаём мишени
+    for (let i = 0; i < 5; i++) {
+        targets.push({
+            x: 500 + Math.random() * 250,
+            y: 350 - Math.random() * 200,
+            width: 30 + Math.random() * 20,
+            height: 30 + Math.random() * 20,
+            hp: 1
+        });
     }
-    
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    const material = new THREE.PointsMaterial({
-        color: color,
-        size: 0.3,
-        transparent: true,
-        opacity: 1
-    });
-    
-    const particleSystem = new THREE.Points(geometry, material);
-    particleSystem.userData.velocities = velocities;
-    scene3D.add(particleSystem);
-    particles.push(particleSystem);
 }
 
-function spawnCrystal() {
-    // Улучшенный кристалл с несколькими материалами
-    const crystalGroup = new THREE.Group();
-    
-    // Основной кристалл
-    const geo = new THREE.OctahedronGeometry(0.6, 0);
-    const mat = new THREE.MeshPhongMaterial({
-        color: 0xffd700, 
-        emissive: 0xaa6600, 
-        emissiveIntensity: 0.8,
-        shininess: 100,
-        transparent: true,
-        opacity: 0.9
-    });
-    const crystal = new THREE.Mesh(geo, mat);
-    crystalGroup.add(crystal);
-    
-    // Внутреннее свечение
-    const innerGeo = new THREE.OctahedronGeometry(0.4, 0);
-    const innerMat = new THREE.MeshBasicMaterial({
-        color: 0xffed4e,
-        transparent: true,
-        opacity: 0.7
-    });
-    const innerCrystal = new THREE.Mesh(innerGeo, innerMat);
-    crystalGroup.add(innerCrystal);
-    
-    // Аура вокруг кристалла
-    const auraGeo = new THREE.OctahedronGeometry(0.9, 0);
-    const auraMat = new THREE.MeshBasicMaterial({
-        color: 0xffd700,
-        transparent: true,
-        opacity: 0.2,
-        side: THREE.BackSide
-    });
-    const aura = new THREE.Mesh(auraGeo, auraMat);
-    crystalGroup.add(aura);
-    
-    crystalGroup.position.x = (Math.random()-0.5)*26;
-    crystalGroup.position.z = (Math.random()-0.5)*26;
-    crystalGroup.position.y = 1.5;
-    
-    scene3D.add(crystalGroup);
-    crystals.push(crystalGroup);
-}
+function startAngryBirds() {
+    if (gameInterval) return;
 
-function startCrystalCollector3D() {
-    function animate() {
-        if (!currentGame || currentGame !== 'crystalCollector3D') return;
-        if (isPaused) { animationId = requestAnimationFrame(animate); return; }
-        
-        // Управление
-        if (keys['ArrowLeft'] && player.position.x > -14) player.position.x -= 0.2;
-        if (keys['ArrowRight'] && player.position.x < 14) player.position.x += 0.2;
-        if (keys['ArrowUp'] && player.position.z > -14) player.position.z -= 0.2;
-        if (keys['ArrowDown'] && player.position.z < 14) player.position.z += 0.2;
-        
-        // Анимация частиц
-        for (let i = particles.length - 1; i >= 0; i--) {
-            const p = particles[i];
-            const positions = p.geometry.attributes.position.array;
-            const velocities = p.userData.velocities;
-            
-            for (let j = 0; j < positions.length; j += 3) {
-                positions[j] += velocities[j];
-                positions[j+1] += velocities[j+1];
-                positions[j+2] += velocities[j+2];
+    let gravity = 0.3;
+    let groundY = 450;
+
+    gameInterval = setInterval(() => {
+        if (isPaused || currentGame !== 'angrybirds') return;
+
+        // Рисуем
+        ctx.fillStyle = '#87CEEB';
+        ctx.fillRect(0, 0, 800, 500);
+
+        // Земля
+        ctx.fillStyle = '#228B22';
+        ctx.fillRect(0, groundY, 800, 50);
+
+        // Рогатка
+        ctx.strokeStyle = '#8B4513';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(slingshot.x, slingshot.y);
+        ctx.lineTo(slingshot.x, slingshot.y - 40);
+        ctx.stroke();
+
+        // Резинка рогатки
+        if (slingshot.active && bird.state === 'idle') {
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(slingshot.x - 10, slingshot.y - 40);
+            ctx.lineTo(bird.x, bird.y);
+            ctx.lineTo(slingshot.x + 10, slingshot.y - 40);
+            ctx.stroke();
+        }
+
+        // Физика птицы
+        if (bird.state === 'flying') {
+            bird.vy += gravity;
+            bird.x += bird.vx;
+            bird.y += bird.vy;
+
+            // Отскок от земли
+            if (bird.y + bird.radius > groundY) {
+                bird.y = groundY - bird.radius;
+                bird.vy *= -0.6;
+                bird.vx *= 0.9;
             }
-            p.geometry.attributes.position.needsUpdate = true;
-            p.material.opacity -= 0.02;
-            
-            if (p.material.opacity <= 0) {
-                scene3D.remove(p);
-                particles.splice(i, 1);
+
+            // Столкновение с мишенями
+            targets.forEach((target, index) => {
+                if (bird.x + bird.radius > target.x &&
+                    bird.x - bird.radius < target.x + target.width &&
+                    bird.y + bird.radius > target.y &&
+                    bird.y - bird.radius < target.y + target.height) {
+                    target.hp--;
+                    if (target.hp <= 0) {
+                        targets.splice(index, 1);
+                        gameScore += 50;
+                        addXP(50);
+                        document.getElementById('currentScore').textContent = gameScore;
+                        checkAchievement('birds_50', gameScore >= 50);
+                        createExplosion(target.x, target.y);
+                    }
+                    bird.vx *= 0.5;
+                    bird.vy *= 0.5;
+                }
+            });
+
+            // Остановка
+            if (Math.abs(bird.vx) < 0.1 && Math.abs(bird.vy) < 0.1 && bird.y >= groundY - bird.radius - 1) {
+                bird.state = 'stopped';
+                setTimeout(() => {
+                    if (targets.length > 0) {
+                        bird = {x:100, y:400, vx:0, vy:0, state:'idle', radius:15};
+                        slingshot.active = true;
+                    } else {
+                        showNotification('🎉 Победа! Все мишени уничтожены!');
+                        setTimeout(() => initAngryBirds(), 2000);
+                    }
+                }, 1000);
             }
         }
-        
-        // Анимация кристаллов и сбор
-        for (let i = crystals.length - 1; i >= 0; i--) {
-            let c = crystals[i];
-            c.rotation.y += 0.05;
-            c.rotation.x += 0.02;
-            c.position.y = 1.5 + Math.sin(Date.now()*0.005+i)*0.5;
-            
-            // Пульсация ауры
-            c.children[2].scale.setScalar(1 + Math.sin(Date.now()*0.01)*0.2);
-            
-            let dx = c.position.x - player.position.x;
-            let dz = c.position.z - player.position.z;
-            let dist = Math.sqrt(dx*dx + dz*dz);
-            
-            if (dist < 1.5) {
-                // Создаём взрыв частиц
-                createExplosion(c.position, 0xffd700);
-                
-                scene3D.remove(c);
-                crystals.splice(i, 1);
-                gameScore += 100;
-                addXP(100);
-                document.getElementById('currentScore').textContent = gameScore;
-                showNotification(' +100 XP');
-                spawnCrystal();
-                if (Math.random()>0.6) spawnCrystal();
-            }
+
+        // Рисуем птицу
+        ctx.fillStyle = bird.state === 'flying' ? '#ff4500' : '#ff0000';
+        ctx.beginPath();
+        ctx.arc(bird.x, bird.y, bird.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Глаз птицы
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(bird.x + 5, bird.y - 3, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(bird.x + 7, bird.y - 3, 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Рисуем мишени
+        targets.forEach(target => {
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(target.x, target.y, target.width, target.height);
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(target.x, target.y, target.width, target.height);
+        });
+
+        // Частицы
+        particles.forEach((p, i) => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life--;
+            ctx.fillStyle = `rgba(255, 100, 0, ${p.life / 30})`;
+            ctx.fillRect(p.x, p.y, 4, 4);
+            if (p.life <= 0) particles.splice(i, 1);
+        });
+
+        // Выстрел
+        if (keys['Space'] && slingshot.active && bird.state === 'idle') {
+            const dx = slingshot.x - bird.x;
+            const dy = slingshot.y - 40 - bird.y;
+            bird.vx = dx * 0.15;
+            bird.vy = dy * 0.15;
+            bird.state = 'flying';
+            slingshot.active = false;
         }
-        
-        camera3D.position.x += (player.position.x - camera3D.position.x)*0.1;
-        camera3D.position.z += (player.position.z+10 - camera3D.position.z)*0.1;
-        camera3D.lookAt(player.position);
-        
-        renderer3D.render(scene3D, camera3D);
-        animationId = requestAnimationFrame(animate);
+
+    }, 16);
+}
+
+function createExplosion(x, y) {
+    for (let i = 0; i < 20; i++) {
+        particles.push({
+            x: x,
+            y: y,
+            vx: (Math.random() - 0.5) * 10,
+            vy: (Math.random() - 0.5) * 10,
+            life: 30
+        });
     }
-    animate();
 }
 
 function endGame(gameType) {
     if (gameInterval) clearInterval(gameInterval);
-    if (animationId) cancelAnimationFrame(animationId);
     showNotification('💥 Счёт: ' + gameScore);
     userData.gamesPlayed++; localStorage.setItem('ss_games', userData.gamesPlayed);
     updateStats();
@@ -917,20 +831,14 @@ function endGame(gameType) {
     setTimeout(() => closeGame(), 2000);
 }
 
-// ============ КЛАВИАТУРА ============
+// КЛАВИАТУРА
 document.addEventListener('keydown', e => {
     if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].indexOf(e.code) > -1) e.preventDefault();
     keys[e.code] = true;
-    if (currentGame === 'spaceSnake' && !isPaused) {
-        if (e.key==='ArrowUp' && snakeDir.y===0) snakeNextDir = {x:0,y:-1};
-        if (e.key==='ArrowDown' && snakeDir.y===0) snakeNextDir = {x:0,y:1};
-        if (e.key==='ArrowLeft' && snakeDir.x===0) snakeNextDir = {x:-1,y:0};
-        if (e.key==='ArrowRight' && snakeDir.x===0) snakeNextDir = {x:1,y:0};
-    }
 });
 document.addEventListener('keyup', e => { keys[e.code] = false; });
 
-// ============ ПРОГРЕСС ============
+// ПРОГРЕСС
 function addXP(amount) {
     const boost = userData.inventory.includes('xp_boost') ? 2 : 1;
     userData.xp += amount * boost;
