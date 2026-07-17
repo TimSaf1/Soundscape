@@ -7,9 +7,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-body { 
+html, body { 
     background: radial-gradient(ellipse at bottom, #1a1b3a 0%, #050510 100%); 
     color:#fff; font-family:'Segoe UI',sans-serif; overflow-x:hidden;
+    width:100%; height:100%; touch-action:none; overscroll-behavior:none;
 }
 .header { padding:15px; text-align:center; background:rgba(0,0,0,0.3); }
 .header h1 { font-size:24px; color:#00f3ff; margin-bottom:10px; }
@@ -36,7 +37,7 @@ body {
 .game-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px; }
 .game-title-large { color:#00f3ff; font-size:20px; font-weight:bold; }
 .score-board { background:rgba(255,215,0,0.2); color:#ffd700; padding:8px 16px; border-radius:10px; font-weight:bold; font-size:16px; }
-.canvas-wrapper { background:#000; border-radius:10px; overflow:hidden; position:relative; width:100%; aspect-ratio:8/5; margin:15px 0; }
+.canvas-wrapper { background:#000; border-radius:10px; overflow:hidden; position:relative; width:100%; aspect-ratio:8/5; margin:15px 0; touch-action:none; }
 canvas { width:100%; height:100%; display:block; touch-action:none; }
 .controls { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:15px; }
 .btn { padding:12px 24px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:13px; }
@@ -44,19 +45,19 @@ canvas { width:100%; height:100%; display:block; touch-action:none; }
 .btn-secondary { background:rgba(255,255,255,0.1); color:#fff; }
 .game-info { text-align:center; padding:12px; background:rgba(0,243,255,0.05); border-radius:10px; font-size:12px; color:#00f3ff; margin-top:10px; border:1px solid rgba(0,243,255,0.1); }
 
-/* === МОБИЛЬНОЕ УПРАВЛЕНИЕ - СКРЫТО ПО УМОЛЧАНИЮ === */
+/* === МОБИЛЬНОЕ УПРАВЛЕНИЕ === */
 .mobile-controls {
     position:fixed; 
     bottom:10px; 
     left:0; 
     right:0; 
     height:220px;
-    display:none !important; /* СКРЫТО ПО УМОЛЧАНИЮ */
+    display:none !important;
     z-index:1000; 
     pointer-events:none;
     padding:0 20px 20px 20px;
 }
-.mobile-controls.active { display:flex !important; } /* ПОКАЗЫВАЕМ ТОЛЬКО КОГДА АКТИВНО */
+.mobile-controls.active { display:flex !important; }
 
 .dpad { position:relative; width:160px; height:160px; pointer-events:auto; flex-shrink:0; }
 .dpad-btn {
@@ -172,16 +173,16 @@ canvas { width:100%; height:100%; display:block; touch-action:none; }
         <div class="stat">⭐ <b id="totalXP">0</b></div>
         <div class="stat">LVL <b id="level">1</b></div>
         <div class="stat">🪙 <b id="coins">100</b></div>
-        <div class="stat"> <b id="gamesPlayed">0</b></div>
+        <div class="stat">🚀 <b id="gamesPlayed">0</b></div>
     </div>
 </div>
 
 <div class="nav">
     <button class="nav-btn active" onclick="showSection('games')"> Игры</button>
-    <button class="nav-btn" onclick="showSection('leaderboard')">🏆 Топ</button>
+    <button class="nav-btn" onclick="showSection('leaderboard')"> Топ</button>
     <button class="nav-btn" onclick="showSection('achievements')">🏅</button>
-    <button class="nav-btn" onclick="showSection('shop')">🛒</button>
-    <button class="nav-btn" onclick="showSection('profile')"></button>
+    <button class="nav-btn" onclick="showSection('shop')"></button>
+    <button class="nav-btn" onclick="showSection('profile')">👤</button>
 </div>
 
 <div class="container">
@@ -196,7 +197,7 @@ canvas { width:100%; height:100%; display:block; touch-action:none; }
             <div class="game-reward">+10 XP</div>
         </div>
         <div class="game-card" onclick="startGame('spaceSnake')">
-            <div class="game-icon"></div>
+            <div class="game-icon">🌌</div>
             <div class="game-title">Звёздная змейка</div>
             <div class="game-desc">2D • Кнопки ← → ↑ ↓</div>
             <div class="game-reward">+15 XP</div>
@@ -222,13 +223,13 @@ canvas { width:100%; height:100%; display:block; touch-action:none; }
             <div class="game-title-large" id="currentGameTitle">Миссия</div>
             <div class="score-board">Счёт: <span id="currentScore">0</span></div>
         </div>
-        <div class="canvas-wrapper">
+        <div class="canvas-wrapper" id="canvasWrapper">
             <canvas id="gameCanvas2D" width="800" height="500" style="display:none;"></canvas>
-            <canvas id="gameCanvas3D" width="800" height="500" style="display:none; touch-action:none; pointer-events:auto;"></canvas>
+            <canvas id="gameCanvas3D" width="800" height="500" style="display:none;"></canvas>
         </div>
         <div class="controls">
             <button class="btn btn-primary" onclick="launchGame()">▶ Старт</button>
-            <button class="btn btn-secondary" onclick="pauseGame()"></button>
+            <button class="btn btn-secondary" onclick="pauseGame()">⏸</button>
             <button class="btn btn-secondary" onclick="resumeGame()">▶</button>
             <button class="btn btn-secondary" onclick="closeGame()">❌</button>
         </div>
@@ -276,7 +277,7 @@ canvas { width:100%; height:100%; display:block; touch-action:none; }
         <div class="dpad-btn dpad-right" data-key="ArrowRight">→</div>
     </div>
     <div class="action-area">
-        <div class="action-btn jump" data-key="Space"></div>
+        <div class="action-btn jump" data-key="Space">⬆</div>
     </div>
 </div>
 
@@ -290,14 +291,16 @@ let animationId = null;
 let gameScore = 0;
 let isPaused = false;
 let keys = {};
-let gameLaunched = false; // Флаг: игра запущена или нет
+let gameLaunched = false;
 
 const canvas2D = document.getElementById('gameCanvas2D');
 const canvas3D = document.getElementById('gameCanvas3D');
+const canvasWrapper = document.getElementById('canvasWrapper');
 let ctx2D = null;
 
 let renderer3D = null, scene3D = null, camera3D = null, player = null;
-let obstacles = [], crystals = [];
+let obstacles = [], crystals = [], particles = [];
+let crystalLight;
 
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
@@ -317,7 +320,7 @@ let leaderboard = JSON.parse(localStorage.getItem('ss_leaderboard')) || [
 ];
 
 const achievements = [
-    {id: 'first_mission', name: 'Первый полёт', desc: 'Заверши любую миссию', icon: ''},
+    {id: 'first_mission', name: 'Первый полёт', desc: 'Заверши любую миссию', icon: '🚀'},
     {id: 'xp_500', name: 'Новичок', desc: '500 XP', icon: '⭐'},
     {id: 'dodge_50', name: 'Манёвренный', desc: '50 в уклоне', icon: '☄️'},
     {id: 'snake_30', name: 'Змей', desc: '30 звёзд', icon: '🐍'}
@@ -335,11 +338,11 @@ window.onload = function() {
     renderLeaderboard();
     renderAchievements();
     renderShop();
-    showNotification(' Soundscape готов!');
+    showNotification('🌌 Soundscape готов!');
     initTouchControls();
 };
 
-// ============ ТАЧ-УПРАВЛЕНИЕ ===
+// ============ ТАЧ-УПРАВЛЕНИЕ (ИСПРАВЛЕНО) ============
 function initTouchControls() {
     const dpadBtns = document.querySelectorAll('.dpad-btn');
     const actionBtns = document.querySelectorAll('.action-btn');
@@ -352,12 +355,14 @@ function initTouchControls() {
             e.stopPropagation();
             keys[key] = true; 
             btn.classList.add('pressed');
+            return false;
         };
         const release = (e) => { 
             e.preventDefault(); 
             e.stopPropagation();
             keys[key] = false; 
             btn.classList.remove('pressed');
+            return false;
         };
         
         btn.addEventListener('touchstart', press, {passive:false});
@@ -376,12 +381,14 @@ function initTouchControls() {
             e.stopPropagation();
             keys[key] = true; 
             btn.classList.add('pressed');
+            return false;
         };
         const release = (e) => { 
             e.preventDefault(); 
             e.stopPropagation();
             keys[key] = false; 
             btn.classList.remove('pressed');
+            return false;
         };
         
         btn.addEventListener('touchstart', press, {passive:false});
@@ -391,6 +398,21 @@ function initTouchControls() {
         btn.addEventListener('mouseup', release);
         btn.addEventListener('mouseleave', release);
     });
+    
+    // Блокируем скролл и зум на canvas
+    canvasWrapper.addEventListener('touchmove', (e) => {
+        if (currentGame && gameLaunched) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }, {passive:false});
+    
+    canvasWrapper.addEventListener('touchstart', (e) => {
+        if (currentGame && gameLaunched) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }, {passive:false});
 }
 
 function showSection(sectionId) {
@@ -412,9 +434,8 @@ function stopAllGames() {
     if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
     if (renderer3D) { renderer3D.dispose(); renderer3D = null; }
     scene3D = null; camera3D = null; player = null;
-    obstacles = []; crystals = [];
+    obstacles = []; crystals = []; particles = [];
     keys = {};
-    // СКРЫВАЕМ КНОПКИ
     document.getElementById('mobileControls').classList.remove('active');
 }
 
@@ -422,7 +443,7 @@ function startGame(gameType) {
     stopAllGames();
     currentGame = gameType;
     gameScore = 0;
-    gameLaunched = false; // Игра еще не запущена (ждет кнопку Старт)
+    gameLaunched = false;
     document.getElementById('currentScore').textContent = '0';
     document.getElementById('activeGame').style.display = 'block';
     
@@ -446,34 +467,38 @@ function startGame(gameType) {
         ctx2D = canvas2D.getContext('2d');
     }
     
-    // НЕ ПОКАЗЫВАЕМ кнопки пока игра не запущена
-    // Кнопки появятся только после launchGame()
-    
     initGame(gameType);
     document.getElementById('activeGame').scrollIntoView({behavior:'smooth',block:'center'});
 }
 
 function initThreeJS() {
     scene3D = new THREE.Scene();
-    scene3D.fog = new THREE.FogExp2(0x050510, 0.03);
+    scene3D.fog = new THREE.FogExp2(0x050510, 0.02);
     camera3D = new THREE.PerspectiveCamera(75, 800/500, 0.1, 1000);
     renderer3D = new THREE.WebGLRenderer({canvas:canvas3D, antialias:true, alpha:true});
     renderer3D.setSize(800, 500);
     renderer3D.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    
+    // Улучшенное освещение
+    const ambientLight = new THREE.AmbientLight(0x404040, 1);
     scene3D.add(ambientLight);
-    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1);
     dirLight.position.set(5, 10, 7);
     scene3D.add(dirLight);
+    
+    // Добавляем точечный свет для кристаллов
+    crystalLight = new THREE.PointLight(0xffd700, 2, 50);
+    crystalLight.position.set(0, 5, 0);
+    scene3D.add(crystalLight);
 }
 
 function launchGame() {
     if (gameInterval) clearInterval(gameInterval);
     if (animationId) cancelAnimationFrame(animationId);
     isPaused = false;
-    gameLaunched = true; // Игра запущена!
+    gameLaunched = true;
     
-    // ПОКАЗЫВАЕМ кнопки только сейчас
     if (isMobile) {
         document.getElementById('mobileControls').classList.add('active');
     }
@@ -498,7 +523,7 @@ function resumeGame() {
 }
 
 function closeGame() {
-    stopAllGames(); // Тут кнопки скроются
+    stopAllGames();
     document.getElementById('activeGame').style.display = 'none';
     canvas2D.style.display = 'none';
     canvas3D.style.display = 'none';
@@ -667,59 +692,215 @@ function startSpaceFlight3D() {
     animate();
 }
 
-// ============ 3D: СБОР КРИСТАЛЛОВ ============
+// ============ 3D: СБОР КРИСТАЛЛОВ (УЛУЧШЕННЫЙ ВИЗУАЛ) ============
 function initCrystalCollector3D() {
     camera3D.position.set(0,10,10); camera3D.lookAt(0,0,0);
-    const geometry = new THREE.SphereGeometry(0.6,16,16);
-    const material = new THREE.MeshPhongMaterial({color:0x00ff88, emissive:0x004422, emissiveIntensity:0.5});
+    
+    // Игрок с улучшенным материалом
+    const geometry = new THREE.SphereGeometry(0.6, 32, 32);
+    const material = new THREE.MeshPhongMaterial({
+        color: 0x00ff88, 
+        emissive: 0x004422, 
+        emissiveIntensity: 0.5,
+        shininess: 100
+    });
     player = new THREE.Mesh(geometry, material);
-    player.position.set(0,0.6,0); scene3D.add(player);
+    player.position.set(0,0.6,0);
+    
+    // Добавляем свечение вокруг игрока
+    const glowGeometry = new THREE.SphereGeometry(0.8, 32, 32);
+    const glowMaterial = new THREE.MeshBasicMaterial({
+        color: 0x00ff88,
+        transparent: true,
+        opacity: 0.3,
+        side: THREE.BackSide
+    });
+    const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+    player.add(glow);
+    
+    scene3D.add(player);
+    
+    // Улучшенная платформа
     const planeGeo = new THREE.PlaneGeometry(30,30);
-    const planeMat = new THREE.MeshPhongMaterial({color:0x1a1b3a, side:THREE.DoubleSide});
+    const planeMat = new THREE.MeshPhongMaterial({
+        color: 0x1a1b3a, 
+        side: THREE.DoubleSide,
+        shininess: 100
+    });
     const plane = new THREE.Mesh(planeGeo, planeMat);
-    plane.rotation.x = -Math.PI/2; plane.position.y = 0; scene3D.add(plane);
+    plane.rotation.x = -Math.PI/2; plane.position.y = 0;
+    scene3D.add(plane);
+    
+    // Сетка с неоновым эффектом
     const gridHelper = new THREE.GridHelper(30,30,0x00f3ff,0x1a1b3a);
-    gridHelper.position.y = 0.01; scene3D.add(gridHelper);
-    crystals = []; spawnCrystal(); gameScore = 0;
+    gridHelper.position.y = 0.01;
+    scene3D.add(gridHelper);
+    
+    // Звёзды на фоне
+    const starsGeometry = new THREE.BufferGeometry();
+    const starsMaterial = new THREE.PointsMaterial({
+        color: 0xffffff,
+        size: 0.1,
+        transparent: true
+    });
+    const starsVertices = [];
+    for (let i = 0; i < 1000; i++) {
+        starsVertices.push(
+            (Math.random() - 0.5) * 100,
+            (Math.random() - 0.5) * 100,
+            (Math.random() - 0.5) * 100
+        );
+    }
+    starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
+    const stars = new THREE.Points(starsGeometry, starsMaterial);
+    scene3D.add(stars);
+    
+    crystals = []; 
+    particles = [];
+    spawnCrystal();
+    gameScore = 0;
+}
+
+function createExplosion(position, color) {
+    // Создаём частицы взрыва
+    const particleCount = 20;
+    const geometry = new THREE.BufferGeometry();
+    const positions = [];
+    const velocities = [];
+    
+    for (let i = 0; i < particleCount; i++) {
+        positions.push(position.x, position.y, position.z);
+        velocities.push(
+            (Math.random() - 0.5) * 0.3,
+            (Math.random() - 0.5) * 0.3,
+            (Math.random() - 0.5) * 0.3
+        );
+    }
+    
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    const material = new THREE.PointsMaterial({
+        color: color,
+        size: 0.3,
+        transparent: true,
+        opacity: 1
+    });
+    
+    const particleSystem = new THREE.Points(geometry, material);
+    particleSystem.userData.velocities = velocities;
+    scene3D.add(particleSystem);
+    particles.push(particleSystem);
 }
 
 function spawnCrystal() {
-    const geo = new THREE.OctahedronGeometry(0.6,0);
-    const mat = new THREE.MeshPhongMaterial({color:0xffd700, emissive:0xaa6600, emissiveIntensity:0.8});
+    // Улучшенный кристалл с несколькими материалами
+    const crystalGroup = new THREE.Group();
+    
+    // Основной кристалл
+    const geo = new THREE.OctahedronGeometry(0.6, 0);
+    const mat = new THREE.MeshPhongMaterial({
+        color: 0xffd700, 
+        emissive: 0xaa6600, 
+        emissiveIntensity: 0.8,
+        shininess: 100,
+        transparent: true,
+        opacity: 0.9
+    });
     const crystal = new THREE.Mesh(geo, mat);
-    crystal.position.x = (Math.random()-0.5)*26;
-    crystal.position.z = (Math.random()-0.5)*26;
-    crystal.position.y = 1.5;
-    scene3D.add(crystal); crystals.push(crystal);
+    crystalGroup.add(crystal);
+    
+    // Внутреннее свечение
+    const innerGeo = new THREE.OctahedronGeometry(0.4, 0);
+    const innerMat = new THREE.MeshBasicMaterial({
+        color: 0xffed4e,
+        transparent: true,
+        opacity: 0.7
+    });
+    const innerCrystal = new THREE.Mesh(innerGeo, innerMat);
+    crystalGroup.add(innerCrystal);
+    
+    // Аура вокруг кристалла
+    const auraGeo = new THREE.OctahedronGeometry(0.9, 0);
+    const auraMat = new THREE.MeshBasicMaterial({
+        color: 0xffd700,
+        transparent: true,
+        opacity: 0.2,
+        side: THREE.BackSide
+    });
+    const aura = new THREE.Mesh(auraGeo, auraMat);
+    crystalGroup.add(aura);
+    
+    crystalGroup.position.x = (Math.random()-0.5)*26;
+    crystalGroup.position.z = (Math.random()-0.5)*26;
+    crystalGroup.position.y = 1.5;
+    
+    scene3D.add(crystalGroup);
+    crystals.push(crystalGroup);
 }
 
 function startCrystalCollector3D() {
     function animate() {
         if (!currentGame || currentGame !== 'crystalCollector3D') return;
         if (isPaused) { animationId = requestAnimationFrame(animate); return; }
+        
+        // Управление
         if (keys['ArrowLeft'] && player.position.x > -14) player.position.x -= 0.2;
         if (keys['ArrowRight'] && player.position.x < 14) player.position.x += 0.2;
         if (keys['ArrowUp'] && player.position.z > -14) player.position.z -= 0.2;
         if (keys['ArrowDown'] && player.position.z < 14) player.position.z += 0.2;
-        for (let i=crystals.length-1; i>=0; i--) {
+        
+        // Анимация частиц
+        for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            const positions = p.geometry.attributes.position.array;
+            const velocities = p.userData.velocities;
+            
+            for (let j = 0; j < positions.length; j += 3) {
+                positions[j] += velocities[j];
+                positions[j+1] += velocities[j+1];
+                positions[j+2] += velocities[j+2];
+            }
+            p.geometry.attributes.position.needsUpdate = true;
+            p.material.opacity -= 0.02;
+            
+            if (p.material.opacity <= 0) {
+                scene3D.remove(p);
+                particles.splice(i, 1);
+            }
+        }
+        
+        // Анимация кристаллов и сбор
+        for (let i = crystals.length - 1; i >= 0; i--) {
             let c = crystals[i];
-            c.rotation.y += 0.05; c.rotation.x += 0.02;
+            c.rotation.y += 0.05;
+            c.rotation.x += 0.02;
             c.position.y = 1.5 + Math.sin(Date.now()*0.005+i)*0.5;
+            
+            // Пульсация ауры
+            c.children[2].scale.setScalar(1 + Math.sin(Date.now()*0.01)*0.2);
+            
             let dx = c.position.x - player.position.x;
             let dz = c.position.z - player.position.z;
             let dist = Math.sqrt(dx*dx + dz*dz);
+            
             if (dist < 1.5) {
-                scene3D.remove(c); c.geometry.dispose(); c.material.dispose();
-                crystals.splice(i,1); gameScore += 100; addXP(100);
+                // Создаём взрыв частиц
+                createExplosion(c.position, 0xffd700);
+                
+                scene3D.remove(c);
+                crystals.splice(i, 1);
+                gameScore += 100;
+                addXP(100);
                 document.getElementById('currentScore').textContent = gameScore;
-                showNotification('💎 +100 XP');
+                showNotification(' +100 XP');
                 spawnCrystal();
                 if (Math.random()>0.6) spawnCrystal();
             }
         }
+        
         camera3D.position.x += (player.position.x - camera3D.position.x)*0.1;
         camera3D.position.z += (player.position.z+10 - camera3D.position.z)*0.1;
         camera3D.lookAt(player.position);
+        
         renderer3D.render(scene3D, camera3D);
         animationId = requestAnimationFrame(animate);
     }
@@ -770,7 +951,7 @@ function checkAchievement(id, condition) {
     if (achievement && condition && !userData.achievements.includes(id)) {
         userData.achievements.push(id);
         localStorage.setItem('ss_achievements', JSON.stringify(userData.achievements));
-        showNotification(' ' + achievement.name + '!');
+        showNotification('🏅 ' + achievement.name + '!');
         userData.coins += 100;
         localStorage.setItem('ss_coins', userData.coins);
         updateStats();
@@ -821,7 +1002,7 @@ function buyItem(itemId) {
     else if (item.type === 'boost') {
         if (!userData.inventory.includes('xp_boost')) {
             userData.inventory.push('xp_boost');
-            setTimeout(() => { userData.inventory = userData.inventory.filter(i => i !== 'xp_boost'); localStorage.setItem('ss_inventory', JSON.stringify(userData.inventory)); showNotification('⚡ Бустер истёк!'); }, item.duration*1000);
+            setTimeout(() => { userData.inventory = userData.inventory.filter(i => i !== 'xp_boost'); localStorage.setItem('ss_inventory', JSON.stringify(userData.inventory)); showNotification(' Бустер истёк!'); }, item.duration*1000);
         }
     }
     localStorage.setItem('ss_coins', userData.coins);
