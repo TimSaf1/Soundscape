@@ -145,16 +145,16 @@ canvas { width:100%; height:100%; display:block; touch-action:none; }
 <div id="games" class="section active">
     <h2 style="text-align:center;margin:20px 0;font-size:24px">Выбери миссию</h2>
     <div class="games-grid">
-        <div class="game-card" onclick="startGame('spaceDodge')">
+        <div class="game-card" onclick="startGame('spaceJump')">
             <div class="game-icon">🚀</div>
-            <div class="game-title">Космический уклон</div>
-            <div class="game-desc">2D • Уклоняйся от астероидов</div>
+            <div class="game-title">Космический Прыжок</div>
+            <div class="game-desc">2D • Жми 🔥 чтобы лететь, уклоняйся от колонн</div>
             <div class="game-reward">+10 XP</div>
         </div>
         <div class="game-card" onclick="startGame('spaceSnake')">
             <div class="game-icon">🌌</div>
             <div class="game-title">Звёздная змейка</div>
-            <div class="game-desc">2D • Собирай звёзды</div>
+            <div class="game-desc">2D • Собирай звёзды, не врезайся в хвост</div>
             <div class="game-reward">+15 XP</div>
         </div>
         <div class="game-card" onclick="startGame('pacman')">
@@ -166,7 +166,7 @@ canvas { width:100%; height:100%; display:block; touch-action:none; }
         <div class="game-card" onclick="startGame('angrybirds')">
             <div class="game-icon">🐦</div>
             <div class="game-title">Space Birds</div>
-            <div class="game-desc">2D • Стреляй по мишеням</div>
+            <div class="game-desc">2D • Стреляй из рогатки по мишеням</div>
             <div class="game-reward">+50 XP</div>
         </div>
     </div>
@@ -183,14 +183,14 @@ canvas { width:100%; height:100%; display:block; touch-action:none; }
             <button class="btn btn-primary" onclick="launchGame()">▶ Старт</button>
             <button class="btn btn-secondary" onclick="pauseGame()">⏸</button>
             <button class="btn btn-secondary" onclick="resumeGame()">▶</button>
-            <button class="btn btn-secondary" onclick="closeGame()"></button>
+            <button class="btn btn-secondary" onclick="closeGame()">❌</button>
         </div>
         <div class="game-info" id="gameInstructions"></div>
     </div>
 </div>
 
 <div id="leaderboard" class="section">
-    <h2 style="text-align:center;margin:20px 0;font-size:24px"> Топ игроков</h2>
+    <h2 style="text-align:center;margin:20px 0;font-size:24px">🏆 Топ игроков</h2>
     <div id="leaderboardList"></div>
 </div>
 
@@ -265,10 +265,11 @@ let leaderboard = JSON.parse(localStorage.getItem('ss_leaderboard')) || [
 ];
 
 const achievements = [
-    {id: 'first_mission', name: 'Первый полёт', desc: 'Заверши любую миссию', icon: ''},
+    {id: 'first_mission', name: 'Первый полёт', desc: 'Заверши любую миссию', icon: '🚀'},
     {id: 'xp_500', name: 'Новичок', desc: '500 XP', icon: '⭐'},
     {id: 'pacman_100', name: 'Pac-Man', desc: '100 в Pac-Man', icon: '👻'},
-    {id: 'birds_50', name: 'Птица', desc: '50 в Birds', icon: '🐦'}
+    {id: 'birds_50', name: 'Птица', desc: '50 в Birds', icon: '🐦'},
+    {id: 'jump_20', name: 'Пилот', desc: '20 в Прыжке', icon: '🚀'}
 ];
 
 const shopItems = [
@@ -278,15 +279,13 @@ const shopItems = [
 ];
 
 // ИГРОВЫЕ ПЕРЕМЕННЫЕ
-let pacman = {x:1, y:1, dir:{x:0,y:0}, nextDir:{x:0,y:0}, mouthOpen:0};
-let ghosts = [];
-let dots = [];
-let maze = [];
-
-let bird = {x:100, y:400, vx:0, vy:0, state:'idle'};
+let pacman = {x:1, y:1, dir:{x:0,y:0}, nextDir:{x:0,y:0}};
+let ghosts = [], dots = [], maze = [];
+let bird = {x:100, y:400, vx:0, vy:0, state:'idle', radius:15};
 let slingshot = {x:100, y:400, active:true};
-let targets = [];
-let particles = [];
+let targets = [], particles = [];
+let jumper = {x:100, y:250, vy:0, radius:15};
+let jumpObstacles = [], jumpRunning = false, jumpFrame = 0;
 
 window.onload = function() {
     updateStats();
@@ -355,8 +354,8 @@ function startGame(gameType) {
     document.getElementById('activeGame').style.display = 'block';
 
     const games = {
-        'spaceDodge': {title: '🚀 Уклон', instructions: isMobile ? '👆 Кнопки ← →' : '← → или мышь'},
-        'spaceSnake': {title: '🌌 Змейка', instructions: isMobile ? ' Кнопки ← → ↑ ↓' : 'Стрелки'},
+        'spaceJump': {title: '🚀 Космический Прыжок', instructions: isMobile ? '👆 Жми кнопку 🔥 для прыжка' : 'Пробел или ↑ для прыжка'},
+        'spaceSnake': {title: '🌌 Змейка', instructions: isMobile ? '👆 Кнопки ← → ↑ ↓' : 'Стрелки'},
         'pacman': {title: '👻 Pac-Man', instructions: isMobile ? '👆 Кнопки для движения' : 'Стрелки'},
         'angrybirds': {title: '🐦 Space Birds', instructions: isMobile ? '👆 Кнопка 🔥 для выстрела' : 'Пробел для выстрела'}
     };
@@ -398,66 +397,108 @@ function closeGame() {
 }
 
 function initGame(gameType) {
-    if (gameType === 'spaceDodge') initSpaceDodge();
+    if (gameType === 'spaceJump') initSpaceJump();
     else if (gameType === 'spaceSnake') initSpaceSnake();
     else if (gameType === 'pacman') initPacman();
     else if (gameType === 'angrybirds') initAngryBirds();
 }
 
 function startGameLogic(gameType) {
-    if (gameType === 'spaceDodge') startSpaceDodge();
+    if (gameType === 'spaceJump') startSpaceJump();
     else if (gameType === 'spaceSnake') startSpaceSnake();
     else if (gameType === 'pacman') startPacman();
     else if (gameType === 'angrybirds') startAngryBirds();
 }
 
-// ИГРА 1: КОСМИЧЕСКИЙ УКЛОН
-let dodgeShip = {x:400, y:450, width:30, height:30};
-let dodgeAsteroids = [], dodgeStars = [], dodgeRunning = false, dodgeFrame = 0;
-
-function initSpaceDodge() {
-    dodgeShip = {x:400, y:450, width:30, height:30};
-    dodgeAsteroids = []; dodgeStars = [];
-    dodgeRunning = false; dodgeFrame = 0;
+// ИГРА 1: КОСМИЧЕСКИЙ ПРЫЖОК (НОВАЯ)
+function initSpaceJump() {
+    jumper = {x:100, y:250, vy:0, radius:15};
+    jumpObstacles = [];
+    jumpRunning = false;
+    jumpFrame = 0;
 }
 
-function startSpaceDodge() {
-    if (dodgeRunning) return;
-    dodgeRunning = true;
+function startSpaceJump() {
+    if (jumpRunning) return;
+    jumpRunning = true;
     gameInterval = setInterval(() => {
-        if (isPaused || currentGame !== 'spaceDodge') return;
-        dodgeFrame++;
-        if (dodgeFrame % 40 === 0) dodgeAsteroids.push({x:Math.random()*760, y:-30, size:15+Math.random()*20, speed:3+Math.random()*3});
-        if (dodgeFrame % 120 === 0) dodgeStars.push({x:Math.random()*760, y:-30, size:10, speed:4});
+        if (isPaused || currentGame !== 'spaceJump') return;
+        jumpFrame++;
 
-        for (let i = dodgeAsteroids.length-1; i >= 0; i--) {
-            let a = dodgeAsteroids[i]; a.y += a.speed;
-            if (dodgeShip.x < a.x+a.size && dodgeShip.x+dodgeShip.width > a.x && dodgeShip.y < a.y+a.size && dodgeShip.y+dodgeShip.height > a.y) { endGame('spaceDodge'); return; }
-            if (a.y > 500) { dodgeAsteroids.splice(i,1); gameScore += 10; addXP(10); document.getElementById('currentScore').textContent = gameScore; }
+        // Гравитация
+        jumper.vy += 0.4;
+        jumper.y += jumper.vy;
+
+        // Прыжок (Пробел или кнопка 🔥)
+        if (keys['Space'] || keys['ArrowUp']) {
+            jumper.vy = -7;
+            keys['Space'] = false;
+            keys['ArrowUp'] = false;
         }
-        for (let i = dodgeStars.length-1; i >= 0; i--) {
-            let s = dodgeStars[i]; s.y += s.speed;
-            if (dodgeShip.x < s.x+s.size && dodgeShip.x+dodgeShip.width > s.x && dodgeShip.y < s.y+s.size && dodgeShip.y+dodgeShip.height > s.y) {
-                dodgeStars.splice(i,1); gameScore += 50; addXP(50); document.getElementById('currentScore').textContent = gameScore;
-            } else if (s.y > 500) dodgeStars.splice(i,1);
+
+        // Столкновение с полом или потолком
+        if (jumper.y + jumper.radius > 500 || jumper.y - jumper.radius < 0) {
+            endGame('spaceJump');
+            return;
         }
-        drawSpaceDodge();
+
+        // Спавн препятствий
+        if (jumpFrame % 100 === 0) {
+            let gap = 130;
+            let topHeight = Math.random() * (500 - gap - 100) + 50;
+            jumpObstacles.push({x:800, top:topHeight, bottom:topHeight+gap, width:40, passed:false});
+        }
+
+        // Движение и столкновения
+        for (let i = jumpObstacles.length - 1; i >= 0; i--) {
+            let obs = jumpObstacles[i];
+            obs.x -= 4;
+
+            // Проверка столкновения
+            if (jumper.x + jumper.radius > obs.x && jumper.x - jumper.radius < obs.x + obs.width) {
+                if (jumper.y - jumper.radius < obs.top || jumper.y + jumper.radius > obs.bottom) {
+                    endGame('spaceJump');
+                    return;
+                }
+            }
+
+            // Начисление очков
+            if (!obs.passed && obs.x + obs.width < jumper.x) {
+                obs.passed = true;
+                gameScore += 10;
+                addXP(10);
+                checkAchievement('jump_20', gameScore >= 20);
+                document.getElementById('currentScore').textContent = gameScore;
+            }
+
+            if (obs.x + obs.width < 0) jumpObstacles.splice(i, 1);
+        }
+        drawSpaceJump();
     }, 16);
 }
 
-function drawSpaceDodge() {
+function drawSpaceJump() {
     ctx.fillStyle = '#050510'; ctx.fillRect(0,0,800,500);
+
+    // Фон звёзды
     ctx.fillStyle = '#fff';
-    for(let i=0; i<50; i++) ctx.fillRect((i*137+dodgeFrame*0.5)%800, (i*241)%500, 1, 1);
-    if (keys['ArrowLeft'] && dodgeShip.x > 0) dodgeShip.x -= 5;
-    if (keys['ArrowRight'] && dodgeShip.x < 770) dodgeShip.x += 5;
-    ctx.fillStyle = '#00f3ff'; ctx.shadowBlur = 15; ctx.shadowColor = '#00f3ff';
-    ctx.beginPath(); ctx.moveTo(dodgeShip.x+15, dodgeShip.y); ctx.lineTo(dodgeShip.x+30, dodgeShip.y+30); ctx.lineTo(dodgeShip.x, dodgeShip.y+30); ctx.closePath(); ctx.fill();
+    for(let i=0; i<50; i++) ctx.fillRect((i*137+jumpFrame*2)%800, (i*241)%500, 1, 1);
+
+    // Препятствия
+    ctx.fillStyle = '#bc13fe';
+    ctx.shadowBlur = 10; ctx.shadowColor = '#bc13fe';
+    jumpObstacles.forEach(obs => {
+        ctx.fillRect(obs.x, 0, obs.width, obs.top);
+        ctx.fillRect(obs.x, obs.bottom, obs.width, 500 - obs.bottom);
+    });
     ctx.shadowBlur = 0;
-    ctx.fillStyle = '#ff2a6d';
-    dodgeAsteroids.forEach(a => { ctx.beginPath(); ctx.arc(a.x+a.size/2, a.y+a.size/2, a.size/2, 0, Math.PI*2); ctx.fill(); });
-    ctx.fillStyle = '#ffd700'; ctx.shadowBlur = 10; ctx.shadowColor = '#ffd700';
-    dodgeStars.forEach(s => { ctx.beginPath(); ctx.arc(s.x+5, s.y+5, 5, 0, Math.PI*2); ctx.fill(); });
+
+    // Игрок (Ракета/Шар)
+    ctx.fillStyle = '#00f3ff';
+    ctx.shadowBlur = 15; ctx.shadowColor = '#00f3ff';
+    ctx.beginPath();
+    ctx.arc(jumper.x, jumper.y, jumper.radius, 0, Math.PI*2);
+    ctx.fill();
     ctx.shadowBlur = 0;
 }
 
@@ -505,7 +546,6 @@ function drawSpaceSnake() {
 
 // ИГРА 3: PAC-MAN
 function initPacman() {
-    // Создаём лабиринт (1=стена, 0=точка, 2=пусто)
     maze = [
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
         [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
@@ -528,87 +568,43 @@ function initPacman() {
         [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,1],
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
     ];
-
-    pacman = {x:1, y:1, dir:{x:0,y:0}, nextDir:{x:0,y:0}, mouthOpen:0};
-    ghosts = [
-        {x:9, y:8, color:'#ff0000', dir:{x:0,y:0}},
-        {x:10, y:8, color:'#ffb8ff', dir:{x:0,y:0}},
-        {x:9, y:9, color:'#00ffff', dir:{x:0,y:0}},
-        {x:10, y:9, color:'#ffb852', dir:{x:0,y:0}}
-    ];
-
-    // Считаем точки
+    pacman = {x:1, y:1, dir:{x:0,y:0}, nextDir:{x:0,y:0}};
+    ghosts = [{x:9,y:8,color:'#ff0000',dir:{x:0,y:0}},{x:10,y:8,color:'#ffb8ff',dir:{x:0,y:0}},{x:9,y:9,color:'#00ffff',dir:{x:0,y:0}},{x:10,y:9,color:'#ffb852',dir:{x:0,y:0}}];
     dots = [];
-    for(let y=0; y<20; y++) {
-        for(let x=0; x<20; x++) {
-            if(maze[y][x] === 0) dots.push({x,y});
-        }
-    }
+    for(let y=0; y<20; y++) for(let x=0; x<20; x++) if(maze[y][x] === 0) dots.push({x,y});
 }
 
 function startPacman() {
     if (gameInterval) return;
     gameInterval = setInterval(() => {
         if (isPaused || currentGame !== 'pacman') return;
-
-        // Движение Pac-Man
         if (keys['ArrowUp']) pacman.nextDir = {x:0,y:-1};
         if (keys['ArrowDown']) pacman.nextDir = {x:0,y:1};
         if (keys['ArrowLeft']) pacman.nextDir = {x:-1,y:0};
         if (keys['ArrowRight']) pacman.nextDir = {x:1,y:0};
 
-        // Пробуем изменить направление
-        let newX = pacman.x + pacman.nextDir.x;
-        let newY = pacman.y + pacman.nextDir.y;
-        if (maze[newY] && maze[newY][newX] !== 1) {
-            pacman.dir = pacman.nextDir;
-        }
+        let newX = pacman.x + pacman.nextDir.x, newY = pacman.y + pacman.nextDir.y;
+        if (maze[newY] && maze[newY][newX] !== 1) pacman.dir = pacman.nextDir;
 
-        // Двигаемся
-        newX = pacman.x + pacman.dir.x;
-        newY = pacman.y + pacman.dir.y;
-        if (maze[newY] && maze[newY][newX] !== 1) {
-            pacman.x = newX;
-            pacman.y = newY;
-        }
+        newX = pacman.x + pacman.dir.x; newY = pacman.y + pacman.dir.y;
+        if (maze[newY] && maze[newY][newX] !== 1) { pacman.x = newX; pacman.y = newY; }
 
-        // Едим точки
         for (let i = dots.length - 1; i >= 0; i--) {
             if (dots[i].x === pacman.x && dots[i].y === pacman.y) {
-                dots.splice(i, 1);
-                gameScore += 20;
-                addXP(20);
+                dots.splice(i, 1); gameScore += 20; addXP(20);
                 document.getElementById('currentScore').textContent = gameScore;
                 checkAchievement('pacman_100', gameScore >= 100);
             }
         }
 
-        // Движение призраков
         ghosts.forEach(ghost => {
             const dirs = [{x:0,y:-1},{x:0,y:1},{x:-1,y:0},{x:1,y:0}];
-            const validDirs = dirs.filter(d => {
-                let nx = ghost.x + d.x;
-                let ny = ghost.y + d.y;
-                return maze[ny] && maze[ny][nx] !== 1;
-            });
-            if (validDirs.length > 0) {
-                const dir = validDirs[Math.floor(Math.random() * validDirs.length)];
-                ghost.x += dir.x;
-                ghost.y += dir.y;
-            }
-
-            // Столкновение с призраком
-            if (ghost.x === pacman.x && ghost.y === pacman.y) {
-                endGame('pacman');
-            }
+            const validDirs = dirs.filter(d => { let nx = ghost.x + d.x, ny = ghost.y + d.y; return maze[ny] && maze[ny][nx] !== 1; });
+            if (validDirs.length > 0) { const dir = validDirs[Math.floor(Math.random() * validDirs.length)]; ghost.x += dir.x; ghost.y += dir.y; }
+            if (ghost.x === pacman.x && ghost.y === pacman.y) endGame('pacman');
         });
 
-        // Победа
-        if (dots.length === 0) {
-            showNotification(' Победа! Все точки собраны!');
-            setTimeout(() => initPacman(), 2000);
-        }
-
+        if (dots.length === 0) { showNotification('🏆 Победа! Все точки собраны!'); setTimeout(() => initPacman(), 2000); }
         drawPacman();
     }, 150);
 }
@@ -616,46 +612,23 @@ function startPacman() {
 function drawPacman() {
     ctx.fillStyle = '#000'; ctx.fillRect(0,0,800,500);
     const cellSize = 40;
-
-    // Рисуем лабиринт
-    for(let y=0; y<20; y++) {
-        for(let x=0; x<20; x++) {
-            if (maze[y][x] === 1) {
-                ctx.fillStyle = '#00f3ff';
-                ctx.fillRect(x*cellSize, y*cellSize, cellSize-1, cellSize-1);
-            }
-        }
-    }
-
-    // Точки
+    for(let y=0; y<20; y++) for(let x=0; x<20; x++) if (maze[y][x] === 1) { ctx.fillStyle = '#00f3ff'; ctx.fillRect(x*cellSize, y*cellSize, cellSize-1, cellSize-1); }
     ctx.fillStyle = '#ffd700';
-    dots.forEach(dot => {
-        ctx.beginPath();
-        ctx.arc(dot.x*cellSize + cellSize/2, dot.y*cellSize + cellSize/2, 4, 0, Math.PI*2);
-        ctx.fill();
-    });
+    dots.forEach(dot => { ctx.beginPath(); ctx.arc(dot.x*cellSize + cellSize/2, dot.y*cellSize + cellSize/2, 4, 0, Math.PI*2); ctx.fill(); });
 
-    // Pac-Man
-    ctx.fillStyle = '#ffff00';
-    ctx.beginPath();
-    let startAngle = 0.2 * Math.PI;
-    let endAngle = 1.8 * Math.PI;
-    if (pacman.dir.x === 1) { startAngle = 0.2*Math.PI; endAngle = 1.8*Math.PI; }
-    else if (pacman.dir.x === -1) { startAngle = 1.2*Math.PI; endAngle = 0.8*Math.PI; }
-    else if (pacman.dir.y === -1) { startAngle = 1.7*Math.PI; endAngle = 1.3*Math.PI; }
-    else if (pacman.dir.y === 1) { startAngle = 0.7*Math.PI; endAngle = 0.3*Math.PI; }
-    ctx.arc(pacman.x*cellSize + cellSize/2, pacman.y*cellSize + cellSize/2, cellSize/2-2, startAngle, endAngle);
-    ctx.lineTo(pacman.x*cellSize + cellSize/2, pacman.y*cellSize + cellSize/2);
-    ctx.fill();
+    ctx.fillStyle = '#ffff00'; ctx.beginPath();
+    let sa = 0.2*Math.PI, ea = 1.8*Math.PI;
+    if (pacman.dir.x === -1) { sa = 1.2*Math.PI; ea = 0.8*Math.PI; }
+    else if (pacman.dir.y === -1) { sa = 1.7*Math.PI; ea = 1.3*Math.PI; }
+    else if (pacman.dir.y === 1) { sa = 0.7*Math.PI; ea = 0.3*Math.PI; }
+    ctx.arc(pacman.x*cellSize + cellSize/2, pacman.y*cellSize + cellSize/2, cellSize/2-2, sa, ea);
+    ctx.lineTo(pacman.x*cellSize + cellSize/2, pacman.y*cellSize + cellSize/2); ctx.fill();
 
-    // Призраки
     ghosts.forEach(ghost => {
-        ctx.fillStyle = ghost.color;
-        ctx.beginPath();
+        ctx.fillStyle = ghost.color; ctx.beginPath();
         ctx.arc(ghost.x*cellSize + cellSize/2, ghost.y*cellSize + cellSize/2, cellSize/2-2, Math.PI, 0);
         ctx.lineTo(ghost.x*cellSize + cellSize-2, ghost.y*cellSize + cellSize-2);
-        ctx.lineTo(ghost.x*cellSize + 2, ghost.y*cellSize + cellSize-2);
-        ctx.fill();
+        ctx.lineTo(ghost.x*cellSize + 2, ghost.y*cellSize + cellSize-2); ctx.fill();
     });
 }
 
@@ -663,163 +636,68 @@ function drawPacman() {
 function initAngryBirds() {
     bird = {x:100, y:400, vx:0, vy:0, state:'idle', radius:15};
     slingshot = {x:100, y:400, active:true, pulling:false, pullX:100, pullY:400};
-    targets = [];
-    particles = [];
-
-    // Создаём мишени
+    targets = []; particles = [];
     for (let i = 0; i < 5; i++) {
-        targets.push({
-            x: 500 + Math.random() * 250,
-            y: 350 - Math.random() * 200,
-            width: 30 + Math.random() * 20,
-            height: 30 + Math.random() * 20,
-            hp: 1
-        });
+        targets.push({ x: 500 + Math.random() * 250, y: 350 - Math.random() * 200, width: 30 + Math.random() * 20, height: 30 + Math.random() * 20, hp: 1 });
     }
 }
 
 function startAngryBirds() {
     if (gameInterval) return;
-
-    let gravity = 0.3;
-    let groundY = 450;
-
+    let gravity = 0.3, groundY = 450;
     gameInterval = setInterval(() => {
         if (isPaused || currentGame !== 'angrybirds') return;
+        ctx.fillStyle = '#87CEEB'; ctx.fillRect(0, 0, 800, 500);
+        ctx.fillStyle = '#228B22'; ctx.fillRect(0, groundY, 800, 50);
 
-        // Рисуем
-        ctx.fillStyle = '#87CEEB';
-        ctx.fillRect(0, 0, 800, 500);
-
-        // Земля
-        ctx.fillStyle = '#228B22';
-        ctx.fillRect(0, groundY, 800, 50);
-
-        // Рогатка
-        ctx.strokeStyle = '#8B4513';
-        ctx.lineWidth = 5;
-        ctx.beginPath();
-        ctx.moveTo(slingshot.x, slingshot.y);
-        ctx.lineTo(slingshot.x, slingshot.y - 40);
-        ctx.stroke();
-
-        // Резинка рогатки
+        ctx.strokeStyle = '#8B4513'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(slingshot.x, slingshot.y); ctx.lineTo(slingshot.x, slingshot.y - 40); ctx.stroke();
         if (slingshot.active && bird.state === 'idle') {
-            ctx.strokeStyle = '#000';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.moveTo(slingshot.x - 10, slingshot.y - 40);
-            ctx.lineTo(bird.x, bird.y);
-            ctx.lineTo(slingshot.x + 10, slingshot.y - 40);
-            ctx.stroke();
+            ctx.strokeStyle = '#000'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(slingshot.x - 10, slingshot.y - 40); ctx.lineTo(bird.x, bird.y); ctx.lineTo(slingshot.x + 10, slingshot.y - 40); ctx.stroke();
         }
 
-        // Физика птицы
         if (bird.state === 'flying') {
-            bird.vy += gravity;
-            bird.x += bird.vx;
-            bird.y += bird.vy;
+            bird.vy += gravity; bird.x += bird.vx; bird.y += bird.vy;
+            if (bird.y + bird.radius > groundY) { bird.y = groundY - bird.radius; bird.vy *= -0.6; bird.vx *= 0.9; }
 
-            // Отскок от земли
-            if (bird.y + bird.radius > groundY) {
-                bird.y = groundY - bird.radius;
-                bird.vy *= -0.6;
-                bird.vx *= 0.9;
-            }
-
-            // Столкновение с мишенями
             targets.forEach((target, index) => {
-                if (bird.x + bird.radius > target.x &&
-                    bird.x - bird.radius < target.x + target.width &&
-                    bird.y + bird.radius > target.y &&
-                    bird.y - bird.radius < target.y + target.height) {
+                if (bird.x + bird.radius > target.x && bird.x - bird.radius < target.x + target.width && bird.y + bird.radius > target.y && bird.y - bird.radius < target.y + target.height) {
                     target.hp--;
                     if (target.hp <= 0) {
-                        targets.splice(index, 1);
-                        gameScore += 50;
-                        addXP(50);
+                        targets.splice(index, 1); gameScore += 50; addXP(50);
                         document.getElementById('currentScore').textContent = gameScore;
                         checkAchievement('birds_50', gameScore >= 50);
                         createExplosion(target.x, target.y);
                     }
-                    bird.vx *= 0.5;
-                    bird.vy *= 0.5;
+                    bird.vx *= 0.5; bird.vy *= 0.5;
                 }
             });
 
-            // Остановка
             if (Math.abs(bird.vx) < 0.1 && Math.abs(bird.vy) < 0.1 && bird.y >= groundY - bird.radius - 1) {
                 bird.state = 'stopped';
                 setTimeout(() => {
-                    if (targets.length > 0) {
-                        bird = {x:100, y:400, vx:0, vy:0, state:'idle', radius:15};
-                        slingshot.active = true;
-                    } else {
-                        showNotification('🎉 Победа! Все мишени уничтожены!');
-                        setTimeout(() => initAngryBirds(), 2000);
-                    }
+                    if (targets.length > 0) { bird = {x:100, y:400, vx:0, vy:0, state:'idle', radius:15}; slingshot.active = true; }
+                    else { showNotification('🎉 Победа! Все мишени уничтожены!'); setTimeout(() => initAngryBirds(), 2000); }
                 }, 1000);
             }
         }
 
-        // Рисуем птицу
-        ctx.fillStyle = bird.state === 'flying' ? '#ff4500' : '#ff0000';
-        ctx.beginPath();
-        ctx.arc(bird.x, bird.y, bird.radius, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.fillStyle = bird.state === 'flying' ? '#ff4500' : '#ff0000'; ctx.beginPath(); ctx.arc(bird.x, bird.y, bird.radius, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(bird.x + 5, bird.y - 3, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(bird.x + 7, bird.y - 3, 2, 0, Math.PI * 2); ctx.fill();
 
-        // Глаз птицы
-        ctx.fillStyle = '#fff';
-        ctx.beginPath();
-        ctx.arc(bird.x + 5, bird.y - 3, 5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#000';
-        ctx.beginPath();
-        ctx.arc(bird.x + 7, bird.y - 3, 2, 0, Math.PI * 2);
-        ctx.fill();
+        targets.forEach(target => { ctx.fillStyle = '#8B4513'; ctx.fillRect(target.x, target.y, target.width, target.height); ctx.strokeStyle = '#000'; ctx.lineWidth = 2; ctx.strokeRect(target.x, target.y, target.width, target.height); });
 
-        // Рисуем мишени
-        targets.forEach(target => {
-            ctx.fillStyle = '#8B4513';
-            ctx.fillRect(target.x, target.y, target.width, target.height);
-            ctx.strokeStyle = '#000';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(target.x, target.y, target.width, target.height);
-        });
+        particles.forEach((p, i) => { p.x += p.vx; p.y += p.vy; p.life--; ctx.fillStyle = `rgba(255, 100, 0, ${p.life / 30})`; ctx.fillRect(p.x, p.y, 4, 4); if (p.life <= 0) particles.splice(i, 1); });
 
-        // Частицы
-        particles.forEach((p, i) => {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.life--;
-            ctx.fillStyle = `rgba(255, 100, 0, ${p.life / 30})`;
-            ctx.fillRect(p.x, p.y, 4, 4);
-            if (p.life <= 0) particles.splice(i, 1);
-        });
-
-        // Выстрел
         if (keys['Space'] && slingshot.active && bird.state === 'idle') {
-            const dx = slingshot.x - bird.x;
-            const dy = slingshot.y - 40 - bird.y;
-            bird.vx = dx * 0.15;
-            bird.vy = dy * 0.15;
-            bird.state = 'flying';
-            slingshot.active = false;
+            bird.vx = (slingshot.x - bird.x) * 0.15; bird.vy = (slingshot.y - 40 - bird.y) * 0.15;
+            bird.state = 'flying'; slingshot.active = false;
         }
-
     }, 16);
 }
 
 function createExplosion(x, y) {
-    for (let i = 0; i < 20; i++) {
-        particles.push({
-            x: x,
-            y: y,
-            vx: (Math.random() - 0.5) * 10,
-            vy: (Math.random() - 0.5) * 10,
-            life: 30
-        });
-    }
+    for (let i = 0; i < 20; i++) particles.push({ x: x, y: y, vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 0.5) * 10, life: 30 });
 }
 
 function endGame(gameType) {
@@ -875,7 +753,7 @@ function renderLeaderboard() {
     localStorage.setItem('ss_leaderboard', JSON.stringify(leaderboard));
     let html = '';
     leaderboard.slice(0,10).forEach((p,i) => {
-        const medal = i===0 ? '🥇' : i===1 ? '' : i===2 ? '🥉' : (i+1)+'.';
+        const medal = i===0 ? '🥇' : i===1 ? '🥈' : i===2 ? '🥉' : (i+1)+'.';
         const isMe = p.name === userData.username ? ' <span style="color:#00f3ff">(ты)</span>' : '';
         html += '<div class="leaderboard-item" style="display:flex;justify-content:space-between;"><span>'+medal+' '+p.name+isMe+'</span><span style="color:#ffd700;font-weight:bold">'+p.xp+'</span></div>';
     });
@@ -910,7 +788,7 @@ function buyItem(itemId) {
     else if (item.type === 'boost') {
         if (!userData.inventory.includes('xp_boost')) {
             userData.inventory.push('xp_boost');
-            setTimeout(() => { userData.inventory = userData.inventory.filter(i => i !== 'xp_boost'); localStorage.setItem('ss_inventory', JSON.stringify(userData.inventory)); showNotification(' Бустер истёк!'); }, item.duration*1000);
+            setTimeout(() => { userData.inventory = userData.inventory.filter(i => i !== 'xp_boost'); localStorage.setItem('ss_inventory', JSON.stringify(userData.inventory)); showNotification('⚡ Бустер истёк!'); }, item.duration*1000);
         }
     }
     localStorage.setItem('ss_coins', userData.coins);
