@@ -1,396 +1,258 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🌌 Soundscape Gaming</title>
-<style>
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select: none; }
-html, body {
-    background: radial-gradient(ellipse at bottom, #1a1b3a 0%, #050510 100%);
-    color:#fff; font-family:'Segoe UI',sans-serif; overflow-x:hidden;
-    width:100%; height:100%; touch-action:none; overscroll-behavior:none;
-}
-.header { padding:15px; text-align:center; background:rgba(0,0,0,0.3); }
-.header h1 { font-size:24px; color:#00f3ff; margin-bottom:10px; text-shadow: 0 0 10px #00f3ff; }
-.stats { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
-.stat { background:rgba(255,255,255,0.05); padding:8px 15px; border-radius:10px; font-size:13px; border: 1px solid rgba(0,243,255,0.2); }
-.stat b { color:#ffd700; font-size:16px; }
-.nav { display:flex; justify-content:center; gap:8px; padding:10px; flex-wrap:wrap; position:sticky; top:0; background:rgba(5,5,16,0.95); backdrop-filter:blur(10px); z-index:100; }
-.nav-btn { padding:8px 16px; border:1px solid rgba(255,255,255,0.2); border-radius:20px; background:rgba(255,255,255,0.05); color:#fff; font-size:12px; cursor:pointer; transition: 0.3s; }
-.nav-btn.active { background:linear-gradient(135deg,#00f3ff,#bc13fe); border-color: transparent; box-shadow: 0 0 15px rgba(0,243,255,0.4); }
-.container { padding:15px; padding-bottom:20px; max-width:1200px; margin:0 auto; }
-.section { display:none; }
-.section.active { display:block; animation:fadeIn 0.3s; }
-@keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-
-.games-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:15px; margin-top:20px; }
-.game-card { background:rgba(255,255,255,0.05); border:1px solid rgba(0,243,255,0.3); border-radius:15px; padding:25px; text-align:center; cursor:pointer; transition:all 0.3s; position: relative; overflow: hidden; }
-.game-card:active { transform:scale(0.97); }
-.game-card:hover { border-color:#00f3ff; box-shadow:0 5px 20px rgba(0,243,255,0.2); }
-.game-card.premium { border-color: #ffd700; background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(188,19,254,0.1)); }
-.game-card.premium::before { content: '💎 PREMIUM'; position: absolute; top: 10px; right: -25px; background: #ffd700; color: #000; font-size: 10px; font-weight: bold; padding: 4px 30px; transform: rotate(45deg); }
-.game-icon { font-size:45px; margin-bottom:10px; }
-.game-title { font-size:17px; font-weight:bold; margin:10px 0; color:#fff; }
-.game-desc { font-size:12px; opacity:0.7; margin-bottom:10px; }
-.game-reward { display:inline-block; background:rgba(255,215,0,0.2); color:#ffd700; padding:5px 12px; border-radius:12px; font-size:11px; font-weight:bold; }
-
-.game-container { background:rgba(0,0,0,0.6); border:1px solid rgba(0,243,255,0.3); border-radius:15px; padding:20px; margin-top:20px; display:none; }
-.game-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px; }
-.game-title-large { color:#00f3ff; font-size:20px; font-weight:bold; }
-.score-board { background:rgba(255,215,0,0.2); color:#ffd700; padding:8px 16px; border-radius:10px; font-weight:bold; font-size:16px; }
-.canvas-wrapper { background:#000; border-radius:10px; overflow:hidden; position:relative; width:100%; aspect-ratio:8/5; margin:15px 0; touch-action:none; border: 1px solid rgba(0,243,255,0.2); }
-canvas { width:100%; height:100%; display:block; touch-action:none; }
-.controls { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:15px; }
-.btn { padding:12px 24px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:13px; transition: 0.2s; }
-.btn:active { transform: scale(0.95); }
-.btn-primary { background:linear-gradient(135deg,#00f3ff,#0088ff); color:#000; }
-.btn-secondary { background:rgba(255,255,255,0.1); color:#fff; border: 1px solid rgba(255,255,255,0.2); }
-.game-info { text-align:center; padding:12px; background:rgba(0,243,255,0.05); border-radius:10px; font-size:12px; color:#00f3ff; margin-top:10px; border:1px solid rgba(0,243,255,0.1); }
-
-/* РИТМ ИГРА: МОБИЛЬНЫЕ КНОПКИ */
-.rhythm-mobile-controls {
-    position: absolute; bottom: 0; left: 0; right: 0; height: 120px;
-    display: none; grid-template-columns: repeat(4, 1fr); gap: 5px; padding: 5px;
-    background: rgba(0,0,0,0.8); z-index: 50;
-}
-.rhythm-mobile-controls.active { display: grid; }
-.rhythm-btn {
-    background: rgba(0, 243, 255, 0.1); border: 2px solid #00f3ff; border-radius: 8px;
-    display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: #00f3ff;
-}
-.rhythm-btn:active, .rhythm-btn.pressed { background: rgba(0, 243, 255, 0.6); color: #000; box-shadow: 0 0 15px #00f3ff; }
-.rhythm-btn.lane-1 { border-color: #00f3ff; color: #00f3ff; }
-.rhythm-btn.lane-2 { border-color: #bc13fe; color: #bc13fe; }
-.rhythm-btn.lane-3 { border-color: #bc13fe; color: #bc13fe; }
-.rhythm-btn.lane-4 { border-color: #ffd700; color: #ffd700; }
-
-/* СТАНДАРТНОЕ МОБИЛЬНОЕ УПРАВЛЕНИЕ */
-.mobile-controls {
-    position:fixed; bottom:10px; left:0; right:0; height:220px;
-    display:none !important; z-index:1000; pointer-events:none;
-    padding:0 20px 20px 20px;
-}
-.mobile-controls.active { display:flex !important; }
-.dpad { position:relative; width:160px; height:160px; pointer-events:auto; flex-shrink:0; }
-.dpad-btn {
-    position:absolute; width:55px; height:55px;
-    background:rgba(0,243,255,0.3); border:3px solid #00f3ff;
-    border-radius:12px; display:flex; align-items:center; justify-content:center;
-    font-size:28px; color:#00f3ff; font-weight:bold;
-    pointer-events:auto; box-shadow:0 4px 10px rgba(0,0,0,0.3);
-}
-.dpad-btn:active, .dpad-btn.pressed { background:rgba(0,243,255,0.7); transform:scale(0.9); }
-.dpad-up { top:0; left:52px; } .dpad-down { bottom:0; left:52px; }
-.dpad-left { top:52px; left:0; } .dpad-right { top:52px; right:0; }
-.action-area { flex:1; display:flex; justify-content:flex-end; align-items:center; pointer-events:auto; }
-.action-btn {
-    width:80px; height:80px; border-radius:50%;
-    background:rgba(188,19,254,0.3); border:4px solid #bc13fe;
-    display:flex; align-items:center; justify-content:center;
-    font-size:32px; color:#bc13fe; font-weight:bold;
-    pointer-events:auto; box-shadow:0 4px 15px rgba(0,0,0,0.3); margin:10px;
-}
-.action-btn:active, .action-btn.pressed { background:rgba(188,19,254,0.7); transform:scale(0.9); }
-.action-btn.fire { background:rgba(255,69,0,0.3); border-color:#ff4500; color:#ff4500; }
-.action-btn.fire:active { background:rgba(255,69,0,0.7); }
-
-.difficulty-selector { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
-.diff-btn { padding: 8px 16px; border: 1px solid #00f3ff; background: transparent; color: #00f3ff; border-radius: 20px; cursor: pointer; }
-.diff-btn.active { background: #00f3ff; color: #000; font-weight: bold; }
-
-.notification {
-    position:fixed; top:20px; left:50%; transform:translateX(-50%) translateY(-100px);
-    background:linear-gradient(135deg,#00f3ff,#bc13fe);
-    padding:14px 28px; border-radius:25px; font-weight:bold; z-index:2000;
-    transition:transform 0.3s; font-size:14px; text-align:center; max-width:90%;
-    box-shadow:0 5px 20px rgba(0,243,255,0.3); pointer-events:none;
-}
-.notification.show { transform:translateX(-50%) translateY(0); }
-
-.leaderboard-item, .shop-item, .achievement {
-    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
-    border-radius:12px; padding:15px; margin-bottom:10px;
-}
-.achievement { text-align:center; }
-.achievement.locked { opacity:0.4; filter:grayscale(1); }
-.achievement-icon { font-size:35px; margin-bottom:8px; }
-.achievement-name { font-weight:bold; color:#00f3ff; font-size:14px; margin-bottom:5px; }
-.achievement-desc { font-size:11px; opacity:0.7; }
-
-.profile-card { background:rgba(255,255,255,0.05); border:1px solid rgba(0,243,255,0.3); border-radius:15px; padding:30px; text-align:center; }
-.avatar { width:90px; height:90px; border-radius:50%; background:linear-gradient(135deg,#00f3ff,#bc13fe); display:flex; align-items:center; justify-content:center; font-size:45px; margin:0 auto 15px; border:3px solid #fff; }
-.username { font-size:24px; font-weight:bold; margin-bottom:10px; }
-.user-level { background:linear-gradient(90deg,#ffd700,#ff8c00); color:#000; padding:6px 20px; border-radius:20px; font-weight:bold; display:inline-block; margin-bottom:20px; font-size:13px; }
-.user-stats { display:flex; justify-content:center; gap:30px; flex-wrap:wrap; margin-top:20px; }
-.user-stat-value { font-size:28px; font-weight:bold; color:#00f3ff; }
-.user-stat-label { font-size:11px; opacity:0.7; text-transform:uppercase; margin-top:5px; }
-
-.shop-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; }
-.shop-item { text-align:center; padding:20px; }
-.shop-icon { font-size:35px; margin-bottom:10px; }
-.shop-name { font-weight:bold; font-size:13px; margin-bottom:10px; }
-.shop-price { background:linear-gradient(135deg,#ffd700,#ff8c00); color:#000; padding:8px 16px; border-radius:18px; font-weight:bold; cursor:pointer; font-size:12px; display:inline-block; }
-.price-tag { font-size: 10px; color: #00f3ff; margin-top: 5px; text-decoration: line-through; opacity: 0.7; }
-
-@media(max-width:600px) {
-    .header h1 { font-size:20px; }
-    .games-grid { grid-template-columns:1fr; }
-    .mobile-controls { height:200px; padding:0 15px 15px 15px; }
-    .dpad { width:140px; height:140px; }
-    .dpad-btn { width:50px; height:50px; font-size:24px; }
-    .dpad-up { left:45px; } .dpad-down { left:45px; }
-    .dpad-left { top:45px; } .dpad-right { top:45px; }
-    .action-btn { width:70px; height:70px; font-size:28px; }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soundscape Gaming</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .header {
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 2px solid #00f3ff;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(90deg, #00f3ff, #bc13fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+        .stats { display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        .stat { background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 10px; }
+        .stat b { color: #ffd700; }
+        .nav { display: flex; justify-content: center; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        .nav-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            cursor: pointer;
+        }
+        .nav-btn.active { background: linear-gradient(90deg, #00f3ff, #bc13fe); }
+        .container { padding: 20px; max-width: 1400px; margin: 0 auto; }
+        .section { display: none; }
+        .section.active { display: block; }
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .game-card {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(0,243,255,0.3);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+        }
+        .game-card:hover { border-color: #00f3ff; transform: translateY(-5px); }
+        .game-icon { font-size: 50px; margin-bottom: 10px; }
+        .game-title { font-size: 18px; font-weight: bold; margin: 10px 0; }
+        .game-desc { font-size: 12px; opacity: 0.8; margin-bottom: 15px; }
+        .xp-btn {
+            background: linear-gradient(90deg, #ffd700, #ff8c00);
+            color: #000;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .game-container {
+            background: rgba(0,0,0,0.8);
+            border: 2px solid #00f3ff;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        canvas {
+            width: 100%;
+            max-width: 800px;
+            height: 600px;
+            margin: 20px auto;
+            display: block;
+            background: #000;
+            border-radius: 10px;
+            border: 3px solid #00f3ff;
+        }
+        .controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 15px; }
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        .btn-primary { background: linear-gradient(90deg, #00f3ff, #bc13fe); }
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(90deg, #00f3ff, #bc13fe);
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            z-index: 10000;
+            animation: slideIn 0.3s;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(-50%) translateY(-100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+    </style>
 </head>
 <body>
 
 <div class="header">
-    <h1>🌌 SOUNDSCAPE</h1>
+    <div class="logo"> SOUNDSCAPE</div>
     <div class="stats">
-        <div class="stat">⭐ <b id="totalXP">0</b></div>
-        <div class="stat">LVL <b id="level">1</b></div>
-        <div class="stat">🪙 <b id="coins">100</b></div>
-        <div class="stat">🚀 <b id="gamesPlayed">0</b></div>
+        <div class="stat">⭐ <b id="userXP">0</b> XP</div>
+        <div class="stat">🏆 <b id="userLevel">1</b> LVL</div>
+        <div class="stat"> <b id="userCoins">100</b></div>
+        <div class="stat"> <b id="userName">Пилот</b></div>
     </div>
-</div>
-
-<div class="nav">
-    <button class="nav-btn active" onclick="showSection('games')">🎮 Игры</button>
-    <button class="nav-btn" onclick="showSection('leaderboard')">🏆 Топ</button>
-    <button class="nav-btn" onclick="showSection('achievements')">🏅</button>
-    <button class="nav-btn" onclick="showSection('shop')">🛒</button>
-    <button class="nav-btn" onclick="showSection('profile')">👤</button>
+    <div class="nav">
+        <button class="nav-btn active" onclick="showSection('games')">🎮 Игры</button>
+        <button class="nav-btn" onclick="showSection('leaderboard')">🏆 Топ</button>
+        <button class="nav-btn" onclick="showSection('achievements')">🏅 Награды</button>
+        <button class="nav-btn" onclick="showSection('chat')">💬 Чат</button>
+        <button class="nav-btn" onclick="showSection('profile')">👤 Профиль</button>
+    </div>
 </div>
 
 <div class="container">
-
-<div id="games" class="section active">
-    <h2 style="text-align:center;margin:20px 0;font-size:24px">Выбери миссию</h2>
-    <div class="games-grid">
-        <div class="game-card" onclick="showDifficultySelector('rhythm')">
-            <div class="game-icon">🎵</div>
-            <div class="game-title">Neon Beats (Ритм)</div>
-            <div class="game-desc">4 дорожки, комбо, D/F/J/K или тач. 3 трека.</div>
-            <div class="game-reward">+50 XP</div>
-        </div>
-        <div class="game-card premium" onclick="checkPremiumAccess('neonBlaster')">
-            <div class="game-icon">🚀</div>
-            <div class="game-title">Neon Blaster</div>
-            <div class="game-desc">Galaga-style. Волны, бонусы, эпичный Босс.</div>
-            <div class="game-reward">Premium • 3000₽</div>
-        </div>
-        <div class="game-card" onclick="startGame('spaceJump')">
-            <div class="game-icon">🛸</div>
-            <div class="game-title">Космический Прыжок</div>
-            <div class="game-desc">2D • Жми 🔥 чтобы лететь, уклоняйся</div>
-            <div class="game-reward">+10 XP</div>
-        </div>
-        <div class="game-card" onclick="startGame('spaceSnake')">
-            <div class="game-icon">🌌</div>
-            <div class="game-title">Звёздная змейка</div>
-            <div class="game-desc">2D • Собирай звёзды, не врезайся</div>
-            <div class="game-reward">+15 XP</div>
-        </div>
-    </div>
-
-    <!-- Выбор сложности для Ритм-игры -->
-    <div id="difficultySelector" class="game-container" style="display:none; text-align:center;">
-        <h3 style="color:#00f3ff; margin-bottom:15px;">Выберите сложность и трек</h3>
-        <div class="difficulty-selector">
-            <button class="diff-btn active" onclick="setDifficulty('easy', this)">Легко</button>
-            <button class="diff-btn" onclick="setDifficulty('medium', this)">Средне</button>
-            <button class="diff-btn" onclick="setDifficulty('hard', this)">Сложно</button>
-        </div>
-        <div style="margin-bottom:15px; font-size:13px; opacity:0.8;">
-            Трек: <span id="currentTrackName" style="color:#ffd700; font-weight:bold;">Cyber Pulse (CC0)</span>
-        </div>
-        <div class="controls">
-            <button class="btn btn-primary" onclick="startRhythmGame()">▶ Начать миссию</button>
-            <button class="btn btn-secondary" onclick="closeGame()">❌ Отмена</button>
-        </div>
-    </div>
-
-    <div id="activeGame" class="game-container">
-        <div class="game-header">
-            <div class="game-title-large" id="currentGameTitle">Миссия</div>
-            <div class="score-board">Счёт: <span id="currentScore">0</span> | Комбо: <span id="comboCount" style="color:#bc13fe">0</span></div>
-        </div>
-        <div class="canvas-wrapper" id="canvasWrapper">
-            <canvas id="gameCanvas" width="800" height="500"></canvas>
-            <div class="rhythm-mobile-controls" id="rhythmMobileControls">
-                <div class="rhythm-btn lane-1" data-key="KeyD">D</div>
-                <div class="rhythm-btn lane-2" data-key="KeyF">F</div>
-                <div class="rhythm-btn lane-3" data-key="KeyJ">J</div>
-                <div class="rhythm-btn lane-4" data-key="KeyK">K</div>
+    <div id="games" class="section active">
+        <h2 style="text-align:center;margin-bottom:20px;">Выбери миссию</h2>
+        <div class="games-grid">
+            <div class="game-card" onclick="startGame('pacman')">
+                <div class="game-icon" style="font-size:60px;">🟡</div>
+                <div class="game-title">Звёздный Pac-Man</div>
+                <div class="game-desc">6 приведений, собирай точки!</div>
+                <button class="xp-btn">+200 XP</button>
+            </div>
+            <div class="game-card" onclick="startGame('shooter')">
+                <div class="game-icon">🚀</div>
+                <div class="game-title">Space Shooter</div>
+                <div class="game-desc">Космический шутер с боссами!</div>
+                <button class="xp-btn">+100 XP</button>
+            </div>
+            <div class="game-card" onclick="startGame('invaders')">
+                <div class="game-icon">👾</div>
+                <div class="game-title">Space Invaders</div>
+                <div class="game-desc">Классика! Уничтожь всех пришельцев</div>
+                <button class="xp-btn">+50 XP</button>
+            </div>
+            <div class="game-card" onclick="startGame('snake')">
+                <div class="game-icon">🐍</div>
+                <div class="game-title">Звёздная змейка</div>
+                <div class="game-desc">Собирай звёзды</div>
+                <button class="xp-btn">+15 XP</button>
             </div>
         </div>
-        <div class="controls" id="standardControls">
-            <button class="btn btn-primary" onclick="launchGame()">▶ Старт</button>
-            <button class="btn btn-secondary" onclick="pauseGame()">⏸</button>
-            <button class="btn btn-secondary" onclick="resumeGame()">▶</button>
-            <button class="btn btn-secondary" onclick="closeGame()">❌</button>
-        </div>
-        <div class="game-info" id="gameInstructions"></div>
-    </div>
-</div>
-
-<div id="leaderboard" class="section">
-    <h2 style="text-align:center;margin:20px 0;font-size:24px">🏆 Топ игроков</h2>
-    <div id="leaderboardList"></div>
-</div>
-
-<div id="achievements" class="section">
-    <h2 style="text-align:center;margin:20px 0;font-size:24px">🏅 Награды</h2>
-    <div id="achievementsList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;"></div>
-</div>
-
-<div id="shop" class="section">
-    <h2 style="text-align:center;margin:20px 0;font-size:24px">🛒 Магазин</h2>
-    <p style="text-align:center;margin-bottom:20px;font-size:16px">Кредиты: <b id="shopCoins" style="color:#ffd700;font-size:20px">100</b> 🪙</p>
-    <div class="shop-grid" id="shopItems"></div>
-</div>
-
-<div id="profile" class="section">
-    <div class="profile-card">
-        <div class="avatar" id="userAvatar">👨‍🚀</div>
-        <div class="username" id="userName">Пилот</div>
-        <div class="user-level">Уровень <span id="userLevel">1</span></div>
-        <div class="user-stats">
-            <div><div class="user-stat-value" id="profileXP">0</div><div class="user-stat-label">XP</div></div>
-            <div><div class="user-stat-value" id="profileGames">0</div><div class="user-stat-label">Игр</div></div>
-            <div><div class="user-stat-value" id="profileAchievements">0</div><div class="user-stat-label">Наград</div></div>
+        <div id="activeGame" class="game-container">
+            <h3 id="gameTitle" style="text-align:center;margin-bottom:15px;"></h3>
+            <canvas id="gameCanvas"></canvas>
+            <div class="controls">
+                <button class="btn btn-primary" onclick="launchGame()">▶ Старт</button>
+                <button class="btn" onclick="pauseGame()">⏸ Пауза</button>
+                <button class="btn" onclick="resumeGame()">▶ Продолжить</button>
+                <button class="btn" onclick="closeGame()">❌ Закрыть</button>
+            </div>
+            <div id="gameInfo" style="text-align:center;margin-top:15px;color:#00f3ff;"></div>
         </div>
     </div>
-</div>
-
-</div>
-
-<!-- СТАНДАРТНОЕ МОБИЛЬНОЕ УПРАВЛЕНИЕ -->
-<div class="mobile-controls" id="mobileControls">
-    <div class="dpad" id="dpad">
-        <div class="dpad-btn dpad-up" data-key="ArrowUp">↑</div>
-        <div class="dpad-btn dpad-down" data-key="ArrowDown">↓</div>
-        <div class="dpad-btn dpad-left" data-key="ArrowLeft">←</div>
-        <div class="dpad-btn dpad-right" data-key="ArrowRight">→</div>
+    <div id="leaderboard" class="section">
+        <h2 style="text-align:center;margin-bottom:20px;">🏆 Топ игроков</h2>
+        <div id="leaderboardList"></div>
     </div>
-    <div class="action-area">
-        <div class="action-btn fire" data-key="Space">🔥</div>
+    <div id="achievements" class="section">
+        <h2 style="text-align:center;margin-bottom:20px;">🏅 Достижения</h2>
+        <div id="achievementsList"></div>
+    </div>
+    <div id="chat" class="section">
+        <h2 style="text-align:center;margin-bottom:20px;">💬 Игровой чат</h2>
+        <div id="chatMessages" style="background:rgba(255,255,255,0.05);padding:20px;border-radius:15px;max-height:500px;overflow-y:auto;"></div>
+        <div style="display:flex;gap:10px;margin-top:15px;">
+            <input type="text" id="chatInput" placeholder="Введите сообщение..." style="flex:1;padding:12px;border:2px solid rgba(0,243,255,0.3);border-radius:10px;background:rgba(255,255,255,0.1);color:#fff;">
+            <button class="btn btn-primary" onclick="sendMessage()">Отправить</button>
+        </div>
+    </div>
+    <div id="profile" class="section">
+        <h2 style="text-align:center;margin-bottom:20px;"> Профиль</h2>
+        <div style="background:rgba(255,255,255,0.05);padding:30px;border-radius:15px;text-align:center;">
+            <div id="profileAvatar" style="width:100px;height:100px;border-radius:50%;background:linear-gradient(90deg,#00f3ff,#bc13fe);display:flex;align-items:center;justify-content:center;font-size:50px;margin:0 auto 20px;">👨‍</div>
+            <h3 id="profileName">Пилот</h3>
+            <p style="color:#ffd700;font-size:20px;margin:10px 0;">Уровень <span id="profileLevel">1</span></p>
+        </div>
     </div>
 </div>
-
-<div class="notification" id="notification"></div>
-
-<!-- Аудио элемент для ритм-игры -->
-<audio id="rhythmAudio" preload="auto"></audio>
 
 <script>
-// ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
-let currentGame = null;
-let gameInterval = null;
-let animFrame = null;
-let gameScore = 0;
-let combo = 0;
-let maxCombo = 0;
-let isPaused = false;
-let keys = {};
-let gameLaunched = false;
-let ctx = null;
-const canvas = document.getElementById('gameCanvas');
-const canvasWrapper = document.getElementById('canvasWrapper');
-
-const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-
 let userData = {
-    username: 'Пилот-' + Math.floor(Math.random() * 9999),
+    id: localStorage.getItem('ss_userId') || 'user_' + Math.random().toString(36).substr(2, 9),
+    name: localStorage.getItem('ss_userName') || 'Пилот-' + Math.floor(Math.random() * 9999),
+    avatar: localStorage.getItem('ss_avatar') || '👨‍🚀',
     xp: parseInt(localStorage.getItem('ss_xp')) || 0,
     coins: parseInt(localStorage.getItem('ss_coins')) || 100,
+    level: 1,
     gamesPlayed: parseInt(localStorage.getItem('ss_games')) || 0,
-    achievements: JSON.parse(localStorage.getItem('ss_achievements')) || [],
-    inventory: JSON.parse(localStorage.getItem('ss_inventory')) || [],
-    premiumUnlocked: localStorage.getItem('ss_premium') === 'true'
+    achievements: JSON.parse(localStorage.getItem('ss_achievements')) || []
 };
 
 let leaderboard = JSON.parse(localStorage.getItem('ss_leaderboard')) || [
-    {name: 'NeonRider', xp: 8500}, {name: 'CosmoKing', xp: 6200}, {name: 'StarWalker', xp: 4100}
+    { name: 'NeonRider', xp: 8500 },
+    { name: 'CosmoKing', xp: 6200 }
 ];
 
-const achievements = [
-    {id: 'first_mission', name: 'Первый полёт', desc: 'Заверши любую миссию', icon: '🚀'},
-    {id: 'rhythm_50', name: 'Ди-джей', desc: 'Комбо 50 в Ритм-игре', icon: '🎵'},
-    {id: 'boss_slayer', name: 'Убийца Боссов', desc: 'Победи босса в Neon Blaster', icon: '👾'},
-    {id: 'xp_500', name: 'Новичок', desc: '500 XP', icon: '⭐'}
-];
-
-const shopItems = [
-    {id: 'avatar_astro', name: 'Астронавт', price: 300, type: 'avatar', icon: '👨‍🚀'},
-    {id: 'credits_200', name: '200 кредитов', price: 250, type: 'coins', amount: 200, icon: '🪙'},
-    {id: 'xp_boost', name: 'x2 XP (1 час)', price: 400, type: 'boost', duration: 3600, icon: '⚡'},
-    {id: 'neon_blaster_unlock', name: 'Neon Blaster', price: 3000, type: 'premium', icon: '🚀', oldPrice: 5000}
-];
-
-// ИГРОВЫЕ ПЕРЕМЕННЫЕ
-let pacman = {x:1, y:1, dir:{x:0,y:0}, nextDir:{x:0,y:0}};
-let ghosts = [], dots = [], maze = [];
-let jumper = {x:100, y:250, vy:0, radius:15};
-let jumpObstacles = [], jumpRunning = false, jumpFrame = 0;
-let snake = [], snakeDir = {x:1,y:0}, snakeNextDir = {x:1,y:0}, snakeFood = {}, snakeRunning = false;
-
-// РИТМ ИГРА ПЕРЕМЕННЫЕ
-let rhythmNotes = [];
-let rhythmStartTime = 0;
-let rhythmDifficulty = 'easy';
-let rhythmTrackIndex = 0;
-let hitEffects = [];
-
-// NEON BLASTER ПЕРЕМЕННЫЕ
-let playerShip = {x:400, y:450, width:30, height:30, hp:3, weapon:1};
-let blasterBullets = [], blasterEnemies = [], blasterPowerups = [], blasterParticles = [];
-let blasterWave = 1, blasterBoss = null, blasterRunning = false;
-
-// ТРЕКИ ДЛЯ РИТМ ИГРЫ (Замени URL на свои из YouTube Audio Library)
-const rhythmTracks = [
-    { name: "Cyber Pulse (Easy)", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", bpm: 100 },
-    { name: "Neon Highway (Medium)", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", bpm: 120 },
-    { name: "Russian Hit 2026 Vibe (Hard)", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3", bpm: 140 }
-];
+let chatMessages = JSON.parse(localStorage.getItem('ss_chat')) || [];
+let currentGame = null;
+let gameInterval = null;
+let gameScore = 0;
+let isPaused = false;
+let canvas, ctx;
+let keys = {};
 
 window.onload = function() {
     updateStats();
-    renderLeaderboard();
-    renderAchievements();
-    renderShop();
-    showNotification('🌌 Soundscape готов! 60 FPS активен.');
-    initTouchControls();
-    ctx = canvas.getContext('2d');
+    document.getElementById('userName').textContent = userData.name;
+    document.getElementById('profileName').textContent = userData.name;
+    document.getElementById('profileAvatar').textContent = userData.avatar;
 };
 
-function initTouchControls() {
-    // Стандартные кнопки
-    document.querySelectorAll('.dpad-btn, .action-btn').forEach(btn => {
-        const key = btn.dataset.key;
-        const press = (e) => { e.preventDefault(); keys[key] = true; btn.classList.add('pressed'); };
-        const release = (e) => { e.preventDefault(); keys[key] = false; btn.classList.remove('pressed'); };
-        btn.addEventListener('touchstart', press, {passive:false});
-        btn.addEventListener('touchend', release, {passive:false});
-        btn.addEventListener('mousedown', press);
-        btn.addEventListener('mouseup', release);
-    });
+function updateStats() {
+    document.getElementById('userXP').textContent = userData.xp;
+    document.getElementById('userLevel').textContent = userData.level;
+    document.getElementById('userCoins').textContent = userData.coins;
+    document.getElementById('profileLevel').textContent = userData.level;
+    userData.level = Math.floor(userData.xp / 500) + 1;
+}
 
-    // Ритм кнопки
-    document.querySelectorAll('.rhythm-btn').forEach(btn => {
-        const key = btn.dataset.key;
-        const press = (e) => { e.preventDefault(); keys[key] = true; btn.classList.add('pressed'); handleRhythmInput(key); };
-        const release = (e) => { e.preventDefault(); keys[key] = false; btn.classList.remove('pressed'); };
-        btn.addEventListener('touchstart', press, {passive:false});
-        btn.addEventListener('touchend', release, {passive:false});
-        btn.addEventListener('mousedown', press);
-        btn.addEventListener('mouseup', release);
-    });
-
-    canvasWrapper.addEventListener('touchmove', (e) => { if (currentGame && gameLaunched) { e.preventDefault(); } }, {passive:false});
+function saveUserData() {
+    localStorage.setItem('ss_userId', userData.id);
+    localStorage.setItem('ss_userName', userData.name);
+    localStorage.setItem('ss_avatar', userData.avatar);
+    localStorage.setItem('ss_xp', userData.xp);
+    localStorage.setItem('ss_coins', userData.coins);
+    localStorage.setItem('ss_level', userData.level);
+    localStorage.setItem('ss_games', userData.gamesPlayed);
+    localStorage.setItem('ss_achievements', JSON.stringify(userData.achievements));
+    updateStats();
 }
 
 function showSection(sectionId) {
@@ -400,692 +262,796 @@ function showSection(sectionId) {
     event.target.classList.add('active');
     if (sectionId === 'leaderboard') renderLeaderboard();
     if (sectionId === 'achievements') renderAchievements();
-    if (sectionId === 'shop') renderShop();
-    if (sectionId === 'profile') renderProfile();
+    if (sectionId === 'chat') renderChat();
 }
 
-function stopAllGames() {
-    currentGame = null;
-    isPaused = false;
-    gameLaunched = false;
-    if (gameInterval) { clearInterval(gameInterval); gameInterval = null; }
-    if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
-    const audio = document.getElementById('rhythmAudio');
-    audio.pause(); audio.currentTime = 0;
-    keys = {};
-    document.getElementById('mobileControls').classList.remove('active');
-    document.getElementById('rhythmMobileControls').classList.remove('active');
-    document.getElementById('standardControls').style.display = 'flex';
-}
-
-function checkPremiumAccess(gameType) {
-    if (userData.premiumUnlocked || userData.inventory.includes('neon_blaster_unlock')) {
-        startGame(gameType);
-    } else {
-        showNotification('💎 Neon Blaster: 3000₽ (Скидка 40% для первых!) Купите в магазине.');
-        showSection('shop');
-    }
-}
-
-function showDifficultySelector(gameType) {
-    stopAllGames();
-    currentGame = gameType;
-    document.getElementById('activeGame').style.display = 'block';
-    document.getElementById('difficultySelector').style.display = 'block';
-    document.getElementById('currentGameTitle').textContent = '🎵 Neon Beats';
-    document.getElementById('gameInstructions').textContent = 'ПК: D, F, J, K | Мобильный: 4 кнопки внизу. Попадай в такт!';
-    updateTrackDisplay();
-}
-
-function setDifficulty(diff, btn) {
-    rhythmDifficulty = diff;
-    document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-}
-
-function updateTrackDisplay() {
-    rhythmTrackIndex = rhythmDifficulty === 'easy' ? 0 : rhythmDifficulty === 'medium' ? 1 : 2;
-    document.getElementById('currentTrackName').textContent = rhythmTracks[rhythmTrackIndex].name;
-}
-
-function startRhythmGame() {
-    document.getElementById('difficultySelector').style.display = 'none';
-    document.getElementById('standardControls').style.display = 'none'; // Скрываем стандартные, т.к. ритм управляется иначе
-    document.getElementById('rhythmMobileControls').classList.add('active');
-    gameScore = 0; combo = 0; maxCombo = 0;
-    document.getElementById('currentScore').textContent = '0';
-    document.getElementById('comboCount').textContent = '0';
-    
-    // Генерация нот
-    generateRhythmNotes();
-    
-    const audio = document.getElementById('rhythmAudio');
-    audio.src = rhythmTracks[rhythmTrackIndex].url;
-    audio.volume = 0.5;
-    
-    gameLaunched = true;
-    isPaused = false;
-    rhythmStartTime = Date.now() + 2000; // Задержка 2 сек перед стартом
-    
-    audio.play().catch(e => {
-        console.log("Автоплей заблокирован, игра начнётся по первому клику");
-        document.getElementById('gameInstructions').textContent = '⚠️ Нажмите на экран для старта аудио!';
-        canvasWrapper.onclick = () => { audio.play(); canvasWrapper.onclick = null; };
-    });
-    
-    showNotification('🎵 3... 2... 1... ПОЕХАЛИ!');
-    rhythmLoop();
-}
-
-function generateRhythmNotes() {
-    rhythmNotes = [];
-    const track = rhythmTracks[rhythmTrackIndex];
-    const duration = 60000; // 60 секунд
-    const spawnRate = track.bpm === 100 ? 600 : track.bpm === 120 ? 450 : 300;
-    
-    for (let time = 2000; time < duration; time += spawnRate) {
-        // Случайная дорожка 0-3
-        const lane = Math.floor(Math.random() * 4);
-        // Иногда добавляем двойные ноты на сложном
-        rhythmNotes.push({ time: time, lane: lane, hit: false, missed: false });
-        if (track.bpm === 140 && Math.random() > 0.7) {
-            rhythmNotes.push({ time: time + 150, lane: (lane + 1) % 4, hit: false, missed: false });
-        }
-    }
-}
-
-function rhythmLoop() {
-    if (!gameLaunched || currentGame !== 'rhythm') return;
-    if (isPaused) { animFrame = requestAnimationFrame(rhythmLoop); return; }
-    
-    const now = Date.now();
-    const audio = document.getElementById('rhythmAudio');
-    const currentTime = audio.currentTime * 1000;
-    
-    // Очистка
-    ctx.fillStyle = '#050510';
-    ctx.fillRect(0, 0, 800, 500);
-    
-    // Дорожки (Cyan, Purple, Purple, Gold)
-    const laneColors = ['#00f3ff', '#bc13fe', '#bc13fe', '#ffd700'];
-    const laneWidth = 100;
-    const startX = 200;
-    const hitLineY = 400;
-    const fallSpeed = rhythmDifficulty === 'easy' ? 0.3 : rhythmDifficulty === 'medium' ? 0.5 : 0.7; // пикселей на мс
-    
-    // Рисуем дорожки
-    for (let i = 0; i < 4; i++) {
-        const x = startX + i * laneWidth;
-        ctx.fillStyle = 'rgba(255,255,255,0.03)';
-        ctx.fillRect(x, 0, laneWidth, 500);
-        ctx.strokeStyle = laneColors[i];
-        ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 500); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x + laneWidth, 0); ctx.lineTo(x + laneWidth, 500); ctx.stroke();
-        
-        // Линия попадания
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = laneColors[i];
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 3;
-        ctx.beginPath(); ctx.moveTo(x + 10, hitLineY); ctx.lineTo(x + laneWidth - 10, hitLineY); ctx.stroke();
-        ctx.shadowBlur = 0;
-        
-        // Подписи клавиш
-        ctx.fillStyle = laneColors[i];
-        ctx.font = 'bold 20px Arial';
-        ctx.textAlign = 'center';
-        const keyLabels = ['D', 'F', 'J', 'K'];
-        ctx.fillText(keyLabels[i], x + laneWidth/2, 480);
-    }
-    
-    // Обновление и отрисовка нот
-    let activeNotes = 0;
-    rhythmNotes.forEach(note => {
-        if (note.hit || note.missed) return;
-        
-        const timeDiff = note.time - currentTime;
-        const y = hitLineY - (timeDiff * fallSpeed);
-        
-        if (y > -50 && y < 550) {
-            activeNotes++;
-            ctx.fillStyle = laneColors[note.lane];
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = laneColors[note.lane];
-            ctx.fillRect(startX + note.lane * laneWidth + 25, y - 15, 50, 30);
-            ctx.shadowBlur = 0;
-        }
-        
-        // Промах
-        if (timeDiff < -150 && !note.missed) {
-            note.missed = true;
-            combo = 0;
-            document.getElementById('comboCount').textContent = combo;
-            showHitEffect('MISS', '#ff4444');
-        }
-    });
-    
-    // Эффекты попадания
-    hitEffects.forEach((eff, i) => {
-        eff.life--;
-        ctx.fillStyle = eff.color;
-        ctx.font = `bold ${20 + (30-eff.life)}px Arial`;
-        ctx.textAlign = 'center';
-        ctx.fillText(eff.text, 400, hitLineY - 50 - (30-eff.life));
-        if (eff.life <= 0) hitEffects.splice(i, 1);
-    });
-    
-    // Конец трека
-    if (currentTime > 60000 || (activeNotes === 0 && currentTime > 5000)) {
-        endGame('rhythm');
-        return;
-    }
-    
-    animFrame = requestAnimationFrame(rhythmLoop);
-}
-
-function handleRhythmInput(key) {
-    if (!gameLaunched || currentGame !== 'rhythm' || isPaused) return;
-    
-    const laneMap = { 'KeyD': 0, 'KeyF': 1, 'KeyJ': 2, 'KeyK': 3 };
-    const lane = laneMap[key];
-    if (lane === undefined) return;
-    
-    const audio = document.getElementById('rhythmAudio');
-    const currentTime = audio.currentTime * 1000;
-    
-    // Ищем ближайшую ноту в этой дорожке
-    let bestNote = null;
-    let minDiff = Infinity;
-    
-    rhythmNotes.forEach(note => {
-        if (note.lane === lane && !note.hit && !note.missed) {
-            const diff = Math.abs(note.time - currentTime);
-            if (diff < minDiff) {
-                minDiff = diff;
-                bestNote = note;
-            }
-        }
-    });
-    
-    if (bestNote && minDiff < 150) {
-        bestNote.hit = true;
-        combo++;
-        if (combo > maxCombo) maxCombo = combo;
-        
-        let points = 10;
-        let text = 'GOOD';
-        let color = '#00f3ff';
-        
-        if (minDiff < 50) { points = 30; text = 'PERFECT!'; color = '#ffd700'; }
-        else if (minDiff < 100) { points = 20; text = 'GREAT'; color = '#bc13fe'; }
-        
-        gameScore += points * (1 + Math.floor(combo / 10));
-        document.getElementById('currentScore').textContent = gameScore;
-        document.getElementById('comboCount').textContent = combo;
-        
-        showHitEffect(text, color);
-        checkAchievement('rhythm_50', combo >= 50);
-    }
-}
-
-function showHitEffect(text, color) {
-    hitEffects.push({ text, color, life: 30 });
-}
-
-// NEON BLASTER (КОСМИЧЕСКИЙ ШУТЕР)
 function startGame(gameType) {
-    stopAllGames();
     currentGame = gameType;
-    gameScore = 0; combo = 0;
-    document.getElementById('currentScore').textContent = '0';
-    document.getElementById('comboCount').textContent = '0';
+    gameScore = 0;
+    isPaused = false;
     document.getElementById('activeGame').style.display = 'block';
-    document.getElementById('difficultySelector').style.display = 'none';
+
+    canvas = document.getElementById('gameCanvas');
+    ctx = canvas.getContext('2d');
+    canvas.width = 800;
+    canvas.height = 600;
 
     const games = {
-        'neonBlaster': {title: '🚀 Neon Blaster (Premium)', instructions: isMobile ? '👆 Кнопки ← → для движения, 🔥 для стрельбы' : 'Стрелки для движения, Пробел для стрельбы'},
-        'spaceJump': {title: '🛸 Космический Прыжок', instructions: isMobile ? '👆 Жми кнопку 🔥 для прыжка' : 'Пробел или ↑ для прыжка'},
-        'spaceSnake': {title: '🌌 Змейка', instructions: isMobile ? '👆 Кнопки ← → ↑ ↓' : 'Стрелки'}
+        'pacman': { title: ' Звёздный Pac-Man', info: 'Управление: стрелки или WASD' },
+        'shooter': { title: ' Space Shooter', info: 'Управление: стрелки + пробел' },
+        'invaders': { title: '👾 Space Invaders', info: 'Управление: стрелки + пробел для стрельбы' },
+        'snake': { title: '🐍 Звёздная змейка', info: 'Управление: стрелки' }
     };
 
-    document.getElementById('currentGameTitle').textContent = games[gameType].title;
-    document.getElementById('gameInstructions').textContent = games[gameType].instructions;
-    document.getElementById('standardControls').style.display = 'flex';
+    document.getElementById('gameTitle').textContent = games[gameType].title;
+    document.getElementById('gameInfo').textContent = games[gameType].info;
 
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, 800, 500);
+    if (gameType === 'pacman') initPacman();
+    else if (gameType === 'shooter') initShooter();
+    else if (gameType === 'invaders') initInvaders();
+    else if (gameType === 'snake') initSnake();
 
-    if (gameType === 'neonBlaster') initNeonBlaster();
-    else if (gameType === 'spaceJump') initSpaceJump();
-    else if (gameType === 'spaceSnake') initSpaceSnake();
-    
-    document.getElementById('activeGame').scrollIntoView({behavior:'smooth',block:'center'});
+    userData.gamesPlayed++;
+    saveUserData();
 }
 
 function launchGame() {
+    if (currentGame === 'pacman') startPacman();
+    else if (currentGame === 'shooter') startShooter();
+    else if (currentGame === 'invaders') startInvaders();
+    else if (currentGame === 'snake') startSnake();
+    showNotification('🎮 Игра началась!');
+}
+
+function pauseGame() {
+    isPaused = true;
     if (gameInterval) clearInterval(gameInterval);
-    if (animFrame) cancelAnimationFrame(animFrame);
-    isPaused = false;
-    gameLaunched = true;
-    if (isMobile) document.getElementById('mobileControls').classList.add('active');
-    
-    if (currentGame === 'neonBlaster') {
-        blasterRunning = true;
-        blasterLoop();
-    } else {
-        startGameLogic(currentGame);
-    }
-    showNotification('🚀 Старт!');
+    showNotification(' Пауза');
 }
 
-function initNeonBlaster() {
-    playerShip = {x:400, y:450, width:30, height:30, hp:3, weapon:1};
-    blasterBullets = []; blasterEnemies = []; blasterPowerups = []; blasterParticles = [];
-    blasterWave = 1; blasterBoss = null; blasterRunning = false;
-}
-
-function blasterLoop() {
-    if (!gameLaunched || currentGame !== 'neonBlaster') return;
-    if (isPaused) { animFrame = requestAnimationFrame(blasterLoop); return; }
-    
-    ctx.fillStyle = '#050510';
-    ctx.fillRect(0, 0, 800, 500);
-    
-    // Звёзды
-    ctx.fillStyle = '#fff';
-    for(let i=0; i<30; i++) ctx.fillRect((i*137+Date.now()*0.05)%800, (i*241)%500, 1, 1);
-    
-    // Управление игроком
-    if (keys['ArrowLeft'] && playerShip.x > 20) playerShip.x -= 5;
-    if (keys['ArrowRight'] && playerShip.x < 780) playerShip.x += 5;
-    if (keys['Space'] && Date.now() % 10 === 0) { // Ограничение скорострельности
-        blasterBullets.push({x: playerShip.x, y: playerShip.y - 20, vy: -8, isPlayer: true, width: 4, height: 10});
-        if (playerShip.weapon >= 2) {
-            blasterBullets.push({x: playerShip.x - 15, y: playerShip.y - 10, vy: -7, vx: -2, isPlayer: true, width: 4, height: 10});
-            blasterBullets.push({x: playerShip.x + 15, y: playerShip.y - 10, vy: -7, vx: 2, isPlayer: true, width: 4, height: 10});
-        }
-    }
-    
-    // Спавн врагов
-    if (!blasterBoss && Math.random() < 0.02 + (blasterWave * 0.005)) {
-        const type = Math.random() > 0.8 ? 'shooter' : 'basic';
-        blasterEnemies.push({
-            x: Math.random() * 700 + 50, y: -30, width: 30, height: 30, 
-            type: type, hp: type === 'shooter' ? 3 : 1, vx: (Math.random() - 0.5) * 2, vy: 2
-        });
-    }
-    
-    // Спавн Босса (каждая 3-я волна)
-    if (blasterWave % 3 === 0 && !blasterBoss && blasterEnemies.length === 0) {
-        blasterBoss = {x: 400, y: 80, width: 80, height: 60, hp: 50, maxHp: 50, vx: 3, phase: 0};
-        showNotification('⚠️ ВНИМАНИЕ: БОСС!');
-    }
-    
-    // Обновление пуль
-    blasterBullets.forEach((b, i) => {
-        b.y += b.vy;
-        if (b.vx) b.x += b.vx;
-        ctx.fillStyle = b.isPlayer ? '#00f3ff' : '#ff4444';
-        ctx.shadowBlur = 10; ctx.shadowColor = ctx.fillStyle;
-        ctx.fillRect(b.x - b.width/2, b.y, b.width, b.height);
-        ctx.shadowBlur = 0;
-        if (b.y < 0 || b.y > 500) blasterBullets.splice(i, 1);
-    });
-    
-    // Обновление врагов
-    blasterEnemies.forEach((e, i) => {
-        e.x += e.vx; e.y += e.vy;
-        if (e.x <= 20 || e.x >= 780) e.vx *= -1;
-        
-        ctx.fillStyle = e.type === 'shooter' ? '#bc13fe' : '#ff8c00';
-        ctx.fillRect(e.x - e.width/2, e.y, e.width, e.height);
-        
-        // Стрельба врагов
-        if (e.type === 'shooter' && Math.random() < 0.01) {
-            blasterBullets.push({x: e.x, y: e.y + 20, vy: 5, isPlayer: false, width: 6, height: 6});
-        }
-        
-        // Столкновение с игроком
-        if (Math.abs(e.x - playerShip.x) < 30 && Math.abs(e.y - playerShip.y) < 30) {
-            playerShip.hp--;
-            blasterEnemies.splice(i, 1);
-            createExplosion(playerShip.x, playerShip.y, '#ff4444');
-            if (playerShip.hp <= 0) endGame('neonBlaster');
-        }
-        
-        if (e.y > 500) blasterEnemies.splice(i, 1);
-    });
-    
-    // Логика Босса
-    if (blasterBoss) {
-        blasterBoss.x += blasterBoss.vx;
-        if (blasterBoss.x <= 100 || blasterBoss.x >= 700) blasterBoss.vx *= -1;
-        
-        ctx.fillStyle = '#ff0000';
-        ctx.shadowBlur = 20; ctx.shadowColor = '#ff0000';
-        ctx.fillRect(blasterBoss.x - blasterBoss.width/2, blasterBoss.y, blasterBoss.width, blasterBoss.height);
-        ctx.shadowBlur = 0;
-        
-        // Полоска HP босса
-        ctx.fillStyle = '#333'; ctx.fillRect(200, 20, 400, 10);
-        ctx.fillStyle = '#ff0000'; ctx.fillRect(200, 20, 400 * (blasterBoss.hp / blasterBoss.maxHp), 10);
-        
-        // Атака босса
-        if (Math.random() < 0.05) {
-            for(let i=-2; i<=2; i++) {
-                blasterBullets.push({x: blasterBoss.x, y: blasterBoss.y + 40, vy: 4, vx: i * 1.5, isPlayer: false, width: 8, height: 8});
-            }
-        }
-        
-        if (blasterBoss.hp <= 0) {
-            blasterBoss = null;
-            blasterWave++;
-            gameScore += 500;
-            addXP(100);
-            checkAchievement('boss_slayer', true);
-            showNotification('🏆 БОСС ПОВЕРЖЕН! +500 очков');
-            blasterPowerups.push({x: 400, y: 100, type: 'heal'});
-        }
-    } else if (blasterEnemies.length === 0 && Math.random() < 0.005) {
-        blasterWave++;
-        showNotification('🌊 Волна ' + blasterWave);
-    }
-    
-    // Столкновения пуль с врагами
-    blasterBullets.forEach((b, bi) => {
-        if (!b.isPlayer) {
-            if (Math.abs(b.x - playerShip.x) < 20 && Math.abs(b.y - playerShip.y) < 20) {
-                playerShip.hp--;
-                blasterBullets.splice(bi, 1);
-                createExplosion(playerShip.x, playerShip.y, '#ff4444');
-                if (playerShip.hp <= 0) endGame('neonBlaster');
-            }
-        } else {
-            // Пуля игрока попала во врага
-            blasterEnemies.forEach((e, ei) => {
-                if (Math.abs(b.x - e.x) < 20 && Math.abs(b.y - e.y) < 20) {
-                    e.hp--;
-                    blasterBullets.splice(bi, 1);
-                    if (e.hp <= 0) {
-                        blasterEnemies.splice(ei, 1);
-                        gameScore += 50;
-                        addXP(10);
-                        createExplosion(e.x, e.y, '#ffd700');
-                        if (Math.random() < 0.1) blasterPowerups.push({x: e.x, y: e.y, type: 'spread'});
-                    }
-                }
-            });
-            // Пуля игрока попала в босса
-            if (blasterBoss && Math.abs(b.x - blasterBoss.x) < 50 && Math.abs(b.y - blasterBoss.y) < 40) {
-                blasterBoss.hp--;
-                blasterBullets.splice(bi, 1);
-                createExplosion(b.x, b.y, '#ff8c00');
-            }
-        }
-    });
-    
-    // Бонусы
-    blasterPowerups.forEach((p, i) => {
-        p.y += 2;
-        ctx.fillStyle = p.type === 'heal' ? '#00ff88' : '#00f3ff';
-        ctx.font = '20px Arial';
-        ctx.fillText(p.type === 'heal' ? '❤️' : '⚡', p.x - 10, p.y);
-        
-        if (Math.abs(p.x - playerShip.x) < 25 && Math.abs(p.y - playerShip.y) < 25) {
-            if (p.type === 'heal' && playerShip.hp < 3) playerShip.hp++;
-            if (p.type === 'spread') playerShip.weapon = 2;
-            blasterPowerups.splice(i, 1);
-            gameScore += 100;
-        }
-        if (p.y > 500) blasterPowerups.splice(i, 1);
-    });
-    
-    // Частицы
-    blasterParticles.forEach((p, i) => {
-        p.x += p.vx; p.y += p.vy; p.life--;
-        ctx.fillStyle = p.color;
-        ctx.fillRect(p.x, p.y, 3, 3);
-        if (p.life <= 0) blasterParticles.splice(i, 1);
-    });
-    
-    // Отрисовка игрока
-    ctx.fillStyle = '#00f3ff';
-    ctx.shadowBlur = 15; ctx.shadowColor = '#00f3ff';
-    ctx.beginPath();
-    ctx.moveTo(playerShip.x, playerShip.y - 20);
-    ctx.lineTo(playerShip.x - 15, playerShip.y + 15);
-    ctx.lineTo(playerShip.x + 15, playerShip.y + 15);
-    ctx.fill();
-    ctx.shadowBlur = 0;
-    
-    // HP игрока
-    ctx.fillStyle = '#fff'; ctx.font = '16px Arial'; ctx.textAlign = 'left';
-    ctx.fillText('HP: ' + '❤️'.repeat(playerShip.hp), 20, 30);
-    ctx.fillText('WAVE: ' + blasterWave, 20, 55);
-    
-    document.getElementById('currentScore').textContent = gameScore;
-    animFrame = requestAnimationFrame(blasterLoop);
-}
-
-function createExplosion(x, y, color) {
-    for (let i = 0; i < 15; i++) {
-        blasterParticles.push({
-            x: x, y: y, vx: (Math.random() - 0.5) * 8, vy: (Math.random() - 0.5) * 8,
-            life: 20 + Math.random() * 10, color: color
-        });
+function resumeGame() {
+    if (isPaused) {
+        isPaused = false;
+        launchGame();
+        showNotification('▶ Продолжаем!');
     }
 }
-
-function startGameLogic(gameType) {
-    if (gameType === 'spaceJump') startSpaceJump();
-    else if (gameType === 'spaceSnake') startSpaceSnake();
-}
-
-function initSpaceJump() {
-    jumper = {x:100, y:250, vy:0, radius:15};
-    jumpObstacles = []; jumpRunning = false; jumpFrame = 0;
-}
-function startSpaceJump() {
-    if (jumpRunning) return; jumpRunning = true;
-    gameInterval = setInterval(() => {
-        if (isPaused || currentGame !== 'spaceJump') return;
-        jumpFrame++;
-        jumper.vy += 0.4; jumper.y += jumper.vy;
-        if (keys['Space'] || keys['ArrowUp']) { jumper.vy = -7; keys['Space'] = false; keys['ArrowUp'] = false; }
-        if (jumper.y + jumper.radius > 500 || jumper.y - jumper.radius < 0) { endGame('spaceJump'); return; }
-        if (jumpFrame % 100 === 0) {
-            let gap = 130, topHeight = Math.random() * (500 - gap - 100) + 50;
-            jumpObstacles.push({x:800, top:topHeight, bottom:topHeight+gap, width:40, passed:false});
-        }
-        for (let i = jumpObstacles.length - 1; i >= 0; i--) {
-            let obs = jumpObstacles[i]; obs.x -= 4;
-            if (jumper.x + jumper.radius > obs.x && jumper.x - jumper.radius < obs.x + obs.width) {
-                if (jumper.y - jumper.radius < obs.top || jumper.y + jumper.radius > obs.bottom) { endGame('spaceJump'); return; }
-            }
-            if (!obs.passed && obs.x + obs.width < jumper.x) {
-                obs.passed = true; gameScore += 10; addXP(10);
-                document.getElementById('currentScore').textContent = gameScore;
-            }
-            if (obs.x + obs.width < 0) jumpObstacles.splice(i, 1);
-        }
-        drawSpaceJump();
-    }, 16);
-}
-function drawSpaceJump() {
-    ctx.fillStyle = '#050510'; ctx.fillRect(0,0,800,500);
-    ctx.fillStyle = '#fff'; for(let i=0; i<50; i++) ctx.fillRect((i*137+jumpFrame*2)%800, (i*241)%500, 1, 1);
-    ctx.fillStyle = '#bc13fe'; ctx.shadowBlur = 10; ctx.shadowColor = '#bc13fe';
-    jumpObstacles.forEach(obs => { ctx.fillRect(obs.x, 0, obs.width, obs.top); ctx.fillRect(obs.x, obs.bottom, obs.width, 500 - obs.bottom); });
-    ctx.shadowBlur = 0; ctx.fillStyle = '#00f3ff'; ctx.shadowBlur = 15; ctx.shadowColor = '#00f3ff';
-    ctx.beginPath(); ctx.arc(jumper.x, jumper.y, jumper.radius, 0, Math.PI*2); ctx.fill(); ctx.shadowBlur = 0;
-}
-
-function initSpaceSnake() {
-    snake = [{x:10, y:10}]; snakeDir = {x:1,y:0}; snakeNextDir = {x:1,y:0};
-    snakeFood = {x:15, y:15}; snakeRunning = false;
-}
-function startSpaceSnake() {
-    if (snakeRunning) return; snakeRunning = true;
-    gameInterval = setInterval(() => {
-        if (isPaused || currentGame !== 'spaceSnake') return;
-        snakeDir = snakeNextDir;
-        const head = {x:snake[0].x+snakeDir.x, y:snake[0].y+snakeDir.y};
-        if (head.x<0 || head.x>=40 || head.y<0 || head.y>=25 || snake.some(s=>s.x===head.x && s.y===head.y)) { endGame('spaceSnake'); return; }
-        snake.unshift(head);
-        if (head.x===snakeFood.x && head.y===snakeFood.y) {
-            gameScore += 15; addXP(15); snakeFood = {x:Math.floor(Math.random()*40), y:Math.floor(Math.random()*25)};
-            document.getElementById('currentScore').textContent = gameScore;
-        } else snake.pop();
-        drawSpaceSnake();
-    }, 100);
-}
-function drawSpaceSnake() {
-    ctx.fillStyle = '#050510'; ctx.fillRect(0,0,800,500);
-    ctx.strokeStyle = 'rgba(0,243,255,0.1)'; ctx.lineWidth = 1;
-    for(let i=0; i<40; i++) { ctx.beginPath(); ctx.moveTo(i*20,0); ctx.lineTo(i*20,500); ctx.stroke(); }
-    for(let i=0; i<25; i++) { ctx.beginPath(); ctx.moveTo(0,i*20); ctx.lineTo(800,i*20); ctx.stroke(); }
-    if (keys['ArrowUp'] && snakeDir.y===0) snakeNextDir = {x:0,y:-1};
-    if (keys['ArrowDown'] && snakeDir.y===0) snakeNextDir = {x:0,y:1};
-    if (keys['ArrowLeft'] && snakeDir.x===0) snakeNextDir = {x:-1,y:0};
-    if (keys['ArrowRight'] && snakeDir.x===0) snakeNextDir = {x:1,y:0};
-    ctx.shadowBlur = 10; ctx.shadowColor = '#00f3ff';
-    snake.forEach((s,i) => { ctx.fillStyle = i===0 ? '#fff' : '#00f3ff'; ctx.fillRect(s.x*20+1, s.y*20+1, 18, 18); });
-    ctx.shadowColor = '#ffd700'; ctx.fillStyle = '#ffd700';
-    ctx.beginPath(); ctx.arc(snakeFood.x*20+10, snakeFood.y*20+10, 8, 0, Math.PI*2); ctx.fill(); ctx.shadowBlur = 0;
-}
-
-function pauseGame() { isPaused = true; if(gameInterval) clearInterval(gameInterval); if(animFrame) cancelAnimationFrame(animFrame); showNotification('⏸ Пауза'); }
-function resumeGame() { if (isPaused) { isPaused = false; if(currentGame === 'neonBlaster') blasterLoop(); else if(currentGame === 'rhythm') rhythmLoop(); else startGameLogic(currentGame); showNotification('▶ Поехали!'); } }
 
 function closeGame() {
-    stopAllGames();
-    document.getElementById('activeGame').style.display = 'none';
-    window.scrollTo({top:0,behavior:'smooth'});
-}
-
-function endGame(gameType) {
     if (gameInterval) clearInterval(gameInterval);
-    if (animFrame) cancelAnimationFrame(animFrame);
-    showNotification('💥 Счёт: ' + gameScore + ' | Макс комбо: ' + maxCombo);
-    userData.gamesPlayed++; localStorage.setItem('ss_games', userData.gamesPlayed);
-    updateStats();
-    checkAchievement('first_mission', true);
-    setTimeout(() => closeGame(), 2500);
+    document.getElementById('activeGame').style.display = 'none';
+    currentGame = null;
 }
 
-// КЛАВИАТУРА
-document.addEventListener('keydown', e => {
-    if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space","KeyD","KeyF","KeyJ","KeyK"].indexOf(e.code) > -1) e.preventDefault();
-    keys[e.code] = true;
-    if (currentGame === 'rhythm' && gameLaunched) handleRhythmInput(e.code);
-});
-document.addEventListener('keyup', e => { keys[e.code] = false; });
+// PAC-MAN С КРАСИВЫМИ ПРИВЕДЕНИЯМИ
+let pacman, ghosts, dots, maze, mouthOpen;
 
-// ПРОГРЕСС
-function addXP(amount) {
-    const boost = userData.inventory.includes('xp_boost') ? 2 : 1;
-    userData.xp += amount * boost;
-    localStorage.setItem('ss_xp', userData.xp);
-    updateStats();
-    checkAchievement('xp_500', userData.xp >= 500);
-}
+function initPacman() {
+    maze = [
+        '####################',
+        '#........#.........#',
+        '#.####.#.#.#.####.#.#',
+        '#.#....#...#....#.#.#',
+        '#.#.##.#.#.#.##.#.#.#',
+        '#.#.#......#.#....#.#',
+        '#...#.####.#.####...#',
+        '#.#.#......#.#....#.#',
+        '#.#.##.####.##.#....#',
+        '#.#....#..#....#....#',
+        '#.####.#..#.####....#',
+        '#......#..#.........#',
+        '####################'
+    ];
 
-function updateStats() {
-    document.getElementById('totalXP').textContent = userData.xp;
-    document.getElementById('level').textContent = Math.floor(userData.xp/500) + 1;
-    document.getElementById('coins').textContent = userData.coins;
-    document.getElementById('gamesPlayed').textContent = userData.gamesPlayed;
-}
+    pacman = { x: 1, y: 1, dir: { x: 0, y: 0 }, nextDir: { x: 0, y: 0 } };
+    mouthOpen = 0;
 
-function checkAchievement(id, condition) {
-    const achievement = achievements.find(a => a.id === id);
-    if (achievement && condition && !userData.achievements.includes(id)) {
-        userData.achievements.push(id);
-        localStorage.setItem('ss_achievements', JSON.stringify(userData.achievements));
-        showNotification('🏅 ' + achievement.name + '!');
-        userData.coins += 100;
-        localStorage.setItem('ss_coins', userData.coins);
-        updateStats();
-    }
-}
+    // Приведения с именами и цветами как в оригинале
+    ghosts = [
+        { x: 10, y: 6, color: '#ff0000', name: 'Blinky', eyeDir: {x:1,y:0} },
+        { x: 9, y: 6, color: '#ffb8ff', name: 'Pinky', eyeDir: {x:-1,y:0} },
+        { x: 10, y: 7, color: '#00ffff', name: 'Inky', eyeDir: {x:0,y:1} },
+        { x: 9, y: 7, color: '#ffb852', name: 'Clyde', eyeDir: {x:0,y:-1} },
+        { x: 5, y: 5, color: '#ff00ff', name: 'Sue', eyeDir: {x:1,y:0} },
+        { x: 15, y: 10, color: '#00ff00', name: 'Funky', eyeDir: {x:-1,y:0} }
+    ];
 
-function renderLeaderboard() {
-    leaderboard.sort((a,b) => b.xp - a.xp);
-    const myIndex = leaderboard.findIndex(p => p.name === userData.username);
-    if (myIndex === -1) leaderboard.push({name:userData.username, xp:userData.xp});
-    else leaderboard[myIndex].xp = userData.xp;
-    leaderboard.sort((a,b) => b.xp - a.xp);
-    localStorage.setItem('ss_leaderboard', JSON.stringify(leaderboard));
-    let html = '';
-    leaderboard.slice(0,10).forEach((p,i) => {
-        const medal = i===0 ? '🥇' : i===1 ? '🥈' : i===2 ? '🥉' : (i+1)+'.';
-        const isMe = p.name === userData.username ? ' <span style="color:#00f3ff">(ты)</span>' : '';
-        html += '<div class="leaderboard-item" style="display:flex;justify-content:space-between;"><span>'+medal+' '+p.name+isMe+'</span><span style="color:#ffd700;font-weight:bold">'+p.xp+'</span></div>';
-    });
-    document.getElementById('leaderboardList').innerHTML = html;
-}
-
-function renderAchievements() {
-    let html = '';
-    achievements.forEach(a => {
-        const unlocked = userData.achievements.includes(a.id);
-        html += '<div class="achievement'+(unlocked?'':' locked')+'"><div class="achievement-icon">'+a.icon+'</div><div class="achievement-name">'+a.name+'</div><div class="achievement-desc">'+a.desc+'</div><div style="font-size:22px;margin-top:8px">'+(unlocked?'✅':'🔒')+'</div></div>';
-    });
-    document.getElementById('achievementsList').innerHTML = html;
-    document.getElementById('profileAchievements').textContent = userData.achievements.length;
-}
-
-function renderShop() {
-    document.getElementById('shopCoins').textContent = userData.coins;
-    let html = '';
-    shopItems.forEach(item => {
-        const isOwned = item.type === 'premium' && userData.premiumUnlocked;
-        html += '<div class="shop-item"><div class="shop-icon">'+item.icon+'</div><div class="shop-name">'+item.name+'</div>';
-        if (item.oldPrice) html += '<div class="price-tag">'+item.oldPrice+'₽</div>';
-        html += '<div class="shop-price" onclick="buyItem(\''+item.id+'\')">'+(isOwned ? '✅ Куплено' : item.price + (item.type === 'premium' ? '₽' : ' 🪙'))+'</div></div>';
-    });
-    document.getElementById('shopItems').innerHTML = html;
-}
-
-function buyItem(itemId) {
-    const item = shopItems.find(i => i.id === itemId);
-    if (item.type === 'premium') {
-        userData.premiumUnlocked = true;
-        localStorage.setItem('ss_premium', 'true');
-        showNotification('💎 Neon Blaster разблокирован! Спасибо за поддержку!');
-        renderShop();
-        return;
-    }
-    if (userData.coins < item.price) { showNotification('⚠️ Мало кредитов!'); return; }
-    userData.coins -= item.price;
-    if (item.type === 'coins') userData.coins += item.amount;
-    else if (item.type === 'avatar') document.getElementById('userAvatar').textContent = item.icon;
-    else if (item.type === 'boost') {
-        if (!userData.inventory.includes('xp_boost')) {
-            userData.inventory.push('xp_boost');
-            setTimeout(() => { userData.inventory = userData.inventory.filter(i => i !== 'xp_boost'); localStorage.setItem('ss_inventory', JSON.stringify(userData.inventory)); showNotification('⚡ Бустер истёк!'); }, item.duration*1000);
+    dots = [];
+    for (let y = 0; y < maze.length; y++) {
+        for (let x = 0; x < maze[y].length; x++) {
+            if (maze[y][x] === '.') dots.push({ x, y });
         }
     }
-    localStorage.setItem('ss_coins', userData.coins);
-    localStorage.setItem('ss_inventory', JSON.stringify(userData.inventory));
-    renderShop(); updateStats();
-    showNotification('✅ '+item.name+'!');
 }
 
-function renderProfile() {
-    document.getElementById('userName').textContent = userData.username;
-    document.getElementById('profileXP').textContent = userData.xp;
-    document.getElementById('profileGames').textContent = userData.gamesPlayed;
-    document.getElementById('profileAchievements').textContent = userData.achievements.length;
+function startPacman() {
+    if (gameInterval) clearInterval(gameInterval);
+    gameInterval = setInterval(updatePacman, 150);
+    document.addEventListener('keydown', handlePacmanKeys);
+}
+
+function handlePacmanKeys(e) {
+    if (currentGame !== 'pacman') return;
+    switch(e.key) {
+        case 'ArrowUp': case 'w': case 'W': pacman.nextDir = { x: 0, y: -1 }; break;
+        case 'ArrowDown': case 's': case 'S': pacman.nextDir = { x: 0, y: 1 }; break;
+        case 'ArrowLeft': case 'a': case 'A': pacman.nextDir = { x: -1, y: 0 }; break;
+        case 'ArrowRight': case 'd': case 'D': pacman.nextDir = { x: 1, y: 0 }; break;
+    }
+}
+
+// Функция рисования красивого приведения
+function drawGhost(ghost, cellSize, offsetX, offsetY) {
+    const x = ghost.x * cellSize + offsetX;
+    const y = ghost.y * cellSize + offsetY;
+    const size = cellSize - 4;
+    const centerX = x + size/2;
+    const centerY = y + size/2;
+    const radius = size/2 - 2;
+
+    // Тень
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.beginPath();
+    ctx.arc(centerX + 2, centerY + 3, radius, Math.PI, 0);
+    ctx.fill();
+
+    // Тело приведения (полукруг сверху)
+    ctx.fillStyle = ghost.color;
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = ghost.color;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY - 2, radius, Math.PI, 0);
+    ctx.fill();
+
+    // Нижняя часть с "ножками" (волнистая)
+    ctx.beginPath();
+    ctx.moveTo(centerX - radius, centerY - 2);
+    ctx.lineTo(centerX - radius, centerY + radius - 5);
+
+    // Волнистые ножки
+    const legWidth = (radius * 2) / 4;
+    for (let i = 0; i < 4; i++) {
+        const legX = centerX - radius + (i * legWidth);
+        const wave = (i % 2 === 0) ? 5 : 0;
+        ctx.lineTo(legX + legWidth/2, centerY + radius - 5 + wave);
+        ctx.lineTo(legX + legWidth, centerY + radius - 5);
+    }
+
+    ctx.lineTo(centerX + radius, centerY - 2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Глаза (белые)
+    const eyeSize = radius * 0.35;
+    const eyeY = centerY - 5;
+    const eyeOffsetX = radius * 0.35;
+
+    // Левый глаз
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.ellipse(centerX - eyeOffsetX, eyeY, eyeSize, eyeSize * 1.2, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Правый глаз
+    ctx.beginPath();
+    ctx.ellipse(centerX + eyeOffsetX, eyeY, eyeSize, eyeSize * 1.2, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Зрачки (следят за направлением)
+    const pupilSize = eyeSize * 0.5;
+    const pupilOffsetX = ghost.eyeDir.x * 2;
+    const pupilOffsetY = ghost.eyeDir.y * 2;
+
+    ctx.fillStyle = '#0000ff';
+    ctx.beginPath();
+    ctx.arc(centerX - eyeOffsetX + pupilOffsetX, eyeY + pupilOffsetY, pupilSize, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(centerX + eyeOffsetX + pupilOffsetX, eyeY + pupilOffsetY, pupilSize, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+function updatePacman() {
+    const cellSize = 40;
+    const offsetX = 50;
+    const offsetY = 50;
+
+    // Анимация рта Pac-Man
+    mouthOpen = (mouthOpen + 1) % 4;
+
+    let newX = pacman.x + pacman.nextDir.x;
+    let newY = pacman.y + pacman.nextDir.y;
+    if (maze[newY] && maze[newY][newX] !== '#') {
+        pacman.dir = pacman.nextDir;
+    }
+
+    newX = pacman.x + pacman.dir.x;
+    newY = pacman.y + pacman.dir.y;
+    if (maze[newY] && maze[newY][newX] !== '#') {
+        pacman.x = newX;
+        pacman.y = newY;
+    }
+
+    // Сбор точек
+    for (let i = dots.length - 1; i >= 0; i--) {
+        if (dots[i].x === pacman.x && dots[i].y === pacman.y) {
+            dots.splice(i, 1);
+            gameScore += 10;
+            userData.xp += 10;
+            userData.coins += 1;
+        }
+    }
+
+    // Движение приведений
+    ghosts.forEach(ghost => {
+        const dirs = [{ x: 0, y: -1 }, { x: 0, y: 1 }, { x: -1, y: 0 }, { x: 1, y: 0 }];
+        const validDirs = dirs.filter(d => {
+            let nx = ghost.x + d.x;
+            let ny = ghost.y + d.y;
+            return maze[ny] && maze[ny][nx] !== '#';
+        });
+
+        if (validDirs.length > 0) {
+            // Иногда преследуют Pac-Man
+            let chosenDir;
+            if (Math.random() < 0.3) {
+                // Движение к Pac-Man
+                const dx = pacman.x - ghost.x;
+                const dy = pacman.y - ghost.y;
+                const chaseDirs = validDirs.filter(d => {
+                    if (d.x !== 0 && Math.sign(d.x) === Math.sign(dx)) return true;
+                    if (d.y !== 0 && Math.sign(d.y) === Math.sign(dy)) return true;
+                    return false;
+                });
+                chosenDir = chaseDirs.length > 0 ? chaseDirs[0] : validDirs[Math.floor(Math.random() * validDirs.length)];
+            } else {
+                chosenDir = validDirs[Math.floor(Math.random() * validDirs.length)];
+            }
+
+            ghost.eyeDir = { x: chosenDir.x, y: chosenDir.y };
+            ghost.x += chosenDir.x;
+            ghost.y += chosenDir.y;
+        }
+
+        // Столкновение с Pac-Man
+        if (ghost.x === pacman.x && ghost.y === pacman.y) {
+            showNotification(' ' + ghost.name + ' поймал тебя! Счёт: ' + gameScore);
+            clearInterval(gameInterval);
+            saveUserData();
+        }
+    });
+
+    // Отрисовка
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 800, 600);
+
+    // Стены
+    ctx.fillStyle = '#00f3ff';
+    ctx.shadowBlur = 5;
+    ctx.shadowColor = '#00f3ff';
+    for (let y = 0; y < maze.length; y++) {
+        for (let x = 0; x < maze[y].length; x++) {
+            if (maze[y][x] === '#') {
+                ctx.fillRect(x * cellSize + offsetX, y * cellSize + offsetY, cellSize - 2, cellSize - 2);
+            }
+        }
+    }
+    ctx.shadowBlur = 0;
+
+    // Точки
+    ctx.fillStyle = '#ffd700';
+    dots.forEach(dot => {
+        ctx.beginPath();
+        ctx.arc(dot.x * cellSize + cellSize/2 + offsetX, dot.y * cellSize + cellSize/2 + offsetY, 4, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    // Pac-Man (с анимацией рта)
+    const pacX = pacman.x * cellSize + cellSize/2 + offsetX;
+    const pacY = pacman.y * cellSize + cellSize/2 + offsetY;
+    const pacRadius = cellSize/2 - 5;
+
+    ctx.fillStyle = '#ffff00';
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = '#ffff00';
+    ctx.beginPath();
+
+    // Угол рта зависит от направления
+    let startAngle, endAngle;
+    const mouthAngle = 0.15 + (mouthOpen * 0.05);
+
+    if (pacman.dir.x === 1) { startAngle = mouthAngle; endAngle = -mouthAngle + Math.PI * 2; }
+    else if (pacman.dir.x === -1) { startAngle = Math.PI + mouthAngle; endAngle = Math.PI - mouthAngle; }
+    else if (pacman.dir.y === -1) { startAngle = -Math.PI/2 + mouthAngle; endAngle = -Math.PI/2 - mouthAngle + Math.PI * 2; }
+    else if (pacman.dir.y === 1) { startAngle = Math.PI/2 + mouthAngle; endAngle = Math.PI/2 - mouthAngle; }
+    else { startAngle = mouthAngle; endAngle = -mouthAngle + Math.PI * 2; }
+
+    ctx.arc(pacX, pacY, pacRadius, startAngle, endAngle);
+    ctx.lineTo(pacX, pacY);
+    ctx.closePath();
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Глаз Pac-Man
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.arc(pacX - 3, pacY - 8, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Приведения (красивые!)
+    ghosts.forEach(ghost => {
+        drawGhost(ghost, cellSize, offsetX, offsetY);
+    });
+
+    document.getElementById('gameTitle').textContent = `🟡 Pac-Man | Счёт: ${gameScore} | Осталось точек: ${dots.length}`;
+    updateStats();
+}
+
+// SPACE SHOOTER (с боссами)
+let player2, bullets2, enemies2, particles2, powerups2;
+let wave, enemiesKilled, bossActive, boss;
+
+function initShooter() {
+    player2 = {
+        x: 400, y: 500, width: 40, height: 40, speed: 5,
+        hp: 100, maxHp: 100, shootCooldown: 0,
+        powerup: null, powerupTimer: 0
+    };
+    bullets2 = []; enemies2 = []; particles2 = []; powerups2 = [];
+    wave = 1; enemiesKilled = 0; bossActive = false; boss = null;
+}
+
+function startShooter() {
+    if (gameInterval) clearInterval(gameInterval);
+    gameInterval = setInterval(updateShooter, 16);
+    document.addEventListener('keydown', (e) => {
+        if (currentGame !== 'shooter') return;
+        keys[e.code] = true;
+        if (e.code === 'Space') e.preventDefault();
+    });
+    document.addEventListener('keyup', (e) => { keys[e.code] = false; });
+}
+
+function updateShooter() {
+    if (keys['ArrowLeft'] || keys['KeyA']) player2.x -= player2.speed;
+    if (keys['ArrowRight'] || keys['KeyD']) player2.x += player2.speed;
+    if (keys['ArrowUp'] || keys['KeyW']) player2.y -= player2.speed;
+    if (keys['ArrowDown'] || keys['KeyS']) player2.y += player2.speed;
+    player2.x = Math.max(20, Math.min(780, player2.x));
+    player2.y = Math.max(20, Math.min(580, player2.y));
+
+    if (player2.shootCooldown > 0) player2.shootCooldown--;
+    if (keys['Space'] && player2.shootCooldown === 0) {
+        const damage = player2.powerup === 'power' ? 3 : 1;
+        if (player2.powerup === 'triple') {
+            bullets2.push({ x: player2.x + player2.width/2, y: player2.y, speed: 8, damage: damage, color: '#00f3ff' });
+            bullets2.push({ x: player2.x + player2.width/2 - 15, y: player2.y + 10, speed: 8, damage: damage, color: '#00f3ff' });
+            bullets2.push({ x: player2.x + player2.width/2 + 15, y: player2.y + 10, speed: 8, damage: damage, color: '#00f3ff' });
+        } else {
+            bullets2.push({ x: player2.x + player2.width/2, y: player2.y, speed: 8, damage: damage, color: '#00f3ff' });
+        }
+        player2.shootCooldown = player2.powerup === 'rapid' ? 5 : 15;
+    }
+
+    if (player2.powerupTimer > 0) {
+        player2.powerupTimer--;
+        if (player2.powerupTimer === 0) player2.powerup = null;
+    }
+
+    if (!bossActive && Math.random() < 0.02 + (wave * 0.005)) {
+        const types = [
+            { width: 30, height: 30, speed: 2, hp: 1, score: 10, color: '#ff0000', wobble: 1 },
+            { width: 40, height: 40, speed: 1.5, hp: 2, score: 20, color: '#ff6600', wobble: 2 },
+            { width: 50, height: 50, speed: 1, hp: 3, score: 30, color: '#ff00ff', wobble: 0.5 }
+        ];
+        const type = types[Math.floor(Math.random() * types.length)];
+        enemies2.push({ x: Math.random() * 750, y: -50, ...type });
+    }
+
+    if (enemiesKilled >= 10 && !bossActive) {
+        bossActive = true;
+        boss = { x: 300, y: 50, width: 200, height: 150, hp: 50 + (wave * 10), maxHp: 50 + (wave * 10), speedX: 2 };
+        showNotification('⚠️ БОСС ПОЯВИЛСЯ!');
+    }
+
+    for (let i = bullets2.length - 1; i >= 0; i--) {
+        let b = bullets2[i];
+        b.y -= b.speed;
+        if (b.y < 0) { bullets2.splice(i, 1); continue; }
+
+        for (let j = enemies2.length - 1; j >= 0; j--) {
+            let e = enemies2[j];
+            if (b.x > e.x && b.x < e.x + e.width && b.y > e.y && b.y < e.y + e.height) {
+                e.hp -= b.damage;
+                bullets2.splice(i, 1);
+                if (e.hp <= 0) {
+                    createExplosion2(e.x + e.width/2, e.y + e.height/2, e.color);
+                    enemies2.splice(j, 1);
+                    gameScore += e.score; enemiesKilled++;
+                    userData.xp += 10; userData.coins += 1;
+                    if (Math.random() < 0.15) {
+                        const types = ['power', 'rapid', 'triple', 'shield'];
+                        const colors = { power: '#ff0000', rapid: '#00ff00', triple: '#00f3ff', shield: '#ffd700' };
+                        const type = types[Math.floor(Math.random() * types.length)];
+                        powerups2.push({ x: e.x + e.width/2, y: e.y + e.height/2, size: 20, type: type, color: colors[type] });
+                    }
+                }
+                break;
+            }
+        }
+
+        if (bossActive && boss) {
+            if (b.x > boss.x && b.x < boss.x + boss.width && b.y > boss.y && b.y < boss.y + boss.height) {
+                boss.hp -= b.damage;
+                bullets2.splice(i, 1);
+                if (boss.hp <= 0) {
+                    createExplosion2(boss.x + boss.width/2, boss.y + boss.height/2, '#ff0000', 50);
+                    gameScore += 500; userData.xp += 200; userData.coins += 50;
+                    bossActive = false; boss = null; wave++; enemiesKilled = 0;
+                    showNotification('🏆 Босс побеждён! Волна ' + wave);
+                }
+            }
+        }
+    }
+
+    for (let i = enemies2.length - 1; i >= 0; i--) {
+        let e = enemies2[i];
+        e.y += e.speed; e.x += Math.sin(e.y * 0.05) * e.wobble;
+        if (player2.x < e.x + e.width && player2.x + player2.width > e.x &&
+            player2.y < e.y + e.height && player2.y + player2.height > e.y) {
+            player2.hp -= 20;
+            createExplosion2(e.x + e.width/2, e.y + e.height/2, e.color);
+            enemies2.splice(i, 1);
+            if (player2.hp <= 0) {
+                showNotification(' Игра окончена! Счёт: ' + gameScore);
+                clearInterval(gameInterval); saveUserData(); return;
+            }
+        }
+        if (e.y > 600) enemies2.splice(i, 1);
+    }
+
+    if (bossActive && boss) {
+        boss.x += boss.speedX;
+        if (boss.x <= 0 || boss.x + boss.width >= 800) boss.speedX *= -1;
+        if (Math.random() < 0.03) {
+            bullets2.push({ x: boss.x + boss.width/2, y: boss.y + boss.height, speed: -3, isEnemy: true, color: '#ff0000' });
+        }
+    }
+
+    for (let i = powerups2.length - 1; i >= 0; i--) {
+        let p = powerups2[i];
+        p.y += 2;
+        if (player2.x < p.x + p.size && player2.x + player2.width > p.x &&
+            player2.y < p.y + p.size && player2.y + player2.height > p.y) {
+            player2.powerup = p.type; player2.powerupTimer = 300;
+            powerups2.splice(i, 1);
+            showNotification('⚡ Бонус: ' + p.type);
+        }
+        if (p.y > 600) powerups2.splice(i, 1);
+    }
+
+    for (let i = particles2.length - 1; i >= 0; i--) {
+        let p = particles2[i];
+        p.x += p.vx; p.y += p.vy; p.life--;
+        if (p.life <= 0) particles2.splice(i, 1);
+    }
+
+    drawShooter2();
+    document.getElementById('gameTitle').textContent = `🚀 Space Shooter | Волна: ${wave} | Счёт: ${gameScore} | HP: ${player2.hp}`;
+    updateStats();
+}
+
+function createExplosion2(x, y, color, count = 10) {
+    for (let i = 0; i < count; i++) {
+        particles2.push({ x: x, y: y, vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 0.5) * 10, life: 30, color: color, size: Math.random() * 5 + 2 });
+    }
+}
+
+function drawShooter2() {
+    ctx.fillStyle = '#000011'; ctx.fillRect(0, 0, 800, 600);
+    ctx.fillStyle = '#fff';
+    for (let i = 0; i < 50; i++) ctx.fillRect((i * 137) % 800, (i * 241) % 600, 1, 1);
+
+    ctx.fillStyle = player2.powerup === 'shield' ? '#ffd700' : '#00f3ff';
+    ctx.shadowBlur = 15; ctx.shadowColor = ctx.fillStyle;
+    ctx.beginPath();
+    ctx.moveTo(player2.x + player2.width/2, player2.y);
+    ctx.lineTo(player2.x + player2.width, player2.y + player2.height);
+    ctx.lineTo(player2.x, player2.y + player2.height);
+    ctx.closePath(); ctx.fill(); ctx.shadowBlur = 0;
+
+    bullets2.forEach(b => { ctx.fillStyle = b.color || '#00f3ff'; ctx.fillRect(b.x - 2, b.y, 4, 10); });
+    enemies2.forEach(e => { ctx.fillStyle = e.color; ctx.shadowBlur = 10; ctx.shadowColor = e.color; ctx.fillRect(e.x, e.y, e.width, e.height); ctx.shadowBlur = 0; });
+
+    if (bossActive && boss) {
+        ctx.fillStyle = '#ff0000'; ctx.shadowBlur = 20; ctx.shadowColor = '#ff0000';
+        ctx.fillRect(boss.x, boss.y, boss.width, boss.height); ctx.shadowBlur = 0;
+        ctx.fillStyle = '#ffff00';
+        ctx.fillRect(boss.x + 40, boss.y + 50, 30, 30);
+        ctx.fillRect(boss.x + boss.width - 70, boss.y + 50, 30, 30);
+    }
+
+    powerups2.forEach(p => { ctx.fillStyle = p.color; ctx.shadowBlur = 15; ctx.shadowColor = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size/2, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0; });
+    particles2.forEach(p => { ctx.fillStyle = p.color; ctx.globalAlpha = p.life / 30; ctx.fillRect(p.x, p.y, p.size, p.size); ctx.globalAlpha = 1; });
+
+    ctx.fillStyle = 'rgba(255,0,0,0.3)'; ctx.fillRect(20, 20, 200, 20);
+    ctx.fillStyle = '#00ff00'; ctx.fillRect(20, 20, (player2.hp / player2.maxHp) * 200, 20);
+    ctx.strokeStyle = '#fff'; ctx.strokeRect(20, 20, 200, 20);
+}
+
+// SPACE INVADERS
+let player, invaders, bullets, particles, invaderDirection;
+
+function initInvaders() {
+    player = { x: 400, y: 550, width: 40, height: 30, speed: 5, shootCooldown: 0 };
+    bullets = []; particles = []; invaderDirection = 1;
+    invaders = [];
+    for (let row = 0; row < 5; row++) {
+        for (let col = 0; col < 11; col++) {
+            invaders.push({
+                x: 100 + col * 60, y: 50 + row * 50, width: 40, height: 30,
+                type: row < 1 ? 3 : row < 3 ? 2 : 1,
+                hp: row < 1 ? 3 : row < 3 ? 2 : 1,
+                color: row < 1 ? '#ff0000' : row < 3 ? '#00ff00' : '#00f3ff',
+                score: row < 1 ? 30 : row < 3 ? 20 : 10
+            });
+        }
+    }
+}
+
+function startInvaders() {
+    if (gameInterval) clearInterval(gameInterval);
+    gameInterval = setInterval(updateInvaders, 16);
+    document.addEventListener('keydown', (e) => {
+        if (currentGame !== 'invaders') return;
+        keys[e.code] = true;
+        if (e.code === 'Space') e.preventDefault();
+    });
+    document.addEventListener('keyup', (e) => { keys[e.code] = false; });
+}
+
+function updateInvaders() {
+    if (keys['ArrowLeft'] || keys['KeyA']) player.x -= player.speed;
+    if (keys['ArrowRight'] || keys['KeyD']) player.x += player.speed;
+    player.x = Math.max(20, Math.min(780, player.x));
+
+    if (player.shootCooldown > 0) player.shootCooldown--;
+    if (keys['Space'] && player.shootCooldown === 0) {
+        bullets.push({ x: player.x + player.width/2, y: player.y, speed: 8, isEnemy: false, color: '#00f3ff' });
+        player.shootCooldown = 15;
+    }
+
+    let hitEdge = false;
+    invaders.forEach(inv => {
+        inv.x += invaderDirection * 2;
+        if (inv.x <= 10 || inv.x + inv.width >= 790) hitEdge = true;
+    });
+
+    if (hitEdge) {
+        invaderDirection *= -1;
+        invaders.forEach(inv => {
+            inv.y += 30;
+            if (inv.y + inv.height >= player.y) {
+                showNotification('💥 Игра окончена! Пришельцы победили!');
+                clearInterval(gameInterval); saveUserData(); return;
+            }
+        });
+    }
+
+    if (Math.random() < 0.02 && invaders.length > 0) {
+        const shooter = invaders[Math.floor(Math.random() * invaders.length)];
+        bullets.push({ x: shooter.x + shooter.width/2, y: shooter.y + shooter.height, speed: 4, isEnemy: true, color: '#ff0000' });
+    }
+
+    for (let i = bullets.length - 1; i >= 0; i--) {
+        let b = bullets[i];
+        b.y += b.isEnemy ? b.speed : -b.speed;
+        if (b.y < 0 || b.y > 600) { bullets.splice(i, 1); continue; }
+
+        if (!b.isEnemy) {
+            for (let j = invaders.length - 1; j >= 0; j--) {
+                let inv = invaders[j];
+                if (b.x > inv.x && b.x < inv.x + inv.width && b.y > inv.y && b.y < inv.y + inv.height) {
+                    inv.hp--; bullets.splice(i, 1);
+                    if (inv.hp <= 0) {
+                        createExplosion(inv.x + inv.width/2, inv.y + inv.height/2, inv.color);
+                        gameScore += inv.score; userData.xp += inv.score / 2; userData.coins += 1;
+                        invaders.splice(j, 1);
+                        if (invaders.length === 0) {
+                            showNotification('🏆 ПОБЕДА! Все пришельцы уничтожены! Счёт: ' + gameScore);
+                            clearInterval(gameInterval); saveUserData(); return;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        if (b.isEnemy) {
+            if (b.x > player.x && b.x < player.x + player.width && b.y > player.y && b.y < player.y + player.height) {
+                createExplosion(player.x + player.width/2, player.y + player.height/2, '#00f3ff', 30);
+                showNotification('💥 Игра окончена! Счёт: ' + gameScore);
+                clearInterval(gameInterval); saveUserData(); return;
+            }
+        }
+    }
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+        let p = particles[i];
+        p.x += p.vx; p.y += p.vy; p.life--;
+        if (p.life <= 0) particles.splice(i, 1);
+    }
+
+    drawInvaders();
+    document.getElementById('gameTitle').textContent = ` Space Invaders | Врагов: ${invaders.length} | Счёт: ${gameScore}`;
+    updateStats();
+}
+
+function createExplosion(x, y, color, count = 10) {
+    for (let i = 0; i < count; i++) {
+        particles.push({ x: x, y: y, vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 0.5) * 10, life: 30, color: color, size: Math.random() * 5 + 2 });
+    }
+}
+
+function drawInvaders() {
+    ctx.fillStyle = '#000011'; ctx.fillRect(0, 0, 800, 600);
+    ctx.fillStyle = '#fff';
+    for (let i = 0; i < 50; i++) ctx.fillRect((i * 137) % 800, (i * 241) % 600, 1, 1);
+
+    ctx.fillStyle = '#00f3ff'; ctx.shadowBlur = 15; ctx.shadowColor = '#00f3ff';
+    ctx.beginPath();
+    ctx.moveTo(player.x + player.width/2, player.y);
+    ctx.lineTo(player.x + player.width, player.y + player.height);
+    ctx.lineTo(player.x, player.y + player.height);
+    ctx.closePath(); ctx.fill(); ctx.shadowBlur = 0;
+
+    invaders.forEach(inv => {
+        ctx.fillStyle = inv.color; ctx.shadowBlur = 10; ctx.shadowColor = inv.color;
+        const x = inv.x, y = inv.y, w = inv.width, h = inv.height;
+        ctx.fillRect(x + w*0.2, y, w*0.6, h*0.6);
+        ctx.fillRect(x + w*0.1, y + h*0.3, w*0.8, h*0.4);
+        ctx.fillStyle = '#000';
+        ctx.fillRect(x + w*0.3, y + h*0.2, w*0.15, h*0.2);
+        ctx.fillRect(x + w*0.55, y + h*0.2, w*0.15, h*0.2);
+        ctx.fillStyle = inv.color;
+        ctx.fillRect(x + w*0.1, y + h*0.7, w*0.2, h*0.3);
+        ctx.fillRect(x + w*0.7, y + h*0.7, w*0.2, h*0.3);
+        ctx.shadowBlur = 0;
+    });
+
+    bullets.forEach(b => { ctx.fillStyle = b.color; ctx.fillRect(b.x - 2, b.y, 4, 10); });
+    particles.forEach(p => { ctx.fillStyle = p.color; ctx.globalAlpha = p.life / 30; ctx.fillRect(p.x, p.y, p.size, p.size); ctx.globalAlpha = 1; });
+}
+
+// SNAKE
+let snake, snakeDir, snakeNextDir, snakeFood;
+
+function initSnake() {
+    snake = [{ x: 15, y: 15 }];
+    snakeDir = { x: 1, y: 0 }; snakeNextDir = { x: 1, y: 0 };
+    snakeFood = { x: 25, y: 25 };
+}
+
+function startSnake() {
+    if (gameInterval) clearInterval(gameInterval);
+    gameInterval = setInterval(updateSnake, 100);
+    document.addEventListener('keydown', (e) => {
+        if (currentGame !== 'snake') return;
+        switch(e.key) {
+            case 'ArrowUp': if (snakeDir.y === 0) snakeNextDir = { x: 0, y: -1 }; break;
+            case 'ArrowDown': if (snakeDir.y === 0) snakeNextDir = { x: 0, y: 1 }; break;
+            case 'ArrowLeft': if (snakeDir.x === 0) snakeNextDir = { x: -1, y: 0 }; break;
+            case 'ArrowRight': if (snakeDir.x === 0) snakeNextDir = { x: 1, y: 0 }; break;
+        }
+    });
+}
+
+function updateSnake() {
+    const cellSize = 20;
+    snakeDir = snakeNextDir;
+    const head = { x: snake[0].x + snakeDir.x, y: snake[0].y + snakeDir.y };
+
+    if (head.x < 0 || head.x >= 40 || head.y < 0 || head.y >= 30 || snake.some(s => s.x === head.x && s.y === head.y)) {
+        showNotification('💥 Игра окончена! Счёт: ' + gameScore);
+        clearInterval(gameInterval); saveUserData(); return;
+    }
+
+    snake.unshift(head);
+    if (head.x === snakeFood.x && head.y === snakeFood.y) {
+        gameScore += 15; userData.xp += 15; userData.coins += 1;
+        snakeFood = { x: Math.floor(Math.random() * 40), y: Math.floor(Math.random() * 30) };
+    } else { snake.pop(); }
+
+    ctx.fillStyle = '#050510'; ctx.fillRect(0, 0, 800, 600);
+    ctx.strokeStyle = 'rgba(0,243,255,0.1)';
+    for (let i = 0; i < 40; i++) { ctx.beginPath(); ctx.moveTo(i * cellSize, 0); ctx.lineTo(i * cellSize, 600); ctx.stroke(); }
+    for (let i = 0; i < 30; i++) { ctx.beginPath(); ctx.moveTo(0, i * cellSize); ctx.lineTo(800, i * cellSize); ctx.stroke(); }
+
+    snake.forEach((s, i) => {
+        ctx.fillStyle = i === 0 ? '#fff' : '#00f3ff';
+        ctx.fillRect(s.x * cellSize + 1, s.y * cellSize + 1, cellSize - 2, cellSize - 2);
+    });
+
+    ctx.fillStyle = '#ffd700';
+    ctx.beginPath();
+    ctx.arc(snakeFood.x * cellSize + cellSize/2, snakeFood.y * cellSize + cellSize/2, cellSize/2 - 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    document.getElementById('gameTitle').textContent = `🐍 Змейка | Счёт: ${gameScore}`;
+    updateStats();
+}
+
+// CHAT
+function renderChat() {
+    const container = document.getElementById('chatMessages');
+    container.innerHTML = '';
+    chatMessages.slice(-50).forEach(msg => {
+        const div = document.createElement('div');
+        div.style.cssText = 'background:rgba(255,255,255,0.1);padding:10px;border-radius:10px;margin-bottom:10px;';
+        div.innerHTML = `<div style="color:#00f3ff;font-weight:bold;">${msg.author}</div><div>${msg.text}</div>`;
+        container.appendChild(div);
+    });
+}
+
+function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (text) {
+        chatMessages.push({ author: userData.name, text: text, time: new Date().toISOString() });
+        localStorage.setItem('ss_chat', JSON.stringify(chatMessages));
+        input.value = ''; renderChat();
+    }
+}
+
+// LEADERBOARD
+function renderLeaderboard() {
+    const userIndex = leaderboard.findIndex(p => p.name === userData.name);
+    if (userIndex === -1) leaderboard.push({ name: userData.name, xp: userData.xp });
+    else leaderboard[userIndex].xp = userData.xp;
+    leaderboard.sort((a, b) => b.xp - a.xp);
+    localStorage.setItem('ss_leaderboard', JSON.stringify(leaderboard));
+
+    const container = document.getElementById('leaderboardList');
+    container.innerHTML = '';
+    leaderboard.slice(0, 10).forEach((player, i) => {
+        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '' : `${i + 1}.`;
+        const isMe = player.name === userData.name ? ' (ты)' : '';
+        const div = document.createElement('div');
+        div.style.cssText = 'background:rgba(255,255,255,0.05);padding:15px;border-radius:10px;margin-bottom:10px;';
+        div.innerHTML = `<div style="display:flex;justify-content:space-between;"><span>${medal} ${player.name}${isMe}</span><span style="color:#ffd700;font-weight:bold;">${player.xp} XP</span></div>`;
+        container.appendChild(div);
+    });
+}
+
+// ACHIEVEMENTS
+function renderAchievements() {
+    const container = document.getElementById('achievementsList');
+    container.innerHTML = '';
+    const achievements = [
+        { id: 'first_game', name: 'Первый полёт', desc: 'Сыграй в любую игру', icon: '🚀' },
+        { id: 'pacman_100', name: 'Pac-Man Мастер', desc: 'Набери 100 очков', icon: '👻' },
+        { id: 'invaders_win', name: 'Защитник Земли', desc: 'Победи в Space Invaders', icon: '' }
+    ];
+
+    achievements.forEach(ach => {
+        const unlocked = userData.achievements.includes(ach.id);
+        const div = document.createElement('div');
+        div.style.cssText = `background:rgba(255,255,255,0.05);padding:15px;border-radius:10px;margin-bottom:10px;opacity:${unlocked ? 1 : 0.4};`;
+        div.innerHTML = `<div style="font-size:40px;">${ach.icon}</div><div style="font-weight:bold;">${ach.name}</div><div style="font-size:12px;opacity:0.8;">${ach.desc}</div><div style="margin-top:10px;font-size:20px;">${unlocked ? '✅' : '🔒'}</div>`;
+        container.appendChild(div);
+    });
 }
 
 function showNotification(text) {
-    const n = document.getElementById('notification');
-    n.textContent = text;
-    n.classList.add('show');
-    setTimeout(() => n.classList.remove('show'), 2500);
+    const div = document.createElement('div');
+    div.className = 'notification';
+    div.textContent = text;
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 2500);
 }
 </script>
+
 </body>
 </html>
