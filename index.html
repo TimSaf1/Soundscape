@@ -10,17 +10,42 @@
             background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
             color: #fff;
             font-family: 'Segoe UI', sans-serif;
+            overflow-x: hidden;
         }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+        @keyframes glow {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(0,243,255,0.5)); }
+            50% { filter: drop-shadow(0 0 40px rgba(0,243,255,0.9)); }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
         .header {
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
             padding: 15px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
             border-bottom: 2px solid #00f3ff;
+            animation: slideIn 0.5s;
         }
         .logo {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: bold;
             background: linear-gradient(90deg, #00f3ff, #bc13fe);
             -webkit-background-clip: text;
@@ -28,47 +53,84 @@
             text-align: center;
         }
         .stats { display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
-        .stat { background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 10px; }
+        .stat { 
+            background: rgba(255,255,255,0.1); 
+            padding: 6px 12px; 
+            border-radius: 10px; 
+            font-size: 13px;
+        }
         .stat b { color: #ffd700; }
-        .nav { display: flex; justify-content: center; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        .nav { display: flex; justify-content: center; gap: 8px; margin-top: 15px; flex-wrap: wrap; }
         .nav-btn {
-            padding: 10px 20px;
+            padding: 8px 16px;
             border: none;
             border-radius: 20px;
             background: rgba(255,255,255,0.1);
             color: #fff;
             cursor: pointer;
+            transition: all 0.3s;
         }
+        .nav-btn:hover { transform: translateY(-2px); background: rgba(0,243,255,0.3); }
         .nav-btn.active { background: linear-gradient(90deg, #00f3ff, #bc13fe); }
         .container { padding: 20px; max-width: 1400px; margin: 0 auto; }
-        .section { display: none; }
+        .section { display: none; animation: slideIn 0.5s; }
         .section.active { display: block; }
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+        
+        .games-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
+            gap: 25px; 
+            margin-top: 30px; 
         }
         .game-card {
             background: rgba(255,255,255,0.05);
             border: 2px solid rgba(0,243,255,0.3);
-            border-radius: 15px;
-            padding: 25px;
+            border-radius: 20px;
+            padding: 20px;
             text-align: center;
             cursor: pointer;
+            transition: all 0.3s;
             position: relative;
+            overflow: hidden;
         }
-        .game-card:hover { border-color: #00f3ff; transform: translateY(-5px); }
-        .game-icon { font-size: 50px; margin-bottom: 10px; }
-        .game-title { font-size: 18px; font-weight: bold; margin: 10px 0; }
-        .game-desc { font-size: 12px; opacity: 0.8; margin-bottom: 15px; }
+        .game-card:hover {
+            border-color: #00f3ff;
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,243,255,0.3);
+        }
+        .game-emoji {
+            font-size: 100px;
+            margin: 20px 0;
+            display: block;
+            animation: float 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(0,243,255,0.5));
+        }
+        .game-card:nth-child(1) .game-emoji { animation-delay: 0s; }
+        .game-card:nth-child(2) .game-emoji { animation-delay: 0.5s; }
+        .game-card:nth-child(3) .game-emoji { animation-delay: 1s; }
+        .game-card:nth-child(4) .game-emoji { animation-delay: 1.5s; }
+        .game-card:nth-child(5) .game-emoji { animation-delay: 2s; }
+        
+        .game-title { 
+            font-size: 20px; 
+            font-weight: bold; 
+            margin: 15px 0;
+            color: #00f3ff;
+        }
+        .game-desc { 
+            font-size: 13px; 
+            opacity: 0.8; 
+            margin-bottom: 15px;
+        }
         .xp-btn {
             background: linear-gradient(90deg, #ffd700, #ff8c00);
             color: #000;
             border: none;
-            padding: 8px 20px;
-            border-radius: 20px;
+            padding: 10px 25px;
+            border-radius: 25px;
             font-weight: bold;
+            cursor: pointer;
+            animation: pulse 2s infinite;
         }
         .game-container {
             background: rgba(0,0,0,0.8);
@@ -77,6 +139,7 @@
             padding: 20px;
             margin-top: 20px;
             display: none;
+            animation: slideIn 0.3s;
         }
         canvas {
             width: 100%;
@@ -97,8 +160,113 @@
             cursor: pointer;
             background: rgba(255,255,255,0.1);
             color: #fff;
+            transition: all 0.3s;
         }
+        .btn:hover { background: rgba(0,243,255,0.3); transform: translateY(-2px); }
         .btn-primary { background: linear-gradient(90deg, #00f3ff, #bc13fe); }
+
+        .quest-section {
+            background: rgba(255,255,255,0.03);
+            border: 2px solid rgba(0,243,255,0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+        .maze-quest {
+            background: rgba(0,0,0,0.5);
+            border: 3px solid #00f3ff;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .maze-container {
+            display: grid;
+            grid-template-columns: repeat(10, 50px);
+            grid-template-rows: repeat(10, 50px);
+            gap: 2px;
+            margin: 20px auto;
+            width: fit-content;
+            background: rgba(0,243,255,0.1);
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .maze-cell {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s;
+        }
+        .maze-cell.wall {
+            background: rgba(100,100,100,0.8);
+        }
+        .maze-cell.player {
+            background: rgba(0,243,255,0.6);
+            animation: pulse 1s infinite;
+        }
+        .maze-cell.star {
+            background: rgba(255,215,0,0.4);
+            animation: bounce 1s infinite;
+        }
+        .quest-card {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(0,243,255,0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        .quest-card:hover {
+            border-color: #00f3ff;
+            transform: translateX(10px);
+        }
+        .quest-card.completed {
+            border-color: #00ff88;
+            background: rgba(0,255,136,0.1);
+        }
+        .quest-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .quest-icon { 
+            font-size: 40px;
+            animation: float 3s ease-in-out infinite;
+        }
+        .quest-title { 
+            font-weight: bold; 
+            font-size: 18px;
+            color: #00f3ff;
+        }
+        .quest-desc { font-size: 14px; color: #aaa; margin-bottom: 15px; }
+        .quest-progress-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .quest-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00f3ff, #bc13fe);
+            transition: width 0.5s;
+        }
+        .quest-reward {
+            background: linear-gradient(90deg, #ffd700, #ff8c00);
+            color: #000;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
         .notification {
             position: fixed;
             top: 20px;
@@ -111,60 +279,62 @@
             z-index: 10000;
             animation: slideIn 0.3s;
         }
-        @keyframes slideIn {
-            from { transform: translateX(-50%) translateY(-100px); opacity: 0; }
-            to { transform: translateX(-50%) translateY(0); opacity: 1; }
-        }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div class="logo"> SOUNDSCAPE</div>
+    <div class="logo">🎵 SOUNDSCAPE</div>
     <div class="stats">
         <div class="stat">⭐ <b id="userXP">0</b> XP</div>
         <div class="stat">🏆 <b id="userLevel">1</b> LVL</div>
-        <div class="stat"> <b id="userCoins">100</b></div>
-        <div class="stat"> <b id="userName">Пилот</b></div>
+        <div class="stat">🪙 <b id="userCoins">100</b></div>
     </div>
     <div class="nav">
         <button class="nav-btn active" onclick="showSection('games')">🎮 Игры</button>
-        <button class="nav-btn" onclick="showSection('leaderboard')">🏆 Топ</button>
-        <button class="nav-btn" onclick="showSection('achievements')">🏅 Награды</button>
-        <button class="nav-btn" onclick="showSection('chat')">💬 Чат</button>
+        <button class="nav-btn" onclick="showSection('quests')">📜 Квесты</button>
+        <button class="nav-btn" onclick="showSection('music')">🔊 Музыка</button>
         <button class="nav-btn" onclick="showSection('profile')">👤 Профиль</button>
     </div>
 </div>
 
 <div class="container">
     <div id="games" class="section active">
-        <h2 style="text-align:center;margin-bottom:20px;">Выбери миссию</h2>
+        <h2 style="text-align:center;margin-bottom:10px;">🎮 Выбери миссию</h2>
+        <p style="text-align:center;color:#aaa;margin-bottom:30px;">Выбери игру и начни своё приключение!</p>
         <div class="games-grid">
-            <div class="game-card" onclick="startGame('pacman')">
-                <div class="game-icon" style="font-size:60px;">🟡</div>
-                <div class="game-title">Звёздный Pac-Man</div>
-                <div class="game-desc">6 приведений, собирай точки!</div>
-                <button class="xp-btn">+200 XP</button>
-            </div>
             <div class="game-card" onclick="startGame('shooter')">
-                <div class="game-icon">🚀</div>
+                <div class="game-emoji">🚀</div>
                 <div class="game-title">Space Shooter</div>
                 <div class="game-desc">Космический шутер с боссами!</div>
                 <button class="xp-btn">+100 XP</button>
             </div>
+            <div class="game-card" onclick="startGame('asteroids')">
+                <div class="game-emoji">☄️</div>
+                <div class="game-title">Asteroid Defense</div>
+                <div class="game-desc">Защити Землю от астероидов!</div>
+                <button class="xp-btn">+80 XP</button>
+            </div>
+            <div class="game-card" onclick="startGame('pacman')">
+                <div class="game-emoji">🟡</div>
+                <div class="game-title">Звёздный Pac-Man</div>
+                <div class="game-desc">6 приведений, собирай точки!</div>
+                <button class="xp-btn">+200 XP</button>
+            </div>
             <div class="game-card" onclick="startGame('invaders')">
-                <div class="game-icon">👾</div>
+                <div class="game-emoji">👾</div>
                 <div class="game-title">Space Invaders</div>
                 <div class="game-desc">Классика! Уничтожь всех пришельцев</div>
                 <button class="xp-btn">+50 XP</button>
             </div>
             <div class="game-card" onclick="startGame('snake')">
-                <div class="game-icon">🐍</div>
+                <div class="game-emoji">🐍</div>
                 <div class="game-title">Звёздная змейка</div>
-                <div class="game-desc">Собирай звёзды</div>
+                <div class="game-desc">Собирай звёзды, не врезайся в хвост</div>
                 <button class="xp-btn">+15 XP</button>
             </div>
         </div>
+        
         <div id="activeGame" class="game-container">
             <h3 id="gameTitle" style="text-align:center;margin-bottom:15px;"></h3>
             <canvas id="gameCanvas"></canvas>
@@ -174,66 +344,115 @@
                 <button class="btn" onclick="resumeGame()">▶ Продолжить</button>
                 <button class="btn" onclick="closeGame()">❌ Закрыть</button>
             </div>
-            <div id="gameInfo" style="text-align:center;margin-top:15px;color:#00f3ff;"></div>
         </div>
     </div>
-    <div id="leaderboard" class="section">
-        <h2 style="text-align:center;margin-bottom:20px;">🏆 Топ игроков</h2>
-        <div id="leaderboardList"></div>
-    </div>
-    <div id="achievements" class="section">
-        <h2 style="text-align:center;margin-bottom:20px;">🏅 Достижения</h2>
-        <div id="achievementsList"></div>
-    </div>
-    <div id="chat" class="section">
-        <h2 style="text-align:center;margin-bottom:20px;">💬 Игровой чат</h2>
-        <div id="chatMessages" style="background:rgba(255,255,255,0.05);padding:20px;border-radius:15px;max-height:500px;overflow-y:auto;"></div>
-        <div style="display:flex;gap:10px;margin-top:15px;">
-            <input type="text" id="chatInput" placeholder="Введите сообщение..." style="flex:1;padding:12px;border:2px solid rgba(0,243,255,0.3);border-radius:10px;background:rgba(255,255,255,0.1);color:#fff;">
-            <button class="btn btn-primary" onclick="sendMessage()">Отправить</button>
+
+    <div id="quests" class="section">
+        <h2 style="text-align:center;margin-bottom:10px;">📜 Активные квесты</h2>
+        <p style="text-align:center;color:#aaa;margin-bottom:30px;">Выполняй задания и получай награды!</p>
+        
+        <div class="quest-section">
+            <h3 style="margin-bottom:20px;color:#00f3ff;">🎮 Квест: Лабиринт сокровищ</h3>
+            <p style="margin-bottom:20px;color:#aaa;">Собери все звёзды в лабиринте чтобы получить награду!</p>
+            
+            <div class="maze-quest">
+                <div style="text-align:center;margin-bottom:15px;">
+                    <span style="color:#00f3ff;">🎯 Цель:</span> Собери <b id="starsCollected">0</b> из <b id="totalStars">5</b> звёзд
+                </div>
+                <div class="maze-container" id="mazeGrid"></div>
+                <div style="text-align:center;margin-top:15px;">
+                    <p style="margin-bottom:10px;color:#aaa;">Управление: стрелки или WASD</p>
+                    <button class="btn btn-primary" onclick="initMazeQuest()">🔄 Начать заново</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="quest-card" id="quest1">
+            <div class="quest-header">
+                <div class="quest-icon">🎮</div>
+                <div>
+                    <div class="quest-title">Первая игра</div>
+                    <div style="font-size:12px;color:#aaa;">Сыграй в любую игру 1 раз</div>
+                </div>
+            </div>
+            <div class="quest-progress-bar">
+                <div class="quest-progress-fill" id="quest1Progress" style="width: 0%"></div>
+            </div>
+            <div class="quest-reward">+50 XP</div>
+        </div>
+        
+        <div class="quest-card" id="quest2">
+            <div class="quest-header">
+                <div class="quest-icon">🏆</div>
+                <div>
+                    <div class="quest-title">Мастер шутера</div>
+                    <div style="font-size:12px;color:#aaa;">Набери 500 очков в Space Shooter</div>
+                </div>
+            </div>
+            <div class="quest-progress-bar">
+                <div class="quest-progress-fill" id="quest2Progress" style="width: 0%"></div>
+            </div>
+            <div class="quest-reward">+200 XP</div>
         </div>
     </div>
+
+    <div id="music" class="section">
+        <h2 style="text-align:center;margin-bottom:20px;">🔊 Музыка</h2>
+        <p style="text-align:center;color:#aaa;">Музыкальный плеер в разработке...</p>
+    </div>
+
     <div id="profile" class="section">
-        <h2 style="text-align:center;margin-bottom:20px;"> Профиль</h2>
+        <h2 style="text-align:center;margin-bottom:20px;">👤 Профиль</h2>
         <div style="background:rgba(255,255,255,0.05);padding:30px;border-radius:15px;text-align:center;">
-            <div id="profileAvatar" style="width:100px;height:100px;border-radius:50%;background:linear-gradient(90deg,#00f3ff,#bc13fe);display:flex;align-items:center;justify-content:center;font-size:50px;margin:0 auto 20px;">👨‍</div>
-            <h3 id="profileName">Пилот</h3>
+            <div style="width:100px;height:100px;border-radius:50%;background:linear-gradient(90deg,#00f3ff,#bc13fe);display:flex;align-items:center;justify-content:center;font-size:50px;margin:0 auto 20px;animation:float 3s ease-in-out infinite;">👨‍</div>
+            <h3>Пилот</h3>
             <p style="color:#ffd700;font-size:20px;margin:10px 0;">Уровень <span id="profileLevel">1</span></p>
         </div>
     </div>
 </div>
 
 <script>
-let userData = {
-    id: localStorage.getItem('ss_userId') || 'user_' + Math.random().toString(36).substr(2, 9),
-    name: localStorage.getItem('ss_userName') || 'Пилот-' + Math.floor(Math.random() * 9999),
-    avatar: localStorage.getItem('ss_avatar') || '👨‍🚀',
-    xp: parseInt(localStorage.getItem('ss_xp')) || 0,
-    coins: parseInt(localStorage.getItem('ss_coins')) || 100,
-    level: 1,
-    gamesPlayed: parseInt(localStorage.getItem('ss_games')) || 0,
-    achievements: JSON.parse(localStorage.getItem('ss_achievements')) || []
-};
-
-let leaderboard = JSON.parse(localStorage.getItem('ss_leaderboard')) || [
-    { name: 'NeonRider', xp: 8500 },
-    { name: 'CosmoKing', xp: 6200 }
-];
-
-let chatMessages = JSON.parse(localStorage.getItem('ss_chat')) || [];
+let userData = { xp: 0, coins: 100, level: 1, gamesPlayed: 0, mazeStars: 0 };
 let currentGame = null;
 let gameInterval = null;
 let gameScore = 0;
-let isPaused = false;
 let canvas, ctx;
 let keys = {};
 
-window.onload = function() {
-    updateStats();
-    document.getElementById('userName').textContent = userData.name;
-    document.getElementById('profileName').textContent = userData.name;
-    document.getElementById('profileAvatar').textContent = userData.avatar;
+let quests = {
+    quest1: { current: 0, target: 1, reward: 50, completed: false },
+    quest2: { current: 0, target: 500, reward: 200, completed: false }
 };
+
+let maze = [];
+let playerPos = { x: 0, y: 0 };
+let stars = [];
+let mazeCompleted = false;
+
+window.onload = function() {
+    loadData();
+    updateStats();
+    updateQuests();
+    initMazeQuest();
+};
+
+function loadData() {
+    const saved = localStorage.getItem('soundscape_v2');
+    if (saved) {
+        const data = JSON.parse(saved);
+        userData = data.userData || userData;
+        quests = data.quests || quests;
+        userData.mazeStars = data.mazeStars || 0;
+    }
+}
+
+function saveData() {
+    localStorage.setItem('soundscape_v2', JSON.stringify({
+        userData: userData,
+        quests: quests,
+        mazeStars: userData.mazeStars
+    }));
+}
 
 function updateStats() {
     document.getElementById('userXP').textContent = userData.xp;
@@ -243,805 +462,410 @@ function updateStats() {
     userData.level = Math.floor(userData.xp / 500) + 1;
 }
 
-function saveUserData() {
-    localStorage.setItem('ss_userId', userData.id);
-    localStorage.setItem('ss_userName', userData.name);
-    localStorage.setItem('ss_avatar', userData.avatar);
-    localStorage.setItem('ss_xp', userData.xp);
-    localStorage.setItem('ss_coins', userData.coins);
-    localStorage.setItem('ss_level', userData.level);
-    localStorage.setItem('ss_games', userData.gamesPlayed);
-    localStorage.setItem('ss_achievements', JSON.stringify(userData.achievements));
-    updateStats();
+function initMazeQuest() {
+    maze = [
+        [1,0,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,1,0,0,1],
+        [1,1,1,0,1,0,1,0,1,1],
+        [1,0,0,0,1,0,0,0,0,1],
+        [1,0,1,1,1,1,1,1,0,1],
+        [1,0,0,0,0,0,0,1,0,1],
+        [1,1,1,1,1,0,0,1,0,1],
+        [1,0,0,0,1,0,0,0,0,1],
+        [1,0,1,0,0,0,1,1,0,1],
+        [1,1,1,1,1,1,1,1,1,1]
+    ];
+    
+    playerPos = { x: 1, y: 1 };
+    stars = [
+        { x: 3, y: 1, collected: false },
+        { x: 8, y: 1, collected: false },
+        { x: 5, y: 5, collected: false },
+        { x: 1, y: 8, collected: false },
+        { x: 8, y: 8, collected: false }
+    ];
+    
+    userData.mazeStars = 0;
+    mazeCompleted = false;
+    renderMaze();
+    updateMazeStats();
 }
 
-function showSection(sectionId) {
+function renderMaze() {
+    const grid = document.getElementById('mazeGrid');
+    grid.innerHTML = '';
+    
+    for (let y = 0; y < 10; y++) {
+        for (let x = 0; x < 10; x++) {
+            const cell = document.createElement('div');
+            cell.className = 'maze-cell';
+            
+            if (maze[y][x] === 1) {
+                cell.classList.add('wall');
+                cell.textContent = '🧱';
+            } else if (playerPos.x === x && playerPos.y === y) {
+                cell.classList.add('player');
+                cell.textContent = '🚀';
+            } else {
+                const star = stars.find(s => s.x === x && s.y === y && !s.collected);
+                if (star) {
+                    cell.classList.add('star');
+                    cell.textContent = '⭐';
+                }
+            }
+            
+            grid.appendChild(cell);
+        }
+    }
+}
+
+function movePlayer(dx, dy) {
+    if (mazeCompleted) return;
+    
+    const newX = playerPos.x + dx;
+    const newY = playerPos.y + dy;
+    
+    if (newX >= 0 && newX < 10 && newY >= 0 && newY < 10 && maze[newY][newX] === 0) {
+        playerPos.x = newX;
+        playerPos.y = newY;
+        
+        stars.forEach(star => {
+            if (!star.collected && star.x === newX && star.y === newY) {
+                star.collected = true;
+                userData.mazeStars++;
+                userData.xp += 20;
+                showNotification('⭐ Звезда собрана! +20 XP');
+                updateMazeStats();
+                saveData();
+                updateStats();
+            }
+        });
+        
+        if (userData.mazeStars >= 5 && !mazeCompleted) {
+            mazeCompleted = true;
+            userData.xp += 100;
+            showNotification('🎉 Лабиринт пройден! +100 XP');
+            saveData();
+            updateStats();
+        }
+        
+        renderMaze();
+    }
+}
+
+function updateMazeStats() {
+    document.getElementById('starsCollected').textContent = userData.mazeStars;
+    document.getElementById('totalStars').textContent = stars.length;
+}
+
+document.addEventListener('keydown', (e) => {
+    keys[e.code] = true;
+    
+    if (document.getElementById('quests').classList.contains('active')) {
+        if (e.code === 'ArrowLeft' || e.code === 'KeyA') movePlayer(-1, 0);
+        if (e.code === 'ArrowRight' || e.code === 'KeyD') movePlayer(1, 0);
+        if (e.code === 'ArrowUp' || e.code === 'KeyW') movePlayer(0, -1);
+        if (e.code === 'ArrowDown' || e.code === 'KeyS') movePlayer(0, 1);
+    }
+    
+    if (e.code === 'Space') e.preventDefault();
+});
+
+document.addEventListener('keyup', e => { keys[e.code] = false; });
+
+function updateQuests() {
+    const q1 = quests.quest1;
+    const q1Progress = Math.min(100, (q1.current / q1.target) * 100);
+    document.getElementById('quest1Progress').style.width = q1Progress + '%';
+    if (q1.completed) document.getElementById('quest1').classList.add('completed');
+    
+    const q2 = quests.quest2;
+    const q2Progress = Math.min(100, (q2.current / q2.target) * 100);
+    document.getElementById('quest2Progress').style.width = q2Progress + '%';
+    if (q2.completed) document.getElementById('quest2').classList.add('completed');
+}
+
+function completeQuest(questId) {
+    if (!quests[questId].completed) {
+        quests[questId].completed = true;
+        userData.xp += quests[questId].reward;
+        saveData();
+        updateStats();
+        updateQuests();
+        showNotification('🎉 Квест выполнен! +' + quests[questId].reward + ' XP');
+    }
+}
+
+function updateQuest(questId, amount) {
+    if (!quests[questId].completed) {
+        quests[questId].current += amount;
+        if (quests[questId].current >= quests[questId].target) {
+            completeQuest(questId);
+        }
+        saveData();
+        updateQuests();
+    }
+}
+
+function showSection(id) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(sectionId).classList.add('active');
+    document.getElementById(id).classList.add('active');
     event.target.classList.add('active');
-    if (sectionId === 'leaderboard') renderLeaderboard();
-    if (sectionId === 'achievements') renderAchievements();
-    if (sectionId === 'chat') renderChat();
 }
 
-function startGame(gameType) {
-    currentGame = gameType;
+function startGame(type) {
+    currentGame = type;
     gameScore = 0;
-    isPaused = false;
     document.getElementById('activeGame').style.display = 'block';
-
     canvas = document.getElementById('gameCanvas');
     ctx = canvas.getContext('2d');
     canvas.width = 800;
     canvas.height = 600;
 
     const games = {
-        'pacman': { title: ' Звёздный Pac-Man', info: 'Управление: стрелки или WASD' },
-        'shooter': { title: ' Space Shooter', info: 'Управление: стрелки + пробел' },
-        'invaders': { title: '👾 Space Invaders', info: 'Управление: стрелки + пробел для стрельбы' },
-        'snake': { title: '🐍 Звёздная змейка', info: 'Управление: стрелки' }
+        'shooter': { title: '🚀 Space Shooter' },
+        'asteroids': { title: '☄️ Asteroid Defense' },
+        'pacman': { title: '🟡 Pac-Man' },
+        'invaders': { title: '👾 Space Invaders' },
+        'snake': { title: '🐍 Змейка' }
     };
-
-    document.getElementById('gameTitle').textContent = games[gameType].title;
-    document.getElementById('gameInfo').textContent = games[gameType].info;
-
-    if (gameType === 'pacman') initPacman();
-    else if (gameType === 'shooter') initShooter();
-    else if (gameType === 'invaders') initInvaders();
-    else if (gameType === 'snake') initSnake();
+    
+    document.getElementById('gameTitle').textContent = games[type].title;
+    
+    if (type === 'shooter') initShooter();
+    else if (type === 'asteroids') initAsteroids();
+    else if (type === 'pacman') initPacman();
+    else if (type === 'invaders') initInvaders();
+    else if (type === 'snake') initSnake();
 
     userData.gamesPlayed++;
-    saveUserData();
+    updateQuest('quest1', 1);
+    saveData();
+    updateStats();
 }
 
 function launchGame() {
-    if (currentGame === 'pacman') startPacman();
-    else if (currentGame === 'shooter') startShooter();
+    if (currentGame === 'shooter') startShooter();
+    else if (currentGame === 'asteroids') startAsteroids();
+    else if (currentGame === 'pacman') startPacman();
     else if (currentGame === 'invaders') startInvaders();
     else if (currentGame === 'snake') startSnake();
     showNotification('🎮 Игра началась!');
 }
 
-function pauseGame() {
-    isPaused = true;
-    if (gameInterval) clearInterval(gameInterval);
-    showNotification(' Пауза');
+function pauseGame() { if (gameInterval) clearInterval(gameInterval); }
+function resumeGame() { launchGame(); }
+function closeGame() { 
+    if (gameInterval) clearInterval(gameInterval); 
+    document.getElementById('activeGame').style.display = 'none'; 
 }
 
-function resumeGame() {
-    if (isPaused) {
-        isPaused = false;
-        launchGame();
-        showNotification('▶ Продолжаем!');
-    }
-}
-
-function closeGame() {
-    if (gameInterval) clearInterval(gameInterval);
-    document.getElementById('activeGame').style.display = 'none';
-    currentGame = null;
-}
-
-// PAC-MAN С КРАСИВЫМИ ПРИВЕДЕНИЯМИ
-let pacman, ghosts, dots, maze, mouthOpen;
-
-function initPacman() {
-    maze = [
-        '####################',
-        '#........#.........#',
-        '#.####.#.#.#.####.#.#',
-        '#.#....#...#....#.#.#',
-        '#.#.##.#.#.#.##.#.#.#',
-        '#.#.#......#.#....#.#',
-        '#...#.####.#.####...#',
-        '#.#.#......#.#....#.#',
-        '#.#.##.####.##.#....#',
-        '#.#....#..#....#....#',
-        '#.####.#..#.####....#',
-        '#......#..#.........#',
-        '####################'
-    ];
-
-    pacman = { x: 1, y: 1, dir: { x: 0, y: 0 }, nextDir: { x: 0, y: 0 } };
-    mouthOpen = 0;
-
-    // Приведения с именами и цветами как в оригинале
-    ghosts = [
-        { x: 10, y: 6, color: '#ff0000', name: 'Blinky', eyeDir: {x:1,y:0} },
-        { x: 9, y: 6, color: '#ffb8ff', name: 'Pinky', eyeDir: {x:-1,y:0} },
-        { x: 10, y: 7, color: '#00ffff', name: 'Inky', eyeDir: {x:0,y:1} },
-        { x: 9, y: 7, color: '#ffb852', name: 'Clyde', eyeDir: {x:0,y:-1} },
-        { x: 5, y: 5, color: '#ff00ff', name: 'Sue', eyeDir: {x:1,y:0} },
-        { x: 15, y: 10, color: '#00ff00', name: 'Funky', eyeDir: {x:-1,y:0} }
-    ];
-
-    dots = [];
-    for (let y = 0; y < maze.length; y++) {
-        for (let x = 0; x < maze[y].length; x++) {
-            if (maze[y][x] === '.') dots.push({ x, y });
-        }
-    }
-}
-
-function startPacman() {
-    if (gameInterval) clearInterval(gameInterval);
-    gameInterval = setInterval(updatePacman, 150);
-    document.addEventListener('keydown', handlePacmanKeys);
-}
-
-function handlePacmanKeys(e) {
-    if (currentGame !== 'pacman') return;
-    switch(e.key) {
-        case 'ArrowUp': case 'w': case 'W': pacman.nextDir = { x: 0, y: -1 }; break;
-        case 'ArrowDown': case 's': case 'S': pacman.nextDir = { x: 0, y: 1 }; break;
-        case 'ArrowLeft': case 'a': case 'A': pacman.nextDir = { x: -1, y: 0 }; break;
-        case 'ArrowRight': case 'd': case 'D': pacman.nextDir = { x: 1, y: 0 }; break;
-    }
-}
-
-// Функция рисования красивого приведения
-function drawGhost(ghost, cellSize, offsetX, offsetY) {
-    const x = ghost.x * cellSize + offsetX;
-    const y = ghost.y * cellSize + offsetY;
-    const size = cellSize - 4;
-    const centerX = x + size/2;
-    const centerY = y + size/2;
-    const radius = size/2 - 2;
-
-    // Тень
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.beginPath();
-    ctx.arc(centerX + 2, centerY + 3, radius, Math.PI, 0);
-    ctx.fill();
-
-    // Тело приведения (полукруг сверху)
-    ctx.fillStyle = ghost.color;
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = ghost.color;
-    ctx.beginPath();
-    ctx.arc(centerX, centerY - 2, radius, Math.PI, 0);
-    ctx.fill();
-
-    // Нижняя часть с "ножками" (волнистая)
-    ctx.beginPath();
-    ctx.moveTo(centerX - radius, centerY - 2);
-    ctx.lineTo(centerX - radius, centerY + radius - 5);
-
-    // Волнистые ножки
-    const legWidth = (radius * 2) / 4;
-    for (let i = 0; i < 4; i++) {
-        const legX = centerX - radius + (i * legWidth);
-        const wave = (i % 2 === 0) ? 5 : 0;
-        ctx.lineTo(legX + legWidth/2, centerY + radius - 5 + wave);
-        ctx.lineTo(legX + legWidth, centerY + radius - 5);
-    }
-
-    ctx.lineTo(centerX + radius, centerY - 2);
-    ctx.closePath();
-    ctx.fill();
-    ctx.shadowBlur = 0;
-
-    // Глаза (белые)
-    const eyeSize = radius * 0.35;
-    const eyeY = centerY - 5;
-    const eyeOffsetX = radius * 0.35;
-
-    // Левый глаз
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.ellipse(centerX - eyeOffsetX, eyeY, eyeSize, eyeSize * 1.2, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Правый глаз
-    ctx.beginPath();
-    ctx.ellipse(centerX + eyeOffsetX, eyeY, eyeSize, eyeSize * 1.2, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Зрачки (следят за направлением)
-    const pupilSize = eyeSize * 0.5;
-    const pupilOffsetX = ghost.eyeDir.x * 2;
-    const pupilOffsetY = ghost.eyeDir.y * 2;
-
-    ctx.fillStyle = '#0000ff';
-    ctx.beginPath();
-    ctx.arc(centerX - eyeOffsetX + pupilOffsetX, eyeY + pupilOffsetY, pupilSize, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.arc(centerX + eyeOffsetX + pupilOffsetX, eyeY + pupilOffsetY, pupilSize, 0, Math.PI * 2);
-    ctx.fill();
-}
-
-function updatePacman() {
-    const cellSize = 40;
-    const offsetX = 50;
-    const offsetY = 50;
-
-    // Анимация рта Pac-Man
-    mouthOpen = (mouthOpen + 1) % 4;
-
-    let newX = pacman.x + pacman.nextDir.x;
-    let newY = pacman.y + pacman.nextDir.y;
-    if (maze[newY] && maze[newY][newX] !== '#') {
-        pacman.dir = pacman.nextDir;
-    }
-
-    newX = pacman.x + pacman.dir.x;
-    newY = pacman.y + pacman.dir.y;
-    if (maze[newY] && maze[newY][newX] !== '#') {
-        pacman.x = newX;
-        pacman.y = newY;
-    }
-
-    // Сбор точек
-    for (let i = dots.length - 1; i >= 0; i--) {
-        if (dots[i].x === pacman.x && dots[i].y === pacman.y) {
-            dots.splice(i, 1);
-            gameScore += 10;
-            userData.xp += 10;
-            userData.coins += 1;
-        }
-    }
-
-    // Движение приведений
-    ghosts.forEach(ghost => {
-        const dirs = [{ x: 0, y: -1 }, { x: 0, y: 1 }, { x: -1, y: 0 }, { x: 1, y: 0 }];
-        const validDirs = dirs.filter(d => {
-            let nx = ghost.x + d.x;
-            let ny = ghost.y + d.y;
-            return maze[ny] && maze[ny][nx] !== '#';
-        });
-
-        if (validDirs.length > 0) {
-            // Иногда преследуют Pac-Man
-            let chosenDir;
-            if (Math.random() < 0.3) {
-                // Движение к Pac-Man
-                const dx = pacman.x - ghost.x;
-                const dy = pacman.y - ghost.y;
-                const chaseDirs = validDirs.filter(d => {
-                    if (d.x !== 0 && Math.sign(d.x) === Math.sign(dx)) return true;
-                    if (d.y !== 0 && Math.sign(d.y) === Math.sign(dy)) return true;
-                    return false;
-                });
-                chosenDir = chaseDirs.length > 0 ? chaseDirs[0] : validDirs[Math.floor(Math.random() * validDirs.length)];
-            } else {
-                chosenDir = validDirs[Math.floor(Math.random() * validDirs.length)];
-            }
-
-            ghost.eyeDir = { x: chosenDir.x, y: chosenDir.y };
-            ghost.x += chosenDir.x;
-            ghost.y += chosenDir.y;
-        }
-
-        // Столкновение с Pac-Man
-        if (ghost.x === pacman.x && ghost.y === pacman.y) {
-            showNotification(' ' + ghost.name + ' поймал тебя! Счёт: ' + gameScore);
-            clearInterval(gameInterval);
-            saveUserData();
-        }
-    });
-
-    // Отрисовка
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, 800, 600);
-
-    // Стены
-    ctx.fillStyle = '#00f3ff';
-    ctx.shadowBlur = 5;
-    ctx.shadowColor = '#00f3ff';
-    for (let y = 0; y < maze.length; y++) {
-        for (let x = 0; x < maze[y].length; x++) {
-            if (maze[y][x] === '#') {
-                ctx.fillRect(x * cellSize + offsetX, y * cellSize + offsetY, cellSize - 2, cellSize - 2);
-            }
-        }
-    }
-    ctx.shadowBlur = 0;
-
-    // Точки
-    ctx.fillStyle = '#ffd700';
-    dots.forEach(dot => {
-        ctx.beginPath();
-        ctx.arc(dot.x * cellSize + cellSize/2 + offsetX, dot.y * cellSize + cellSize/2 + offsetY, 4, 0, Math.PI * 2);
-        ctx.fill();
-    });
-
-    // Pac-Man (с анимацией рта)
-    const pacX = pacman.x * cellSize + cellSize/2 + offsetX;
-    const pacY = pacman.y * cellSize + cellSize/2 + offsetY;
-    const pacRadius = cellSize/2 - 5;
-
-    ctx.fillStyle = '#ffff00';
-    ctx.shadowBlur = 15;
-    ctx.shadowColor = '#ffff00';
-    ctx.beginPath();
-
-    // Угол рта зависит от направления
-    let startAngle, endAngle;
-    const mouthAngle = 0.15 + (mouthOpen * 0.05);
-
-    if (pacman.dir.x === 1) { startAngle = mouthAngle; endAngle = -mouthAngle + Math.PI * 2; }
-    else if (pacman.dir.x === -1) { startAngle = Math.PI + mouthAngle; endAngle = Math.PI - mouthAngle; }
-    else if (pacman.dir.y === -1) { startAngle = -Math.PI/2 + mouthAngle; endAngle = -Math.PI/2 - mouthAngle + Math.PI * 2; }
-    else if (pacman.dir.y === 1) { startAngle = Math.PI/2 + mouthAngle; endAngle = Math.PI/2 - mouthAngle; }
-    else { startAngle = mouthAngle; endAngle = -mouthAngle + Math.PI * 2; }
-
-    ctx.arc(pacX, pacY, pacRadius, startAngle, endAngle);
-    ctx.lineTo(pacX, pacY);
-    ctx.closePath();
-    ctx.fill();
-    ctx.shadowBlur = 0;
-
-    // Глаз Pac-Man
-    ctx.fillStyle = '#000';
-    ctx.beginPath();
-    ctx.arc(pacX - 3, pacY - 8, 3, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Приведения (красивые!)
-    ghosts.forEach(ghost => {
-        drawGhost(ghost, cellSize, offsetX, offsetY);
-    });
-
-    document.getElementById('gameTitle').textContent = `🟡 Pac-Man | Счёт: ${gameScore} | Осталось точек: ${dots.length}`;
-    updateStats();
-}
-
-// SPACE SHOOTER (с боссами)
-let player2, bullets2, enemies2, particles2, powerups2;
-let wave, enemiesKilled, bossActive, boss;
-
+let player, bullets, enemies;
 function initShooter() {
-    player2 = {
-        x: 400, y: 500, width: 40, height: 40, speed: 5,
-        hp: 100, maxHp: 100, shootCooldown: 0,
-        powerup: null, powerupTimer: 0
-    };
-    bullets2 = []; enemies2 = []; particles2 = []; powerups2 = [];
-    wave = 1; enemiesKilled = 0; bossActive = false; boss = null;
+    player = { x: 400, y: 500, w: 40, h: 40 };
+    bullets = [];
+    enemies = [];
 }
-
 function startShooter() {
     if (gameInterval) clearInterval(gameInterval);
-    gameInterval = setInterval(updateShooter, 16);
-    document.addEventListener('keydown', (e) => {
-        if (currentGame !== 'shooter') return;
-        keys[e.code] = true;
-        if (e.code === 'Space') e.preventDefault();
-    });
-    document.addEventListener('keyup', (e) => { keys[e.code] = false; });
-}
-
-function updateShooter() {
-    if (keys['ArrowLeft'] || keys['KeyA']) player2.x -= player2.speed;
-    if (keys['ArrowRight'] || keys['KeyD']) player2.x += player2.speed;
-    if (keys['ArrowUp'] || keys['KeyW']) player2.y -= player2.speed;
-    if (keys['ArrowDown'] || keys['KeyS']) player2.y += player2.speed;
-    player2.x = Math.max(20, Math.min(780, player2.x));
-    player2.y = Math.max(20, Math.min(580, player2.y));
-
-    if (player2.shootCooldown > 0) player2.shootCooldown--;
-    if (keys['Space'] && player2.shootCooldown === 0) {
-        const damage = player2.powerup === 'power' ? 3 : 1;
-        if (player2.powerup === 'triple') {
-            bullets2.push({ x: player2.x + player2.width/2, y: player2.y, speed: 8, damage: damage, color: '#00f3ff' });
-            bullets2.push({ x: player2.x + player2.width/2 - 15, y: player2.y + 10, speed: 8, damage: damage, color: '#00f3ff' });
-            bullets2.push({ x: player2.x + player2.width/2 + 15, y: player2.y + 10, speed: 8, damage: damage, color: '#00f3ff' });
-        } else {
-            bullets2.push({ x: player2.x + player2.width/2, y: player2.y, speed: 8, damage: damage, color: '#00f3ff' });
-        }
-        player2.shootCooldown = player2.powerup === 'rapid' ? 5 : 15;
-    }
-
-    if (player2.powerupTimer > 0) {
-        player2.powerupTimer--;
-        if (player2.powerupTimer === 0) player2.powerup = null;
-    }
-
-    if (!bossActive && Math.random() < 0.02 + (wave * 0.005)) {
-        const types = [
-            { width: 30, height: 30, speed: 2, hp: 1, score: 10, color: '#ff0000', wobble: 1 },
-            { width: 40, height: 40, speed: 1.5, hp: 2, score: 20, color: '#ff6600', wobble: 2 },
-            { width: 50, height: 50, speed: 1, hp: 3, score: 30, color: '#ff00ff', wobble: 0.5 }
-        ];
-        const type = types[Math.floor(Math.random() * types.length)];
-        enemies2.push({ x: Math.random() * 750, y: -50, ...type });
-    }
-
-    if (enemiesKilled >= 10 && !bossActive) {
-        bossActive = true;
-        boss = { x: 300, y: 50, width: 200, height: 150, hp: 50 + (wave * 10), maxHp: 50 + (wave * 10), speedX: 2 };
-        showNotification('⚠️ БОСС ПОЯВИЛСЯ!');
-    }
-
-    for (let i = bullets2.length - 1; i >= 0; i--) {
-        let b = bullets2[i];
-        b.y -= b.speed;
-        if (b.y < 0) { bullets2.splice(i, 1); continue; }
-
-        for (let j = enemies2.length - 1; j >= 0; j--) {
-            let e = enemies2[j];
-            if (b.x > e.x && b.x < e.x + e.width && b.y > e.y && b.y < e.y + e.height) {
-                e.hp -= b.damage;
-                bullets2.splice(i, 1);
-                if (e.hp <= 0) {
-                    createExplosion2(e.x + e.width/2, e.y + e.height/2, e.color);
-                    enemies2.splice(j, 1);
-                    gameScore += e.score; enemiesKilled++;
-                    userData.xp += 10; userData.coins += 1;
-                    if (Math.random() < 0.15) {
-                        const types = ['power', 'rapid', 'triple', 'shield'];
-                        const colors = { power: '#ff0000', rapid: '#00ff00', triple: '#00f3ff', shield: '#ffd700' };
-                        const type = types[Math.floor(Math.random() * types.length)];
-                        powerups2.push({ x: e.x + e.width/2, y: e.y + e.height/2, size: 20, type: type, color: colors[type] });
-                    }
+    gameInterval = setInterval(() => {
+        if (keys['ArrowLeft']) player.x -= 6;
+        if (keys['ArrowRight']) player.x += 6;
+        if (keys[' ']) bullets.push({ x: player.x + 20, y: player.y });
+        
+        if (Math.random() < 0.02) enemies.push({ x: Math.random() * 760, y: -30, w: 30, h: 30 });
+        
+        bullets.forEach((b, i) => { b.y -= 10; if (b.y < 0) bullets.splice(i, 1); });
+        enemies.forEach((e, i) => {
+            e.y += 2;
+            bullets.forEach((b, j) => {
+                if (b.x > e.x && b.x < e.x + e.w && b.y > e.y && b.y < e.y + e.h) {
+                    enemies.splice(i, 1);
+                    bullets.splice(j, 1);
+                    gameScore += 10;
+                    userData.xp += 10;
+                    updateQuest('quest2', 10);
                 }
-                break;
-            }
-        }
-
-        if (bossActive && boss) {
-            if (b.x > boss.x && b.x < boss.x + boss.width && b.y > boss.y && b.y < boss.y + boss.height) {
-                boss.hp -= b.damage;
-                bullets2.splice(i, 1);
-                if (boss.hp <= 0) {
-                    createExplosion2(boss.x + boss.width/2, boss.y + boss.height/2, '#ff0000', 50);
-                    gameScore += 500; userData.xp += 200; userData.coins += 50;
-                    bossActive = false; boss = null; wave++; enemiesKilled = 0;
-                    showNotification('🏆 Босс побеждён! Волна ' + wave);
-                }
-            }
-        }
-    }
-
-    for (let i = enemies2.length - 1; i >= 0; i--) {
-        let e = enemies2[i];
-        e.y += e.speed; e.x += Math.sin(e.y * 0.05) * e.wobble;
-        if (player2.x < e.x + e.width && player2.x + player2.width > e.x &&
-            player2.y < e.y + e.height && player2.y + player2.height > e.y) {
-            player2.hp -= 20;
-            createExplosion2(e.x + e.width/2, e.y + e.height/2, e.color);
-            enemies2.splice(i, 1);
-            if (player2.hp <= 0) {
-                showNotification(' Игра окончена! Счёт: ' + gameScore);
-                clearInterval(gameInterval); saveUserData(); return;
-            }
-        }
-        if (e.y > 600) enemies2.splice(i, 1);
-    }
-
-    if (bossActive && boss) {
-        boss.x += boss.speedX;
-        if (boss.x <= 0 || boss.x + boss.width >= 800) boss.speedX *= -1;
-        if (Math.random() < 0.03) {
-            bullets2.push({ x: boss.x + boss.width/2, y: boss.y + boss.height, speed: -3, isEnemy: true, color: '#ff0000' });
-        }
-    }
-
-    for (let i = powerups2.length - 1; i >= 0; i--) {
-        let p = powerups2[i];
-        p.y += 2;
-        if (player2.x < p.x + p.size && player2.x + player2.width > p.x &&
-            player2.y < p.y + p.size && player2.y + player2.height > p.y) {
-            player2.powerup = p.type; player2.powerupTimer = 300;
-            powerups2.splice(i, 1);
-            showNotification('⚡ Бонус: ' + p.type);
-        }
-        if (p.y > 600) powerups2.splice(i, 1);
-    }
-
-    for (let i = particles2.length - 1; i >= 0; i--) {
-        let p = particles2[i];
-        p.x += p.vx; p.y += p.vy; p.life--;
-        if (p.life <= 0) particles2.splice(i, 1);
-    }
-
-    drawShooter2();
-    document.getElementById('gameTitle').textContent = `🚀 Space Shooter | Волна: ${wave} | Счёт: ${gameScore} | HP: ${player2.hp}`;
-    updateStats();
-}
-
-function createExplosion2(x, y, color, count = 10) {
-    for (let i = 0; i < count; i++) {
-        particles2.push({ x: x, y: y, vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 0.5) * 10, life: 30, color: color, size: Math.random() * 5 + 2 });
-    }
-}
-
-function drawShooter2() {
-    ctx.fillStyle = '#000011'; ctx.fillRect(0, 0, 800, 600);
-    ctx.fillStyle = '#fff';
-    for (let i = 0; i < 50; i++) ctx.fillRect((i * 137) % 800, (i * 241) % 600, 1, 1);
-
-    ctx.fillStyle = player2.powerup === 'shield' ? '#ffd700' : '#00f3ff';
-    ctx.shadowBlur = 15; ctx.shadowColor = ctx.fillStyle;
-    ctx.beginPath();
-    ctx.moveTo(player2.x + player2.width/2, player2.y);
-    ctx.lineTo(player2.x + player2.width, player2.y + player2.height);
-    ctx.lineTo(player2.x, player2.y + player2.height);
-    ctx.closePath(); ctx.fill(); ctx.shadowBlur = 0;
-
-    bullets2.forEach(b => { ctx.fillStyle = b.color || '#00f3ff'; ctx.fillRect(b.x - 2, b.y, 4, 10); });
-    enemies2.forEach(e => { ctx.fillStyle = e.color; ctx.shadowBlur = 10; ctx.shadowColor = e.color; ctx.fillRect(e.x, e.y, e.width, e.height); ctx.shadowBlur = 0; });
-
-    if (bossActive && boss) {
-        ctx.fillStyle = '#ff0000'; ctx.shadowBlur = 20; ctx.shadowColor = '#ff0000';
-        ctx.fillRect(boss.x, boss.y, boss.width, boss.height); ctx.shadowBlur = 0;
-        ctx.fillStyle = '#ffff00';
-        ctx.fillRect(boss.x + 40, boss.y + 50, 30, 30);
-        ctx.fillRect(boss.x + boss.width - 70, boss.y + 50, 30, 30);
-    }
-
-    powerups2.forEach(p => { ctx.fillStyle = p.color; ctx.shadowBlur = 15; ctx.shadowColor = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size/2, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0; });
-    particles2.forEach(p => { ctx.fillStyle = p.color; ctx.globalAlpha = p.life / 30; ctx.fillRect(p.x, p.y, p.size, p.size); ctx.globalAlpha = 1; });
-
-    ctx.fillStyle = 'rgba(255,0,0,0.3)'; ctx.fillRect(20, 20, 200, 20);
-    ctx.fillStyle = '#00ff00'; ctx.fillRect(20, 20, (player2.hp / player2.maxHp) * 200, 20);
-    ctx.strokeStyle = '#fff'; ctx.strokeRect(20, 20, 200, 20);
-}
-
-// SPACE INVADERS
-let player, invaders, bullets, particles, invaderDirection;
-
-function initInvaders() {
-    player = { x: 400, y: 550, width: 40, height: 30, speed: 5, shootCooldown: 0 };
-    bullets = []; particles = []; invaderDirection = 1;
-    invaders = [];
-    for (let row = 0; row < 5; row++) {
-        for (let col = 0; col < 11; col++) {
-            invaders.push({
-                x: 100 + col * 60, y: 50 + row * 50, width: 40, height: 30,
-                type: row < 1 ? 3 : row < 3 ? 2 : 1,
-                hp: row < 1 ? 3 : row < 3 ? 2 : 1,
-                color: row < 1 ? '#ff0000' : row < 3 ? '#00ff00' : '#00f3ff',
-                score: row < 1 ? 30 : row < 3 ? 20 : 10
             });
-        }
-    }
+            if (e.y > 600) enemies.splice(i, 1);
+        });
+        
+        drawShooter();
+        updateStats();
+    }, 16);
+}
+function drawShooter() {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 800, 600);
+    ctx.fillStyle = '#00f3ff';
+    ctx.fillRect(player.x, player.y, player.w, player.h);
+    bullets.forEach(b => { ctx.fillStyle = '#0ff'; ctx.fillRect(b.x, b.y, 4, 10); });
+    enemies.forEach(e => { ctx.fillStyle = '#f00'; ctx.fillRect(e.x, e.y, e.w, e.h); });
 }
 
+let asteroidPlayer, asteroids, asteroidBullets;
+function initAsteroids() {
+    asteroidPlayer = { x: 400, y: 550 };
+    asteroids = [];
+    asteroidBullets = [];
+}
+function startAsteroids() {
+    if (gameInterval) clearInterval(gameInterval);
+    gameInterval = setInterval(() => {
+        if (keys['ArrowLeft']) asteroidPlayer.x -= 7;
+        if (keys['ArrowRight']) asteroidPlayer.x += 7;
+        if (keys[' ']) asteroidBullets.push({ x: asteroidPlayer.x, y: asteroidPlayer.y });
+        
+        if (Math.random() < 0.03) asteroids.push({ x: Math.random() * 760, y: -20, size: 20 });
+        
+        asteroidBullets.forEach((b, i) => { b.y -= 10; if (b.y < 0) asteroidBullets.splice(i, 1); });
+        asteroids.forEach((a, i) => {
+            a.y += 3;
+            asteroidBullets.forEach((b, j) => {
+                if (Math.abs(b.x - a.x) < a.size && Math.abs(b.y - a.y) < a.size) {
+                    asteroids.splice(i, 1);
+                    asteroidBullets.splice(j, 1);
+                    gameScore += 10;
+                }
+            });
+            if (a.y > 620) asteroids.splice(i, 1);
+        });
+        
+        drawAsteroids();
+        updateStats();
+    }, 16);
+}
+function drawAsteroids() {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 800, 600);
+    ctx.fillStyle = '#00f3ff';
+    ctx.beginPath();
+    ctx.moveTo(asteroidPlayer.x, asteroidPlayer.y - 15);
+    ctx.lineTo(asteroidPlayer.x + 25, asteroidPlayer.y + 15);
+    ctx.lineTo(asteroidPlayer.x - 25, asteroidPlayer.y + 15);
+    ctx.closePath();
+    ctx.fill();
+    asteroidBullets.forEach(b => { ctx.fillStyle = '#0ff'; ctx.fillRect(b.x - 2, b.y, 4, 10); });
+    asteroids.forEach(a => { ctx.fillStyle = '#888'; ctx.beginPath(); ctx.arc(a.x, a.y, a.size, 0, Math.PI * 2); ctx.fill(); });
+}
+
+let pacman, ghosts, dots, mazeData;
+function initPacman() {
+    mazeData = ['####################','#........#.........#','#.####.#.#.#.####.#.#','#.#....#...#....#.#.#','#.#.##.#.#.#.##.#.#.#','#.#.#......#.#....#.#','#...#.####.#.####...#','#.#.#......#.#....#.#','#.#.##.####.##.#....#','#.#....#..#....#....#','#.####.#..#.####....#','#......#..#.........#','####################'];
+    pacman = { x: 1, y: 1 };
+    ghosts = [{ x: 10, y: 6 }, { x: 9, y: 6 }, { x: 10, y: 7 }];
+    dots = [];
+    for (let y = 0; y < mazeData.length; y++) for (let x = 0; x < mazeData[y].length; x++) if (mazeData[y][x] === '.') dots.push({ x, y });
+}
+function startPacman() {
+    if (gameInterval) clearInterval(gameInterval);
+    gameInterval = setInterval(() => {
+        if (keys['ArrowLeft']) pacman.x--;
+        if (keys['ArrowRight']) pacman.x++;
+        if (keys['ArrowUp']) pacman.y--;
+        if (keys['ArrowDown']) pacman.y++;
+        
+        dots.forEach((d, i) => { if (d.x === pacman.x && d.y === pacman.y) { dots.splice(i, 1); gameScore += 10; } });
+        ghosts.forEach(g => { if (g.x === pacman.x && g.y === pacman.y) { clearInterval(gameInterval); showNotification('Пойман!'); } });
+        
+        drawPacman();
+        updateStats();
+    }, 150);
+}
+function drawPacman() {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 800, 600);
+    ctx.fillStyle = '#00f3ff';
+    for (let y = 0; y < mazeData.length; y++) for (let x = 0; x < mazeData[y].length; x++) if (mazeData[y][x] === '#') ctx.fillRect(x * 40 + 50, y * 40 + 50, 38, 38);
+    ctx.fillStyle = '#ffd700';
+    dots.forEach(d => { ctx.beginPath(); ctx.arc(d.x * 40 + 70, d.y * 40 + 70, 4, 0, Math.PI * 2); ctx.fill(); });
+    ctx.fillStyle = '#ffff00';
+    ctx.beginPath();
+    ctx.arc(pacman.x * 40 + 70, pacman.y * 40 + 70, 15, 0.15 * Math.PI, 1.85 * Math.PI);
+    ctx.fill();
+    ghosts.forEach(g => { ctx.fillStyle = '#f00'; ctx.fillRect(g.x * 40 + 50, g.y * 40 + 50, 38, 38); });
+}
+
+let invaderPlayer, invaders, invaderBullets, invaderDir;
+function initInvaders() {
+    invaderPlayer = { x: 400, y: 550 };
+    invaders = [];
+    invaderBullets = [];
+    invaderDir = 1;
+    for (let row = 0; row < 4; row++) for (let col = 0; col < 8; col++) invaders.push({ x: 100 + col * 60, y: 50 + row * 50, w: 40, h: 30 });
+}
 function startInvaders() {
     if (gameInterval) clearInterval(gameInterval);
-    gameInterval = setInterval(updateInvaders, 16);
-    document.addEventListener('keydown', (e) => {
-        if (currentGame !== 'invaders') return;
-        keys[e.code] = true;
-        if (e.code === 'Space') e.preventDefault();
-    });
-    document.addEventListener('keyup', (e) => { keys[e.code] = false; });
-}
-
-function updateInvaders() {
-    if (keys['ArrowLeft'] || keys['KeyA']) player.x -= player.speed;
-    if (keys['ArrowRight'] || keys['KeyD']) player.x += player.speed;
-    player.x = Math.max(20, Math.min(780, player.x));
-
-    if (player.shootCooldown > 0) player.shootCooldown--;
-    if (keys['Space'] && player.shootCooldown === 0) {
-        bullets.push({ x: player.x + player.width/2, y: player.y, speed: 8, isEnemy: false, color: '#00f3ff' });
-        player.shootCooldown = 15;
-    }
-
-    let hitEdge = false;
-    invaders.forEach(inv => {
-        inv.x += invaderDirection * 2;
-        if (inv.x <= 10 || inv.x + inv.width >= 790) hitEdge = true;
-    });
-
-    if (hitEdge) {
-        invaderDirection *= -1;
-        invaders.forEach(inv => {
-            inv.y += 30;
-            if (inv.y + inv.height >= player.y) {
-                showNotification('💥 Игра окончена! Пришельцы победили!');
-                clearInterval(gameInterval); saveUserData(); return;
-            }
-        });
-    }
-
-    if (Math.random() < 0.02 && invaders.length > 0) {
-        const shooter = invaders[Math.floor(Math.random() * invaders.length)];
-        bullets.push({ x: shooter.x + shooter.width/2, y: shooter.y + shooter.height, speed: 4, isEnemy: true, color: '#ff0000' });
-    }
-
-    for (let i = bullets.length - 1; i >= 0; i--) {
-        let b = bullets[i];
-        b.y += b.isEnemy ? b.speed : -b.speed;
-        if (b.y < 0 || b.y > 600) { bullets.splice(i, 1); continue; }
-
-        if (!b.isEnemy) {
-            for (let j = invaders.length - 1; j >= 0; j--) {
-                let inv = invaders[j];
-                if (b.x > inv.x && b.x < inv.x + inv.width && b.y > inv.y && b.y < inv.y + inv.height) {
-                    inv.hp--; bullets.splice(i, 1);
-                    if (inv.hp <= 0) {
-                        createExplosion(inv.x + inv.width/2, inv.y + inv.height/2, inv.color);
-                        gameScore += inv.score; userData.xp += inv.score / 2; userData.coins += 1;
-                        invaders.splice(j, 1);
-                        if (invaders.length === 0) {
-                            showNotification('🏆 ПОБЕДА! Все пришельцы уничтожены! Счёт: ' + gameScore);
-                            clearInterval(gameInterval); saveUserData(); return;
-                        }
-                    }
-                    break;
+    gameInterval = setInterval(() => {
+        if (keys['ArrowLeft']) invaderPlayer.x -= 5;
+        if (keys['ArrowRight']) invaderPlayer.x += 5;
+        if (keys[' ']) invaderBullets.push({ x: invaderPlayer.x + 20, y: invaderPlayer.y });
+        
+        let hitEdge = false;
+        invaders.forEach(inv => { inv.x += invaderDir * 2; if (inv.x <= 10 || inv.x >= 770) hitEdge = true; });
+        if (hitEdge) { invaderDir *= -1; invaders.forEach(inv => inv.y += 30); }
+        
+        invaderBullets.forEach((b, i) => { b.y -= 8; if (b.y < 0) invaderBullets.splice(i, 1); });
+        invaders.forEach((inv, i) => {
+            invaderBullets.forEach((b, j) => {
+                if (b.x > inv.x && b.x < inv.x + inv.w && b.y > inv.y && b.y < inv.y + inv.h) {
+                    invaders.splice(i, 1);
+                    invaderBullets.splice(j, 1);
+                    gameScore += 10;
                 }
-            }
-        }
-
-        if (b.isEnemy) {
-            if (b.x > player.x && b.x < player.x + player.width && b.y > player.y && b.y < player.y + player.height) {
-                createExplosion(player.x + player.width/2, player.y + player.height/2, '#00f3ff', 30);
-                showNotification('💥 Игра окончена! Счёт: ' + gameScore);
-                clearInterval(gameInterval); saveUserData(); return;
-            }
-        }
-    }
-
-    for (let i = particles.length - 1; i >= 0; i--) {
-        let p = particles[i];
-        p.x += p.vx; p.y += p.vy; p.life--;
-        if (p.life <= 0) particles.splice(i, 1);
-    }
-
-    drawInvaders();
-    document.getElementById('gameTitle').textContent = ` Space Invaders | Врагов: ${invaders.length} | Счёт: ${gameScore}`;
-    updateStats();
+            });
+        });
+        
+        drawInvaders();
+        updateStats();
+    }, 16);
 }
-
-function createExplosion(x, y, color, count = 10) {
-    for (let i = 0; i < count; i++) {
-        particles.push({ x: x, y: y, vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 0.5) * 10, life: 30, color: color, size: Math.random() * 5 + 2 });
-    }
-}
-
 function drawInvaders() {
-    ctx.fillStyle = '#000011'; ctx.fillRect(0, 0, 800, 600);
-    ctx.fillStyle = '#fff';
-    for (let i = 0; i < 50; i++) ctx.fillRect((i * 137) % 800, (i * 241) % 600, 1, 1);
-
-    ctx.fillStyle = '#00f3ff'; ctx.shadowBlur = 15; ctx.shadowColor = '#00f3ff';
-    ctx.beginPath();
-    ctx.moveTo(player.x + player.width/2, player.y);
-    ctx.lineTo(player.x + player.width, player.y + player.height);
-    ctx.lineTo(player.x, player.y + player.height);
-    ctx.closePath(); ctx.fill(); ctx.shadowBlur = 0;
-
-    invaders.forEach(inv => {
-        ctx.fillStyle = inv.color; ctx.shadowBlur = 10; ctx.shadowColor = inv.color;
-        const x = inv.x, y = inv.y, w = inv.width, h = inv.height;
-        ctx.fillRect(x + w*0.2, y, w*0.6, h*0.6);
-        ctx.fillRect(x + w*0.1, y + h*0.3, w*0.8, h*0.4);
-        ctx.fillStyle = '#000';
-        ctx.fillRect(x + w*0.3, y + h*0.2, w*0.15, h*0.2);
-        ctx.fillRect(x + w*0.55, y + h*0.2, w*0.15, h*0.2);
-        ctx.fillStyle = inv.color;
-        ctx.fillRect(x + w*0.1, y + h*0.7, w*0.2, h*0.3);
-        ctx.fillRect(x + w*0.7, y + h*0.7, w*0.2, h*0.3);
-        ctx.shadowBlur = 0;
-    });
-
-    bullets.forEach(b => { ctx.fillStyle = b.color; ctx.fillRect(b.x - 2, b.y, 4, 10); });
-    particles.forEach(p => { ctx.fillStyle = p.color; ctx.globalAlpha = p.life / 30; ctx.fillRect(p.x, p.y, p.size, p.size); ctx.globalAlpha = 1; });
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 800, 600);
+    ctx.fillStyle = '#00f3ff';
+    ctx.fillRect(invaderPlayer.x, invaderPlayer.y, 40, 30);
+    invaders.forEach(inv => { ctx.fillStyle = '#0f0'; ctx.fillRect(inv.x, inv.y, inv.w, inv.h); });
+    invaderBullets.forEach(b => { ctx.fillStyle = '#0ff'; ctx.fillRect(b.x, b.y, 4, 10); });
 }
 
-// SNAKE
-let snake, snakeDir, snakeNextDir, snakeFood;
-
+let snake, dir, food;
 function initSnake() {
     snake = [{ x: 15, y: 15 }];
-    snakeDir = { x: 1, y: 0 }; snakeNextDir = { x: 1, y: 0 };
-    snakeFood = { x: 25, y: 25 };
+    dir = { x: 1, y: 0 };
+    food = { x: 25, y: 25 };
 }
-
 function startSnake() {
     if (gameInterval) clearInterval(gameInterval);
-    gameInterval = setInterval(updateSnake, 100);
-    document.addEventListener('keydown', (e) => {
-        if (currentGame !== 'snake') return;
-        switch(e.key) {
-            case 'ArrowUp': if (snakeDir.y === 0) snakeNextDir = { x: 0, y: -1 }; break;
-            case 'ArrowDown': if (snakeDir.y === 0) snakeNextDir = { x: 0, y: 1 }; break;
-            case 'ArrowLeft': if (snakeDir.x === 0) snakeNextDir = { x: -1, y: 0 }; break;
-            case 'ArrowRight': if (snakeDir.x === 0) snakeNextDir = { x: 1, y: 0 }; break;
-        }
-    });
+    gameInterval = setInterval(() => {
+        if (keys['ArrowLeft'] && dir.x !== 1) dir = { x: -1, y: 0 };
+        if (keys['ArrowRight'] && dir.x !== -1) dir = { x: 1, y: 0 };
+        if (keys['ArrowUp'] && dir.y !== 1) dir = { x: 0, y: -1 };
+        if (keys['ArrowDown'] && dir.y !== -1) dir = { x: 0, y: 1 };
+        
+        const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+        if (head.x < 0 || head.x >= 40 || head.y < 0 || head.y >= 30) { clearInterval(gameInterval); showNotification('Game Over!'); return; }
+        
+        snake.unshift(head);
+        if (head.x === food.x && head.y === food.y) { gameScore += 15; food = { x: Math.floor(Math.random() * 40), y: Math.floor(Math.random() * 30) }; }
+        else snake.pop();
+        
+        drawSnake();
+        updateStats();
+    }, 100);
 }
-
-function updateSnake() {
-    const cellSize = 20;
-    snakeDir = snakeNextDir;
-    const head = { x: snake[0].x + snakeDir.x, y: snake[0].y + snakeDir.y };
-
-    if (head.x < 0 || head.x >= 40 || head.y < 0 || head.y >= 30 || snake.some(s => s.x === head.x && s.y === head.y)) {
-        showNotification('💥 Игра окончена! Счёт: ' + gameScore);
-        clearInterval(gameInterval); saveUserData(); return;
-    }
-
-    snake.unshift(head);
-    if (head.x === snakeFood.x && head.y === snakeFood.y) {
-        gameScore += 15; userData.xp += 15; userData.coins += 1;
-        snakeFood = { x: Math.floor(Math.random() * 40), y: Math.floor(Math.random() * 30) };
-    } else { snake.pop(); }
-
-    ctx.fillStyle = '#050510'; ctx.fillRect(0, 0, 800, 600);
+function drawSnake() {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 800, 600);
     ctx.strokeStyle = 'rgba(0,243,255,0.1)';
-    for (let i = 0; i < 40; i++) { ctx.beginPath(); ctx.moveTo(i * cellSize, 0); ctx.lineTo(i * cellSize, 600); ctx.stroke(); }
-    for (let i = 0; i < 30; i++) { ctx.beginPath(); ctx.moveTo(0, i * cellSize); ctx.lineTo(800, i * cellSize); ctx.stroke(); }
-
-    snake.forEach((s, i) => {
-        ctx.fillStyle = i === 0 ? '#fff' : '#00f3ff';
-        ctx.fillRect(s.x * cellSize + 1, s.y * cellSize + 1, cellSize - 2, cellSize - 2);
-    });
-
+    for (let i = 0; i < 40; i++) { ctx.beginPath(); ctx.moveTo(i * 20, 0); ctx.lineTo(i * 20, 600); ctx.stroke(); }
+    for (let i = 0; i < 30; i++) { ctx.beginPath(); ctx.moveTo(0, i * 20); ctx.lineTo(800, i * 20); ctx.stroke(); }
+    snake.forEach((s, i) => { ctx.fillStyle = i === 0 ? '#fff' : '#00f3ff'; ctx.fillRect(s.x * 20 + 1, s.y * 20 + 1, 18, 18); });
     ctx.fillStyle = '#ffd700';
     ctx.beginPath();
-    ctx.arc(snakeFood.x * cellSize + cellSize/2, snakeFood.y * cellSize + cellSize/2, cellSize/2 - 2, 0, Math.PI * 2);
+    ctx.arc(food.x * 20 + 10, food.y * 20 + 10, 8, 0, Math.PI * 2);
     ctx.fill();
-
-    document.getElementById('gameTitle').textContent = `🐍 Змейка | Счёт: ${gameScore}`;
-    updateStats();
-}
-
-// CHAT
-function renderChat() {
-    const container = document.getElementById('chatMessages');
-    container.innerHTML = '';
-    chatMessages.slice(-50).forEach(msg => {
-        const div = document.createElement('div');
-        div.style.cssText = 'background:rgba(255,255,255,0.1);padding:10px;border-radius:10px;margin-bottom:10px;';
-        div.innerHTML = `<div style="color:#00f3ff;font-weight:bold;">${msg.author}</div><div>${msg.text}</div>`;
-        container.appendChild(div);
-    });
-}
-
-function sendMessage() {
-    const input = document.getElementById('chatInput');
-    const text = input.value.trim();
-    if (text) {
-        chatMessages.push({ author: userData.name, text: text, time: new Date().toISOString() });
-        localStorage.setItem('ss_chat', JSON.stringify(chatMessages));
-        input.value = ''; renderChat();
-    }
-}
-
-// LEADERBOARD
-function renderLeaderboard() {
-    const userIndex = leaderboard.findIndex(p => p.name === userData.name);
-    if (userIndex === -1) leaderboard.push({ name: userData.name, xp: userData.xp });
-    else leaderboard[userIndex].xp = userData.xp;
-    leaderboard.sort((a, b) => b.xp - a.xp);
-    localStorage.setItem('ss_leaderboard', JSON.stringify(leaderboard));
-
-    const container = document.getElementById('leaderboardList');
-    container.innerHTML = '';
-    leaderboard.slice(0, 10).forEach((player, i) => {
-        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '' : `${i + 1}.`;
-        const isMe = player.name === userData.name ? ' (ты)' : '';
-        const div = document.createElement('div');
-        div.style.cssText = 'background:rgba(255,255,255,0.05);padding:15px;border-radius:10px;margin-bottom:10px;';
-        div.innerHTML = `<div style="display:flex;justify-content:space-between;"><span>${medal} ${player.name}${isMe}</span><span style="color:#ffd700;font-weight:bold;">${player.xp} XP</span></div>`;
-        container.appendChild(div);
-    });
-}
-
-// ACHIEVEMENTS
-function renderAchievements() {
-    const container = document.getElementById('achievementsList');
-    container.innerHTML = '';
-    const achievements = [
-        { id: 'first_game', name: 'Первый полёт', desc: 'Сыграй в любую игру', icon: '🚀' },
-        { id: 'pacman_100', name: 'Pac-Man Мастер', desc: 'Набери 100 очков', icon: '👻' },
-        { id: 'invaders_win', name: 'Защитник Земли', desc: 'Победи в Space Invaders', icon: '' }
-    ];
-
-    achievements.forEach(ach => {
-        const unlocked = userData.achievements.includes(ach.id);
-        const div = document.createElement('div');
-        div.style.cssText = `background:rgba(255,255,255,0.05);padding:15px;border-radius:10px;margin-bottom:10px;opacity:${unlocked ? 1 : 0.4};`;
-        div.innerHTML = `<div style="font-size:40px;">${ach.icon}</div><div style="font-weight:bold;">${ach.name}</div><div style="font-size:12px;opacity:0.8;">${ach.desc}</div><div style="margin-top:10px;font-size:20px;">${unlocked ? '✅' : '🔒'}</div>`;
-        container.appendChild(div);
-    });
 }
 
 function showNotification(text) {
@@ -1052,6 +876,5 @@ function showNotification(text) {
     setTimeout(() => div.remove(), 2500);
 }
 </script>
-
 </body>
 </html>
