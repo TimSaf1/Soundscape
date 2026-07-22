@@ -2,255 +2,239 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Soundscape Gaming</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
         body {
             background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
             color: #fff;
             font-family: 'Segoe UI', sans-serif;
             overflow-x: hidden;
         }
-        
+
         @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-15px) rotate(5deg); }
-        }
-        @keyframes glow {
-            0%, 100% { filter: drop-shadow(0 0 20px rgba(0,243,255,0.5)); }
-            50% { filter: drop-shadow(0 0 40px rgba(0,243,255,0.9)); }
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
         @keyframes slideIn {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-        
+
         .header {
             background: rgba(0,0,0,0.6);
-            padding: 15px;
+            padding: 10px;
             border-bottom: 2px solid #00f3ff;
-            animation: slideIn 0.5s;
         }
         .logo {
-            font-size: 26px;
+            font-size: 20px;
             font-weight: bold;
             background: linear-gradient(90deg, #00f3ff, #bc13fe);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-align: center;
         }
-        .stats { display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
-        .stat { 
-            background: rgba(255,255,255,0.1); 
-            padding: 6px 12px; 
-            border-radius: 10px; 
-            font-size: 13px;
-        }
+        .stats { display: flex; justify-content: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+        .stat { background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 8px; font-size: 12px; }
         .stat b { color: #ffd700; }
-        .nav { display: flex; justify-content: center; gap: 8px; margin-top: 15px; flex-wrap: wrap; }
+        .nav { display: flex; justify-content: center; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
         .nav-btn {
-            padding: 8px 16px;
+            padding: 6px 12px;
             border: none;
-            border-radius: 20px;
+            border-radius: 15px;
             background: rgba(255,255,255,0.1);
             color: #fff;
             cursor: pointer;
-            transition: all 0.3s;
+            font-size: 12px;
         }
-        .nav-btn:hover { transform: translateY(-2px); background: rgba(0,243,255,0.3); }
         .nav-btn.active { background: linear-gradient(90deg, #00f3ff, #bc13fe); }
-        .container { padding: 20px; max-width: 1400px; margin: 0 auto; }
+        .container { padding: 15px; max-width: 1400px; margin: 0 auto; padding-bottom: 150px; }
         .section { display: none; animation: slideIn 0.5s; }
         .section.active { display: block; }
-        
-        .games-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
-            gap: 25px; 
-            margin-top: 30px; 
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
         }
         .game-card {
             background: rgba(255,255,255,0.05);
             border: 2px solid rgba(0,243,255,0.3);
-            border-radius: 20px;
-            padding: 20px;
+            border-radius: 15px;
+            padding: 15px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
         }
-        .game-card:hover {
-            border-color: #00f3ff;
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,243,255,0.3);
-        }
+        .game-card:active { transform: scale(0.95); }
         .game-emoji {
-            font-size: 100px;
-            margin: 20px 0;
+            font-size: 60px;
+            margin: 10px 0;
             display: block;
             animation: float 3s ease-in-out infinite;
-            filter: drop-shadow(0 0 20px rgba(0,243,255,0.5));
         }
-        .game-card:nth-child(1) .game-emoji { animation-delay: 0s; }
-        .game-card:nth-child(2) .game-emoji { animation-delay: 0.5s; }
-        .game-card:nth-child(3) .game-emoji { animation-delay: 1s; }
-        .game-card:nth-child(4) .game-emoji { animation-delay: 1.5s; }
-        .game-card:nth-child(5) .game-emoji { animation-delay: 2s; }
-        
-        .game-title { 
-            font-size: 20px; 
-            font-weight: bold; 
-            margin: 15px 0;
-            color: #00f3ff;
-        }
-        .game-desc { 
-            font-size: 13px; 
-            opacity: 0.8; 
-            margin-bottom: 15px;
-        }
+        .game-title { font-size: 16px; font-weight: bold; margin: 10px 0; color: #00f3ff; }
+        .game-desc { font-size: 12px; opacity: 0.8; margin-bottom: 10px; }
         .xp-btn {
             background: linear-gradient(90deg, #ffd700, #ff8c00);
             color: #000;
             border: none;
-            padding: 10px 25px;
-            border-radius: 25px;
+            padding: 8px 20px;
+            border-radius: 20px;
             font-weight: bold;
-            cursor: pointer;
-            animation: pulse 2s infinite;
+            font-size: 12px;
         }
         .game-container {
             background: rgba(0,0,0,0.8);
             border: 2px solid #00f3ff;
             border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
+            padding: 10px;
+            margin-top: 15px;
             display: none;
-            animation: slideIn 0.3s;
         }
         canvas {
             width: 100%;
             max-width: 800px;
-            height: 600px;
-            margin: 20px auto;
+            aspect-ratio: 4/3;
+            margin: 10px auto;
             display: block;
             background: #000;
             border-radius: 10px;
-            border: 3px solid #00f3ff;
+            border: 2px solid #00f3ff;
         }
-        .controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 15px; }
+        .controls { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
         .btn {
-            padding: 12px 25px;
+            padding: 10px 18px;
             border: none;
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
             background: rgba(255,255,255,0.1);
             color: #fff;
-            transition: all 0.3s;
+            font-size: 12px;
         }
-        .btn:hover { background: rgba(0,243,255,0.3); transform: translateY(-2px); }
+        .btn:active { transform: scale(0.95); }
         .btn-primary { background: linear-gradient(90deg, #00f3ff, #bc13fe); }
+
+        /* КОМПАКТНЫЕ МОБИЛЬНЫЕ КНОПКИ */
+        .mobile-controls {
+            display: none;
+            position: fixed;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 10px 15px;
+            pointer-events: none;
+        }
+        .mobile-controls.active { display: flex; justify-content: space-between; align-items: flex-end; }
+
+        .d-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 45px);
+            grid-template-rows: repeat(3, 45px);
+            gap: 3px;
+            pointer-events: auto;
+        }
+        .d-btn {
+            width: 45px;
+            height: 45px;
+            background: rgba(0,243,255,0.3);
+            border: 2px solid #00f3ff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            touch-action: none;
+        }
+        .d-btn.active-press {
+            background: rgba(0,243,255,0.7);
+            transform: scale(0.9);
+        }
+        .d-btn.up { grid-column: 2; grid-row: 1; }
+        .d-btn.left { grid-column: 1; grid-row: 2; }
+        .d-btn.right { grid-column: 3; grid-row: 2; }
+        .d-btn.down { grid-column: 2; grid-row: 3; }
+
+        .fire-btn {
+            width: 70px;
+            height: 70px;
+            background: rgba(255,69,0,0.4);
+            border: 3px solid #ff4500;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            cursor: pointer;
+            pointer-events: auto;
+            touch-action: none;
+            margin-bottom: 5px;
+        }
+        .fire-btn.active-press {
+            background: rgba(255,69,0,0.8);
+            transform: scale(0.9);
+        }
 
         .quest-section {
             background: rgba(255,255,255,0.03);
             border: 2px solid rgba(0,243,255,0.3);
-            border-radius: 20px;
-            padding: 30px;
-            margin: 20px 0;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
         }
         .maze-quest {
             background: rgba(0,0,0,0.5);
-            border: 3px solid #00f3ff;
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
+            border: 2px solid #00f3ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
         }
         .maze-container {
             display: grid;
-            grid-template-columns: repeat(10, 50px);
-            grid-template-rows: repeat(10, 50px);
+            grid-template-columns: repeat(10, 32px);
+            grid-template-rows: repeat(10, 32px);
             gap: 2px;
-            margin: 20px auto;
+            margin: 15px auto;
             width: fit-content;
-            background: rgba(0,243,255,0.1);
-            padding: 10px;
-            border-radius: 10px;
         }
         .maze-cell {
-            width: 50px;
-            height: 50px;
+            width: 32px;
+            height: 32px;
             background: rgba(255,255,255,0.1);
-            border-radius: 5px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            transition: all 0.3s;
+            font-size: 18px;
         }
-        .maze-cell.wall {
-            background: rgba(100,100,100,0.8);
-        }
-        .maze-cell.player {
-            background: rgba(0,243,255,0.6);
-            animation: pulse 1s infinite;
-        }
-        .maze-cell.star {
-            background: rgba(255,215,0,0.4);
-            animation: bounce 1s infinite;
-        }
+        .maze-cell.wall { background: rgba(100,100,100,0.8); }
+        .maze-cell.player { background: rgba(0,243,255,0.6); }
+        .maze-cell.star { background: rgba(255,215,0,0.4); }
+
         .quest-card {
             background: rgba(255,255,255,0.05);
             border: 2px solid rgba(0,243,255,0.3);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: all 0.3s;
-        }
-        .quest-card:hover {
-            border-color: #00f3ff;
-            transform: translateX(10px);
-        }
-        .quest-card.completed {
-            border-color: #00ff88;
-            background: rgba(0,255,136,0.1);
-        }
-        .quest-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+            border-radius: 10px;
+            padding: 15px;
             margin-bottom: 15px;
         }
-        .quest-icon { 
-            font-size: 40px;
-            animation: float 3s ease-in-out infinite;
-        }
-        .quest-title { 
-            font-weight: bold; 
-            font-size: 18px;
-            color: #00f3ff;
-        }
-        .quest-desc { font-size: 14px; color: #aaa; margin-bottom: 15px; }
+        .quest-card.completed { border-color: #00ff88; background: rgba(0,255,136,0.1); }
+        .quest-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .quest-icon { font-size: 30px; }
+        .quest-title { font-weight: bold; font-size: 14px; color: #00f3ff; }
+        .quest-desc { font-size: 11px; color: #aaa; margin-bottom: 8px; }
         .quest-progress-bar {
             width: 100%;
-            height: 12px;
+            height: 8px;
             background: rgba(255,255,255,0.1);
-            border-radius: 10px;
+            border-radius: 5px;
             overflow: hidden;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         .quest-progress-fill {
             height: 100%;
@@ -260,24 +244,31 @@
         .quest-reward {
             background: linear-gradient(90deg, #ffd700, #ff8c00);
             color: #000;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 13px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 11px;
             font-weight: bold;
             display: inline-block;
         }
 
         .notification {
             position: fixed;
-            top: 20px;
+            top: 10px;
             left: 50%;
             transform: translateX(-50%);
             background: linear-gradient(90deg, #00f3ff, #bc13fe);
-            padding: 15px 30px;
-            border-radius: 25px;
+            padding: 10px 20px;
+            border-radius: 20px;
             font-weight: bold;
             z-index: 10000;
-            animation: slideIn 0.3s;
+            font-size: 12px;
+        }
+
+        .hint-text {
+            text-align: center;
+            color: #aaa;
+            font-size: 11px;
+            margin-top: 5px;
         }
     </style>
 </head>
@@ -288,20 +279,20 @@
     <div class="stats">
         <div class="stat">⭐ <b id="userXP">0</b> XP</div>
         <div class="stat">🏆 <b id="userLevel">1</b> LVL</div>
-        <div class="stat">🪙 <b id="userCoins">100</b></div>
+        <div class="stat"> <b id="userCoins">100</b></div>
     </div>
     <div class="nav">
-        <button class="nav-btn active" onclick="showSection('games')">🎮 Игры</button>
-        <button class="nav-btn" onclick="showSection('quests')">📜 Квесты</button>
-        <button class="nav-btn" onclick="showSection('music')">🔊 Музыка</button>
-        <button class="nav-btn" onclick="showSection('profile')">👤 Профиль</button>
+        <button class="nav-btn active" onclick="showSection('games', event)">🎮 Игры</button>
+        <button class="nav-btn" onclick="showSection('quests', event)">📜 Квесты</button>
+        <button class="nav-btn" onclick="showSection('music', event)">🔊 Музыка</button>
+        <button class="nav-btn" onclick="showSection('profile', event)">👤 Профиль</button>
     </div>
 </div>
 
 <div class="container">
     <div id="games" class="section active">
         <h2 style="text-align:center;margin-bottom:10px;">🎮 Выбери миссию</h2>
-        <p style="text-align:center;color:#aaa;margin-bottom:30px;">Выбери игру и начни своё приключение!</p>
+        <p style="text-align:center;color:#aaa;margin-bottom:20px;font-size:12px;">Выбери игру и начни приключение!</p>
         <div class="games-grid">
             <div class="game-card" onclick="startGame('shooter')">
                 <div class="game-emoji">🚀</div>
@@ -324,55 +315,63 @@
             <div class="game-card" onclick="startGame('invaders')">
                 <div class="game-emoji">👾</div>
                 <div class="game-title">Space Invaders</div>
-                <div class="game-desc">Классика! Уничтожь всех пришельцев</div>
+                <div class="game-desc">Классика! Уничтожь пришельцев</div>
                 <button class="xp-btn">+50 XP</button>
             </div>
             <div class="game-card" onclick="startGame('snake')">
                 <div class="game-emoji">🐍</div>
                 <div class="game-title">Звёздная змейка</div>
-                <div class="game-desc">Собирай звёзды, не врезайся в хвост</div>
+                <div class="game-desc">Собирай звёзды!</div>
                 <button class="xp-btn">+15 XP</button>
             </div>
         </div>
-        
+
         <div id="activeGame" class="game-container">
-            <h3 id="gameTitle" style="text-align:center;margin-bottom:15px;"></h3>
+            <h3 id="gameTitle" style="text-align:center;margin-bottom:10px;font-size:14px;"></h3>
             <canvas id="gameCanvas"></canvas>
+            <p class="hint-text" id="controlHint">ПК: Стрелки/WASD + Пробел | Телефон: кнопки внизу</p>
             <div class="controls">
                 <button class="btn btn-primary" onclick="launchGame()">▶ Старт</button>
                 <button class="btn" onclick="pauseGame()">⏸ Пауза</button>
-                <button class="btn" onclick="resumeGame()">▶ Продолжить</button>
-                <button class="btn" onclick="closeGame()">❌ Закрыть</button>
+                <button class="btn" onclick="resumeGame()">▶</button>
+                <button class="btn" onclick="closeGame()">❌</button>
             </div>
         </div>
     </div>
 
+    <!-- МОБИЛЬНЫЕ КНОПКИ -->
+    <div id="mobileControls" class="mobile-controls">
+        <div class="d-pad">
+            <div class="d-btn up" data-key="up">️</div>
+            <div class="d-btn left" data-key="left">⬅️</div>
+            <div class="d-btn right" data-key="right">➡️</div>
+            <div class="d-btn down" data-key="down">⬇️</div>
+        </div>
+        <div class="fire-btn" data-key="fire">🔥</div>
+    </div>
+
     <div id="quests" class="section">
-        <h2 style="text-align:center;margin-bottom:10px;">📜 Активные квесты</h2>
-        <p style="text-align:center;color:#aaa;margin-bottom:30px;">Выполняй задания и получай награды!</p>
-        
+        <h2 style="text-align:center;margin-bottom:10px;font-size:18px;">📜 Квесты</h2>
+
         <div class="quest-section">
-            <h3 style="margin-bottom:20px;color:#00f3ff;">🎮 Квест: Лабиринт сокровищ</h3>
-            <p style="margin-bottom:20px;color:#aaa;">Собери все звёзды в лабиринте чтобы получить награду!</p>
-            
+            <h3 style="margin-bottom:15px;color:#00f3ff;font-size:14px;">🎮 Лабиринт сокровищ</h3>
             <div class="maze-quest">
-                <div style="text-align:center;margin-bottom:15px;">
-                    <span style="color:#00f3ff;">🎯 Цель:</span> Собери <b id="starsCollected">0</b> из <b id="totalStars">5</b> звёзд
+                <div style="text-align:center;margin-bottom:10px;font-size:12px;">
+                    Собери <b id="starsCollected">0</b> из <b id="totalStars">5</b> ⭐
                 </div>
                 <div class="maze-container" id="mazeGrid"></div>
-                <div style="text-align:center;margin-top:15px;">
-                    <p style="margin-bottom:10px;color:#aaa;">Управление: стрелки или WASD</p>
-                    <button class="btn btn-primary" onclick="initMazeQuest()">🔄 Начать заново</button>
+                <div style="text-align:center;margin-top:10px;">
+                    <button class="btn btn-primary" onclick="initMazeQuest()" style="font-size:11px;padding:8px 15px;">🔄 Заново</button>
                 </div>
             </div>
         </div>
-        
+
         <div class="quest-card" id="quest1">
             <div class="quest-header">
-                <div class="quest-icon">🎮</div>
+                <div class="quest-icon"></div>
                 <div>
                     <div class="quest-title">Первая игра</div>
-                    <div style="font-size:12px;color:#aaa;">Сыграй в любую игру 1 раз</div>
+                    <div class="quest-desc">Сыграй в любую игру 1 раз</div>
                 </div>
             </div>
             <div class="quest-progress-bar">
@@ -380,13 +379,13 @@
             </div>
             <div class="quest-reward">+50 XP</div>
         </div>
-        
+
         <div class="quest-card" id="quest2">
             <div class="quest-header">
                 <div class="quest-icon">🏆</div>
                 <div>
                     <div class="quest-title">Мастер шутера</div>
-                    <div style="font-size:12px;color:#aaa;">Набери 500 очков в Space Shooter</div>
+                    <div class="quest-desc">Набери 500 очков</div>
                 </div>
             </div>
             <div class="quest-progress-bar">
@@ -397,16 +396,16 @@
     </div>
 
     <div id="music" class="section">
-        <h2 style="text-align:center;margin-bottom:20px;">🔊 Музыка</h2>
-        <p style="text-align:center;color:#aaa;">Музыкальный плеер в разработке...</p>
+        <h2 style="text-align:center;margin-bottom:20px;font-size:18px;">🔊 Музыка</h2>
+        <p style="text-align:center;color:#aaa;font-size:12px;">В разработке...</p>
     </div>
 
     <div id="profile" class="section">
-        <h2 style="text-align:center;margin-bottom:20px;">👤 Профиль</h2>
-        <div style="background:rgba(255,255,255,0.05);padding:30px;border-radius:15px;text-align:center;">
-            <div style="width:100px;height:100px;border-radius:50%;background:linear-gradient(90deg,#00f3ff,#bc13fe);display:flex;align-items:center;justify-content:center;font-size:50px;margin:0 auto 20px;animation:float 3s ease-in-out infinite;">👨‍</div>
-            <h3>Пилот</h3>
-            <p style="color:#ffd700;font-size:20px;margin:10px 0;">Уровень <span id="profileLevel">1</span></p>
+        <h2 style="text-align:center;margin-bottom:20px;font-size:18px;">👤 Профиль</h2>
+        <div style="background:rgba(255,255,255,0.05);padding:20px;border-radius:15px;text-align:center;">
+            <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(90deg,#00f3ff,#bc13fe);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 15px;">👨‍🚀</div>
+            <h3 style="font-size:16px;">Пилот</h3>
+            <p style="color:#ffd700;font-size:16px;margin:10px 0;">Уровень <span id="profileLevel">1</span></p>
         </div>
     </div>
 </div>
@@ -417,27 +416,27 @@ let currentGame = null;
 let gameInterval = null;
 let gameScore = 0;
 let canvas, ctx;
-let keys = {};
+
+let input = { left: false, right: false, up: false, down: false, fire: false };
 
 let quests = {
     quest1: { current: 0, target: 1, reward: 50, completed: false },
     quest2: { current: 0, target: 500, reward: 200, completed: false }
 };
 
-let maze = [];
-let playerPos = { x: 0, y: 0 };
-let stars = [];
-let mazeCompleted = false;
+let maze = [], playerPos = { x: 0, y: 0 }, stars = [], mazeCompleted = false;
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
 window.onload = function() {
     loadData();
     updateStats();
     updateQuests();
     initMazeQuest();
+    setupMobileControls();
 };
 
 function loadData() {
-    const saved = localStorage.getItem('soundscape_v2');
+    const saved = localStorage.getItem('soundscape_v3');
     if (saved) {
         const data = JSON.parse(saved);
         userData = data.userData || userData;
@@ -447,11 +446,7 @@ function loadData() {
 }
 
 function saveData() {
-    localStorage.setItem('soundscape_v2', JSON.stringify({
-        userData: userData,
-        quests: quests,
-        mazeStars: userData.mazeStars
-    }));
+    localStorage.setItem('soundscape_v3', JSON.stringify({ userData, quests, mazeStars: userData.mazeStars }));
 }
 
 function updateStats() {
@@ -462,29 +457,67 @@ function updateStats() {
     userData.level = Math.floor(userData.xp / 500) + 1;
 }
 
+function setupMobileControls() {
+    const buttons = document.querySelectorAll('.d-btn, .fire-btn');
+    buttons.forEach(btn => {
+        const key = btn.dataset.key;
+        btn.addEventListener('touchstart', (e) => { e.preventDefault(); input[key] = true; btn.classList.add('active-press'); }, { passive: false });
+        btn.addEventListener('touchend', (e) => { e.preventDefault(); input[key] = false; btn.classList.remove('active-press'); }, { passive: false });
+        btn.addEventListener('touchcancel', () => { input[key] = false; btn.classList.remove('active-press'); });
+        btn.addEventListener('mousedown', (e) => { e.preventDefault(); input[key] = true; btn.classList.add('active-press'); });
+        btn.addEventListener('mouseup', (e) => { e.preventDefault(); input[key] = false; btn.classList.remove('active-press'); });
+        btn.addEventListener('mouseleave', () => { input[key] = false; btn.classList.remove('active-press'); });
+    });
+}
+
+document.addEventListener('keydown', (e) => {
+    const code = e.code;
+    if (code === 'ArrowLeft' || code === 'KeyA') input.left = true;
+    if (code === 'ArrowRight' || code === 'KeyD') input.right = true;
+    if (code === 'ArrowUp' || code === 'KeyW') input.up = true;
+    if (code === 'ArrowDown' || code === 'KeyS') input.down = true;
+    if (code === 'Space') input.fire = true;
+    if (document.getElementById('quests').classList.contains('active')) {
+        if (code === 'ArrowLeft' || code === 'KeyA') movePlayer(-1, 0);
+        if (code === 'ArrowRight' || code === 'KeyD') movePlayer(1, 0);
+        if (code === 'ArrowUp' || code === 'KeyW') movePlayer(0, -1);
+        if (code === 'ArrowDown' || code === 'KeyS') movePlayer(0, 1);
+    }
+    if (code === 'Space') e.preventDefault();
+});
+
+document.addEventListener('keyup', (e) => {
+    const code = e.code;
+    if (code === 'ArrowLeft' || code === 'KeyA') input.left = false;
+    if (code === 'ArrowRight' || code === 'KeyD') input.right = false;
+    if (code === 'ArrowUp' || code === 'KeyW') input.up = false;
+    if (code === 'ArrowDown' || code === 'KeyS') input.down = false;
+    if (code === 'Space') input.fire = false;
+});
+
+let touchStartX = 0, touchStartY = 0;
+document.addEventListener('touchstart', e => {
+    if (document.getElementById('quests').classList.contains('active')) {
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+    }
+}, { passive: true });
+
+document.addEventListener('touchend', e => {
+    if (document.getElementById('quests').classList.contains('active')) {
+        const dx = e.changedTouches[0].screenX - touchStartX;
+        const dy = e.changedTouches[0].screenY - touchStartY;
+        if (Math.abs(dx) > 30 || Math.abs(dy) > 30) {
+            if (Math.abs(dx) > Math.abs(dy)) movePlayer(dx > 0 ? 1 : -1, 0);
+            else movePlayer(0, dy > 0 ? 1 : -1);
+        }
+    }
+}, { passive: true });
+
 function initMazeQuest() {
-    maze = [
-        [1,0,1,1,1,1,1,1,1,1],
-        [1,0,0,0,0,0,1,0,0,1],
-        [1,1,1,0,1,0,1,0,1,1],
-        [1,0,0,0,1,0,0,0,0,1],
-        [1,0,1,1,1,1,1,1,0,1],
-        [1,0,0,0,0,0,0,1,0,1],
-        [1,1,1,1,1,0,0,1,0,1],
-        [1,0,0,0,1,0,0,0,0,1],
-        [1,0,1,0,0,0,1,1,0,1],
-        [1,1,1,1,1,1,1,1,1,1]
-    ];
-    
+    maze = [[1,0,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,1,0,0,1],[1,1,1,0,1,0,1,0,1,1],[1,0,0,0,1,0,0,0,0,1],[1,0,1,1,1,1,1,1,0,1],[1,0,0,0,0,0,0,1,0,1],[1,1,1,1,1,0,0,1,0,1],[1,0,0,0,1,0,0,0,0,1],[1,0,1,0,0,0,1,1,0,1],[1,1,1,1,1,1,1,1,1,1]];
     playerPos = { x: 1, y: 1 };
-    stars = [
-        { x: 3, y: 1, collected: false },
-        { x: 8, y: 1, collected: false },
-        { x: 5, y: 5, collected: false },
-        { x: 1, y: 8, collected: false },
-        { x: 8, y: 8, collected: false }
-    ];
-    
+    stars = [{ x: 3, y: 1, collected: false },{ x: 8, y: 1, collected: false },{ x: 5, y: 5, collected: false },{ x: 1, y: 8, collected: false },{ x: 8, y: 8, collected: false }];
     userData.mazeStars = 0;
     mazeCompleted = false;
     renderMaze();
@@ -493,27 +526,18 @@ function initMazeQuest() {
 
 function renderMaze() {
     const grid = document.getElementById('mazeGrid');
+    if (!grid) return;
     grid.innerHTML = '';
-    
     for (let y = 0; y < 10; y++) {
         for (let x = 0; x < 10; x++) {
             const cell = document.createElement('div');
             cell.className = 'maze-cell';
-            
-            if (maze[y][x] === 1) {
-                cell.classList.add('wall');
-                cell.textContent = '🧱';
-            } else if (playerPos.x === x && playerPos.y === y) {
-                cell.classList.add('player');
-                cell.textContent = '🚀';
-            } else {
+            if (maze[y][x] === 1) { cell.classList.add('wall'); cell.textContent = '🧱'; }
+            else if (playerPos.x === x && playerPos.y === y) { cell.classList.add('player'); cell.textContent = '🚀'; }
+            else {
                 const star = stars.find(s => s.x === x && s.y === y && !s.collected);
-                if (star) {
-                    cell.classList.add('star');
-                    cell.textContent = '⭐';
-                }
+                if (star) { cell.classList.add('star'); cell.textContent = '⭐'; }
             }
-            
             grid.appendChild(cell);
         }
     }
@@ -521,26 +545,20 @@ function renderMaze() {
 
 function movePlayer(dx, dy) {
     if (mazeCompleted) return;
-    
-    const newX = playerPos.x + dx;
-    const newY = playerPos.y + dy;
-    
+    const newX = playerPos.x + dx, newY = playerPos.y + dy;
     if (newX >= 0 && newX < 10 && newY >= 0 && newY < 10 && maze[newY][newX] === 0) {
-        playerPos.x = newX;
-        playerPos.y = newY;
-        
+        playerPos.x = newX; playerPos.y = newY;
         stars.forEach(star => {
             if (!star.collected && star.x === newX && star.y === newY) {
                 star.collected = true;
                 userData.mazeStars++;
                 userData.xp += 20;
-                showNotification('⭐ Звезда собрана! +20 XP');
+                showNotification('⭐ +20 XP');
                 updateMazeStats();
                 saveData();
                 updateStats();
             }
         });
-        
         if (userData.mazeStars >= 5 && !mazeCompleted) {
             mazeCompleted = true;
             userData.xp += 100;
@@ -548,41 +566,25 @@ function movePlayer(dx, dy) {
             saveData();
             updateStats();
         }
-        
         renderMaze();
     }
 }
 
 function updateMazeStats() {
-    document.getElementById('starsCollected').textContent = userData.mazeStars;
-    document.getElementById('totalStars').textContent = stars.length;
+    const sc = document.getElementById('starsCollected'), ts = document.getElementById('totalStars');
+    if (sc) sc.textContent = userData.mazeStars;
+    if (ts) ts.textContent = stars.length;
 }
 
-document.addEventListener('keydown', (e) => {
-    keys[e.code] = true;
-    
-    if (document.getElementById('quests').classList.contains('active')) {
-        if (e.code === 'ArrowLeft' || e.code === 'KeyA') movePlayer(-1, 0);
-        if (e.code === 'ArrowRight' || e.code === 'KeyD') movePlayer(1, 0);
-        if (e.code === 'ArrowUp' || e.code === 'KeyW') movePlayer(0, -1);
-        if (e.code === 'ArrowDown' || e.code === 'KeyS') movePlayer(0, 1);
-    }
-    
-    if (e.code === 'Space') e.preventDefault();
-});
-
-document.addEventListener('keyup', e => { keys[e.code] = false; });
-
 function updateQuests() {
-    const q1 = quests.quest1;
-    const q1Progress = Math.min(100, (q1.current / q1.target) * 100);
-    document.getElementById('quest1Progress').style.width = q1Progress + '%';
-    if (q1.completed) document.getElementById('quest1').classList.add('completed');
-    
-    const q2 = quests.quest2;
-    const q2Progress = Math.min(100, (q2.current / q2.target) * 100);
-    document.getElementById('quest2Progress').style.width = q2Progress + '%';
-    if (q2.completed) document.getElementById('quest2').classList.add('completed');
+    const q1 = quests.quest1, p1 = document.getElementById('quest1Progress');
+    if (p1) p1.style.width = Math.min(100, (q1.current / q1.target) * 100) + '%';
+    const el1 = document.getElementById('quest1');
+    if (el1 && q1.completed) el1.classList.add('completed');
+    const q2 = quests.quest2, p2 = document.getElementById('quest2Progress');
+    if (p2) p2.style.width = Math.min(100, (q2.current / q2.target) * 100) + '%';
+    const el2 = document.getElementById('quest2');
+    if (el2 && q2.completed) el2.classList.add('completed');
 }
 
 function completeQuest(questId) {
@@ -592,26 +594,26 @@ function completeQuest(questId) {
         saveData();
         updateStats();
         updateQuests();
-        showNotification('🎉 Квест выполнен! +' + quests[questId].reward + ' XP');
+        showNotification('🎉 +' + quests[questId].reward + ' XP');
     }
 }
 
 function updateQuest(questId, amount) {
     if (!quests[questId].completed) {
         quests[questId].current += amount;
-        if (quests[questId].current >= quests[questId].target) {
-            completeQuest(questId);
-        }
+        if (quests[questId].current >= quests[questId].target) completeQuest(questId);
         saveData();
         updateQuests();
     }
 }
 
-function showSection(id) {
+function showSection(id, event) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    event.target.classList.add('active');
+    if (event) event.target.classList.add('active');
+    if (id === 'quests') { initMazeQuest(); updateQuests(); }
+    if (id !== 'games') document.getElementById('mobileControls').classList.remove('active');
 }
 
 function startGame(type) {
@@ -626,13 +628,12 @@ function startGame(type) {
     const games = {
         'shooter': { title: '🚀 Space Shooter' },
         'asteroids': { title: '☄️ Asteroid Defense' },
-        'pacman': { title: '🟡 Pac-Man' },
+        'pacman': { title: '🟡 Звёздный Pac-Man' },
         'invaders': { title: '👾 Space Invaders' },
         'snake': { title: '🐍 Змейка' }
     };
-    
     document.getElementById('gameTitle').textContent = games[type].title;
-    
+
     if (type === 'shooter') initShooter();
     else if (type === 'asteroids') initAsteroids();
     else if (type === 'pacman') initPacman();
@@ -643,6 +644,7 @@ function startGame(type) {
     updateQuest('quest1', 1);
     saveData();
     updateStats();
+    if (isMobile) document.getElementById('mobileControls').classList.add('active');
 }
 
 function launchGame() {
@@ -651,221 +653,372 @@ function launchGame() {
     else if (currentGame === 'pacman') startPacman();
     else if (currentGame === 'invaders') startInvaders();
     else if (currentGame === 'snake') startSnake();
-    showNotification('🎮 Игра началась!');
+    showNotification('🎮 Поехали!');
 }
 
 function pauseGame() { if (gameInterval) clearInterval(gameInterval); }
 function resumeGame() { launchGame(); }
-function closeGame() { 
-    if (gameInterval) clearInterval(gameInterval); 
-    document.getElementById('activeGame').style.display = 'none'; 
+function closeGame() {
+    if (gameInterval) clearInterval(gameInterval);
+    document.getElementById('activeGame').style.display = 'none';
+    document.getElementById('mobileControls').classList.remove('active');
+    input.left = input.right = input.up = input.down = input.fire = false;
 }
 
+// === SPACE SHOOTER ===
 let player, bullets, enemies;
 function initShooter() {
-    player = { x: 400, y: 500, w: 40, h: 40 };
-    bullets = [];
-    enemies = [];
+    player = { x: 400, y: 500, w: 40, h: 40, cooldown: 0 };
+    bullets = []; enemies = [];
 }
 function startShooter() {
     if (gameInterval) clearInterval(gameInterval);
     gameInterval = setInterval(() => {
-        if (keys['ArrowLeft']) player.x -= 6;
-        if (keys['ArrowRight']) player.x += 6;
-        if (keys[' ']) bullets.push({ x: player.x + 20, y: player.y });
-        
-        if (Math.random() < 0.02) enemies.push({ x: Math.random() * 760, y: -30, w: 30, h: 30 });
-        
-        bullets.forEach((b, i) => { b.y -= 10; if (b.y < 0) bullets.splice(i, 1); });
+        if (input.left) player.x -= 5;
+        if (input.right) player.x += 5;
+        player.x = Math.max(0, Math.min(canvas.width - player.w, player.x));
+        if (player.cooldown > 0) player.cooldown--;
+        if (input.fire && player.cooldown === 0) { bullets.push({ x: player.x + player.w/2 - 2, y: player.y }); player.cooldown = 10; }
+        if (Math.random() < 0.03) enemies.push({ x: Math.random() * (canvas.width - 30), y: -30, w: 30, h: 30 });
+        bullets.forEach((b, i) => { b.y -= 8; if (b.y < 0) bullets.splice(i, 1); });
         enemies.forEach((e, i) => {
             e.y += 2;
             bullets.forEach((b, j) => {
                 if (b.x > e.x && b.x < e.x + e.w && b.y > e.y && b.y < e.y + e.h) {
-                    enemies.splice(i, 1);
-                    bullets.splice(j, 1);
-                    gameScore += 10;
-                    userData.xp += 10;
+                    enemies.splice(i, 1); bullets.splice(j, 1);
+                    gameScore += 10; userData.xp += 10;
                     updateQuest('quest2', 10);
                 }
             });
-            if (e.y > 600) enemies.splice(i, 1);
+            if (e.y > canvas.height) enemies.splice(i, 1);
         });
-        
         drawShooter();
         updateStats();
     }, 16);
 }
 function drawShooter() {
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, 800, 600);
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#fff';
+    for (let i = 0; i < 30; i++) ctx.fillRect((i*137)%canvas.width, (i*241)%canvas.height, 1, 1);
     ctx.fillStyle = '#00f3ff';
-    ctx.fillRect(player.x, player.y, player.w, player.h);
+    ctx.beginPath();
+    ctx.moveTo(player.x + player.w/2, player.y);
+    ctx.lineTo(player.x + player.w, player.y + player.h);
+    ctx.lineTo(player.x, player.y + player.h);
+    ctx.closePath(); ctx.fill();
     bullets.forEach(b => { ctx.fillStyle = '#0ff'; ctx.fillRect(b.x, b.y, 4, 10); });
     enemies.forEach(e => { ctx.fillStyle = '#f00'; ctx.fillRect(e.x, e.y, e.w, e.h); });
 }
 
+// === ASTEROIDS ===
 let asteroidPlayer, asteroids, asteroidBullets;
 function initAsteroids() {
-    asteroidPlayer = { x: 400, y: 550 };
-    asteroids = [];
-    asteroidBullets = [];
+    asteroidPlayer = { x: canvas.width/2, y: canvas.height - 40, cooldown: 0 };
+    asteroids = []; asteroidBullets = [];
 }
 function startAsteroids() {
     if (gameInterval) clearInterval(gameInterval);
     gameInterval = setInterval(() => {
-        if (keys['ArrowLeft']) asteroidPlayer.x -= 7;
-        if (keys['ArrowRight']) asteroidPlayer.x += 7;
-        if (keys[' ']) asteroidBullets.push({ x: asteroidPlayer.x, y: asteroidPlayer.y });
-        
-        if (Math.random() < 0.03) asteroids.push({ x: Math.random() * 760, y: -20, size: 20 });
-        
+        if (input.left) asteroidPlayer.x -= 6;
+        if (input.right) asteroidPlayer.x += 6;
+        asteroidPlayer.x = Math.max(20, Math.min(canvas.width - 20, asteroidPlayer.x));
+        if (asteroidPlayer.cooldown > 0) asteroidPlayer.cooldown--;
+        if (input.fire && asteroidPlayer.cooldown === 0) { asteroidBullets.push({ x: asteroidPlayer.x, y: asteroidPlayer.y }); asteroidPlayer.cooldown = 12; }
+        if (Math.random() < 0.04) asteroids.push({ x: Math.random() * canvas.width, y: -20, size: 15 });
         asteroidBullets.forEach((b, i) => { b.y -= 10; if (b.y < 0) asteroidBullets.splice(i, 1); });
         asteroids.forEach((a, i) => {
             a.y += 3;
             asteroidBullets.forEach((b, j) => {
                 if (Math.abs(b.x - a.x) < a.size && Math.abs(b.y - a.y) < a.size) {
-                    asteroids.splice(i, 1);
-                    asteroidBullets.splice(j, 1);
-                    gameScore += 10;
+                    asteroids.splice(i, 1); asteroidBullets.splice(j, 1);
+                    gameScore += 10; userData.xp += 10;
                 }
             });
-            if (a.y > 620) asteroids.splice(i, 1);
+            if (a.y > canvas.height + 20) asteroids.splice(i, 1);
         });
-        
         drawAsteroids();
         updateStats();
     }, 16);
 }
 function drawAsteroids() {
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, 800, 600);
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#fff';
+    for (let i = 0; i < 30; i++) ctx.fillRect((i*127)%canvas.width, (i*331)%canvas.height, 1, 1);
     ctx.fillStyle = '#00f3ff';
     ctx.beginPath();
     ctx.moveTo(asteroidPlayer.x, asteroidPlayer.y - 15);
-    ctx.lineTo(asteroidPlayer.x + 25, asteroidPlayer.y + 15);
-    ctx.lineTo(asteroidPlayer.x - 25, asteroidPlayer.y + 15);
-    ctx.closePath();
-    ctx.fill();
+    ctx.lineTo(asteroidPlayer.x + 20, asteroidPlayer.y + 15);
+    ctx.lineTo(asteroidPlayer.x - 20, asteroidPlayer.y + 15);
+    ctx.closePath(); ctx.fill();
     asteroidBullets.forEach(b => { ctx.fillStyle = '#0ff'; ctx.fillRect(b.x - 2, b.y, 4, 10); });
     asteroids.forEach(a => { ctx.fillStyle = '#888'; ctx.beginPath(); ctx.arc(a.x, a.y, a.size, 0, Math.PI * 2); ctx.fill(); });
 }
 
+// === PAC-MAN С 6 ПРИВЕДЕНИЯМИ ===
 let pacman, ghosts, dots, mazeData;
 function initPacman() {
-    mazeData = ['####################','#........#.........#','#.####.#.#.#.####.#.#','#.#....#...#....#.#.#','#.#.##.#.#.#.##.#.#.#','#.#.#......#.#....#.#','#...#.####.#.####...#','#.#.#......#.#....#.#','#.#.##.####.##.#....#','#.#....#..#....#....#','#.####.#..#.####....#','#......#..#.........#','####################'];
-    pacman = { x: 1, y: 1 };
-    ghosts = [{ x: 10, y: 6 }, { x: 9, y: 6 }, { x: 10, y: 7 }];
+    mazeData = [
+        '####################',
+        '#........#.........#',
+        '#.####.#.#.#.####.#.#',
+        '#.#....#...#....#.#.#',
+        '#.#.##.#.#.#.##.#.#.#',
+        '#.#.#......#.#....#.#',
+        '#...#.####.#.####...#',
+        '#.#.#......#.#....#.#',
+        '#.#.##.####.##.#....#',
+        '#.#....#..#....#....#',
+        '#.####.#..#.####....#',
+        '#......#..#.........#',
+        '####################'
+    ];
+    pacman = { x: 1, y: 1, dir: { x: 0, y: 0 }, nextDir: { x: 0, y: 0 }, mouthOpen: 0 };
+    ghosts = [
+        { x: 10, y: 6, color: '#ff0000', name: 'Blinky', eyeDir: {x:1,y:0} },
+        { x: 9, y: 6, color: '#ffb8ff', name: 'Pinky', eyeDir: {x:-1,y:0} },
+        { x: 10, y: 7, color: '#00ffff', name: 'Inky', eyeDir: {x:0,y:1} },
+        { x: 9, y: 7, color: '#ffb852', name: 'Clyde', eyeDir: {x:0,y:-1} },
+        { x: 5, y: 5, color: '#ff00ff', name: 'Sue', eyeDir: {x:1,y:0} },
+        { x: 15, y: 10, color: '#00ff00', name: 'Funky', eyeDir: {x:-1,y:0} }
+    ];
     dots = [];
-    for (let y = 0; y < mazeData.length; y++) for (let x = 0; x < mazeData[y].length; x++) if (mazeData[y][x] === '.') dots.push({ x, y });
+    for (let y = 0; y < mazeData.length; y++) {
+        for (let x = 0; x < mazeData[y].length; x++) {
+            if (mazeData[y][x] === '.') dots.push({ x, y });
+        }
+    }
 }
+
 function startPacman() {
     if (gameInterval) clearInterval(gameInterval);
     gameInterval = setInterval(() => {
-        if (keys['ArrowLeft']) pacman.x--;
-        if (keys['ArrowRight']) pacman.x++;
-        if (keys['ArrowUp']) pacman.y--;
-        if (keys['ArrowDown']) pacman.y++;
-        
-        dots.forEach((d, i) => { if (d.x === pacman.x && d.y === pacman.y) { dots.splice(i, 1); gameScore += 10; } });
-        ghosts.forEach(g => { if (g.x === pacman.x && g.y === pacman.y) { clearInterval(gameInterval); showNotification('Пойман!'); } });
-        
+        pacman.mouthOpen = (pacman.mouthOpen + 1) % 4;
+
+        // Управление
+        if (input.left) pacman.nextDir = { x: -1, y: 0 };
+        if (input.right) pacman.nextDir = { x: 1, y: 0 };
+        if (input.up) pacman.nextDir = { x: 0, y: -1 };
+        if (input.down) pacman.nextDir = { x: 0, y: 1 };
+
+        // Попытка изменить направление
+        let newX = pacman.x + pacman.nextDir.x;
+        let newY = pacman.y + pacman.nextDir.y;
+        if (mazeData[newY] && mazeData[newY][newX] !== '#') {
+            pacman.dir = pacman.nextDir;
+        }
+
+        // Движение
+        newX = pacman.x + pacman.dir.x;
+        newY = pacman.y + pacman.dir.y;
+        if (mazeData[newY] && mazeData[newY][newX] !== '#') {
+            pacman.x = newX;
+            pacman.y = newY;
+        }
+
+        // Сбор точек
+        for (let i = dots.length - 1; i >= 0; i--) {
+            if (dots[i].x === pacman.x && dots[i].y === pacman.y) {
+                dots.splice(i, 1);
+                gameScore += 10;
+                userData.xp += 10;
+            }
+        }
+
+        // Движение приведений
+        ghosts.forEach(ghost => {
+            const dirs = [{ x: 0, y: -1 }, { x: 0, y: 1 }, { x: -1, y: 0 }, { x: 1, y: 0 }];
+            const validDirs = dirs.filter(d => {
+                let nx = ghost.x + d.x, ny = ghost.y + d.y;
+                return mazeData[ny] && mazeData[ny][nx] !== '#';
+            });
+            if (validDirs.length > 0) {
+                let chosenDir;
+                if (Math.random() < 0.3) {
+                    const dx = pacman.x - ghost.x, dy = pacman.y - ghost.y;
+                    const chaseDirs = validDirs.filter(d => {
+                        if (d.x !== 0 && Math.sign(d.x) === Math.sign(dx)) return true;
+                        if (d.y !== 0 && Math.sign(d.y) === Math.sign(dy)) return true;
+                        return false;
+                    });
+                    chosenDir = chaseDirs.length > 0 ? chaseDirs[0] : validDirs[Math.floor(Math.random() * validDirs.length)];
+                } else {
+                    chosenDir = validDirs[Math.floor(Math.random() * validDirs.length)];
+                }
+                ghost.eyeDir = { x: chosenDir.x, y: chosenDir.y };
+                ghost.x += chosenDir.x;
+                ghost.y += chosenDir.y;
+            }
+            if (ghost.x === pacman.x && ghost.y === pacman.y) {
+                showNotification('💀 ' + ghost.name + ' поймал тебя! Счёт: ' + gameScore);
+                clearInterval(gameInterval);
+                saveData();
+            }
+        });
+
         drawPacman();
         updateStats();
     }, 150);
 }
+
 function drawPacman() {
+    const cellSize = 40;
+    const offsetX = 50;
+    const offsetY = 50;
+
     ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, 800, 600);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Стены
     ctx.fillStyle = '#00f3ff';
-    for (let y = 0; y < mazeData.length; y++) for (let x = 0; x < mazeData[y].length; x++) if (mazeData[y][x] === '#') ctx.fillRect(x * 40 + 50, y * 40 + 50, 38, 38);
+    ctx.shadowBlur = 5;
+    ctx.shadowColor = '#00f3ff';
+    for (let y = 0; y < mazeData.length; y++) {
+        for (let x = 0; x < mazeData[y].length; x++) {
+            if (mazeData[y][x] === '#') {
+                ctx.fillRect(x * cellSize + offsetX, y * cellSize + offsetY, cellSize - 2, cellSize - 2);
+            }
+        }
+    }
+    ctx.shadowBlur = 0;
+
+    // Точки
     ctx.fillStyle = '#ffd700';
-    dots.forEach(d => { ctx.beginPath(); ctx.arc(d.x * 40 + 70, d.y * 40 + 70, 4, 0, Math.PI * 2); ctx.fill(); });
+    dots.forEach(dot => {
+        ctx.beginPath();
+        ctx.arc(dot.x * cellSize + cellSize/2 + offsetX, dot.y * cellSize + cellSize/2 + offsetY, 4, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    // Pac-Man с анимацией рта
+    const pacX = pacman.x * cellSize + cellSize/2 + offsetX;
+    const pacY = pacman.y * cellSize + cellSize/2 + offsetY;
+    const pacRadius = cellSize/2 - 5;
+
     ctx.fillStyle = '#ffff00';
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = '#ffff00';
     ctx.beginPath();
-    ctx.arc(pacman.x * 40 + 70, pacman.y * 40 + 70, 15, 0.15 * Math.PI, 1.85 * Math.PI);
+
+    let startAngle, endAngle;
+    const mouthAngle = 0.15 + (pacman.mouthOpen * 0.05);
+
+    if (pacman.dir.x === 1) { startAngle = mouthAngle; endAngle = -mouthAngle + Math.PI * 2; }
+    else if (pacman.dir.x === -1) { startAngle = Math.PI + mouthAngle; endAngle = Math.PI - mouthAngle; }
+    else if (pacman.dir.y === -1) { startAngle = -Math.PI/2 + mouthAngle; endAngle = -Math.PI/2 - mouthAngle + Math.PI * 2; }
+    else if (pacman.dir.y === 1) { startAngle = Math.PI/2 + mouthAngle; endAngle = Math.PI/2 - mouthAngle; }
+    else { startAngle = mouthAngle; endAngle = -mouthAngle + Math.PI * 2; }
+
+    ctx.arc(pacX, pacY, pacRadius, startAngle, endAngle);
+    ctx.lineTo(pacX, pacY);
+    ctx.closePath();
     ctx.fill();
-    ghosts.forEach(g => { ctx.fillStyle = '#f00'; ctx.fillRect(g.x * 40 + 50, g.y * 40 + 50, 38, 38); });
+    ctx.shadowBlur = 0;
+
+    // Глаз Pac-Man
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.arc(pacX - 3, pacY - 8, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Приведения с именами
+    ghosts.forEach(ghost => {
+        const gx = ghost.x * cellSize + offsetX;
+        const gy = ghost.y * cellSize + offsetY;
+        const gs = cellSize - 4;
+
+        ctx.fillStyle = ghost.color;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = ghost.color;
+
+        // Тело приведения
+        ctx.beginPath();
+        ctx.arc(gx + gs/2, gy + gs/2 - 2, gs/2 - 2, Math.PI, 0);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Глаза
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(gx + gs/2 - 5, gy + gs/2 - 5, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(gx + gs/2 + 5, gy + gs/2 - 5, 4, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    document.getElementById('gameTitle').textContent = ` Pac-Man | Счёт: ${gameScore} | Осталось точек: ${dots.length}`;
 }
 
+// === SPACE INVADERS ===
 let invaderPlayer, invaders, invaderBullets, invaderDir;
 function initInvaders() {
-    invaderPlayer = { x: 400, y: 550 };
-    invaders = [];
-    invaderBullets = [];
-    invaderDir = 1;
-    for (let row = 0; row < 4; row++) for (let col = 0; col < 8; col++) invaders.push({ x: 100 + col * 60, y: 50 + row * 50, w: 40, h: 30 });
+    invaderPlayer = { x: canvas.width/2 - 20, y: canvas.height - 40, cooldown: 0 };
+    invaders = []; invaderBullets = []; invaderDir = 1;
+    for (let row = 0; row < 3; row++) for (let col = 0; col < 6; col++) invaders.push({ x: 60 + col * 50, y: 40 + row * 40, w: 35, h: 25 });
 }
 function startInvaders() {
     if (gameInterval) clearInterval(gameInterval);
     gameInterval = setInterval(() => {
-        if (keys['ArrowLeft']) invaderPlayer.x -= 5;
-        if (keys['ArrowRight']) invaderPlayer.x += 5;
-        if (keys[' ']) invaderBullets.push({ x: invaderPlayer.x + 20, y: invaderPlayer.y });
-        
+        if (input.left) invaderPlayer.x -= 5;
+        if (input.right) invaderPlayer.x += 5;
+        invaderPlayer.x = Math.max(0, Math.min(canvas.width - 40, invaderPlayer.x));
+        if (invaderPlayer.cooldown > 0) invaderPlayer.cooldown--;
+        if (input.fire && invaderPlayer.cooldown === 0) { invaderBullets.push({ x: invaderPlayer.x + 18, y: invaderPlayer.y }); invaderPlayer.cooldown = 15; }
         let hitEdge = false;
-        invaders.forEach(inv => { inv.x += invaderDir * 2; if (inv.x <= 10 || inv.x >= 770) hitEdge = true; });
-        if (hitEdge) { invaderDir *= -1; invaders.forEach(inv => inv.y += 30); }
-        
-        invaderBullets.forEach((b, i) => { b.y -= 8; if (b.y < 0) invaderBullets.splice(i, 1); });
+        invaders.forEach(inv => { inv.x += invaderDir * 1.5; if (inv.x <= 10 || inv.x >= canvas.width - 45) hitEdge = true; });
+        if (hitEdge) { invaderDir *= -1; invaders.forEach(inv => inv.y += 25); }
+        invaderBullets.forEach((b, i) => { b.y -= 6; if (b.y < 0) invaderBullets.splice(i, 1); });
         invaders.forEach((inv, i) => {
             invaderBullets.forEach((b, j) => {
                 if (b.x > inv.x && b.x < inv.x + inv.w && b.y > inv.y && b.y < inv.y + inv.h) {
-                    invaders.splice(i, 1);
-                    invaderBullets.splice(j, 1);
-                    gameScore += 10;
+                    invaders.splice(i, 1); invaderBullets.splice(j, 1); gameScore += 10; userData.xp += 5;
                 }
             });
         });
-        
         drawInvaders();
         updateStats();
     }, 16);
 }
 function drawInvaders() {
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, 800, 600);
-    ctx.fillStyle = '#00f3ff';
-    ctx.fillRect(invaderPlayer.x, invaderPlayer.y, 40, 30);
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#fff';
+    for (let i = 0; i < 30; i++) ctx.fillRect((i*137)%canvas.width, (i*241)%canvas.height, 1, 1);
+    ctx.fillStyle = '#00f3ff'; ctx.fillRect(invaderPlayer.x, invaderPlayer.y, 40, 30);
     invaders.forEach(inv => { ctx.fillStyle = '#0f0'; ctx.fillRect(inv.x, inv.y, inv.w, inv.h); });
-    invaderBullets.forEach(b => { ctx.fillStyle = '#0ff'; ctx.fillRect(b.x, b.y, 4, 10); });
+    invaderBullets.forEach(b => { ctx.fillStyle = '#0ff'; ctx.fillRect(b.x, b.y, 4, 8); });
 }
 
-let snake, dir, food;
+// === SNAKE ===
+let snake, dir, nextDir, food;
 function initSnake() {
-    snake = [{ x: 15, y: 15 }];
-    dir = { x: 1, y: 0 };
-    food = { x: 25, y: 25 };
+    snake = [{ x: 15, y: 10 }]; dir = { x: 1, y: 0 }; nextDir = { x: 1, y: 0 }; food = { x: 20, y: 10 };
 }
 function startSnake() {
     if (gameInterval) clearInterval(gameInterval);
     gameInterval = setInterval(() => {
-        if (keys['ArrowLeft'] && dir.x !== 1) dir = { x: -1, y: 0 };
-        if (keys['ArrowRight'] && dir.x !== -1) dir = { x: 1, y: 0 };
-        if (keys['ArrowUp'] && dir.y !== 1) dir = { x: 0, y: -1 };
-        if (keys['ArrowDown'] && dir.y !== -1) dir = { x: 0, y: 1 };
-        
+        if (input.left && dir.x !== 1) nextDir = { x: -1, y: 0 };
+        else if (input.right && dir.x !== -1) nextDir = { x: 1, y: 0 };
+        else if (input.up && dir.y !== 1) nextDir = { x: 0, y: -1 };
+        else if (input.down && dir.y !== -1) nextDir = { x: 0, y: 1 };
+        dir = nextDir;
         const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
-        if (head.x < 0 || head.x >= 40 || head.y < 0 || head.y >= 30) { clearInterval(gameInterval); showNotification('Game Over!'); return; }
-        
+        if (head.x < 0 || head.x >= 40 || head.y < 0 || head.y >= 30) { clearInterval(gameInterval); showNotification(' Game Over!'); return; }
+        if (snake.some(s => s.x === head.x && s.y === head.y)) { clearInterval(gameInterval); showNotification('💥 Game Over!'); return; }
         snake.unshift(head);
-        if (head.x === food.x && head.y === food.y) { gameScore += 15; food = { x: Math.floor(Math.random() * 40), y: Math.floor(Math.random() * 30) }; }
+        if (head.x === food.x && head.y === food.y) { gameScore += 15; userData.xp += 10; food = { x: Math.floor(Math.random() * 38) + 1, y: Math.floor(Math.random() * 28) + 1 }; }
         else snake.pop();
-        
         drawSnake();
         updateStats();
-    }, 100);
+    }, 120);
 }
 function drawSnake() {
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, 800, 600);
+    const cellSize = 20;
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = 'rgba(0,243,255,0.1)';
-    for (let i = 0; i < 40; i++) { ctx.beginPath(); ctx.moveTo(i * 20, 0); ctx.lineTo(i * 20, 600); ctx.stroke(); }
-    for (let i = 0; i < 30; i++) { ctx.beginPath(); ctx.moveTo(0, i * 20); ctx.lineTo(800, i * 20); ctx.stroke(); }
-    snake.forEach((s, i) => { ctx.fillStyle = i === 0 ? '#fff' : '#00f3ff'; ctx.fillRect(s.x * 20 + 1, s.y * 20 + 1, 18, 18); });
-    ctx.fillStyle = '#ffd700';
-    ctx.beginPath();
-    ctx.arc(food.x * 20 + 10, food.y * 20 + 10, 8, 0, Math.PI * 2);
-    ctx.fill();
+    for (let i = 0; i < 40; i++) { ctx.beginPath(); ctx.moveTo(i * cellSize, 0); ctx.lineTo(i * cellSize, 600); ctx.stroke(); }
+    for (let i = 0; i < 30; i++) { ctx.beginPath(); ctx.moveTo(0, i * cellSize); ctx.lineTo(800, i * cellSize); ctx.stroke(); }
+    snake.forEach((s, i) => { ctx.fillStyle = i === 0 ? '#fff' : '#00f3ff'; ctx.fillRect(s.x * cellSize + 1, s.y * cellSize + 1, cellSize - 2, cellSize - 2); });
+    ctx.fillStyle = '#ffd700'; ctx.beginPath(); ctx.arc(food.x * cellSize + cellSize/2, food.y * cellSize + cellSize/2, cellSize/2 - 2, 0, Math.PI * 2); ctx.fill();
 }
 
 function showNotification(text) {
@@ -873,7 +1026,7 @@ function showNotification(text) {
     div.className = 'notification';
     div.textContent = text;
     document.body.appendChild(div);
-    setTimeout(() => div.remove(), 2500);
+    setTimeout(() => div.remove(), 2000);
 }
 </script>
 </body>
