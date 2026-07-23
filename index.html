@@ -29,20 +29,17 @@
             overflow-x: hidden;
         }
 
-        /* === КОСМИЧЕСКИЙ ФОН (Только при классе .space-bg-active) === */
+        /* === КОСМИЧЕСКИЙ ФОН === */
         #spaceCanvas {
             position: fixed;
             inset: 0;
             z-index: 0;
             pointer-events: none;
-            display: none; /* Скрыт по умолчанию */
+            display: none;
         }
 
-        body.space-bg-active #spaceCanvas {
-            display: block;
-        }
+        body.space-bg-active #spaceCanvas { display: block; }
 
-        /* Туманности (статичные, без анимации) */
         body.space-bg-active::before,
         body.space-bg-active::after {
             content: '';
@@ -52,7 +49,6 @@
             opacity: 0.2;
             z-index: 0;
             pointer-events: none;
-            /* Анимация удалена для неподвижности */
         }
         body.space-bg-active::before {
             width: 600px; height: 600px;
@@ -161,171 +157,82 @@
             padding: 40px 30px 150px;
         }
 
-        .hero-section {
-            text-align: center;
-            padding: 60px 20px;
-            animation: slideIn 0.8s;
-        }
+        .hero-section { text-align: center; padding: 60px 20px; animation: slideIn 0.8s; }
         .hero-title {
-            font-size: 56px;
-            font-weight: 900;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
+            font-size: 56px; font-weight: 900; letter-spacing: 2px; margin-bottom: 20px;
             background: linear-gradient(90deg, var(--accent), #fff, var(--purple));
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             animation: shimmer 4s linear infinite;
         }
-        .hero-subtitle {
-            font-size: 18px;
-            color: var(--text-muted);
-            max-width: 700px;
-            margin: 0 auto 40px;
-            line-height: 1.6;
-        }
-        .hero-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
+        .hero-subtitle { font-size: 18px; color: var(--text-muted); max-width: 700px; margin: 0 auto 40px; line-height: 1.6; }
+        .hero-buttons { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
         .hero-btn {
-            padding: 16px 32px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            padding: 16px 32px; border-radius: 12px; font-size: 16px; font-weight: 700;
+            cursor: pointer; text-decoration: none; transition: all 0.3s;
+            display: flex; align-items: center; gap: 10px; border: none;
         }
         .hero-btn-primary {
             background: linear-gradient(90deg, var(--accent), var(--purple));
-            color: #000;
-            border: none;
-            animation: pulseGlow 3s infinite;
+            color: #000; animation: pulseGlow 3s infinite;
         }
         .hero-btn-primary:hover { transform: translateY(-3px) scale(1.05); }
         .hero-btn-secondary {
-            background: rgba(255,255,255,0.05);
-            color: var(--text);
+            background: rgba(255,255,255,0.05); color: var(--text);
             border: 1px solid var(--accent);
         }
         .hero-btn-secondary:hover { background: var(--accent-dim); transform: translateY(-3px); }
 
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 60px;
-        }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 60px; }
         .feature-card {
             background: linear-gradient(135deg, rgba(17, 21, 48, 0.8), rgba(26, 31, 58, 0.6));
-            border: 1px solid rgba(0, 243, 255, 0.2);
-            border-radius: 16px;
-            padding: 30px;
-            text-align: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
+            border: 1px solid rgba(0, 243, 255, 0.2); border-radius: 16px; padding: 30px;
+            text-align: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;
         }
-        .feature-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--accent);
-            box-shadow: 0 20px 40px rgba(0, 243, 255, 0.15);
-        }
+        .feature-card:hover { transform: translateY(-8px); border-color: var(--accent); box-shadow: 0 20px 40px rgba(0, 243, 255, 0.15); }
         .feature-icon { font-size: 48px; margin-bottom: 15px; display: block; }
         .feature-title { font-size: 20px; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
         .feature-desc { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
 
         .section { display: none; animation: slideIn 0.4s; }
         .section.active { display: block; }
-
-        .section-title {
-            text-align: center;
-            font-size: 36px;
-            font-weight: 800;
-            margin-bottom: 30px;
-            color: var(--text);
-        }
+        .section-title { text-align: center; font-size: 36px; font-weight: 800; margin-bottom: 30px; color: var(--text); }
 
         .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         .game-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(0,243,255,0.2);
-            border-radius: 16px;
-            padding: 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(0,243,255,0.2);
+            border-radius: 16px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.3s;
         }
-        .game-card:hover {
-            border-color: var(--accent);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,243,255,0.15);
-            background: rgba(0, 243, 255, 0.05);
-        }
+        .game-card:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,243,255,0.15); background: rgba(0, 243, 255, 0.05); }
         .game-icon { font-size: 50px; margin-bottom: 15px; display: block; }
         .game-title { font-size: 20px; font-weight: bold; margin: 10px 0; color: var(--accent); }
         .game-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 15px; }
-        .xp-btn {
-            background: linear-gradient(90deg, #ffd700, #ff8c00);
-            color: #000; border: none; padding: 8px 20px;
-            border-radius: 20px; font-weight: bold; cursor: pointer;
-            font-size: 13px;
-        }
+        .xp-btn { background: linear-gradient(90deg, #ffd700, #ff8c00); color: #000; border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 13px; }
 
-        .game-container {
-            background: rgba(0,0,0,0.6);
-            border: 1px solid var(--accent);
-            border-radius: 16px;
-            padding: 20px;
-            margin-top: 30px;
-            display: none;
-            backdrop-filter: blur(10px);
-        }
-        canvas.game-canvas {
-            width: 100%; max-width: 800px; height: 500px;
-            margin: 20px auto; display: block;
-            background: #000; border-radius: 12px;
-            border: 2px solid var(--accent);
-        }
+        .game-container { background: rgba(0,0,0,0.6); border: 1px solid var(--accent); border-radius: 16px; padding: 20px; margin-top: 30px; display: none; backdrop-filter: blur(10px); }
+        canvas.game-canvas { width: 100%; max-width: 800px; height: 500px; margin: 20px auto; display: block; background: #000; border-radius: 12px; border: 2px solid var(--accent); }
         .controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 15px; }
-        .btn {
-            padding: 10px 24px; border: none; border-radius: 8px;
-            font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.1);
-            color: #fff; transition: all 0.2s; font-size: 14px;
-        }
+        .btn { padding: 10px 24px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.1); color: #fff; transition: all 0.2s; font-size: 14px; }
         .btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
         .btn-primary { background: linear-gradient(90deg, var(--accent), var(--purple)); color: #000; }
 
-        .quest-section {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(0,243,255,0.2);
-            border-radius: 16px; padding: 25px; margin: 20px 0;
+        /* Beatmaker & My Beats Sections */
+        .studio-placeholder {
+            text-align: center; padding: 60px 20px; background: rgba(0,0,0,0.3);
+            border: 1px dashed var(--accent); border-radius: 20px; margin-top: 20px;
         }
-        .maze-container {
-            display: grid; grid-template-columns: repeat(10, 40px); grid-template-rows: repeat(10, 40px);
-            gap: 4px; margin: 20px auto; width: fit-content;
-        }
-        .maze-cell {
-            width: 40px; height: 40px; background: rgba(255,255,255,0.05);
-            border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 22px;
-            transition: all 0.2s;
-        }
+        .studio-placeholder h3 { color: var(--accent); margin-bottom: 15px; font-size: 24px; }
+        .studio-placeholder p { color: var(--text-muted); margin-bottom: 25px; }
+
+        .quest-section { background: rgba(255,255,255,0.03); border: 1px solid rgba(0,243,255,0.2); border-radius: 16px; padding: 25px; margin: 20px 0; }
+        .maze-container { display: grid; grid-template-columns: repeat(10, 40px); grid-template-rows: repeat(10, 40px); gap: 4px; margin: 20px auto; width: fit-content; }
+        .maze-cell { width: 40px; height: 40px; background: rgba(255,255,255,0.05); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 22px; transition: all 0.2s; }
         .maze-cell.wall { background: rgba(100,100,100,0.4); border: 1px solid rgba(255,255,255,0.1); }
         .maze-cell.player { background: rgba(0,243,255,0.3); box-shadow: 0 0 15px var(--accent); }
         .maze-cell.star { background: rgba(255,215,0,0.2); }
 
         .repeat-quest { background: rgba(0,0,0,0.3); border: 1px solid var(--purple); border-radius: 16px; padding: 25px; margin: 20px 0; }
         .quest-pattern { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; margin: 20px auto; max-width: 600px; }
-        .pattern-step {
-            aspect-ratio: 1; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 28px;
-            cursor: pointer; transition: all 0.3s;
-        }
+        .pattern-step { aspect-ratio: 1; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 28px; cursor: pointer; transition: all 0.3s; }
         .pattern-step:hover { transform: scale(1.1); border-color: var(--accent); }
         .pattern-step.show { background: linear-gradient(135deg, var(--purple), var(--accent)); border-color: var(--accent); animation: pulse 0.5s; }
         .pattern-step.user-correct { background: var(--success); border-color: var(--success); }
@@ -333,10 +240,7 @@
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
         .quest-status { text-align: center; font-size: 16px; margin: 15px 0; min-height: 24px; color: var(--accent); font-weight: 600; }
 
-        .quest-card {
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(0,243,255,0.2);
-            border-radius: 12px; padding: 20px; margin-bottom: 15px;
-        }
+        .quest-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(0,243,255,0.2); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
         .quest-card.completed { border-color: var(--success); background: rgba(0,255,136,0.05); }
         .quest-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
         .quest-icon { font-size: 32px; }
@@ -348,20 +252,10 @@
 
         .music-container { max-width: 700px; margin: 0 auto; }
         .search-box-wrapper { position: relative; width: 100%; margin-bottom: 20px; }
-        #music-search-input {
-            width: 100%; padding: 16px; border: 1px solid rgba(255,255,255,0.2); border-radius: 12px;
-            font-size: 16px; background: rgba(0,0,0,0.3); color: #fff; outline: none;
-        }
+        #music-search-input { width: 100%; padding: 16px; border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; font-size: 16px; background: rgba(0,0,0,0.3); color: #fff; outline: none; }
         #music-search-input:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 243, 255, 0.2); }
-        .results-list {
-            position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-panel);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 0 0 12px 12px;
-            max-height: 300px; overflow-y: auto; z-index: 1000; margin: 5px 0 0 0; padding: 0; list-style: none;
-        }
-        .results-list li {
-            display: flex; align-items: center; justify-content: space-between; padding: 14px 16px;
-            border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.2s;
-        }
+        .results-list { position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-panel); border: 1px solid rgba(255,255,255,0.1); border-radius: 0 0 12px 12px; max-height: 300px; overflow-y: auto; z-index: 1000; margin: 5px 0 0 0; padding: 0; list-style: none; }
+        .results-list li { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.2s; }
         .results-list li:hover { background: rgba(0, 243, 255, 0.1); }
         .result-info { display: flex; flex-direction: column; overflow: hidden; margin-right: 10px; flex: 1; }
         .result-title { font-weight: bold; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
@@ -370,11 +264,7 @@
         .preview-btn { background: var(--accent); color: #000; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
         .duration-text { font-size: 12px; color: var(--text-muted); }
 
-        .player-card {
-            margin-top: 20px; background: rgba(0,0,0,0.4); border: 1px solid rgba(0, 243, 255, 0.3);
-            color: #fff; padding: 25px; border-radius: 16px; display: flex; flex-direction: column; gap: 20px;
-            backdrop-filter: blur(10px);
-        }
+        .player-card { margin-top: 20px; background: rgba(0,0,0,0.4); border: 1px solid rgba(0, 243, 255, 0.3); color: #fff; padding: 25px; border-radius: 16px; display: flex; flex-direction: column; gap: 20px; backdrop-filter: blur(10px); }
         .track-details { display: flex; align-items: center; gap: 20px; }
         .track-cover { width: 70px; height: 70px; border-radius: 10px; object-fit: cover; border: 2px solid var(--accent); }
         .progress-wrapper { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--text-muted); }
@@ -388,17 +278,8 @@
         .volume-wrapper { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
         .hidden { display: none !important; }
 
-        .profile-card {
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(0,243,255,0.2);
-            padding: 40px; border-radius: 20px; text-align: center; max-width: 500px; margin: 0 auto;
-        }
-        .profile-avatar {
-            width: 120px; height: 120px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), var(--purple));
-            display: flex; align-items: center; justify-content: center;
-            font-size: 60px; margin: 0 auto 20px;
-            box-shadow: 0 0 30px rgba(0, 243, 255, 0.3);
-        }
+        .profile-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(0,243,255,0.2); padding: 40px; border-radius: 20px; text-align: center; max-width: 500px; margin: 0 auto; }
+        .profile-avatar { width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--purple)); display: flex; align-items: center; justify-content: center; font-size: 60px; margin: 0 auto 20px; box-shadow: 0 0 30px rgba(0, 243, 255, 0.3); }
 
         .notification {
             position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-100px);
@@ -438,8 +319,9 @@
     <div class="nav">
         <button class="nav-btn active" onclick="showSection('home', event)">🏠 Главная</button>
         <button class="nav-btn" onclick="showSection('games', event)">🎮 Игры</button>
+        <button class="nav-btn" onclick="showSection('beatmaker', event)">🎹 AI Студия</button>
+        <button class="nav-btn" onclick="showSection('my-beats', event)">💾 Мои биты</button>
         <button class="nav-btn" onclick="showSection('quests', event)">📜 Квесты</button>
-        <a href="beatmaker_pro_list.html" class="nav-btn">🎹 Мои биты</a>
         <button class="nav-btn" onclick="showSection('music', event)">🔊 Музыка</button>
         <button class="nav-btn" onclick="showSection('profile', event)">👤 Профиль</button>
     </div>
@@ -457,7 +339,7 @@
             </p>
             <div class="hero-buttons">
                 <button class="hero-btn hero-btn-primary" onclick="showSection('games')">🚀 Начать миссию</button>
-                <a href="beatmaker_pro.html" class="hero-btn hero-btn-secondary">🎹 Стать битмейкером</a>
+                <button class="hero-btn hero-btn-secondary" onclick="showSection('beatmaker')">🎹 Стать битмейкером</button>
             </div>
         </div>
 
@@ -472,12 +354,12 @@
                 <div class="feature-title">Ритм-квесты</div>
                 <div class="feature-desc">Проходи лабиринты и запоминай музыкальные паттерны для получения наград.</div>
             </div>
-            <div class="feature-card" onclick="window.location.href='beatmaker_pro.html'">
+            <div class="feature-card" onclick="showSection('beatmaker')">
                 <span class="feature-icon">🧠</span>
                 <div class="feature-title">AI Проверка битов</div>
                 <div class="feature-desc">Создавай лупы и проходи проверку нейросети на соответствие жанру планеты.</div>
             </div>
-            <div class="feature-card" onclick="window.location.href='beatmaker_pro_list.html'">
+            <div class="feature-card" onclick="showSection('my-beats')">
                 <span class="feature-icon">🎛️</span>
                 <div class="feature-title">Pro Studio</div>
                 <div class="feature-desc">Полноценная DAW с FX-цепочками, обрезкой, лимитером и экспортом в 320 kbps MP3.</div>
@@ -519,6 +401,26 @@
                 <button class="btn" style="background: rgba(255,0,85,0.2); color: var(--danger);" onclick="closeGame()">❌ Закрыть</button>
             </div>
             <div id="gameInfo" style="text-align:center;margin-top:15px;color:var(--accent); font-weight: bold;"></div>
+        </div>
+    </div>
+
+    <!-- AI СТУДИЯ (Бывший beatmaker_pro.html) -->
+    <div id="beatmaker" class="section">
+        <h2 class="section-title">🎹 AI Студия Битмейкера</h2>
+        <div class="studio-placeholder">
+            <h3>🚧 Раздел в активной разработке</h3>
+            <p>Здесь будет полноценный секвенсор с AI-проверкой ритма, выбором планетарных жанров и экспортом.</p>
+            <button class="btn btn-primary" onclick="showNotification('🔜 Скоро будет доступно!')">Узнать подробнее</button>
+        </div>
+    </div>
+
+    <!-- МОИ БИТЫ (Бывший beatmaker_pro_list.html) -->
+    <div id="my-beats" class="section">
+        <h2 class="section-title">💾 Мои сохранённые биты</h2>
+        <div class="studio-placeholder">
+            <h3>📂 Пока тут пусто</h3>
+            <p>Создай свой первый трек в AI Студии, и он появится здесь с возможностью прослушивания и скачивания.</p>
+            <button class="btn btn-primary" onclick="showSection('beatmaker')">Перейти в студию</button>
         </div>
     </div>
 
@@ -666,19 +568,16 @@ function initSpaceStars() {
     }
 }
 
-// Статичная отрисовка (без анимации для экономии ресурсов и соответствия ТЗ)
 function drawSpaceStars() {
     sCtx.clearRect(0, 0, spaceCanvas.width, spaceCanvas.height);
     starsArr.forEach(s => {
         s.alpha += s.speed;
-        const a = (Math.sin(s.alpha) + 1) / 2; // Плавное мерцание от 0 до 1
-
+        const a = (Math.sin(s.alpha) + 1) / 2;
         sCtx.beginPath();
         sCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
         sCtx.fillStyle = s.color;
         sCtx.globalAlpha = a * 0.9;
         sCtx.fill();
-
         if (s.r > 1.2) {
             sCtx.globalAlpha = a * 0.3;
             sCtx.arc(s.x, s.y, s.r * 3, 0, Math.PI * 2);
@@ -686,10 +585,8 @@ function drawSpaceStars() {
         }
     });
     sCtx.globalAlpha = 1;
-
-    // Продолжаем анимацию только если фон сейчас активен
     if (document.body.classList.contains('space-bg-active')) {
-        requestAnimationFrame(drawSpaceStars);
+        animationFrameId = requestAnimationFrame(drawSpaceStars);
     }
 }
 
@@ -698,10 +595,13 @@ function enableSpaceBg() {
     drawSpaceStars();
 }
 
-//function disableSpaceBg() {
-//    document.body.classList.remove('space-bg-active');
-//    sCtx.clearRect(0, 0, spaceCanvas.width, spaceCanvas.height);
-//}
+function disableSpaceBg() {
+    document.body.classList.remove('space-bg-active');
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+    }
+    sCtx.clearRect(0, 0, spaceCanvas.width, spaceCanvas.height);
+}
 
 window.onload = function() {
     loadData();
@@ -709,8 +609,6 @@ window.onload = function() {
     updateQuests();
     initMazeQuest();
     initRepeatQuest();
-
-    // Инициализация фона для стартовой страницы
     resizeSpaceCanvas();
     if (document.getElementById('home').classList.contains('active')) {
         enableSpaceBg();
@@ -736,7 +634,7 @@ function showSection(id, event) {
         });
     }
 
-    // === ЛОГИКА ВКЛЮЧЕНИЯ/ВЫКЛЮЧЕНИЯ ФОНА ===
+    // Логика включения/выключения фона
     if (id === 'home' || id === 'music') {
         enableSpaceBg();
     } else {
@@ -747,10 +645,8 @@ function showSection(id, event) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ... (остальной код игр, квестов и музыки остаётся без изменений, он полностью рабочий) ...
-
 function loadData() {
-    const saved = localStorage.getItem('soundscape_v5');
+    const saved = localStorage.getItem('soundscape_v6');
     if (saved) {
         const data = JSON.parse(saved);
         userData = data.userData || userData;
@@ -759,7 +655,7 @@ function loadData() {
 }
 
 function saveData() {
-    localStorage.setItem('soundscape_v5', JSON.stringify({ userData, quests }));
+    localStorage.setItem('soundscape_v6', JSON.stringify({ userData, quests }));
 }
 
 function updateStats() {
@@ -772,6 +668,7 @@ function updateStats() {
     document.getElementById('profileCoins').textContent = userData.coins;
 }
 
+// ИГРЫ
 function startGame(type) {
     currentGame = type;
     gameScore = 0;
@@ -982,6 +879,7 @@ function drawSnake() {
     ctx.fillStyle = '#ffd700'; ctx.beginPath(); ctx.arc(food.x * cellSize + cellSize/2, food.y * cellSize + cellSize/2, cellSize/2 - 2, 0, Math.PI * 2); ctx.fill();
 }
 
+// КВЕСТЫ
 function initMazeQuest() {
     maze = [[1,0,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,1,0,0,1],[1,1,1,0,1,0,1,0,1,1],[1,0,0,0,1,0,0,0,0,1],[1,0,1,1,1,1,1,1,0,1],[1,0,0,0,0,0,0,1,0,1],[1,1,1,1,1,0,0,1,0,1],[1,0,0,0,1,0,0,0,0,1],[1,0,1,0,0,0,1,1,0,1],[1,1,1,1,1,1,1,1,1,1]];
     playerPos = { x: 1, y: 1 };
@@ -1173,6 +1071,7 @@ function updateQuest(questId, amount) {
     }
 }
 
+// МУЗЫКА
 const globalAudio = new Audio();
 globalAudio.crossOrigin = "anonymous";
 let currentTrackData = null, isRepeat = false, previousVolume = 0.8, debounceTimer = null;
@@ -1211,7 +1110,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchTracksFromPiped(query) {
         try {
             const response = await fetch(`${PIPED_API_BASE}/search?q=${encodeURIComponent(query)}&filter=music_songs`);
-            if (!response.ok) throw new Error('Ошибка');
+            if (!response.ok) throw new Error('Ошибка сети');
             const data = await response.json();
             const items = data.items || data.relatedStreams || [];
             if (items.length > 0) {
@@ -1225,13 +1124,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 }));
                 renderSearchResults(formatted);
             } else { renderSearchResults([]); }
-        } catch (err) { renderSearchResults([]); }
+        } catch (err) {
+            console.warn("Music API error:", err);
+            renderSearchResults([]);
+        }
     }
 
     function renderSearchResults(tracks) {
         resultsList.innerHTML = '';
         if (tracks.length === 0) {
-            resultsList.innerHTML = `<li style="padding:14px; color:var(--text-muted); text-align:center;">Ничего не найдено</li>`;
+            resultsList.innerHTML = `<li style="padding:14px; color:var(--text-muted); text-align:center;">Ничего не найдено или ошибка API</li>`;
             resultsList.classList.remove('hidden');
             return;
         }
@@ -1260,18 +1162,26 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!audioUrl && track.videoId) {
             try {
                 const streamRes = await fetch(`${PIPED_API_BASE}/streams/${track.videoId}`);
+                if(!streamRes.ok) throw new Error("Stream fetch failed");
                 const streamData = await streamRes.json();
                 const audioStreams = streamData.audioStreams || [];
                 if (audioStreams.length > 0) {
                     const sorted = audioStreams.sort((a, b) => a.bitrate - b.bitrate);
                     audioUrl = sorted[sorted.length - 1].url;
                 }
-            } catch (err) { console.error("Ошибка потока:", err); }
+            } catch (err) {
+                console.error("Ошибка потока:", err);
+                showNotification('⚠️ Ошибка загрузки аудио');
+                return;
+            }
         }
         if (audioUrl) {
             globalAudio.src = audioUrl;
             globalAudio.load();
-            globalAudio.play().then(() => { playPauseBtn.innerText = '⏸'; }).catch(err => console.error(err));
+            globalAudio.play().then(() => { playPauseBtn.innerText = '⏸'; }).catch(err => {
+                console.error(err);
+                showNotification('⚠️ Невозможно воспроизвести');
+            });
         }
     }
 
