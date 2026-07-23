@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
-<head>
+<html lang="ru"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Soundscape | Музыкальная Вселенная</title>
@@ -702,10 +701,10 @@
         }
     </style>
 </head>
-<body>
+<body class="space-bg-active">
 
 <!-- AUTH OVERLAY -->
-<div class="auth-overlay" id="authOverlay">
+<div class="auth-overlay" id="authOverlay" style="display: none;">
     <div class="auth-box">
         <h2> SOUNDSCAPE</h2>
         <p>Войди или создай аккаунт, чтобы сохранить прогресс</p>
@@ -716,7 +715,7 @@
     </div>
 </div>
 
-<canvas id="spaceCanvas"></canvas>
+<canvas id="spaceCanvas" width="1171" height="960"></canvas>
 <div class="notification" id="notification">Уведомление</div>
 
 <header class="header">
@@ -726,13 +725,14 @@
             <div class="stat-chip">⭐ <b id="userXP">0</b> XP</div>
             <div class="stat-chip">🏆 <b id="userLevel">1</b> LVL</div>
             <div class="stat-chip"> <b id="userCoins">100</b></div>
-            <div class="stat-chip">👤 <b id="userName">Пилот</b></div>
+            <div class="stat-chip">👤 <b id="userName">timsaf</b></div>
         </div>
     </div>
     <div class="nav">
         <button class="nav-btn active" onclick="showSection('home', event)">🏠 Главная</button>
         <button class="nav-btn" onclick="showSection('games', event)"> Игры</button>
-        <button class="nav-btn" onclick="showSection('beatmaker', event)">🎹 Студия</button>
+        <button class="nav-btn" onclick="showSection('beatmaker', event)">🎛️ Студия Itunes</button>
+        <a href="beatmaker_pro_list.html" class="nav-btn">🎹 Студия Про</a>
         <button class="nav-btn" onclick="showSection('quests', event)">📜 Квесты</button>
         <button class="nav-btn" onclick="showSection('music', event)"> Музыка</button>
         <button class="nav-btn" onclick="showSection('profile', event)">👤 Профиль</button>
@@ -748,10 +748,8 @@
             <p class="hero-subtitle">Погрузись в музыкальную вселенную. Играй в аркадные миссии, проходи ритм-квесты, создавай уникальные лупы с проверкой от нейросети и стань профессиональным космическим битмейкером.</p>
             <div class="hero-buttons">
                 <button class="hero-btn hero-btn-primary" onclick="showSection('games')">🚀 Начать миссию</button>
-                <button class="hero-btn hero-btn-secondary" onclick="showSection('beatmaker')">🎹 Стать битмейкером</button>
-            </div>
-        </div>
-        <div class="features-grid">
+                <a class="hero-btn hero-btn-secondary" href="beatmaker_pro_list.html">🎹 Стать битмейкером
+            </a></div></div><div class="features-grid">
             <div class="feature-card" onclick="showSection('games')">
                 <span class="feature-icon">🎮</span>
                 <div class="feature-title">Аркадные миссии</div>
@@ -764,18 +762,21 @@
             </div>
             <div class="feature-card" onclick="showSection('beatmaker')">
                 <span class="feature-icon">🎛️</span>
-                <div class="feature-title">Beat Studio</div>
+                <div class="feature-title">Beat Studio Itunes</div>
                 <div class="feature-desc">Создавай биты с реальными звуками из iTunes превью. Экспорт в MP3.</div>
             </div>
+            <div class="feature-card" onclick="window.location.href='beatmaker_pro_list.html'">
+    		<span class="feature-icon">🎹</span>
+    		<div class="feature-title">Beat Maker Pro</div>
+   		<div class="feature-desc">Создавай биты со встроенной библиотекой звуков с высоким качеством. Экспорт в MP3.</div>
+	    </div>
             <div class="feature-card" onclick="showSection('music')">
                 <span class="feature-icon">🔊</span>
                 <div class="feature-title">Музыка</div>
                 <div class="feature-desc">Ищи и слушай треки через iTunes API. 30-секундные превью.</div>
             </div>
         </div>
-    </div>
-
-    <!-- ИГРЫ -->
+    </div><!-- ИГРЫ -->
     <div id="games" class="section">
         <h2 class="section-title">🎮 Выбери миссию</h2>
         <div class="games-grid">
@@ -823,12 +824,12 @@
         </div>
     </div>
 
-    <!-- BEAT COMPOSER PRO -->
+    <!-- BEAT COMPOSER PRO Itunes -->
     <div id="beatmaker" class="section">
-        <h2 class="section-title"> Beat Composer Pro</h2>
+        <h2 class="section-title"> Beat Composer Pro Itunes</h2>
         <div class="daw-container">
             <div class="daw-header">
-                <div class="daw-title">BEAT COMPOSER PRO</div>
+                <div class="daw-title">BEAT COMPOSER PRO ITUNES</div>
                 <div class="daw-controls">
                     <button class="daw-btn daw-btn-play" onclick="playBeat()">▶ Play</button>
                     <button class="daw-btn daw-btn-reset" onclick="resetBeat()"> Reset</button>
@@ -852,7 +853,7 @@
                 </div>
                 <div class="daw-setting">
                     <label style="display: flex; align-items: center; gap: 5px;">
-                        <input type="checkbox" checked> Суммировать звуки
+                        <input type="checkbox" checked=""> Суммировать звуки
                     </label>
                 </div>
                 <div class="daw-setting" style="margin-left: auto;">
@@ -863,15 +864,11 @@
             <div class="daw-main">
                 <div class="daw-sidebar">
                     <h3>📁 SOUNDS/</h3>
-                    <div class="daw-sounds-list" id="dawSoundsList">
-                        <!-- Звуки загружаются динамически -->
-                    </div>
+                    <div class="daw-sounds-list" id="dawSoundsList"><div class="daw-sound-item"><span class="icon">🥁</span><span class="name">808 Kick</span></div><div class="daw-sound-item"><span class="icon"></span><span class="name">Trap Snare</span></div><div class="daw-sound-item"><span class="icon">🎩</span><span class="name">Hi-Hat</span></div><div class="daw-sound-item"><span class="icon">🎸</span><span class="name">Reese Bass</span></div><div class="daw-sound-item"><span class="icon">🎤</span><span class="name">Vocal Chop</span></div><div class="daw-sound-item"><span class="icon">✨</span><span class="name">Riser FX</span></div><div class="daw-sound-item"><span class="icon"></span><span class="name">Synth Lead</span></div><div class="daw-sound-item"><span class="icon"></span><span class="name">Kick Drum</span></div></div>
                 </div>
 
                 <div class="daw-timeline-container">
-                    <div class="daw-timeline" id="dawTimeline">
-                        <!-- Tracks generated by JS -->
-                    </div>
+                    <div class="daw-timeline" id="dawTimeline"><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(217, 38, 38);">Track 1</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(217, 128, 38);">Track 2</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(217, 217, 38);">Track 3</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(128, 217, 38);">Track 4</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(38, 217, 38);">Track 5</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(38, 217, 128);">Track 6</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(38, 217, 217);">Track 7</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(38, 128, 217);">Track 8</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(38, 38, 217);">Track 9</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(128, 38, 217);">Track 10</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(217, 38, 217);">Track 11</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div></div>
                 </div>
             </div>
         </div>
@@ -884,7 +881,7 @@
         <div class="quest-section">
             <h3 style="margin-bottom:12px;color:var(--accent);">🎮 Квест 1: Лабиринт сокровищ</h3>
             <div style="text-align:center;margin-bottom:8px; color: var(--text-muted);">Собери <b id="starsCollected" style="color:var(--accent)">0</b> из <b id="totalStars">5</b> </div>
-            <div class="maze-container" id="mazeGrid"></div>
+            <div class="maze-container" id="mazeGrid"><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell player"></div><div class="maze-cell"></div><div class="maze-cell star">⭐</div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell star">⭐</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell star">⭐</div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell star">⭐</div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell star">⭐</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div></div>
             <div style="text-align:center;margin-top:10px;">
                 <button class="btn btn-primary" onclick="initMazeQuest()">🔄 Заново</button>
             </div>
@@ -894,7 +891,7 @@
             <h3 style="margin-bottom:12px;color:var(--purple);">🧠 Квест 2: Повтори бит</h3>
             <div class="repeat-quest">
                 <p style="text-align:center;color:var(--text-muted);margin-bottom:12px;">Запомни последовательность и повтори её!</p>
-                <div class="quest-pattern" id="questPattern"></div>
+                <div class="quest-pattern" id="questPattern"><div class="pattern-step" data-index="0"></div><div class="pattern-step" data-index="1">🥁</div><div class="pattern-step" data-index="2"></div><div class="pattern-step" data-index="3">🥁</div><div class="pattern-step" data-index="4">🥁</div><div class="pattern-step" data-index="5">🎸</div><div class="pattern-step" data-index="6">🥁</div><div class="pattern-step" data-index="7"></div></div>
                 <div class="quest-status" id="questStatus">Нажми "Показать паттерн" чтобы начать</div>
                 <div style="text-align:center;margin-top:12px;">
                     <button class="btn btn-primary" onclick="showPattern()">👁 Показать паттерн</button>
@@ -966,7 +963,7 @@
         <h2 class="section-title"> Профиль пилота</h2>
         <div class="profile-card">
             <div class="profile-avatar">👨🚀</div>
-            <h3 id="profileName" style="font-size:24px; margin-bottom:8px;">Пилот</h3>
+            <h3 id="profileName" style="font-size:24px; margin-bottom:8px;">timsaf</h3>
             <p style="color:var(--accent); font-size:18px; margin-bottom:15px;">Уровень <span id="profileLevel">1</span></p>
             <div class="profile-stats">
                 <div class="p-stat">
@@ -986,9 +983,7 @@
         </div>
     </div>
 
-</div>
-
-<script>
+</div><script>
 // === АУТЕНТИФИКАЦИЯ ===
 let currentUser = null;
 let userData = {
@@ -2007,5 +2002,6 @@ function showNotification(text) {
     setTimeout(() => div.classList.remove('show'), 2500);
 }
 </script>
-</body>
-</html>
+
+
+</body></html>
