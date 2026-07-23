@@ -17,7 +17,9 @@
             --danger: #ff0055;
             --success: #00ff88;
             --purple: #bc13fe;
+            --gold: #ffd700;
             --gradient-1: linear-gradient(135deg, #00f3ff, #bc13fe);
+            --gradient-gold: linear-gradient(135deg, #ffd700, #ff8c00);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -89,6 +91,16 @@
             transition: all 0.3s;
         }
         .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0, 243, 255, 0.4); }
+        .guest-btn {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: #fff;
+            margin-top: 10px;
+        }
+        .guest-btn:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: var(--accent);
+        }
 
         /* === КОСМИЧЕСКИЙ ФОН === */
         #spaceCanvas {
@@ -125,6 +137,11 @@
         }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes shimmer { to { background-position: 200% center; } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes starTwinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
 
         /* === HEADER === */
         .header {
@@ -166,7 +183,16 @@
             align-items: center;
             gap: 5px;
         }
-        .stat-chip b { color: #ffd700; }
+        .stat-chip b { color: var(--gold); }
+        .guest-badge {
+            background: rgba(255,165,0,0.2);
+            color: orange;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-left: 5px;
+            border: 1px solid orange;
+        }
 
         .nav {
             display: flex;
@@ -290,6 +316,212 @@
             font-size: 32px;
             font-weight: 800;
             margin-bottom: 25px;
+        }
+
+        /* === SUBSCRIPTION TIERS === */
+        .subscription-section {
+            margin-top: 60px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(17, 21, 48, 0.6));
+            border-radius: 24px;
+            border: 2px solid rgba(0, 243, 255, 0.2);
+        }
+        .subscription-title {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 20px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subscription-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+        .tiers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .tier-card {
+            background: linear-gradient(135deg, rgba(17, 21, 48, 0.9), rgba(26, 31, 58, 0.7));
+            border: 2px solid rgba(0, 243, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .tier-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 243, 255, 0.3);
+        }
+        .tier-card.featured {
+            border-color: var(--gold);
+            transform: scale(1.05);
+        }
+        .tier-card.featured:hover {
+            transform: scale(1.05) translateY(-10px);
+        }
+        .tier-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--gradient-gold);
+            color: #000;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .tier-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+        .tier-name {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        .tier-price {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            color: var(--gold);
+        }
+        .tier-price span {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+        .tier-features {
+            list-style: none;
+            text-align: left;
+            margin: 20px 0;
+        }
+        .tier-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .tier-features li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: bold;
+        }
+        .tier-features li.disabled {
+            opacity: 0.5;
+        }
+        .tier-features li.disabled::before {
+            content: '✗';
+            color: var(--danger);
+        }
+        .tier-btn {
+            width: 100%;
+            padding: 14px;
+            margin-top: 20px;
+            background: var(--gradient-1);
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tier-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 243, 255, 0.4);
+        }
+        .tier-btn.gold {
+            background: var(--gradient-gold);
+        }
+
+        /* === TELEGRAM CTA SECTION === */
+        .telegram-cta {
+            margin-top: 50px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(0, 136, 204, 0.15), rgba(188, 19, 254, 0.15));
+            border-radius: 24px;
+            border: 2px solid rgba(0, 136, 204, 0.4);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .telegram-cta::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 136, 204, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        .telegram-cta-content {
+            position: relative;
+            z-index: 2;
+        }
+        .telegram-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(0, 136, 204, 0.6));
+        }
+        .telegram-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, #0088cc, #00f3ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .telegram-text {
+            font-size: 18px;
+            color: var(--text);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .telegram-bot {
+            display: inline-block;
+            background: linear-gradient(90deg, #0088cc, #00aaff);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: 2px solid rgba(255,255,255,0.2);
+            margin-top: 10px;
+        }
+        .telegram-bot:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 136, 204, 0.5);
+            background: linear-gradient(90deg, #00aaff, #00f3ff);
+        }
+        .telegram-features {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        .telegram-features span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         /* === BEAT COMPOSER PRO (DAW) === */
@@ -416,8 +648,17 @@
             background: rgba(0, 243, 255, 0.1);
             transform: translateX(5px);
         }
+        .daw-sound-item.premium {
+            border-color: var(--gold);
+            background: rgba(255, 215, 0, 0.1);
+        }
+        .daw-sound-item.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
         .daw-sound-item .icon { font-size: 20px; }
-        .daw-sound-item .name { font-size: 12px; font-weight: 600; }
+        .daw-sound-item .name { font-size: 12px; font-weight: 600; flex: 1; }
+        .daw-sound-item .lock-icon { font-size: 14px; color: var(--gold); }
 
         .daw-timeline-container {
             background: rgba(0,0,0,0.4);
@@ -489,14 +730,28 @@
             box-shadow: 0 10px 30px rgba(0,243,255,0.15);
             background: rgba(0, 243, 255, 0.05);
         }
+        .game-card.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: var(--danger);
+        }
         .game-icon { font-size: 50px; margin-bottom: 12px; display: block; }
         .game-title { font-size: 18px; font-weight: bold; margin: 8px 0; color: var(--accent); }
         .game-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
         .xp-btn {
-            background: linear-gradient(90deg, #ffd700, #ff8c00);
+            background: linear-gradient(90deg, var(--gold), #ff8c00);
             color: #000; border: none; padding: 7px 18px;
             border-radius: 20px; font-weight: bold; cursor: pointer;
             font-size: 12px;
+        }
+        .lock-badge {
+            background: var(--danger);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            display: inline-block;
+            margin-top: 8px;
         }
 
         .game-container {
@@ -519,12 +774,13 @@
         .mobile-controls {
             display: none;
             position: absolute;
-            bottom: 20px;
+            bottom: 80px;
             left: 0;
             right: 0;
             justify-content: space-between;
             padding: 0 20px;
             pointer-events: none;
+            z-index: 50;
         }
         .d-pad {
             display: grid;
@@ -615,13 +871,17 @@
             border-radius: 12px; padding: 15px; margin-bottom: 15px;
         }
         .quest-card.completed { border-color: var(--success); background: rgba(0,255,136,0.05); }
+        .quest-card.locked {
+            opacity: 0.5;
+            border-color: var(--danger);
+        }
         .quest-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
         .quest-icon { font-size: 30px; }
         .quest-title { font-weight: bold; font-size: 15px; color: var(--accent); }
         .quest-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
         .quest-progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
         .quest-progress-fill { height: 100%; background: var(--gradient-1); transition: width 0.5s; }
-        .quest-reward { background: linear-gradient(90deg, #ffd700, #ff8c00); color: #000; padding: 5px 12px; border-radius: 15px; font-size: 11px; font-weight: bold; display: inline-block; }
+        .quest-reward { background: linear-gradient(90deg, var(--gold), #ff8c00); color: #000; padding: 5px 12px; border-radius: 15px; font-size: 11px; font-weight: bold; display: inline-block; }
 
         /* === MUSIC === */
         .music-container { max-width: 700px; margin: 0 auto; }
@@ -690,6 +950,12 @@
             box-shadow: 0 10px 30px rgba(0, 243, 255, 0.4);
         }
         .notification.show { transform: translateX(-50%) translateY(0); }
+        .notification.error {
+            background: linear-gradient(90deg, var(--danger), #ff5500);
+        }
+        .notification.gold {
+            background: var(--gradient-gold);
+        }
 
         @media (max-width: 768px) {
             .hero-title { font-size: 32px; }
@@ -698,20 +964,24 @@
             .maze-container { grid-template-columns: repeat(10, 30px); grid-template-rows: repeat(10, 30px); }
             .maze-cell { width: 30px; height: 30px; font-size: 18px; }
             .mobile-controls { display: flex !important; }
+            .tiers-grid { grid-template-columns: 1fr; }
+            .tier-card.featured { transform: none; }
+            .tier-card.featured:hover { transform: translateY(-10px); }
+            .telegram-features { flex-direction: column; gap: 10px; }
         }
     </style>
 </head>
 <body class="space-bg-active">
 
-<!-- AUTH OVERLAY (Убран style="display: none;", чтобы показывался по умолчанию) -->
+<!-- AUTH OVERLAY -->
 <div class="auth-overlay" id="authOverlay">
     <div class="auth-box">
         <h2>🪐 SOUNDSCAPE</h2>
-        <p>Войди или создай аккаунт, чтобы сохранить прогресс</p>
-        <input type="text" class="auth-input" id="authUsername" placeholder="Придумай никнейм">
+        <p>Войди или играй как гость</p>
+        <input type="text" class="auth-input" id="authUsername" placeholder="Имя пользователя">
         <input type="password" class="auth-input" id="authPassword" placeholder="Пароль">
-        <button class="auth-btn" onclick="registerUser()">🚀 Начать путешествие</button>
-        <p style="margin-top: 15px; font-size: 12px;">Уже есть аккаунт? <a href="#" onclick="toggleAuthMode()" style="color: var(--accent);">Войти</a></p>
+        <button class="auth-btn" onclick="registerUser()">🚀 Войти</button>
+        <button class="auth-btn guest-btn" onclick="guestLogin()">👤 Играть как гость</button>
     </div>
 </div>
 
@@ -723,18 +993,17 @@
         <div class="logo">🪐 SOUNDSCAPE</div>
         <div class="stats">
             <div class="stat-chip">⭐ <b id="userXP">0</b> XP</div>
-            <div class="stat-chip">🏆 <b id="userLevel">1</b> LVL</div>
+            <div class="stat-chip"> <b id="userLevel">1</b> LVL</div>
             <div class="stat-chip">🪙 <b id="userCoins">100</b></div>
-            <!-- Заменено timsaf на Гость -->
-            <div class="stat-chip">👤 <b id="userName">Гость</b></div>
+            <div class="stat-chip">👤 <b id="userName">Гость</b><span id="userBadge" class="guest-badge">ГОСТЬ</span></div>
         </div>
     </div>
     <div class="nav">
         <button class="nav-btn active" onclick="showSection('home', event)">🏠 Главная</button>
         <button class="nav-btn" onclick="showSection('games', event)">🎮 Игры</button>
-        <button class="nav-btn" onclick="showSection('beatmaker', event)">🎛️ Студия Itunes</button>
-        <a href="beatmaker_pro_list.html" class="nav-btn">🎹 Студия Про</a>
-        <button class="nav-btn" onclick="showSection('quests', event)">📜 Квесты</button>
+        <button class="nav-btn" onclick="showSection('beatmaker', event)">️ Студия Itunes</button>
+        <button class="nav-btn" onclick="showSection('beatmaker_pro', event)">🎹 Студия Про</button>
+        <button class="nav-btn" onclick="showSection('quests', event)"> Квесты</button>
         <button class="nav-btn" onclick="showSection('music', event)">🔊 Музыка</button>
         <button class="nav-btn" onclick="showSection('profile', event)">👤 Профиль</button>
     </div>
@@ -749,7 +1018,7 @@
             <p class="hero-subtitle">Погрузись в музыкальную вселенную. Играй в аркадные миссии, проходи ритм-квесты, создавай уникальные лупы с проверкой от нейросети и стань профессиональным космическим битмейкером.</p>
             <div class="hero-buttons">
                 <button class="hero-btn hero-btn-primary" onclick="showSection('games')">🚀 Начать миссию</button>
-                <a class="hero-btn hero-btn-secondary" href="beatmaker_pro_list.html">🎹 Стать битмейкером</a>
+                <button class="hero-btn hero-btn-secondary" onclick="showSection('subscriptions')">💎 Тарифы</button>
             </div>
         </div>
         <div class="features-grid">
@@ -768,8 +1037,8 @@
                 <div class="feature-title">Beat Studio Itunes</div>
                 <div class="feature-desc">Создавай биты с реальными звуками из iTunes превью. Экспорт в MP3.</div>
             </div>
-            <div class="feature-card" onclick="window.location.href='beatmaker_pro_list.html'">
-                <span class="feature-icon">🎹</span>
+            <div class="feature-card" onclick="showSection('beatmaker_pro')">
+                <span class="feature-icon"></span>
                 <div class="feature-title">Beat Maker Pro</div>
                 <div class="feature-desc">Создавай биты со встроенной библиотекой звуков с высоким качеством. Экспорт в MP3.</div>
             </div>
@@ -777,6 +1046,88 @@
                 <span class="feature-icon">🔊</span>
                 <div class="feature-title">Музыка</div>
                 <div class="feature-desc">Ищи и слушай треки через iTunes API. 30-секундные превью.</div>
+            </div>
+        </div>
+
+        <!-- SUBSCRIPTION TIERS -->
+        <div class="subscription-section" id="subscriptions">
+            <h2 class="subscription-title">💎 Выбери свой путь</h2>
+            <p class="subscription-subtitle">Разблокируй полный потенциал Soundscape с нашими тарифами</p>
+
+            <div class="tiers-grid">
+                <!-- GUEST TIER -->
+                <div class="tier-card">
+                    <div class="tier-icon">👤</div>
+                    <h3 class="tier-name">Гость</h3>
+                    <div class="tier-price">Бесплатно</div>
+                    <ul class="tier-features">
+                        <li> 2 игры в день</li>
+                        <li>🎵 Прослушивание превью</li>
+                        <li>❌ Без MP3 экспорта</li>
+                        <li> 10 базовых звуков</li>
+                        <li>❌ Прогресс не сохраняется</li>
+                        <li> 1 квест недоступен</li>
+                        <li>❌ Нет премиум функций</li>
+                    </ul>
+                    <button class="tier-btn" onclick="selectTier('guest')">Текущий тариф</button>
+                </div>
+
+                <!-- EXPLORER TIER -->
+                <div class="tier-card featured">
+                    <div class="tier-badge">ПОПУЛЯРНЫЙ</div>
+                    <div class="tier-icon">🔭</div>
+                    <h3 class="tier-name">Исследователь</h3>
+                    <div class="tier-price">499 ₽<span>/мес</span></div>
+                    <ul class="tier-features">
+                        <li> Безлимитные игры</li>
+                        <li>🎵 До 20 битов в месяц</li>
+                        <li> Экспорт MP3</li>
+                        <li>🔊 Доступ к 50 звукам</li>
+                        <li> Сохранение на сервере</li>
+                        <li>📜 1 квест в день</li>
+                        <li> Ранний доступ к функциям</li>
+                        <li>🏆 VIP статус</li>
+                    </ul>
+                    <button class="tier-btn gold" onclick="selectTier('explorer')">Выбрать тариф</button>
+                </div>
+
+                <!-- VIP TIER -->
+                <div class="tier-card">
+                    <div class="tier-icon">👑</div>
+                    <h3 class="tier-name">VIP Премиум</h3>
+                    <div class="tier-price">999 ₽<span>/мес</span></div>
+                    <ul class="tier-features">
+                        <li>🎮 Всё без ограничений</li>
+                        <li>🎵 Безлимитные MP3</li>
+                        <li>🔊 Все премиум звуки</li>
+                        <li>💾 Автосохранение</li>
+                        <li> Все квесты доступны</li>
+                        <li>🌟 Самый ранний доступ</li>
+                        <li>🎁 Эксклюзивные бонусы</li>
+                        <li>💎 Приоритетная поддержка</li>
+                    </ul>
+                    <button class="tier-btn" onclick="selectTier('vip')">Выбрать тариф</button>
+                </div>
+            </div>
+
+            <!-- TELEGRAM CTA (вместо соцсетей) -->
+            <div class="telegram-cta">
+                <div class="telegram-cta-content">
+                    <div class="telegram-icon">📱</div>
+                    <h3 class="telegram-title">Присоединяйся к нам в Telegram Mini App</h3>
+                    <p class="telegram-text">
+                        Играй прямо в Telegram, получай эксклюзивные бонусы, участвуй в турнирах и общайся с сообществом Soundscape!
+                    </p>
+                    <a href="https://t.me/go_play_map_bot" class="telegram-bot" target="_blank">
+                        🤖 @go_play_map_bot
+                    </a>
+                    <div class="telegram-features">
+                        <span> Мгновенный доступ</span>
+                        <span>🎁 Бонус за вход</span>
+                        <span>🏆 Турниры каждый день</span>
+                        <span> Живое сообщество</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -797,8 +1148,14 @@
                 <div class="game-desc">6 приведений, собирай точки!</div>
                 <button class="xp-btn">+200 XP за победу</button>
             </div>
+            <div class="game-card" onclick="startGame('invaders')">
+                <div class="game-icon">👾</div>
+                <div class="game-title">Space Invaders</div>
+                <div class="game-desc">Классика! Уничтожь всех пришельцев</div>
+                <button class="xp-btn">+50 XP</button>
+            </div>
             <div class="game-card" onclick="startGame('snake')">
-                <div class="game-icon">🐍</div>
+                <div class="game-icon"></div>
                 <div class="game-title">Звёздная змейка</div>
                 <div class="game-desc">Собирай звёзды</div>
                 <button class="xp-btn">+15 XP за звезду</button>
@@ -878,13 +1235,41 @@
         </div>
     </div>
 
+    <!-- BEAT MAKER PRO (New Section to fix 404) -->
+    <div id="beatmaker_pro" class="section">
+        <h2 class="section-title"> Beat Maker Pro Studio</h2>
+        <div class="daw-container">
+            <div class="daw-header">
+                <div class="daw-title">BEAT MAKER PRO STUDIO</div>
+                <div class="daw-controls">
+                    <button class="daw-btn daw-btn-play" onclick="playProBeat()">▶ Play</button>
+                    <button class="daw-btn daw-btn-reset" onclick="resetProBeat()">⏹ Reset</button>
+                    <button class="daw-btn daw-btn-export" onclick="exportProBeat()">💿 Export MP3</button>
+                    <button class="daw-btn daw-btn-save" onclick="saveProBeat()">💾 Сохранить</button>
+                </div>
+            </div>
+            <div style="text-align:center;padding:40px;color:var(--text-muted);">
+                <h3 style="margin-bottom:20px;color:var(--accent);"> Профессиональная студия</h3>
+                <p>Здесь будет полноценная DAW с:</p>
+                <ul style="list-style:none;margin:20px 0;line-height:2;">
+                    <li>✓ FX-цепочками</li>
+                    <li>✓ Обрезкой аудио</li>
+                    <li>✓ Лимитером</li>
+                    <li>✓ Экспортом в 320 kbps MP3</li>
+                    <li>✓ Библиотекой премиум звуков</li>
+                </ul>
+                <button class="btn btn-primary" onclick="showSection('subscriptions')" style="margin-top:20px;">💎 Получить доступ</button>
+            </div>
+        </div>
+    </div>
+
     <!-- КВЕСТЫ -->
     <div id="quests" class="section">
-        <h2 class="section-title">📜 Активные квесты</h2>
+        <h2 class="section-title"> Активные квесты</h2>
 
         <div class="quest-section">
             <h3 style="margin-bottom:12px;color:var(--accent);">🎮 Квест 1: Лабиринт сокровищ</h3>
-            <div style="text-align:center;margin-bottom:8px; color: var(--text-muted);">Собери <b id="starsCollected" style="color:var(--accent)">0</b> из <b id="totalStars">5</b> ⭐</div>
+            <div style="text-align:center;margin-bottom:8px; color: var(--text-muted);">Собери <b id="starsCollected" style="color:var(--accent)">0</b> из <b id="totalStars">5</b> </div>
             <div class="maze-container" id="mazeGrid"></div>
             <div style="text-align:center;margin-top:10px;">
                 <button class="btn btn-primary" onclick="initMazeQuest()">🔄 Заново</button>
@@ -906,7 +1291,7 @@
 
         <div class="quest-card" id="quest1">
             <div class="quest-header">
-                <div class="quest-icon">🎮</div>
+                <div class="quest-icon"></div>
                 <div>
                     <div class="quest-title">Первая игра</div>
                     <div class="quest-desc">Сыграй в любую игру 1 раз</div>
@@ -966,8 +1351,7 @@
     <div id="profile" class="section">
         <h2 class="section-title">👤 Профиль пилота</h2>
         <div class="profile-card">
-            <div class="profile-avatar">👨‍🚀</div>
-            <!-- Заменено timsaf на динамический id -->
+            <div class="profile-avatar">👨🚀</div>
             <h3 id="profileName" style="font-size:24px; margin-bottom:8px;">Гость</h3>
             <p style="color:var(--accent); font-size:18px; margin-bottom:15px;">Уровень <span id="profileLevel">1</span></p>
             <div class="profile-stats">
@@ -991,114 +1375,206 @@
 </div>
 
 <script>
-// === АУТЕНТИФИКАЦИЯ ===
+// === АУТЕНТИФИКАЦИЯ И ТАРИФЫ ===
 let currentUser = null;
+let userTier = 'guest'; // guest, explorer, vip
+let isGuest = false;
 let userData = {
-    xp: 0, coins: 100, level: 1, gamesPlayed: 0, mazeStars: 0,
-    repeatQuestDone: false, beats: [], projects: {}
+    xp: 0, coins: 100, level: 1, gamesPlayed: 0, gamesToday: 0,
+    lastGameDate: null, beatsCreated: 0, beatsThisMonth: 0,
+    mazeStars: 0, repeatQuestDone: false, beats: [], projects: {},
+    questsCompleted: 0, lastQuestDate: null, lastBeatMonth: null
 };
 let isLoginMode = false;
 
 window.onload = function() {
     const saved = localStorage.getItem('soundscape_current_user');
     if (saved) {
-        currentUser = JSON.parse(saved);
-        userData = currentUser.data || userData;
+        const data = JSON.parse(saved);
+        currentUser = data.username;
+        isGuest = data.isGuest || false;
+        userTier = data.tier || 'guest';
+        userData = data.data || userData;
+        checkDailyReset();
         document.getElementById('authOverlay').style.display = 'none';
         initApp();
-    } else {
-        // Если пользователя нет, показываем окно входа
-        document.getElementById('authOverlay').style.display = 'flex';
     }
 };
+
+function checkDailyReset() {
+    const today = new Date().toDateString();
+    if (userData.lastGameDate !== today) {
+        userData.gamesToday = 0;
+        userData.lastGameDate = today;
+    }
+    if (userData.lastQuestDate !== today) {
+        userData.questsCompleted = 0;
+        userData.lastQuestDate = today;
+    }
+    const currentMonth = new Date().getMonth();
+    if (userData.lastBeatMonth !== currentMonth) {
+        userData.beatsThisMonth = 0;
+        userData.lastBeatMonth = currentMonth;
+    }
+}
 
 function registerUser() {
     const username = document.getElementById('authUsername').value.trim();
     const password = document.getElementById('authPassword').value.trim();
 
     if (username.length < 3) {
-        showNotification('❌ Никнейм должен быть не менее 3 символов');
+        showNotification('❌ Никнейм должен быть не менее 3 символов', 'error');
         return;
     }
     if (password.length < 4) {
-        showNotification('❌ Пароль должен быть не менее 4 символов');
+        showNotification('❌ Пароль должен быть не менее 4 символов', 'error');
         return;
     }
 
-    const users = JSON.parse(localStorage.getItem('soundscape_users') || '[]');
-
-    if (isLoginMode) {
-        // Login
-        const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
-        if (user) {
-            currentUser = user;
-            userData = user.data || userData;
-            localStorage.setItem('soundscape_current_user', JSON.stringify(currentUser));
-            document.getElementById('authOverlay').style.display = 'none';
-            initApp();
-            showNotification('✅ С возвращением, ' + username + '!');
-        } else {
-            showNotification('❌ Неверный логин или пароль');
-        }
-    } else {
-        // Register
-        if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
-            showNotification('❌ Такой пользователь уже существует');
-            return;
-        }
-
-        currentUser = {
-            username: username,
-            password: password,
-            data: JSON.parse(JSON.stringify(userData)), // Глубокая копия, чтобы не было ссылок
-            createdAt: new Date().toISOString()
-        };
-
-        users.push(currentUser);
-        localStorage.setItem('soundscape_users', JSON.stringify(users));
-        localStorage.setItem('soundscape_current_user', JSON.stringify(currentUser));
-        document.getElementById('authOverlay').style.display = 'none';
-        initApp();
-        showNotification('🚀 Добро пожаловать, ' + username + '!');
-    }
+    currentUser = username;
+    isGuest = false;
+    userTier = 'guest';
+    document.getElementById('authOverlay').style.display = 'none';
+    initApp();
+    saveUserData();
+    showNotification('✅ Добро пожаловать, ' + username + '!');
 }
 
-function toggleAuthMode() {
-    isLoginMode = !isLoginMode;
-    const title = document.querySelector('.auth-box h2');
-    const btn = document.querySelector('.auth-btn');
-    const link = document.querySelector('.auth-box a');
+function guestLogin() {
+    currentUser = 'Guest_' + Math.floor(Math.random() * 10000);
+    isGuest = true;
+    userTier = 'guest';
+    document.getElementById('authOverlay').style.display = 'none';
+    initApp();
+    showNotification('👤 Гостевой режим активирован');
+    showNotification('⚠️ У гостя ограниченный доступ. Получи подписку для полного доступа!', 'gold');
+}
 
-    if (isLoginMode) {
-        title.textContent = '🔐 Вход';
-        btn.textContent = '🚀 Войти';
-        link.textContent = 'Создать аккаунт';
-    } else {
-        title.textContent = '🪐 SOUNDSCAPE';
-        btn.textContent = '🚀 Начать путешествие';
-        link.textContent = 'Войти';
+function selectTier(tier) {
+    if (tier === 'guest') {
+        showNotification('⚠️ Вы уже используете гостевой тариф');
+        return;
     }
+
+    if (tier === 'explorer') {
+        showNotification('💎 Тариф "Исследователь" - 499₽/мес\n\n Разблокирует:\n• Безлимитные игры\n• До 20 битов в месяц\n• Экспорт MP3\n• 50 звуков\n• Сохранение на сервере\n• 1 квест в день\n• Ранний доступ', 'gold');
+        userTier = 'explorer';
+    } else if (tier === 'vip') {
+        showNotification('👑 Тариф "VIP Премиум" - 999₽/мес\n\n🔓 Разблокирует:\n• Всё без ограничений\n• Безлимитные MP3\n• Все премиум звуки\n• Автосохранение\n• Все квесты\n• Самый ранний доступ\n• Эксклюзивные бонусы', 'gold');
+        userTier = 'vip';
+    }
+
+    saveUserData();
+    updateUIForTier();
+}
+
+function saveUserData() {
+    const data = {
+        username: currentUser,
+        isGuest: isGuest,
+        tier: userTier,
+        data: userData
+    };
+    localStorage.setItem('soundscape_current_user', JSON.stringify(data));
 }
 
 function logout() {
     localStorage.removeItem('soundscape_current_user');
-    location.reload(); // Перезагрузка покажет экран входа
+    location.reload();
 }
 
 function initApp() {
-    // Обновляем имя пользователя во всех местах
-    const name = currentUser.username;
+    const name = currentUser;
     document.getElementById('userName').textContent = name;
     document.getElementById('profileName').textContent = name;
-    
+
+    const badge = document.getElementById('userBadge');
+    if (userTier === 'explorer') {
+        badge.textContent = 'ИССЛЕДОВАТЕЛЬ';
+        badge.style.background = 'rgba(0,243,255,0.2)';
+        badge.style.color = '#00f3ff';
+        badge.style.borderColor = '#00f3ff';
+    } else if (userTier === 'vip') {
+        badge.textContent = 'VIP';
+        badge.style.background = 'rgba(255,215,0,0.2)';
+        badge.style.color = '#ffd700';
+        badge.style.borderColor = '#ffd700';
+    } else {
+        badge.textContent = 'ГОСТЬ';
+        badge.style.background = 'rgba(255,165,0,0.2)';
+        badge.style.color = 'orange';
+        badge.style.borderColor = 'orange';
+    }
+
     updateStats();
     updateQuests();
+    updateUIForTier();
     initMazeQuest();
     initRepeatQuest();
     initDAW();
     loadItunesSounds();
     resizeSpaceCanvas();
     if (document.getElementById('home').classList.contains('active')) enableSpaceBg();
+}
+
+function updateUIForTier() {
+    if (userTier === 'guest') {
+        const gamesPlayed = userData.gamesToday || 0;
+        if (gamesPlayed >= 2) {
+            showNotification('⚠️ Гостевой лимит: 2 игры в день исчерпаны. Получите подписку для безлимита!', 'error');
+        }
+    }
+    updateSoundsList();
+}
+
+function updateSoundsList() {
+    const soundsList = document.getElementById('dawSoundsList');
+    if (!soundsList) return;
+
+    const sounds = soundsList.querySelectorAll('.daw-sound-item');
+    sounds.forEach((item, index) => {
+        if (index >= 10) {
+            item.classList.add('locked');
+            if (userTier === 'guest') {
+                item.classList.add('premium');
+                item.innerHTML += '<span class="lock-icon">🔒</span>';
+            }
+        }
+    });
+}
+
+function checkGameLimit() {
+    if (userTier === 'guest') {
+        if (userData.gamesToday >= 2) {
+            showNotification('❌ Гостевой лимит: 2 игры в день исчерпаны.\n\n💎 Получите подписку "Исследователь" за 499₽/мес для безлимита!', 'error');
+            return false;
+        }
+    }
+    return true;
+}
+
+function checkBeatLimit() {
+    if (userTier === 'guest') {
+        showNotification(' Гостям недоступно создание битов.\n\n💎 Получите подписку "Исследователь" за 499₽/мес для создания до 20 битов в месяц!', 'error');
+        return false;
+    }
+    if (userTier === 'explorer' && userData.beatsThisMonth >= 20) {
+        showNotification(' Лимит битов исчерпан (20/20).\n\n👑 Перейдите на VIP за 999₽/мес для безлимита!', 'error');
+        return false;
+    }
+    return true;
+}
+
+function checkQuestAccess(questId) {
+    if (userTier === 'guest' && questId === 'quest3') {
+        showNotification('❌ Этот квест недоступен гостям.\n\n Получите подписку для доступа ко всем квестам!', 'error');
+        return false;
+    }
+    if (userTier === 'explorer' && userData.questsCompleted >= 1) {
+        showNotification('❌ Лимит квестов исчерпан (1/1 в день).\n\n👑 Перейдите на VIP для безлимита!', 'error');
+        return false;
+    }
+    return true;
 }
 
 // === КОСМИЧЕСКИЙ ФОН ===
@@ -1183,18 +1659,6 @@ function showSection(id, event) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function saveData() {
-    if (!currentUser) return;
-    currentUser.data = userData;
-    const users = JSON.parse(localStorage.getItem('soundscape_users') || '[]');
-    const idx = users.findIndex(u => u.username === currentUser.username);
-    if (idx !== -1) {
-        users[idx] = currentUser;
-        localStorage.setItem('soundscape_users', JSON.stringify(users));
-    }
-    localStorage.setItem('soundscape_current_user', JSON.stringify(currentUser));
-}
-
 function updateStats() {
     userData.level = Math.floor(userData.xp / 500) + 1;
     document.getElementById('userXP').textContent = userData.xp;
@@ -1235,22 +1699,32 @@ function initDAW() {
 function loadDAWSounds() {
     const soundsList = document.getElementById('dawSoundsList');
     const sounds = [
-        { icon: '🥁', name: '808 Kick', category: 'Drums' },
-        { icon: '🪘', name: 'Trap Snare', category: 'Drums' },
-        { icon: '🎩', name: 'Hi-Hat', category: 'Drums' },
-        { icon: '🎸', name: 'Reese Bass', category: 'Bass' },
-        { icon: '🎤', name: 'Vocal Chop', category: 'Vocals' },
-        { icon: '✨', name: 'Riser FX', category: 'FX' },
-        { icon: '🎹', name: 'Synth Lead', category: 'Synth' },
-        { icon: '🥁', name: 'Kick Drum', category: 'Drums' }
+        { icon: '🥁', name: '808 Kick', category: 'Drums', premium: false },
+        { icon: '🪘', name: 'Trap Snare', category: 'Drums', premium: false },
+        { icon: '', name: 'Hi-Hat', category: 'Drums', premium: false },
+        { icon: '🎸', name: 'Reese Bass', category: 'Bass', premium: false },
+        { icon: '🎤', name: 'Vocal Chop', category: 'Vocals', premium: false },
+        { icon: '✨', name: 'Riser FX', category: 'FX', premium: false },
+        { icon: '🎹', name: 'Synth Lead', category: 'Synth', premium: false },
+        { icon: '🥁', name: 'Kick Drum', category: 'Drums', premium: false },
+        { icon: '🎺', name: 'Brass Hit', category: 'Brass', premium: true },
+        { icon: '🎻', name: 'String Section', category: 'Strings', premium: true },
+        { icon: '🎷', name: 'Saxophone', category: 'Brass', premium: true },
+        { icon: '🎪', name: 'Carnival FX', category: 'FX', premium: true }
     ];
 
     soundsList.innerHTML = '';
-    sounds.forEach(sound => {
+    sounds.forEach((sound, index) => {
         const item = document.createElement('div');
         item.className = 'daw-sound-item';
-        item.innerHTML = `<span class="icon">${sound.icon}</span><span class="name">${sound.name}</span>`;
-        item.onclick = () => addSoundToCurrentTrack(sound);
+        if (sound.premium) {
+            item.classList.add('premium');
+            if (userTier === 'guest') {
+                item.classList.add('locked');
+            }
+        }
+        item.innerHTML = `<span class="icon">${sound.icon}</span><span class="name">${sound.name}</span>${sound.premium && userTier === 'guest' ? '<span class="lock-icon">🔒</span>' : ''}`;
+        item.onclick = () => addSoundToCurrentTrack(sound, index);
         soundsList.appendChild(item);
     });
 }
@@ -1297,7 +1771,12 @@ function toggleCell(trackIdx, stepIdx) {
     renderTimeline();
 }
 
-function addSoundToCurrentTrack(sound) {
+function addSoundToCurrentTrack(sound, index) {
+    if (sound.premium && userTier === 'guest') {
+        showNotification('❌ Премиум звук недоступен гостям.\n\n💎 Получите подписку для доступа!', 'error');
+        return;
+    }
+
     const emptyTrack = dawTracks.findIndex(t => t.sounds.every(s => s === null));
     if (emptyTrack !== -1) {
         dawTracks[emptyTrack].name = sound.name;
@@ -1378,13 +1857,19 @@ function resetBeat() {
 }
 
 function exportBeat() {
-    showNotification('💿 Export MP3 (320kbps) - Функция требует сервер');
+    if (userTier === 'guest') {
+        showNotification('❌ Экспорт MP3 недоступен гостям.\n\n💎 Получите подписку "Исследователь" за 499₽/мес!', 'error');
+        return;
+    }
+    showNotification('💿 Export MP3 (320kbps)');
     userData.xp += 100;
-    saveData();
+    saveUserData();
     updateStats();
 }
 
 function saveBeat() {
+    if (!checkBeatLimit()) return;
+
     if (!userData.projects) userData.projects = {};
     userData.projects[currentProject] = {
         tracks: dawTracks,
@@ -1392,8 +1877,31 @@ function saveBeat() {
         name: document.getElementById('dawProject').value,
         savedAt: new Date().toISOString()
     };
-    saveData();
+
+    userData.beatsCreated++;
+    userData.beatsThisMonth = (userData.beatsThisMonth || 0) + 1;
+
+    saveUserData();
     showNotification('💾 Проект сохранён!');
+}
+
+// Pro Beat Maker functions
+function playProBeat() {
+    showNotification('▶ Pro Beat Player - Функция в разработке');
+}
+function resetProBeat() {
+    showNotification('⏹ Pro Beat Reset');
+}
+function exportProBeat() {
+    if (userTier === 'guest') {
+        showNotification('❌ Экспорт недоступен гостям', 'error');
+        return;
+    }
+    showNotification('💿 Export Pro MP3');
+}
+function saveProBeat() {
+    if (!checkBeatLimit()) return;
+    showNotification('💾 Pro Beat Saved');
 }
 
 // === ITUNES API ===
@@ -1496,7 +2004,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     playPauseBtn.addEventListener('click', () => {
         if (!globalAudio.src) return;
-        if (globalAudio.paused) { globalAudio.play(); playPauseBtn.innerText = '⏸'; } 
+        if (globalAudio.paused) { globalAudio.play(); playPauseBtn.innerText = '⏸'; }
         else { globalAudio.pause(); playPauseBtn.innerText = '▶'; }
     });
 
@@ -1516,7 +2024,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     globalAudio.addEventListener('ended', () => {
-        if (isRepeat) { globalAudio.currentTime = 0; globalAudio.play(); } 
+        if (isRepeat) { globalAudio.currentTime = 0; globalAudio.play(); }
         else { playPauseBtn.innerText = '▶'; }
     });
 
@@ -1530,7 +2038,7 @@ document.addEventListener('DOMContentLoaded', () => {
             previousVolume = globalAudio.volume;
             globalAudio.volume = 0;
             volumeSlider.value = 0;
-            muteBtn.innerText = '🔇';
+            muteBtn.innerText = '';
         } else {
             globalAudio.volume = previousVolume || 0.8;
             volumeSlider.value = globalAudio.volume;
@@ -1551,46 +2059,73 @@ let currentGame = null, gameInterval = null, gameScore = 0, canvas, ctx;
 let input = { left: false, right: false, up: false, down: false, fire: false };
 
 function startGame(type) {
+    if (!checkGameLimit()) return;
+
     currentGame = type;
     gameScore = 0;
     document.getElementById('activeGame').style.display = 'block';
     canvas = document.getElementById('gameCanvas');
     ctx = canvas.getContext('2d');
+
     const containerWidth = canvas.parentElement.clientWidth - 30;
-    canvas.width = Math.min(800, containerWidth);
+    canvas.width = Math.min(600, containerWidth);
     canvas.height = canvas.width * 0.75;
 
     const games = {
         'shooter': { title: '🚀 Space Shooter' },
         'pacman': { title: '🟡 Звёздный Pac-Man' },
+        'invaders': { title: '👾 Space Invaders' },
         'snake': { title: '🐍 Звёздная змейка' }
     };
     document.getElementById('gameTitle').textContent = games[type].title;
-    document.getElementById('gameInfo').textContent = 'Счёт: 0';
+    document.getElementById('gameInfo').textContent = 'Нажми "Старт" чтобы начать';
 
     if (type === 'shooter') initShooter();
     else if (type === 'pacman') initPacman();
+    else if (type === 'invaders') initInvaders();
     else if (type === 'snake') initSnake();
+
+    if('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+        document.getElementById('mobileControls').style.display = 'flex';
+    }
 
     if (!userData.gamesPlayed || userData.gamesPlayed === 0) {
         userData.gamesPlayed = 1;
         updateQuest('quest1', 1);
-        saveData();
+        saveUserData();
         updateStats();
     }
+
+    userData.gamesToday = (userData.gamesToday || 0) + 1;
+    saveUserData();
+
+    setTimeout(() => {
+        document.getElementById('activeGame').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
 }
 
 function launchGame() {
     if (currentGame === 'shooter') startShooter();
     else if (currentGame === 'pacman') startPacman();
+    else if (currentGame === 'invaders') startInvaders();
     else if (currentGame === 'snake') startSnake();
-    showNotification('🚀 Миссия началась!');
+    showNotification(' Игра началась!');
 }
 
-function pauseGame() { if (gameInterval) clearInterval(gameInterval); }
+function pauseGame() {
+    if (gameInterval) {
+        clearInterval(gameInterval);
+        gameInterval = null;
+    }
+}
+
 function closeGame() {
-    if (gameInterval) clearInterval(gameInterval);
+    if (gameInterval) {
+        clearInterval(gameInterval);
+        gameInterval = null;
+    }
     document.getElementById('activeGame').style.display = 'none';
+    document.getElementById('mobileControls').style.display = 'none';
     input = { left: false, right: false, up: false, down: false, fire: false };
 }
 
@@ -1621,46 +2156,76 @@ document.addEventListener('keyup', (e) => {
 let player, bullets, enemies;
 function initShooter() {
     player = { x: canvas.width/2 - 20, y: canvas.height - 60, w: 40, h: 40, cooldown: 0 };
-    bullets = []; enemies = [];
+    bullets = [];
+    enemies = [];
 }
+
 function startShooter() {
     if (gameInterval) clearInterval(gameInterval);
     gameInterval = setInterval(() => {
-        if (input.left) player.x -= 6;
-        if (input.right) player.x += 6;
+        if (input.left) player.x -= 5;
+        if (input.right) player.x += 5;
         player.x = Math.max(0, Math.min(canvas.width - player.w, player.x));
-        if (player.cooldown > 0) player.cooldown--;
+
         if (input.fire && player.cooldown === 0) {
             bullets.push({ x: player.x + player.w/2 - 2, y: player.y });
-            player.cooldown = 8;
+            player.cooldown = 10;
         }
-        if (Math.random() < 0.04) enemies.push({ x: Math.random() * (canvas.width - 30), y: -30, w: 30, h: 30 });
+        if (player.cooldown > 0) player.cooldown--;
 
-        bullets.forEach((b, i) => { b.y -= 10; if (b.y < 0) bullets.splice(i, 1); });
-        enemies.forEach((e, i) => {
-            e.y += 3;
-            bullets.forEach((b, j) => {
+        if (Math.random() < 0.03) {
+            enemies.push({ x: Math.random() * (canvas.width - 30), y: -30, w: 30, h: 30 });
+        }
+
+        bullets = bullets.filter(b => {
+            b.y -= 8;
+            return b.y > 0;
+        });
+
+        enemies = enemies.filter(e => {
+            e.y += 2;
+            bullets.forEach((b, bi) => {
                 if (b.x > e.x && b.x < e.x + e.w && b.y > e.y && b.y < e.y + e.h) {
-                    enemies.splice(i, 1); bullets.splice(j, 1);
-                    gameScore += 10; userData.xp += 5;
+                    enemies.splice(enemies.indexOf(e), 1);
+                    bullets.splice(bi, 1);
+                    gameScore += 10;
+                    userData.xp += 2;
                 }
             });
-            if (e.y > canvas.height) enemies.splice(i, 1);
+            return e.y < canvas.height;
         });
+
         drawShooter();
         updateStats();
         document.getElementById('gameInfo').textContent = `Счёт: ${gameScore} | XP: ${userData.xp}`;
     }, 16);
 }
+
 function drawShooter() {
-    ctx.fillStyle = '#050714'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#050714';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
     ctx.fillStyle = '#fff';
-    for (let i = 0; i < 40; i++) ctx.fillRect((i*137)%canvas.width, (i*241 + Date.now()/50)%canvas.height, 1.5, 1.5);
-    ctx.fillStyle = '#00f3ff'; ctx.shadowBlur = 15; ctx.shadowColor = '#00f3ff';
-    ctx.beginPath(); ctx.moveTo(player.x + player.w/2, player.y); ctx.lineTo(player.x + player.w, player.y + player.h); ctx.lineTo(player.x, player.y + player.h); ctx.closePath(); ctx.fill();
+    for (let i = 0; i < 40; i++) {
+        ctx.fillRect((i*137)%canvas.width, (i*241 + Date.now()/50)%canvas.height, 1.5, 1.5);
+    }
+
+    ctx.fillStyle = '#00f3ff';
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = '#00f3ff';
+    ctx.beginPath();
+    ctx.moveTo(player.x + player.w/2, player.y);
+    ctx.lineTo(player.x + player.w, player.y + player.h);
+    ctx.lineTo(player.x, player.y + player.h);
+    ctx.closePath();
+    ctx.fill();
     ctx.shadowBlur = 0;
-    bullets.forEach(b => { ctx.fillStyle = '#0ff'; ctx.fillRect(b.x, b.y, 4, 12); });
-    enemies.forEach(e => { ctx.fillStyle = '#ff0055'; ctx.shadowBlur = 10; ctx.shadowColor = '#ff0055'; ctx.fillRect(e.x, e.y, e.w, e.h); ctx.shadowBlur = 0; });
+
+    ctx.fillStyle = '#0ff';
+    bullets.forEach(b => ctx.fillRect(b.x, b.y, 4, 12));
+
+    ctx.fillStyle = '#ff0055';
+    enemies.forEach(e => ctx.fillRect(e.x, e.y, e.w, e.h));
 }
 
 let pacman, ghosts, dots, mazeData;
@@ -1673,66 +2238,229 @@ function initPacman() {
         { x: 5, y: 5, color: '#bc13fe' }, { x: 15, y: 10, color: '#00ff88' }
     ];
     dots = [];
-    for (let y = 0; y < mazeData.length; y++) for (let x = 0; x < mazeData[y].length; x++) if (mazeData[y][x] === '.') dots.push({ x, y });
+    for (let y = 0; y < mazeData.length; y++) {
+        for (let x = 0; x < mazeData[y].length; x++) {
+            if (mazeData[y][x] === '.') dots.push({ x, y });
+        }
+    }
 }
+
 function startPacman() {
     if (gameInterval) clearInterval(gameInterval);
     gameInterval = setInterval(() => {
         pacman.mouthOpen = (pacman.mouthOpen + 1) % 4;
+
         if (input.left) pacman.nextDir = { x: -1, y: 0 };
         if (input.right) pacman.nextDir = { x: 1, y: 0 };
         if (input.up) pacman.nextDir = { x: 0, y: -1 };
         if (input.down) pacman.nextDir = { x: 0, y: 1 };
 
-        let newX = pacman.x + pacman.nextDir.x, newY = pacman.y + pacman.nextDir.y;
-        if (mazeData[newY] && mazeData[newY][newX] !== '#') pacman.dir = pacman.nextDir;
-        newX = pacman.x + pacman.dir.x; newY = pacman.y + pacman.dir.y;
-        if (mazeData[newY] && mazeData[newY][newX] !== '#') { pacman.x = newX; pacman.y = newY; }
+        let newX = pacman.x + pacman.nextDir.x;
+        let newY = pacman.y + pacman.nextDir.y;
+
+        if (mazeData[newY] && mazeData[newY][newX] !== '#') {
+            pacman.dir = pacman.nextDir;
+        }
+
+        newX = pacman.x + pacman.dir.x;
+        newY = pacman.y + pacman.dir.y;
+
+        if (mazeData[newY] && mazeData[newY][newX] !== '#') {
+            pacman.x = newX;
+            pacman.y = newY;
+        }
 
         for (let i = dots.length - 1; i >= 0; i--) {
             if (dots[i].x === pacman.x && dots[i].y === pacman.y) {
-                dots.splice(i, 1); gameScore += 10; userData.xp += 5;
+                dots.splice(i, 1);
+                gameScore += 10;
+                userData.xp += 5;
             }
         }
 
         ghosts.forEach(ghost => {
             const dirs = [{ x: 0, y: -1 }, { x: 0, y: 1 }, { x: -1, y: 0 }, { x: 1, y: 0 }];
-            const validDirs = dirs.filter(d => { let nx = ghost.x + d.x, ny = ghost.y + d.y; return mazeData[ny] && mazeData[ny][nx] !== '#'; });
-            if (validDirs.length > 0) { const dir = validDirs[Math.floor(Math.random() * validDirs.length)]; ghost.x += dir.x; ghost.y += dir.y; }
+            const validDirs = dirs.filter(d => {
+                let nx = ghost.x + d.x;
+                let ny = ghost.y + d.y;
+                return mazeData[ny] && mazeData[ny][nx] !== '#';
+            });
+
+            if (validDirs.length > 0) {
+                const dir = validDirs[Math.floor(Math.random() * validDirs.length)];
+                ghost.x += dir.x;
+                ghost.y += dir.y;
+            }
+
             if (ghost.x === pacman.x && ghost.y === pacman.y) {
                 showNotification('💀 Тебя поймали! Счёт: ' + gameScore);
-                clearInterval(gameInterval); saveData();
+                clearInterval(gameInterval);
+                saveUserData();
             }
         });
+
         drawPacman();
         updateStats();
-        document.getElementById('gameInfo').textContent = `Счёт: ${gameScore} | Осталось точек: ${dots.length}`;
+        document.getElementById('gameInfo').textContent = `Счёт: ${gameScore} | Точек: ${dots.length}`;
     }, 150);
 }
+
 function drawPacman() {
     const cellSize = Math.floor(canvas.width / 20);
     const offsetX = (canvas.width - (mazeData[0].length * cellSize)) / 2;
     const offsetY = (canvas.height - (mazeData.length * cellSize)) / 2;
 
-    ctx.fillStyle = '#050714'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#050714';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
     ctx.fillStyle = '#00f3ff';
-    for (let y = 0; y < mazeData.length; y++) for (let x = 0; x < mazeData[y].length; x++) if (mazeData[y][x] === '#') ctx.fillRect(x * cellSize + offsetX, y * cellSize + offsetY, cellSize - 2, cellSize - 2);
+    for (let y = 0; y < mazeData.length; y++) {
+        for (let x = 0; x < mazeData[y].length; x++) {
+            if (mazeData[y][x] === '#') {
+                ctx.fillRect(x * cellSize + offsetX, y * cellSize + offsetY, cellSize - 2, cellSize - 2);
+            }
+        }
+    }
 
     ctx.fillStyle = '#ffd700';
-    dots.forEach(dot => { ctx.beginPath(); ctx.arc(dot.x * cellSize + cellSize/2 + offsetX, dot.y * cellSize + cellSize/2 + offsetY, 3, 0, Math.PI * 2); ctx.fill(); });
+    dots.forEach(dot => {
+        ctx.beginPath();
+        ctx.arc(dot.x * cellSize + cellSize/2 + offsetX, dot.y * cellSize + cellSize/2 + offsetY, 3, 0, Math.PI * 2);
+        ctx.fill();
+    });
 
-    ctx.fillStyle = '#ffff00'; ctx.shadowBlur = 10; ctx.shadowColor = '#ffff00';
-    const pacX = pacman.x * cellSize + cellSize/2 + offsetX, pacY = pacman.y * cellSize + cellSize/2 + offsetY;
-    ctx.beginPath(); ctx.arc(pacX, pacY, cellSize/2 - 4, 0.15 * Math.PI, 1.85 * Math.PI); ctx.lineTo(pacX, pacY); ctx.fill();
+    ctx.fillStyle = '#ffff00';
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#ffff00';
+    const pacX = pacman.x * cellSize + cellSize/2 + offsetX;
+    const pacY = pacman.y * cellSize + cellSize/2 + offsetY;
+    ctx.beginPath();
+    ctx.arc(pacX, pacY, cellSize/2 - 4, 0.15 * Math.PI, 1.85 * Math.PI);
+    ctx.lineTo(pacX, pacY);
+    ctx.fill();
     ctx.shadowBlur = 0;
 
-    ghosts.forEach(ghost => { ctx.fillStyle = ghost.color; ctx.shadowBlur = 8; ctx.shadowColor = ghost.color; ctx.fillRect(ghost.x * cellSize + offsetX + 2, ghost.y * cellSize + offsetY + 2, cellSize - 4, cellSize - 4); ctx.shadowBlur = 0; });
+    ghosts.forEach(ghost => {
+        ctx.fillStyle = ghost.color;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = ghost.color;
+        ctx.fillRect(ghost.x * cellSize + offsetX + 2, ghost.y * cellSize + offsetY + 2, cellSize - 4, cellSize - 4);
+        ctx.shadowBlur = 0;
+    });
+}
+
+let invaderPlayer, invaderBullets, invaderDirection;
+function initInvaders() {
+    invaderPlayer = { x: canvas.width/2, y: canvas.height - 40, w: 30, h: 20 };
+    bullets = [];
+    invaderBullets = [];
+    invaderDirection = 1;
+    enemies = [];
+    for (let row = 0; row < 4; row++) {
+        for (let col = 0; col < 8; col++) {
+            enemies.push({ x: 50 + col * 60, y: 50 + row * 40, w: 30, h: 25 });
+        }
+    }
+}
+
+function startInvaders() {
+    if (gameInterval) clearInterval(gameInterval);
+    gameInterval = setInterval(() => {
+        if (input.left) invaderPlayer.x -= 5;
+        if (input.right) invaderPlayer.x += 5;
+        invaderPlayer.x = Math.max(0, Math.min(canvas.width - invaderPlayer.w, invaderPlayer.x));
+
+        if (input.fire && Math.random() < 0.1) {
+            bullets.push({ x: invaderPlayer.x + invaderPlayer.w/2, y: invaderPlayer.y });
+        }
+
+        let hitEdge = false;
+        enemies.forEach(e => {
+            e.x += invaderDirection * 1;
+            if (e.x <= 10 || e.x >= canvas.width - 40) hitEdge = true;
+        });
+
+        if (hitEdge) {
+            invaderDirection *= -1;
+            enemies.forEach(e => e.y += 20);
+        }
+
+        if (Math.random() < 0.02 && enemies.length > 0) {
+            const shooter = enemies[Math.floor(Math.random() * enemies.length)];
+            invaderBullets.push({ x: shooter.x + shooter.w/2, y: shooter.y + shooter.h });
+        }
+
+        bullets = bullets.filter(b => {
+            b.y -= 8;
+            return b.y > 0;
+        });
+
+        invaderBullets = invaderBullets.filter(b => {
+            b.y += 4;
+            if (b.y > canvas.height) return false;
+            if (Math.abs(b.x - invaderPlayer.x) < 20 && Math.abs(b.y - invaderPlayer.y) < 20) {
+                showNotification('💥 Тебя подбили! Счёт: ' + gameScore);
+                clearInterval(gameInterval);
+                return false;
+            }
+            return true;
+        });
+
+        bullets.forEach((b, bi) => {
+            enemies.forEach((e, ei) => {
+                if (b.x > e.x && b.x < e.x + e.w && b.y > e.y && b.y < e.y + e.h) {
+                    enemies.splice(ei, 1);
+                    bullets.splice(bi, 1);
+                    gameScore += 10;
+                    userData.xp += 2;
+                }
+            });
+        });
+
+        if (enemies.length === 0) {
+            showNotification(' Победа! Все пришельцы уничтожены! Счёт: ' + gameScore);
+            clearInterval(gameInterval);
+        }
+
+        drawInvaders();
+        updateStats();
+        document.getElementById('gameInfo').textContent = `Счёт: ${gameScore} | Врагов: ${enemies.length}`;
+    }, 16);
+}
+
+function drawInvaders() {
+    ctx.fillStyle = '#050714';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = '#fff';
+    for (let i = 0; i < 30; i++) {
+        ctx.fillRect((i*137)%canvas.width, (i*241)%canvas.height, 1.5, 1.5);
+    }
+
+    ctx.fillStyle = '#00f3ff';
+    ctx.fillRect(invaderPlayer.x, invaderPlayer.y, invaderPlayer.w, invaderPlayer.h);
+
+    ctx.fillStyle = '#0ff';
+    bullets.forEach(b => ctx.fillRect(b.x - 2, b.y, 4, 10));
+
+    ctx.fillStyle = '#ff0055';
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#ff0055';
+    enemies.forEach(e => ctx.fillRect(e.x, e.y, e.w, e.h));
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = '#ff5500';
+    invaderBullets.forEach(b => ctx.fillRect(b.x - 2, b.y, 4, 10));
 }
 
 let snake, dir, nextDir, food;
 function initSnake() {
-    snake = [{ x: 15, y: 10 }]; dir = { x: 1, y: 0 }; nextDir = { x: 1, y: 0 }; food = { x: 20, y: 10 };
+    snake = [{ x: 15, y: 10 }];
+    dir = { x: 1, y: 0 };
+    nextDir = { x: 1, y: 0 };
+    food = { x: 20, y: 10 };
 }
+
 function startSnake() {
     if (gameInterval) clearInterval(gameInterval);
     gameInterval = setInterval(() => {
@@ -1740,28 +2468,60 @@ function startSnake() {
         else if (input.right && dir.x !== -1) nextDir = { x: 1, y: 0 };
         else if (input.up && dir.y !== 1) nextDir = { x: 0, y: -1 };
         else if (input.down && dir.y !== -1) nextDir = { x: 0, y: 1 };
+
         dir = nextDir;
         const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
-        const cols = Math.floor(canvas.width / 20), rows = Math.floor(canvas.height / 20);
-        if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows || snake.some(s => s.x === head.x && s.y === head.y)) {
-            clearInterval(gameInterval); showNotification('💥 Game Over! Счёт: ' + gameScore); return;
+        const cols = Math.floor(canvas.width / 20);
+        const rows = Math.floor(canvas.height / 20);
+
+        if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows) {
+            clearInterval(gameInterval);
+            showNotification('💥 Game Over! Счёт: ' + gameScore);
+            return;
         }
+
+        if (snake.some(s => s.x === head.x && s.y === head.y)) {
+            clearInterval(gameInterval);
+            showNotification('💥 Game Over! Счёт: ' + gameScore);
+            return;
+        }
+
         snake.unshift(head);
+
         if (head.x === food.x && head.y === food.y) {
-            gameScore += 15; userData.xp += 10;
-            food = { x: Math.floor(Math.random() * (cols-2)) + 1, y: Math.floor(Math.random() * (rows-2)) + 1 };
-        } else snake.pop();
+            gameScore += 15;
+            userData.xp += 10;
+            food = {
+                x: Math.floor(Math.random() * (cols-2)) + 1,
+                y: Math.floor(Math.random() * (rows-2)) + 1
+            };
+        } else {
+            snake.pop();
+        }
+
         drawSnake();
         updateStats();
         document.getElementById('gameInfo').textContent = `Счёт: ${gameScore} | Длина: ${snake.length}`;
     }, 120);
 }
+
 function drawSnake() {
     const cellSize = 20;
-    ctx.fillStyle = '#050714'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-    snake.forEach((s, i) => { ctx.fillStyle = i === 0 ? '#fff' : '#00f3ff'; ctx.shadowBlur = i===0 ? 10 : 0; ctx.shadowColor = '#00f3ff'; ctx.fillRect(s.x * cellSize + 1, s.y * cellSize + 1, cellSize - 2, cellSize - 2); });
+    ctx.fillStyle = '#050714';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    snake.forEach((s, i) => {
+        ctx.fillStyle = i === 0 ? '#fff' : '#00f3ff';
+        ctx.shadowBlur = i===0 ? 10 : 0;
+        ctx.shadowColor = '#00f3ff';
+        ctx.fillRect(s.x * cellSize + 1, s.y * cellSize + 1, cellSize - 2, cellSize - 2);
+    });
     ctx.shadowBlur = 0;
-    ctx.fillStyle = '#ffd700'; ctx.beginPath(); ctx.arc(food.x * cellSize + cellSize/2, food.y * cellSize + cellSize/2, cellSize/2 - 2, 0, Math.PI * 2); ctx.fill();
+
+    ctx.fillStyle = '#ffd700';
+    ctx.beginPath();
+    ctx.arc(food.x * cellSize + cellSize/2, food.y * cellSize + cellSize/2, cellSize/2 - 2, 0, Math.PI * 2);
+    ctx.fill();
 }
 
 // === КВЕСТЫ ===
@@ -1791,11 +2551,18 @@ function renderMaze() {
         for (let x = 0; x < 10; x++) {
             const cell = document.createElement('div');
             cell.className = 'maze-cell';
-            if (maze[y][x] === 1) { cell.classList.add('wall'); cell.textContent = '🌑'; }
-            else if (playerPos.x === x && playerPos.y === y) { cell.classList.add('player'); cell.textContent = '🚀'; }
-            else {
+            if (maze[y][x] === 1) {
+                cell.classList.add('wall');
+                cell.textContent = '🌑';
+            } else if (playerPos.x === x && playerPos.y === y) {
+                cell.classList.add('player');
+                cell.textContent = '🚀';
+            } else {
                 const star = stars.find(s => s.x === x && s.y === y && !s.collected);
-                if (star) { cell.classList.add('star'); cell.textContent = '⭐'; }
+                if (star) {
+                    cell.classList.add('star');
+                    cell.textContent = '⭐';
+                }
             }
             grid.appendChild(cell);
         }
@@ -1804,9 +2571,11 @@ function renderMaze() {
 
 function movePlayer(dx, dy) {
     if (mazeCompleted || quests.quest3.completed) return;
-    const newX = playerPos.x + dx, newY = playerPos.y + dy;
+    const newX = playerPos.x + dx;
+    const newY = playerPos.y + dy;
     if (newX >= 0 && newX < 10 && newY >= 0 && newY < 10 && maze[newY][newX] === 0) {
-        playerPos.x = newX; playerPos.y = newY;
+        playerPos.x = newX;
+        playerPos.y = newY;
         stars.forEach(star => {
             if (!star.collected && star.x === newX && star.y === newY) {
                 star.collected = true;
@@ -1814,7 +2583,7 @@ function movePlayer(dx, dy) {
                 userData.xp += 20;
                 showNotification('⭐ +20 XP');
                 updateMazeStats();
-                saveData();
+                saveUserData();
                 updateStats();
             }
         });
@@ -1822,7 +2591,7 @@ function movePlayer(dx, dy) {
             mazeCompleted = true;
             userData.xp += 100;
             showNotification('🎉 Лабиринт пройден! +100 XP');
-            saveData();
+            saveUserData();
             updateStats();
         }
         renderMaze();
@@ -1830,7 +2599,8 @@ function movePlayer(dx, dy) {
 }
 
 function updateMazeStats() {
-    const sc = document.getElementById('starsCollected'), ts = document.getElementById('totalStars');
+    const sc = document.getElementById('starsCollected');
+    const ts = document.getElementById('totalStars');
     if (sc) sc.textContent = userData.mazeStars;
     if (ts) ts.textContent = stars.length;
 }
@@ -1868,6 +2638,8 @@ function renderQuestPattern() {
 
 function showPattern() {
     if (quests.quest3.completed) return;
+    if (!checkQuestAccess('quest3')) return;
+
     questShowingPattern = true;
     userPattern = [];
     questStepIndex = 0;
@@ -1904,12 +2676,13 @@ function handleQuestStepClick(index, element) {
         questStepIndex++;
 
         if (questStepIndex >= 8) {
-            document.getElementById('questStatus').textContent = '🎉 Отлично! Ты повторил бит!';
+            document.getElementById('questStatus').textContent = ' Отлично! Ты повторил бит!';
             userData.xp += 300;
             userData.coins += 100;
             quests.quest3.current = 1;
             quests.quest3.completed = true;
-            saveData();
+            userData.questsCompleted++;
+            saveUserData();
             updateStats();
             updateQuests();
             showNotification('🏆 Квест выполнен! +300 XP');
@@ -1933,12 +2706,14 @@ function resetRepeatQuest() {
 }
 
 function updateQuests() {
-    const q1 = quests.quest1, p1 = document.getElementById('quest1Progress');
+    const q1 = quests.quest1;
+    const p1 = document.getElementById('quest1Progress');
     if (p1) p1.style.width = Math.min(100, (q1.current / q1.target) * 100) + '%';
     const el1 = document.getElementById('quest1');
     if (el1 && q1.completed) el1.classList.add('completed');
 
-    const q3 = quests.quest3, p3 = document.getElementById('quest3Progress');
+    const q3 = quests.quest3;
+    const p3 = document.getElementById('quest3Progress');
     if (p3) p3.style.width = Math.min(100, (q3.current / q3.target) * 100) + '%';
     const el3 = document.getElementById('quest3');
     if (el3 && q3.completed) el3.classList.add('completed');
@@ -1948,7 +2723,7 @@ function completeQuest(questId) {
     if (!quests[questId].completed) {
         quests[questId].completed = true;
         userData.xp += quests[questId].reward;
-        saveData();
+        saveUserData();
         updateStats();
         updateQuests();
         showNotification('🎉 +' + quests[questId].reward + ' XP');
@@ -1959,16 +2734,17 @@ function updateQuest(questId, amount) {
     if (!quests[questId].completed) {
         quests[questId].current += amount;
         if (quests[questId].current >= quests[questId].target) completeQuest(questId);
-        saveData();
+        saveUserData();
         updateQuests();
     }
 }
 
-function showNotification(text) {
+function showNotification(text, type = '') {
     const div = document.getElementById('notification');
     div.textContent = text;
-    div.classList.add('show');
-    setTimeout(() => div.classList.remove('show'), 2500);
+    div.className = 'notification show';
+    if (type) div.classList.add(type);
+    setTimeout(() => div.classList.remove('show'), 3000);
 }
 </script>
 </body>
