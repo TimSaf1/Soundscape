@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Soundscape | Музыкальная Вселенная</title>
     <style>
         :root {
@@ -17,10 +17,11 @@
             --danger: #ff0055;
             --success: #00ff88;
             --purple: #bc13fe;
+            --gradient-1: linear-gradient(135deg, #00f3ff, #bc13fe);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
         html, body {
             background: radial-gradient(ellipse at top, #1a1f3a 0%, #0a0e27 40%, #050714 100%);
             color: var(--text);
@@ -29,20 +30,73 @@
             overflow-x: hidden;
         }
 
-        /* === КОСМИЧЕСКИЙ ФОН (Только при классе .space-bg-active) === */
+        /* === AUTH OVERLAY === */
+        .auth-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 7, 20, 0.98);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+        .auth-box {
+            background: linear-gradient(135deg, rgba(17, 21, 48, 0.95), rgba(26, 31, 58, 0.95));
+            border: 2px solid var(--accent);
+            border-radius: 24px;
+            padding: 40px;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(0, 243, 255, 0.3);
+        }
+        .auth-box h2 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .auth-box p { color: var(--text-muted); margin-bottom: 30px; }
+        .auth-input {
+            width: 100%;
+            padding: 14px 18px;
+            margin: 10px 0;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(0, 243, 255, 0.3);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .auth-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+            outline: none;
+        }
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            margin-top: 20px;
+            background: var(--gradient-1);
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0, 243, 255, 0.4); }
+
+        /* === КОСМИЧЕСКИЙ ФОН === */
         #spaceCanvas {
             position: fixed;
             inset: 0;
             z-index: 0;
             pointer-events: none;
-            display: none; /* Скрыт по умолчанию */
         }
-
-        body.space-bg-active #spaceCanvas {
-            display: block;
-        }
-
-        /* Туманности (статичные, без анимации) */
         body.space-bg-active::before,
         body.space-bg-active::after {
             content: '';
@@ -52,7 +106,6 @@
             opacity: 0.2;
             z-index: 0;
             pointer-events: none;
-            /* Анимация удалена для неподвижности */
         }
         body.space-bg-active::before {
             width: 600px; height: 600px;
@@ -67,8 +120,8 @@
 
         @keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 20px rgba(0, 243, 255, 0.4), 0 0 40px rgba(188, 19, 254, 0.2); }
-            50% { box-shadow: 0 0 40px rgba(0, 243, 255, 0.7), 0 0 80px rgba(188, 19, 254, 0.4); }
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 243, 255, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(188, 19, 254, 0.6); }
         }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes shimmer { to { background-position: 200% center; } }
@@ -78,11 +131,10 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(10, 14, 39, 0.85);
-            padding: 15px 30px;
-            border-bottom: 1px solid rgba(0, 243, 255, 0.3);
+            background: rgba(10, 14, 39, 0.9);
+            padding: 15px 20px;
+            border-bottom: 2px solid rgba(0, 243, 255, 0.3);
             backdrop-filter: blur(15px);
-            animation: slideIn 0.6s;
         }
         .header-inner {
             display: flex;
@@ -91,12 +143,11 @@
             max-width: 1400px;
             margin: 0 auto;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 10px;
         }
         .logo {
             font-size: 24px;
             font-weight: 800;
-            letter-spacing: 1.5px;
             background: linear-gradient(90deg, var(--accent), var(--purple), #fff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -104,53 +155,47 @@
             align-items: center;
             gap: 10px;
         }
-        .logo-icon {
-            font-size: 28px;
-            animation: rotate 10s linear infinite;
-            -webkit-text-fill-color: initial;
-        }
-        
-        .stats { display: flex; gap: 12px; flex-wrap: wrap; }
+        .stats { display: flex; gap: 8px; flex-wrap: wrap; }
         .stat-chip {
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
-            padding: 6px 14px;
+            padding: 6px 12px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 12px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
         .stat-chip b { color: #ffd700; }
 
-        .nav { 
-            display: flex; 
-            justify-content: center; 
-            gap: 10px; 
-            margin-top: 15px; 
-            flex-wrap: wrap; 
-            max-width: 1400px;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 0 30px;
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+            overflow-x: auto;
+            scrollbar-width: none;
         }
+        .nav::-webkit-scrollbar { display: none; }
         .nav-btn {
-            padding: 10px 20px;
+            padding: 8px 16px;
             border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
+            border-radius: 20px;
             background: rgba(255,255,255,0.05);
             color: var(--text);
             cursor: pointer;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             transition: all 0.3s;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
+            white-space: nowrap;
         }
         .nav-btn:hover { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); transform: translateY(-2px); }
-        .nav-btn.active { background: linear-gradient(90deg, var(--accent), var(--purple)); color: #000; border-color: transparent; }
+        .nav-btn.active { background: var(--gradient-1); color: #000; border-color: transparent; }
 
         /* === MAIN CONTENT === */
         .page-wrapper {
@@ -158,19 +203,17 @@
             z-index: 5;
             max-width: 1400px;
             margin: 0 auto;
-            padding: 40px 30px 150px;
+            padding: 30px 20px 150px;
         }
 
         .hero-section {
             text-align: center;
-            padding: 60px 20px;
-            animation: slideIn 0.8s;
+            padding: 50px 20px;
         }
         .hero-title {
-            font-size: 56px;
+            font-size: 48px;
             font-weight: 900;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             background: linear-gradient(90deg, var(--accent), #fff, var(--purple));
             background-size: 200% auto;
             -webkit-background-clip: text;
@@ -178,85 +221,264 @@
             animation: shimmer 4s linear infinite;
         }
         .hero-subtitle {
-            font-size: 18px;
+            font-size: 16px;
             color: var(--text-muted);
-            max-width: 700px;
-            margin: 0 auto 40px;
+            max-width: 600px;
+            margin: 0 auto 30px;
             line-height: 1.6;
         }
         .hero-buttons {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
             flex-wrap: wrap;
         }
         .hero-btn {
-            padding: 16px 32px;
+            padding: 14px 28px;
             border-radius: 12px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
             text-decoration: none;
             transition: all 0.3s;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            border: none;
         }
         .hero-btn-primary {
-            background: linear-gradient(90deg, var(--accent), var(--purple));
+            background: var(--gradient-1);
             color: #000;
-            border: none;
             animation: pulseGlow 3s infinite;
         }
         .hero-btn-primary:hover { transform: translateY(-3px) scale(1.05); }
         .hero-btn-secondary {
             background: rgba(255,255,255,0.05);
             color: var(--text);
-            border: 1px solid var(--accent);
+            border: 2px solid var(--accent);
         }
         .hero-btn-secondary:hover { background: var(--accent-dim); transform: translateY(-3px); }
 
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 60px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 40px;
         }
         .feature-card {
             background: linear-gradient(135deg, rgba(17, 21, 48, 0.8), rgba(26, 31, 58, 0.6));
             border: 1px solid rgba(0, 243, 255, 0.2);
             border-radius: 16px;
-            padding: 30px;
+            padding: 25px;
             text-align: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s;
             cursor: pointer;
         }
         .feature-card:hover {
-            transform: translateY(-8px);
+            transform: translateY(-5px);
             border-color: var(--accent);
-            box-shadow: 0 20px 40px rgba(0, 243, 255, 0.15);
+            box-shadow: 0 15px 30px rgba(0, 243, 255, 0.1);
         }
-        .feature-icon { font-size: 48px; margin-bottom: 15px; display: block; }
-        .feature-title { font-size: 20px; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
-        .feature-desc { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
+        .feature-icon { font-size: 40px; margin-bottom: 12px; display: block; }
+        .feature-title { font-size: 18px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+        .feature-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
 
         .section { display: none; animation: slideIn 0.4s; }
         .section.active { display: block; }
-        
         .section-title {
             text-align: center;
-            font-size: 36px;
+            font-size: 32px;
             font-weight: 800;
-            margin-bottom: 30px;
-            color: var(--text);
+            margin-bottom: 25px;
         }
 
-        .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        /* === BEAT COMPOSER PRO (DAW) === */
+        .daw-container {
+            background: var(--bg-panel);
+            border: 2px solid rgba(0, 243, 255, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .daw-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(0, 243, 255, 0.3);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .daw-title {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #00f3ff, #bc13fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+        .daw-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .daw-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+        }
+        .daw-btn-play { background: linear-gradient(135deg, #00f3ff, #0099ff); color: #000; }
+        .daw-btn-reset { background: linear-gradient(135deg, #ff0055, #ff5500); color: #fff; }
+        .daw-btn-export { background: linear-gradient(135deg, #00ff88, #00cc66); color: #000; }
+        .daw-btn-save { background: linear-gradient(135deg, #ffaa00, #ff8800); color: #000; }
+        .daw-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+
+        .daw-settings {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+        }
+        .daw-setting {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .daw-setting label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .daw-setting input, .daw-setting select {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 8px;
+            padding: 6px 12px;
+            color: #fff;
+            font-size: 13px;
+        }
+        .daw-setting input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .daw-main {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 20px;
+        }
+        .daw-sidebar {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 15px;
+        }
+        .daw-sidebar h3 {
+            font-size: 14px;
+            color: var(--accent);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .daw-sounds-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .daw-sound-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .daw-sound-item:hover {
+            border-color: var(--accent);
+            background: rgba(0, 243, 255, 0.1);
+            transform: translateX(5px);
+        }
+        .daw-sound-item .icon { font-size: 20px; }
+        .daw-sound-item .name { font-size: 12px; font-weight: 600; }
+
+        .daw-timeline-container {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .daw-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-height: 400px;
+            overflow-x: auto;
+            overflow-y: auto;
+        }
+        .daw-track {
+            display: flex;
+            align-items: stretch;
+            min-width: 800px;
+        }
+        .daw-track-header {
+            min-width: 100px;
+            background: rgba(0, 243, 255, 0.1);
+            border-right: 1px solid rgba(0, 243, 255, 0.3);
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent);
+        }
+        .daw-track-cells {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(32, 1fr);
+            gap: 1px;
+        }
+        .daw-cell {
+            aspect-ratio: 1;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .daw-cell:hover {
+            background: rgba(0, 243, 255, 0.2);
+            border-color: var(--accent);
+        }
+        .daw-cell.active {
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+
+        /* === GAMES === */
+        .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
         .game-card {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(0,243,255,0.2);
             border-radius: 16px;
-            padding: 30px;
+            padding: 25px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
@@ -267,204 +489,271 @@
             box-shadow: 0 10px 30px rgba(0,243,255,0.15);
             background: rgba(0, 243, 255, 0.05);
         }
-        .game-icon { font-size: 50px; margin-bottom: 15px; display: block; }
-        .game-title { font-size: 20px; font-weight: bold; margin: 10px 0; color: var(--accent); }
-        .game-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 15px; }
-        .xp-btn { 
-            background: linear-gradient(90deg, #ffd700, #ff8c00); 
-            color: #000; border: none; padding: 8px 20px; 
-            border-radius: 20px; font-weight: bold; cursor: pointer; 
-            font-size: 13px;
+        .game-icon { font-size: 50px; margin-bottom: 12px; display: block; }
+        .game-title { font-size: 18px; font-weight: bold; margin: 8px 0; color: var(--accent); }
+        .game-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+        .xp-btn {
+            background: linear-gradient(90deg, #ffd700, #ff8c00);
+            color: #000; border: none; padding: 7px 18px;
+            border-radius: 20px; font-weight: bold; cursor: pointer;
+            font-size: 12px;
         }
 
-        .game-container { 
-            background: rgba(0,0,0,0.6); 
-            border: 1px solid var(--accent); 
-            border-radius: 16px; 
-            padding: 20px; 
-            margin-top: 30px; 
-            display: none; 
-            backdrop-filter: blur(10px);
+        .game-container {
+            background: rgba(0,0,0,0.7);
+            border: 2px solid var(--accent);
+            border-radius: 16px;
+            padding: 15px;
+            margin-top: 25px;
+            display: none;
+            position: relative;
         }
-        canvas.game-canvas { 
-            width: 100%; max-width: 800px; height: 500px; 
-            margin: 20px auto; display: block; 
-            background: #000; border-radius: 12px; 
-            border: 2px solid var(--accent); 
+        canvas.game-canvas {
+            width: 100%; max-width: 800px; height: auto; aspect-ratio: 4/3;
+            margin: 15px auto; display: block;
+            background: #000; border-radius: 12px;
+            border: 2px solid var(--accent);
+            touch-action: none;
         }
+
+        /* МОБИЛЬНОЕ УПРАВЛЕНИЕ */
+        .mobile-controls {
+            display: none;
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            justify-content: space-between;
+            padding: 0 20px;
+            pointer-events: none;
+        }
+        .d-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 55px);
+            grid-template-rows: repeat(2, 55px);
+            gap: 6px;
+            pointer-events: auto;
+        }
+        .d-btn {
+            width: 55px;
+            height: 55px;
+            background: rgba(0, 243, 255, 0.2);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            user-select: none;
+            cursor: pointer;
+        }
+        .d-btn:active { background: var(--accent); color: #000; }
+        .d-btn.up { grid-column: 2; grid-row: 1; }
+        .d-btn.left { grid-column: 1; grid-row: 2; }
+        .d-btn.down { grid-column: 2; grid-row: 2; }
+        .d-btn.right { grid-column: 3; grid-row: 2; }
+        .action-btn {
+            width: 75px;
+            height: 75px;
+            background: rgba(255, 0, 85, 0.3);
+            border: 3px solid var(--danger);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            pointer-events: auto;
+            user-select: none;
+            cursor: pointer;
+        }
+        .action-btn:active { background: var(--danger); }
+
         .controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 15px; }
-        .btn { 
-            padding: 10px 24px; border: none; border-radius: 8px; 
-            font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.1); 
-            color: #fff; transition: all 0.2s; font-size: 14px;
+        .btn {
+            padding: 10px 20px; border: none; border-radius: 10px;
+            font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.1);
+            color: #fff; transition: all 0.2s; font-size: 13px;
         }
         .btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
-        .btn-primary { background: linear-gradient(90deg, var(--accent), var(--purple)); color: #000; }
+        .btn-primary { background: var(--gradient-1); color: #000; }
+        .btn-danger { background: rgba(255,0,85,0.2); color: var(--danger); }
 
-        .quest-section { 
-            background: rgba(255,255,255,0.03); 
-            border: 1px solid rgba(0,243,255,0.2); 
-            border-radius: 16px; padding: 25px; margin: 20px 0; 
+        /* === QUESTS === */
+        .quest-section {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(0,243,255,0.2);
+            border-radius: 16px; padding: 20px; margin: 20px 0;
         }
-        .maze-container { 
-            display: grid; grid-template-columns: repeat(10, 40px); grid-template-rows: repeat(10, 40px); 
-            gap: 4px; margin: 20px auto; width: fit-content; 
+        .maze-container {
+            display: grid; grid-template-columns: repeat(10, 35px); grid-template-rows: repeat(10, 35px);
+            gap: 3px; margin: 15px auto; width: fit-content;
         }
-        .maze-cell { 
-            width: 40px; height: 40px; background: rgba(255,255,255,0.05); 
-            border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 22px; 
+        .maze-cell {
+            width: 35px; height: 35px; background: rgba(255,255,255,0.05);
+            border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 20px;
             transition: all 0.2s;
         }
         .maze-cell.wall { background: rgba(100,100,100,0.4); border: 1px solid rgba(255,255,255,0.1); }
         .maze-cell.player { background: rgba(0,243,255,0.3); box-shadow: 0 0 15px var(--accent); }
         .maze-cell.star { background: rgba(255,215,0,0.2); }
 
-        .repeat-quest { background: rgba(0,0,0,0.3); border: 1px solid var(--purple); border-radius: 16px; padding: 25px; margin: 20px 0; }
-        .quest-pattern { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; margin: 20px auto; max-width: 600px; }
-        .pattern-step { 
-            aspect-ratio: 1; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); 
-            border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 28px; 
-            cursor: pointer; transition: all 0.3s; 
+        .repeat-quest { background: rgba(0,0,0,0.3); border: 1px solid var(--purple); border-radius: 16px; padding: 20px; margin: 20px 0; }
+        .quest-pattern { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; margin: 15px auto; max-width: 500px; }
+        .pattern-step {
+            aspect-ratio: 1; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 26px;
+            cursor: pointer; transition: all 0.3s;
         }
         .pattern-step:hover { transform: scale(1.1); border-color: var(--accent); }
-        .pattern-step.show { background: linear-gradient(135deg, var(--purple), var(--accent)); border-color: var(--accent); animation: pulse 0.5s; }
+        .pattern-step.show { background: var(--gradient-1); border-color: var(--accent); animation: pulse 0.5s; }
         .pattern-step.user-correct { background: var(--success); border-color: var(--success); }
         .pattern-step.user-wrong { background: var(--danger); border-color: var(--danger); }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
-        .quest-status { text-align: center; font-size: 16px; margin: 15px 0; min-height: 24px; color: var(--accent); font-weight: 600; }
+        .quest-status { text-align: center; font-size: 15px; margin: 15px 0; min-height: 24px; color: var(--accent); font-weight: 600; }
 
-        .quest-card { 
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(0,243,255,0.2); 
-            border-radius: 12px; padding: 20px; margin-bottom: 15px; 
+        .quest-card {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(0,243,255,0.2);
+            border-radius: 12px; padding: 15px; margin-bottom: 15px;
         }
         .quest-card.completed { border-color: var(--success); background: rgba(0,255,136,0.05); }
-        .quest-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-        .quest-icon { font-size: 32px; }
-        .quest-title { font-weight: bold; font-size: 16px; color: var(--accent); }
-        .quest-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 10px; }
-        .quest-progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin-bottom: 10px; }
-        .quest-progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--purple)); transition: width 0.5s; }
-        .quest-reward { background: linear-gradient(90deg, #ffd700, #ff8c00); color: #000; padding: 6px 14px; border-radius: 15px; font-size: 12px; font-weight: bold; display: inline-block; }
+        .quest-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .quest-icon { font-size: 30px; }
+        .quest-title { font-weight: bold; font-size: 15px; color: var(--accent); }
+        .quest-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+        .quest-progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+        .quest-progress-fill { height: 100%; background: var(--gradient-1); transition: width 0.5s; }
+        .quest-reward { background: linear-gradient(90deg, #ffd700, #ff8c00); color: #000; padding: 5px 12px; border-radius: 15px; font-size: 11px; font-weight: bold; display: inline-block; }
 
+        /* === MUSIC === */
         .music-container { max-width: 700px; margin: 0 auto; }
         .search-box-wrapper { position: relative; width: 100%; margin-bottom: 20px; }
-        #music-search-input { 
-            width: 100%; padding: 16px; border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; 
-            font-size: 16px; background: rgba(0,0,0,0.3); color: #fff; outline: none; 
+        #music-search-input {
+            width: 100%; padding: 14px; border: 2px solid rgba(255,255,255,0.2); border-radius: 12px;
+            font-size: 15px; background: rgba(0,0,0,0.4); color: #fff; outline: none;
         }
         #music-search-input:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 243, 255, 0.2); }
-        .results-list { 
-            position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-panel); 
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 0 0 12px 12px; 
-            max-height: 300px; overflow-y: auto; z-index: 1000; margin: 5px 0 0 0; padding: 0; list-style: none; 
+        .results-list {
+            position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-panel);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 0 0 12px 12px;
+            max-height: 300px; overflow-y: auto; z-index: 1000; margin: 5px 0 0 0; padding: 0; list-style: none;
         }
-        .results-list li { 
-            display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; 
-            border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.2s; 
+        .results-list li {
+            display: flex; align-items: center; justify-content: space-between; padding: 12px 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.2s;
         }
         .results-list li:hover { background: rgba(0, 243, 255, 0.1); }
         .result-info { display: flex; flex-direction: column; overflow: hidden; margin-right: 10px; flex: 1; }
         .result-title { font-weight: bold; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
         .result-artist { font-size: 12px; color: var(--text-muted); }
         .result-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-        .preview-btn { background: var(--accent); color: #000; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
-        .duration-text { font-size: 12px; color: var(--text-muted); }
-        
-        .player-card { 
-            margin-top: 20px; background: rgba(0,0,0,0.4); border: 1px solid rgba(0, 243, 255, 0.3); 
-            color: #fff; padding: 25px; border-radius: 16px; display: flex; flex-direction: column; gap: 20px; 
+        .preview-btn { background: var(--accent); color: #000; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: bold; }
+        .duration-text { font-size: 11px; color: var(--text-muted); }
+
+        .player-card {
+            margin-top: 20px; background: rgba(0,0,0,0.5); border: 2px solid rgba(0, 243, 255, 0.3);
+            color: #fff; padding: 20px; border-radius: 16px; display: flex; flex-direction: column; gap: 15px;
             backdrop-filter: blur(10px);
         }
-        .track-details { display: flex; align-items: center; gap: 20px; }
-        .track-cover { width: 70px; height: 70px; border-radius: 10px; object-fit: cover; border: 2px solid var(--accent); }
-        .progress-wrapper { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--text-muted); }
+        .track-details { display: flex; align-items: center; gap: 15px; }
+        .track-cover { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; border: 2px solid var(--accent); }
+        .progress-wrapper { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text-muted); }
         .progress-wrapper input[type="range"] { flex-grow: 1; accent-color: var(--accent); cursor: pointer; }
-        .player-controls { display: flex; justify-content: center; align-items: center; gap: 25px; }
-        .control-btn { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 20px; cursor: pointer; width: 50px; height: 50px; border-radius: 50%; transition: all 0.2s; }
+        .player-controls { display: flex; justify-content: center; align-items: center; gap: 20px; }
+        .control-btn { background: transparent; border: 2px solid rgba(255,255,255,0.2); color: white; font-size: 18px; cursor: pointer; width: 45px; height: 45px; border-radius: 50%; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
         .control-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--accent); }
         .control-btn.active { color: var(--accent); border-color: var(--accent); }
-        .main-btn { font-size: 28px; background: linear-gradient(135deg, var(--accent), var(--purple)); border: none; color: #000; width: 65px; height: 65px; }
+        .main-btn { font-size: 24px; background: var(--gradient-1); border: none; color: #000; width: 60px; height: 60px; }
         .main-btn:hover { transform: scale(1.1); }
-        .volume-wrapper { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
-        .hidden { display: none !important; }
+        .volume-wrapper { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
 
+        /* === PROFILE === */
         .profile-card {
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(0,243,255,0.2);
-            padding: 40px; border-radius: 20px; text-align: center; max-width: 500px; margin: 0 auto;
+            background: rgba(255,255,255,0.03); border: 2px solid rgba(0,243,255,0.2);
+            padding: 30px 20px; border-radius: 20px; text-align: center; max-width: 500px; margin: 0 auto;
         }
-        .profile-avatar { 
-            width: 120px; height: 120px; border-radius: 50%; 
-            background: linear-gradient(135deg, var(--accent), var(--purple)); 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 60px; margin: 0 auto 20px; 
+        .profile-avatar {
+            width: 100px; height: 100px; border-radius: 50%;
+            background: var(--gradient-1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 50px; margin: 0 auto 15px;
             box-shadow: 0 0 30px rgba(0, 243, 255, 0.3);
         }
+        .profile-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
+        .p-stat { background: rgba(255,255,255,0.05); padding: 12px 5px; border-radius: 12px; text-align: center; }
+        .p-stat-val { font-size: 20px; font-weight: bold; color: var(--accent); }
+        .p-stat-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
 
-        .notification { 
-            position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-100px); 
-            background: linear-gradient(90deg, var(--accent), var(--purple)); color: #000; 
-            padding: 14px 32px; border-radius: 30px; font-weight: 700; font-size: 15px; 
-            z-index: 10000; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-            box-shadow: 0 10px 30px rgba(0, 243, 255, 0.4); 
+        .notification {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
+            background: var(--gradient-1); color: #000;
+            padding: 12px 24px; border-radius: 25px; font-weight: 700; font-size: 14px;
+            z-index: 10000; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(0, 243, 255, 0.4);
         }
         .notification.show { transform: translateX(-50%) translateY(0); }
 
         @media (max-width: 768px) {
-            .hero-title { font-size: 36px; }
-            .header-inner { flex-direction: column; text-align: center; }
-            .nav { padding: 0 10px; }
-            .maze-container { grid-template-columns: repeat(10, 32px); grid-template-rows: repeat(10, 32px); }
-            .maze-cell { width: 32px; height: 32px; font-size: 18px; }
+            .hero-title { font-size: 32px; }
+            .daw-main { grid-template-columns: 1fr; }
+            .daw-sidebar { display: none; }
+            .maze-container { grid-template-columns: repeat(10, 30px); grid-template-rows: repeat(10, 30px); }
+            .maze-cell { width: 30px; height: 30px; font-size: 18px; }
+            .mobile-controls { display: flex !important; }
         }
     </style>
 </head>
 <body>
+
+<!-- AUTH OVERLAY -->
+<div class="auth-overlay" id="authOverlay">
+    <div class="auth-box">
+        <h2> SOUNDSCAPE</h2>
+        <p>Войди или создай аккаунт, чтобы сохранить прогресс</p>
+        <input type="text" class="auth-input" id="authUsername" placeholder="Придумай никнейм">
+        <input type="password" class="auth-input" id="authPassword" placeholder="Пароль">
+        <button class="auth-btn" onclick="registerUser()"> Начать путешествие</button>
+        <p style="margin-top: 15px; font-size: 12px;">Уже есть аккаунт? <a href="#" onclick="toggleAuthMode()" style="color: var(--accent);">Войти</a></p>
+    </div>
+</div>
 
 <canvas id="spaceCanvas"></canvas>
 <div class="notification" id="notification">Уведомление</div>
 
 <header class="header">
     <div class="header-inner">
-        <div class="logo">
-            <span class="logo-icon">🪐</span>
-            <span>SOUNDSCAPE</span>
-        </div>
+        <div class="logo">🪐 SOUNDSCAPE</div>
         <div class="stats">
             <div class="stat-chip">⭐ <b id="userXP">0</b> XP</div>
-            <div class="stat-chip">🚀 <b id="userLevel">1</b> LVL</div>
-            <div class="stat-chip">🪙 <b id="userCoins">100</b></div>
+            <div class="stat-chip">🏆 <b id="userLevel">1</b> LVL</div>
+            <div class="stat-chip"> <b id="userCoins">100</b></div>
+            <div class="stat-chip">👤 <b id="userName">Пилот</b></div>
         </div>
     </div>
     <div class="nav">
         <button class="nav-btn active" onclick="showSection('home', event)">🏠 Главная</button>
-        <button class="nav-btn" onclick="showSection('games', event)">🎮 Игры</button>
+        <button class="nav-btn" onclick="showSection('games', event)"> Игры</button>
+        <button class="nav-btn" onclick="showSection('beatmaker', event)">🎹 Студия</button>
         <button class="nav-btn" onclick="showSection('quests', event)">📜 Квесты</button>
-        <a href="beatmaker_pro_list.html" class="nav-btn">🎹 Мои биты</a>
-        <a href="beatmaker.html" class="nav-btn">🎹 AI Проверка битов</a>
-        <button class="nav-btn" onclick="showSection('music', event)">🔊 Музыка</button>
+        <button class="nav-btn" onclick="showSection('music', event)"> Музыка</button>
         <button class="nav-btn" onclick="showSection('profile', event)">👤 Профиль</button>
     </div>
 </header>
 
 <div class="page-wrapper">
-    
-    <!-- ГЛАВНОЕ МЕНЮ (HERO) -->
+
+    <!-- ГЛАВНОЕ МЕНЮ -->
     <div id="home" class="section active">
         <div class="hero-section">
             <h1 class="hero-title">SOUNDSCAPE</h1>
-            <p class="hero-subtitle">
-                Погрузись в музыкальную вселенную. Играй в аркадные миссии, проходи ритм-квесты, 
-                создавай уникальные лупы с проверкой от нейросети и стань профессиональным космическим битмейкером.
-            </p>
+            <p class="hero-subtitle">Погрузись в музыкальную вселенную. Играй в аркадные миссии, проходи ритм-квесты, создавай уникальные лупы с проверкой от нейросети и стань профессиональным космическим битмейкером.</p>
             <div class="hero-buttons">
                 <button class="hero-btn hero-btn-primary" onclick="showSection('games')">🚀 Начать миссию</button>
-                <a href="beatmaker_pro.html" class="hero-btn hero-btn-secondary">🎹 Стать битмейкером</a>
+                <button class="hero-btn hero-btn-secondary" onclick="showSection('beatmaker')">🎹 Стать битмейкером</button>
             </div>
         </div>
-
         <div class="features-grid">
             <div class="feature-card" onclick="showSection('games')">
-                <span class="feature-icon">🕹️</span>
+                <span class="feature-icon">🎮</span>
                 <div class="feature-title">Аркадные миссии</div>
                 <div class="feature-desc">Space Shooter, Pac-Man и Змейка. Зарабатывай XP за каждый высокий счёт.</div>
             </div>
@@ -473,15 +762,15 @@
                 <div class="feature-title">Ритм-квесты</div>
                 <div class="feature-desc">Проходи лабиринты и запоминай музыкальные паттерны для получения наград.</div>
             </div>
-            <div class="feature-card" onclick="window.location.href='beatmaker.html'">
-                <span class="feature-icon">🧠</span>
-                <div class="feature-title">AI Проверка битов</div>
-                <div class="feature-desc">Создавай лупы и проходи проверку нейросети на соответствие жанру планеты.</div>
-            </div>
-            <div class="feature-card" onclick="window.location.href='beatmaker_pro_list.html'">
+            <div class="feature-card" onclick="showSection('beatmaker')">
                 <span class="feature-icon">🎛️</span>
-                <div class="feature-title">Pro Studio</div>
-                <div class="feature-desc">Полноценная DAW с FX-цепочками, обрезкой, лимитером и экспортом в 320 kbps MP3.</div>
+                <div class="feature-title">Beat Studio</div>
+                <div class="feature-desc">Создавай биты с реальными звуками из iTunes превью. Экспорт в MP3.</div>
+            </div>
+            <div class="feature-card" onclick="showSection('music')">
+                <span class="feature-icon">🔊</span>
+                <div class="feature-title">Музыка</div>
+                <div class="feature-desc">Ищи и слушай треки через iTunes API. 30-секундные превью.</div>
             </div>
         </div>
     </div>
@@ -493,56 +782,121 @@
             <div class="game-card" onclick="startGame('shooter')">
                 <div class="game-icon">🚀</div>
                 <div class="game-title">Space Shooter</div>
-                <div class="game-desc">Космический шутер с астероидами и врагами!</div>
+                <div class="game-desc">Космический шутер с боссами!</div>
                 <button class="xp-btn">+100 XP за победу</button>
             </div>
             <div class="game-card" onclick="startGame('pacman')">
                 <div class="game-icon">🟡</div>
                 <div class="game-title">Звёздный Pac-Man</div>
-                <div class="game-desc">6 приведений, собирай точки в космосе!</div>
+                <div class="game-desc">6 приведений, собирай точки!</div>
                 <button class="xp-btn">+200 XP за победу</button>
             </div>
             <div class="game-card" onclick="startGame('snake')">
                 <div class="game-icon">🐍</div>
                 <div class="game-title">Звёздная змейка</div>
-                <div class="game-desc">Собирай звёзды, не врезайся в хвост</div>
+                <div class="game-desc">Собирай звёзды</div>
                 <button class="xp-btn">+15 XP за звезду</button>
             </div>
         </div>
-        
+
         <div id="activeGame" class="game-container">
-            <h3 id="gameTitle" style="text-align:center;margin-bottom:15px;color:var(--accent);"></h3>
+            <h3 id="gameTitle" style="text-align:center;margin-bottom:10px;color:var(--accent);"></h3>
             <canvas id="gameCanvas" class="game-canvas"></canvas>
+
+            <!-- МОБИЛЬНОЕ УПРАВЛЕНИЕ -->
+            <div class="mobile-controls" id="mobileControls">
+                <div class="d-pad">
+                    <div class="d-btn up" ontouchstart="input.up=true" ontouchend="input.up=false">⬆️</div>
+                    <div class="d-btn left" ontouchstart="input.left=true" ontouchend="input.left=false">⬅️</div>
+                    <div class="d-btn down" ontouchstart="input.down=true" ontouchend="input.down=false">⬇️</div>
+                    <div class="d-btn right" ontouchstart="input.right=true" ontouchend="input.right=false">➡️</div>
+                </div>
+                <div class="action-btn" ontouchstart="input.fire=true" ontouchend="input.fire=false">🔥</div>
+            </div>
+
             <div class="controls">
                 <button class="btn btn-primary" onclick="launchGame()">▶ Старт</button>
-                <button class="btn" onclick="pauseGame()">⏸ Пауза</button>
-                <button class="btn" onclick="resumeGame()">▶ Продолжить</button>
-                <button class="btn" style="background: rgba(255,0,85,0.2); color: var(--danger);" onclick="closeGame()">❌ Закрыть</button>
+                <button class="btn" onclick="pauseGame()"> Пауза</button>
+                <button class="btn btn-danger" onclick="closeGame()">❌ Закрыть</button>
             </div>
-            <div id="gameInfo" style="text-align:center;margin-top:15px;color:var(--accent); font-weight: bold;"></div>
+            <div id="gameInfo" style="text-align:center;margin-top:10px;color:var(--accent); font-weight: bold; font-size:14px;"></div>
+        </div>
+    </div>
+
+    <!-- BEAT COMPOSER PRO -->
+    <div id="beatmaker" class="section">
+        <h2 class="section-title"> Beat Composer Pro</h2>
+        <div class="daw-container">
+            <div class="daw-header">
+                <div class="daw-title">BEAT COMPOSER PRO</div>
+                <div class="daw-controls">
+                    <button class="daw-btn daw-btn-play" onclick="playBeat()">▶ Play</button>
+                    <button class="daw-btn daw-btn-reset" onclick="resetBeat()"> Reset</button>
+                    <button class="daw-btn daw-btn-export" onclick="exportBeat()"> Export MP3 (320kbps)</button>
+                    <button class="daw-btn daw-btn-save" onclick="saveBeat()">💾 Сохранить проект</button>
+                </div>
+            </div>
+
+            <div class="daw-settings">
+                <div class="daw-setting">
+                    <label>BPM:</label>
+                    <input type="number" id="dawBpm" value="120" min="60" max="200" style="width: 60px;">
+                </div>
+                <div class="daw-setting">
+                    <label>Проект:</label>
+                    <select id="dawProject">
+                        <option value="1">1 (default)</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+                </div>
+                <div class="daw-setting">
+                    <label style="display: flex; align-items: center; gap: 5px;">
+                        <input type="checkbox" checked> Суммировать звуки
+                    </label>
+                </div>
+                <div class="daw-setting" style="margin-left: auto;">
+                    <button class="btn" onclick="showSection('music')" style="background: rgba(0,243,255,0.2); color: var(--accent);">🔊 iTunes Sounds</button>
+                </div>
+            </div>
+
+            <div class="daw-main">
+                <div class="daw-sidebar">
+                    <h3>📁 SOUNDS/</h3>
+                    <div class="daw-sounds-list" id="dawSoundsList">
+                        <!-- Звуки загружаются динамически -->
+                    </div>
+                </div>
+
+                <div class="daw-timeline-container">
+                    <div class="daw-timeline" id="dawTimeline">
+                        <!-- Tracks generated by JS -->
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- КВЕСТЫ -->
     <div id="quests" class="section">
         <h2 class="section-title">📜 Активные квесты</h2>
-        
+
         <div class="quest-section">
-            <h3 style="margin-bottom:15px;color:var(--accent);">🎮 Квест 1: Лабиринт сокровищ</h3>
-            <div style="text-align:center;margin-bottom:10px; color: var(--text-muted);">Собери <b id="starsCollected" style="color:var(--accent)">0</b> из <b id="totalStars">5</b> ⭐</div>
+            <h3 style="margin-bottom:12px;color:var(--accent);">🎮 Квест 1: Лабиринт сокровищ</h3>
+            <div style="text-align:center;margin-bottom:8px; color: var(--text-muted);">Собери <b id="starsCollected" style="color:var(--accent)">0</b> из <b id="totalStars">5</b> </div>
             <div class="maze-container" id="mazeGrid"></div>
-            <div style="text-align:center;margin-top:15px;">
+            <div style="text-align:center;margin-top:10px;">
                 <button class="btn btn-primary" onclick="initMazeQuest()">🔄 Заново</button>
             </div>
         </div>
 
         <div class="quest-section">
-            <h3 style="margin-bottom:15px;color:var(--purple);">🧠 Квест 2: Повтори бит</h3>
+            <h3 style="margin-bottom:12px;color:var(--purple);">🧠 Квест 2: Повтори бит</h3>
             <div class="repeat-quest">
-                <p style="text-align:center;color:var(--text-muted);margin-bottom:15px;">Запомни последовательность и повтори её! Нажимай на клетки в правильном порядке.</p>
+                <p style="text-align:center;color:var(--text-muted);margin-bottom:12px;">Запомни последовательность и повтори её!</p>
                 <div class="quest-pattern" id="questPattern"></div>
                 <div class="quest-status" id="questStatus">Нажми "Показать паттерн" чтобы начать</div>
-                <div style="text-align:center;margin-top:15px;">
+                <div style="text-align:center;margin-top:12px;">
                     <button class="btn btn-primary" onclick="showPattern()">👁 Показать паттерн</button>
                     <button class="btn" onclick="resetRepeatQuest()">🔄 Сбросить</button>
                 </div>
@@ -574,34 +928,34 @@
         </div>
     </div>
 
-    <!-- МУЗЫКА -->
+    <!-- МУЗЫКА (ITUNES API) -->
     <div id="music" class="section">
         <h2 class="section-title">🔊 Космический плеер</h2>
         <div class="music-container">
             <div class="search-box-wrapper">
-                <input type="text" id="music-search-input" placeholder="Поиск трека или исполнителя..." autocomplete="off">
+                <input type="text" id="music-search-input" placeholder="Поиск трека или исполнителя (iTunes)..." autocomplete="off">
                 <ul id="search-results-list" class="results-list hidden"></ul>
             </div>
             <div id="player-card" class="player-card hidden">
                 <div class="track-details">
-                    <img id="player-cover" src="https://via.placeholder.com/70" alt="Cover" class="track-cover">
+                    <img id="player-cover" src="https://via.placeholder.com/60" alt="Cover" class="track-cover">
                     <div style="flex:1; overflow:hidden;">
-                        <div id="player-title" style="font-weight:700; font-size:18px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Название трека</div>
-                        <div id="player-artist" style="font-size:14px; color:var(--text-muted);">Исполнитель</div>
+                        <div id="player-title" style="font-weight:700; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Название трека</div>
+                        <div id="player-artist" style="font-size:13px; color:var(--text-muted);">Исполнитель</div>
                     </div>
                 </div>
                 <div class="progress-wrapper">
                     <span id="current-time">0:00</span>
                     <input type="range" id="progress-bar" value="0" min="0" max="100" step="0.1">
-                    <span id="total-duration">0:00</span>
+                    <span id="total-duration">0:30</span>
                 </div>
                 <div class="player-controls">
                     <button id="repeat-btn" class="control-btn" title="Зацикливание">🔁</button>
                     <button id="play-pause-btn" class="control-btn main-btn">▶</button>
                 </div>
                 <div class="volume-wrapper">
-                    <button id="mute-btn" class="control-btn" style="width:40px; height:40px; font-size:16px;">🔊</button>
-                    <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.8" style="width:100px;">
+                    <button id="mute-btn" class="control-btn" style="width:35px; height:35px; font-size:14px;">🔊</button>
+                    <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.8" style="width:80px;">
                 </div>
             </div>
         </div>
@@ -609,35 +963,137 @@
 
     <!-- ПРОФИЛЬ -->
     <div id="profile" class="section">
-        <h2 class="section-title">👤 Профиль пилота</h2>
+        <h2 class="section-title"> Профиль пилота</h2>
         <div class="profile-card">
-            <div class="profile-avatar">👨‍🚀</div>
-            <h3 id="profileName" style="font-size:28px; margin-bottom:10px;">Пилот</h3>
-            <p style="color:var(--accent); font-size:20px; margin-bottom:20px;">Уровень <span id="profileLevel">1</span></p>
-            <div style="display:flex; justify-content:center; gap:20px; flex-wrap:wrap;">
-                <div class="stat-chip" style="font-size:16px; padding:10px 20px;">⭐ <b id="profileXP">0</b> XP</div>
-                <div class="stat-chip" style="font-size:16px; padding:10px 20px;">🪙 <b id="profileCoins">100</b></div>
+            <div class="profile-avatar">👨🚀</div>
+            <h3 id="profileName" style="font-size:24px; margin-bottom:8px;">Пилот</h3>
+            <p style="color:var(--accent); font-size:18px; margin-bottom:15px;">Уровень <span id="profileLevel">1</span></p>
+            <div class="profile-stats">
+                <div class="p-stat">
+                    <div class="p-stat-val" id="profileXP">0</div>
+                    <div class="p-stat-label">Всего XP</div>
+                </div>
+                <div class="p-stat">
+                    <div class="p-stat-val" id="profileGames">0</div>
+                    <div class="p-stat-label">Игр</div>
+                </div>
+                <div class="p-stat">
+                    <div class="p-stat-val" id="profileBeats">0</div>
+                    <div class="p-stat-label">Битов</div>
+                </div>
             </div>
+            <button class="btn" style="margin-top: 25px; width: 100%; border: 2px solid var(--accent); color: var(--accent);" onclick="logout()">🚪 Выйти из аккаунта</button>
         </div>
     </div>
 
 </div>
 
 <script>
-// === ДАННЫЕ ===
-let userData = { xp: 0, coins: 100, level: 1, gamesPlayed: 0, mazeStars: 0, repeatQuestDone: false };
-let currentGame = null, gameInterval = null, gameScore = 0, canvas, ctx;
-let input = { left: false, right: false, up: false, down: false, fire: false };
+// === АУТЕНТИФИКАЦИЯ ===
+let currentUser = null;
+let userData = {
+    xp: 0, coins: 100, level: 1, gamesPlayed: 0, mazeStars: 0,
+    repeatQuestDone: false, beats: [], projects: {}
+};
+let isLoginMode = false;
 
-let quests = {
-    quest1: { current: 0, target: 1, reward: 50, completed: false },
-    quest3: { current: 0, target: 1, reward: 300, completed: false }
+window.onload = function() {
+    const saved = localStorage.getItem('soundscape_current_user');
+    if (saved) {
+        currentUser = JSON.parse(saved);
+        userData = currentUser.data || userData;
+        document.getElementById('authOverlay').style.display = 'none';
+        initApp();
+    }
 };
 
-let maze = [], playerPos = { x: 0, y: 0 }, stars = [], mazeCompleted = false;
-let questPattern = [], userPattern = [], questStepIndex = 0, questShowingPattern = false;
+function registerUser() {
+    const username = document.getElementById('authUsername').value.trim();
+    const password = document.getElementById('authPassword').value.trim();
 
-// === УПРАВЛЕНИЕ КОСМИЧЕСКИМ ФОНОМ ===
+    if (username.length < 3) {
+        showNotification('❌ Никнейм должен быть не менее 3 символов');
+        return;
+    }
+    if (password.length < 4) {
+        showNotification('❌ Пароль должен быть не менее 4 символов');
+        return;
+    }
+
+    const users = JSON.parse(localStorage.getItem('soundscape_users') || '[]');
+
+    if (isLoginMode) {
+        // Login
+        const user = users.find(u => u.username === username && u.password === password);
+        if (user) {
+            currentUser = user;
+            userData = user.data || userData;
+            localStorage.setItem('soundscape_current_user', JSON.stringify(currentUser));
+            document.getElementById('authOverlay').style.display = 'none';
+            initApp();
+            showNotification('✅ С возвращением, ' + username + '!');
+        } else {
+            showNotification('❌ Неверный логин или пароль');
+        }
+    } else {
+        // Register
+        if (users.find(u => u.username === username)) {
+            showNotification('❌ Такой пользователь уже существует');
+            return;
+        }
+
+        currentUser = {
+            username: username,
+            password: password,
+            data: userData,
+            createdAt: new Date().toISOString()
+        };
+
+        users.push(currentUser);
+        localStorage.setItem('soundscape_users', JSON.stringify(users));
+        localStorage.setItem('soundscape_current_user', JSON.stringify(currentUser));
+        document.getElementById('authOverlay').style.display = 'none';
+        initApp();
+        showNotification('🚀 Добро пожаловать, ' + username + '!');
+    }
+}
+
+function toggleAuthMode() {
+    isLoginMode = !isLoginMode;
+    const title = document.querySelector('.auth-box h2');
+    const btn = document.querySelector('.auth-btn');
+    const link = document.querySelector('.auth-box a');
+
+    if (isLoginMode) {
+        title.textContent = '🔐 Вход';
+        btn.textContent = '🚀 Войти';
+        link.textContent = 'Создать аккаунт';
+    } else {
+        title.textContent = '🪐 SOUNDSCAPE';
+        btn.textContent = '🚀 Начать путешествие';
+        link.textContent = 'Войти';
+    }
+}
+
+function logout() {
+    localStorage.removeItem('soundscape_current_user');
+    location.reload();
+}
+
+function initApp() {
+    document.getElementById('userName').textContent = currentUser.username;
+    document.getElementById('profileName').textContent = currentUser.username;
+    updateStats();
+    updateQuests();
+    initMazeQuest();
+    initRepeatQuest();
+    initDAW();
+    loadItunesSounds();
+    resizeSpaceCanvas();
+    if (document.getElementById('home').classList.contains('active')) enableSpaceBg();
+}
+
+// === КОСМИЧЕСКИЙ ФОН ===
 const spaceCanvas = document.getElementById('spaceCanvas');
 const sCtx = spaceCanvas.getContext('2d');
 let starsArr = [];
@@ -647,9 +1103,7 @@ function resizeSpaceCanvas() {
     spaceCanvas.width = window.innerWidth;
     spaceCanvas.height = window.innerHeight;
     initSpaceStars();
-    if (document.body.classList.contains('space-bg-active')) {
-        drawSpaceStars();
-    }
+    if (document.body.classList.contains('space-bg-active')) drawSpaceStars();
 }
 
 function initSpaceStars() {
@@ -667,19 +1121,16 @@ function initSpaceStars() {
     }
 }
 
-// Статичная отрисовка (без анимации для экономии ресурсов и соответствия ТЗ)
 function drawSpaceStars() {
     sCtx.clearRect(0, 0, spaceCanvas.width, spaceCanvas.height);
     starsArr.forEach(s => {
         s.alpha += s.speed;
-        const a = (Math.sin(s.alpha) + 1) / 2; // Плавное мерцание от 0 до 1
-        
+        const a = (Math.sin(s.alpha) + 1) / 2;
         sCtx.beginPath();
         sCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
         sCtx.fillStyle = s.color;
         sCtx.globalAlpha = a * 0.9;
         sCtx.fill();
-        
         if (s.r > 1.2) {
             sCtx.globalAlpha = a * 0.3;
             sCtx.arc(s.x, s.y, s.r * 3, 0, Math.PI * 2);
@@ -687,10 +1138,8 @@ function drawSpaceStars() {
         }
     });
     sCtx.globalAlpha = 1;
-    
-    // Продолжаем анимацию только если фон сейчас активен
     if (document.body.classList.contains('space-bg-active')) {
-        requestAnimationFrame(drawSpaceStars);
+        animationFrameId = requestAnimationFrame(drawSpaceStars);
     }
 }
 
@@ -699,68 +1148,43 @@ function enableSpaceBg() {
     drawSpaceStars();
 }
 
-//function disableSpaceBg() {
-//    document.body.classList.remove('space-bg-active');
-//    sCtx.clearRect(0, 0, spaceCanvas.width, spaceCanvas.height);
-//}
-
-window.onload = function() {
-    loadData();
-    updateStats();
-    updateQuests();
-    initMazeQuest();
-    initRepeatQuest();
-    
-    // Инициализация фона для стартовой страницы
-    resizeSpaceCanvas();
-    if (document.getElementById('home').classList.contains('active')) {
-        enableSpaceBg();
-    }
-};
+function disableSpaceBg() {
+    document.body.classList.remove('space-bg-active');
+    if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    sCtx.clearRect(0, 0, spaceCanvas.width, spaceCanvas.height);
+}
 
 window.addEventListener('resize', resizeSpaceCanvas);
 
-// НАВИГАЦИЯ
+// === НАВИГАЦИЯ ===
 function showSection(id, event) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    
+
     if (event) {
         let target = event.target.closest('.nav-btn');
         if(target) target.classList.add('active');
-    } else {
-        document.querySelectorAll('.nav-btn').forEach(b => {
-            if(b.getAttribute('onclick')?.includes(`'${id}'`) || (id === 'home' && b.textContent.includes('Главная'))) {
-                b.classList.add('active');
-            }
-        });
-    }
-    
-    // === ЛОГИКА ВКЛЮЧЕНИЯ/ВЫКЛЮЧЕНИЯ ФОНА ===
-    if (id === 'home' || id === 'music') {
-        enableSpaceBg();
-    } else {
-        disableSpaceBg();
     }
 
+    if (id === 'home' || id === 'music') enableSpaceBg();
+    else disableSpaceBg();
+
     if (id === 'quests') { initMazeQuest(); initRepeatQuest(); updateQuests(); }
+    if (id === 'profile') updateProfile();
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ... (остальной код игр, квестов и музыки остаётся без изменений, он полностью рабочий) ...
-
-function loadData() {
-    const saved = localStorage.getItem('soundscape_v5');
-    if (saved) {
-        const data = JSON.parse(saved);
-        userData = data.userData || userData;
-        quests = data.quests || quests;
-    }
-}
-
 function saveData() {
-    localStorage.setItem('soundscape_v5', JSON.stringify({ userData, quests }));
+    if (!currentUser) return;
+    currentUser.data = userData;
+    const users = JSON.parse(localStorage.getItem('soundscape_users') || '[]');
+    const idx = users.findIndex(u => u.username === currentUser.username);
+    if (idx !== -1) {
+        users[idx] = currentUser;
+        localStorage.setItem('soundscape_users', JSON.stringify(users));
+    }
+    localStorage.setItem('soundscape_current_user', JSON.stringify(currentUser));
 }
 
 function updateStats() {
@@ -768,10 +1192,395 @@ function updateStats() {
     document.getElementById('userXP').textContent = userData.xp;
     document.getElementById('userLevel').textContent = userData.level;
     document.getElementById('userCoins').textContent = userData.coins;
+}
+
+function updateProfile() {
     document.getElementById('profileLevel').textContent = userData.level;
     document.getElementById('profileXP').textContent = userData.xp;
-    document.getElementById('profileCoins').textContent = userData.coins;
+    document.getElementById('profileGames').textContent = userData.gamesPlayed;
+    document.getElementById('profileBeats').textContent = userData.beats ? userData.beats.length : 0;
 }
+
+// === BEAT COMPOSER PRO (DAW) ===
+let dawTracks = [];
+let currentProject = 1;
+let bpm = 120;
+let isPlaying = false;
+let playInterval = null;
+let currentStep = 0;
+const totalSteps = 32;
+const totalTracks = 11;
+
+function initDAW() {
+    // Initialize tracks
+    dawTracks = [];
+    for (let i = 0; i < totalTracks; i++) {
+        dawTracks.push({
+            name: `Track ${i + 1}`,
+            sounds: new Array(totalSteps).fill(null),
+            color: `hsl(${(i * 30) % 360}, 70%, 50%)`
+        });
+    }
+
+    renderTimeline();
+    loadDAWSounds();
+}
+
+function loadDAWSounds() {
+    const soundsList = document.getElementById('dawSoundsList');
+    const sounds = [
+        { icon: '🥁', name: '808 Kick', category: 'Drums' },
+        { icon: '', name: 'Trap Snare', category: 'Drums' },
+        { icon: '🎩', name: 'Hi-Hat', category: 'Drums' },
+        { icon: '🎸', name: 'Reese Bass', category: 'Bass' },
+        { icon: '🎤', name: 'Vocal Chop', category: 'Vocals' },
+        { icon: '✨', name: 'Riser FX', category: 'FX' },
+        { icon: '', name: 'Synth Lead', category: 'Synth' },
+        { icon: '', name: 'Kick Drum', category: 'Drums' }
+    ];
+
+    soundsList.innerHTML = '';
+    sounds.forEach(sound => {
+        const item = document.createElement('div');
+        item.className = 'daw-sound-item';
+        item.innerHTML = `<span class="icon">${sound.icon}</span><span class="name">${sound.name}</span>`;
+        item.onclick = () => addSoundToCurrentTrack(sound);
+        soundsList.appendChild(item);
+    });
+}
+
+function renderTimeline() {
+    const timeline = document.getElementById('dawTimeline');
+    timeline.innerHTML = '';
+
+    dawTracks.forEach((track, trackIdx) => {
+        const trackEl = document.createElement('div');
+        trackEl.className = 'daw-track';
+
+        const header = document.createElement('div');
+        header.className = 'daw-track-header';
+        header.textContent = track.name;
+        header.style.borderLeft = `3px solid ${track.color}`;
+
+        const cells = document.createElement('div');
+        cells.className = 'daw-track-cells';
+
+        for (let i = 0; i < totalSteps; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'daw-cell';
+            if (track.sounds[i]) {
+                cell.classList.add('active');
+                cell.style.background = track.color;
+            }
+            cell.onclick = () => toggleCell(trackIdx, i);
+            cells.appendChild(cell);
+        }
+
+        trackEl.appendChild(header);
+        trackEl.appendChild(cells);
+        timeline.appendChild(trackEl);
+    });
+}
+
+function toggleCell(trackIdx, stepIdx) {
+    if (dawTracks[trackIdx].sounds[stepIdx]) {
+        dawTracks[trackIdx].sounds[stepIdx] = null;
+    } else {
+        dawTracks[trackIdx].sounds[stepIdx] = { type: 'beat', step: stepIdx };
+    }
+    renderTimeline();
+}
+
+function addSoundToCurrentTrack(sound) {
+    // Add to first empty track or create new
+    const emptyTrack = dawTracks.findIndex(t => t.sounds.every(s => s === null));
+    if (emptyTrack !== -1) {
+        dawTracks[emptyTrack].name = sound.name;
+        dawTracks[emptyTrack].sounds[0] = { type: 'sound', data: sound };
+        renderTimeline();
+        showNotification(`➕ Добавлено: ${sound.name}`);
+    } else {
+        showNotification('❌ Нет свободных дорожек');
+    }
+}
+
+function playBeat() {
+    if (isPlaying) return;
+    isPlaying = true;
+    currentStep = 0;
+
+    const intervalMs = (60 / bpm) * 1000 / 4; // 16th notes
+
+    playInterval = setInterval(() => {
+        // Highlight current step
+        document.querySelectorAll('.daw-cell').forEach((cell, idx) => {
+            const step = idx % totalSteps;
+            if (step === currentStep) {
+                cell.style.boxShadow = '0 0 10px #00f3ff';
+            } else {
+                cell.style.boxShadow = '';
+            }
+        });
+
+        // Play sounds at current step
+        dawTracks.forEach(track => {
+            if (track.sounds[currentStep]) {
+                playSoundEffect(track.sounds[currentStep]);
+            }
+        });
+
+        currentStep = (currentStep + 1) % totalSteps;
+    }, intervalMs);
+
+    showNotification('▶ Playing...');
+}
+
+function playSoundEffect(sound) {
+    // Web Audio API для реальных звуков
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    // Different sounds
+    if (sound.data && sound.data.name.includes('Kick')) {
+        osc.frequency.setValueAtTime(60, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+        gain.gain.setValueAtTime(1, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.5);
+    } else if (sound.data && sound.data.name.includes('Snare')) {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(200, ctx.currentTime);
+        gain.gain.setValueAtTime(0.7, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.2);
+    } else if (sound.data && sound.data.name.includes('Hi-Hat')) {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(8000, ctx.currentTime);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.05);
+    } else {
+        // Default beep
+        osc.frequency.setValueAtTime(440, ctx.currentTime);
+        gain.gain.setValueAtTime(0.5, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.1);
+    }
+}
+
+function resetBeat() {
+    if (playInterval) clearInterval(playInterval);
+    isPlaying = false;
+    currentStep = 0;
+    document.querySelectorAll('.daw-cell').forEach(cell => {
+        cell.style.boxShadow = '';
+    });
+    showNotification(' Reset');
+}
+
+function exportBeat() {
+    showNotification('💿 Export MP3 (320kbps) - Функция требует сервер');
+    // BACKEND: Здесь будет реальный экспорт через сервер
+    userData.xp += 100;
+    saveData();
+    updateStats();
+}
+
+function saveBeat() {
+    if (!userData.projects) userData.projects = {};
+
+    userData.projects[currentProject] = {
+        tracks: dawTracks,
+        bpm: bpm,
+        name: document.getElementById('dawProject').value,
+        savedAt: new Date().toISOString()
+    };
+
+    saveData();
+    showNotification(' Проект сохранён!');
+}
+
+// === ITUNES API ===
+const globalAudio = new Audio();
+globalAudio.crossOrigin = "anonymous";
+let isRepeat = false, previousVolume = 0.8, debounceTimer = null;
+
+function loadItunesSounds() {
+    // Sounds are loaded dynamically via search
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('music-search-input');
+    const resultsList = document.getElementById('search-results-list');
+    const playerCard = document.getElementById('player-card');
+    const playPauseBtn = document.getElementById('play-pause-btn');
+    const repeatBtn = document.getElementById('repeat-btn');
+    const muteBtn = document.getElementById('mute-btn');
+    const progressBar = document.getElementById('progress-bar');
+    const volumeSlider = document.getElementById('volume-slider');
+    const currentTimeEl = document.getElementById('current-time');
+    const totalDurationEl = document.getElementById('total-duration');
+
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(debounceTimer);
+        const rawQuery = e.target.value.trim();
+        if (!rawQuery) { resultsList.innerHTML = ''; resultsList.classList.add('hidden'); return; }
+        debounceTimer = setTimeout(() => searchItunes(rawQuery), 400);
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !resultsList.contains(e.target)) resultsList.classList.add('hidden');
+    });
+
+    async function searchItunes(query) {
+        try {
+            const response = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=15`);
+            if (!response.ok) throw new Error('Ошибка');
+            const data = await response.json();
+
+            if (data.results && data.results.length > 0) {
+                const tracks = data.results.map(track => ({
+                    title: track.trackName,
+                    artist: track.artistName,
+                    previewUrl: track.previewUrl,
+                    cover: track.artworkUrl100 || 'https://via.placeholder.com/60',
+                    duration: track.trackTimeMillis / 1000
+                }));
+                renderItunesResults(tracks);
+            } else {
+                renderItunesResults([]);
+            }
+        } catch (err) {
+            console.error("iTunes API error:", err);
+            renderItunesResults([]);
+        }
+    }
+
+    function renderItunesResults(tracks) {
+        resultsList.innerHTML = '';
+        if (tracks.length === 0) {
+            resultsList.innerHTML = `<li style="padding:14px; color:var(--text-muted); text-align:center;">Ничего не найдено</li>`;
+            resultsList.classList.remove('hidden');
+            return;
+        }
+        tracks.forEach(track => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <div class="result-info">
+                    <span class="result-title">${track.title}</span>
+                    <span class="result-artist">${track.artist}</span>
+                </div>
+                <div class="result-actions">
+                    <button class="preview-btn">▶ 30s</button>
+                    <span class="duration-text">${formatTime(track.duration)}</span>
+                </div>
+            `;
+            li.addEventListener('click', () => {
+                playItunesPreview(track);
+                resultsList.classList.add('hidden');
+                searchInput.blur();
+            });
+            resultsList.appendChild(li);
+        });
+        resultsList.classList.remove('hidden');
+    }
+
+    function playItunesPreview(track) {
+        globalAudio.pause();
+        globalAudio.currentTime = 0;
+        progressBar.value = 0;
+        currentTimeEl.innerText = "0:00";
+        totalDurationEl.innerText = "0:30";
+
+        document.getElementById('player-title').innerText = track.title;
+        document.getElementById('player-artist').innerText = track.artist;
+        document.getElementById('player-cover').src = track.cover.replace('100x100', '300x300');
+        playerCard.classList.remove('hidden');
+
+        if (track.previewUrl) {
+            globalAudio.src = track.previewUrl;
+            globalAudio.load();
+            globalAudio.play().then(() => {
+                playPauseBtn.innerText = '⏸';
+            }).catch(err => console.error(err));
+        }
+    }
+
+    playPauseBtn.addEventListener('click', () => {
+        if (!globalAudio.src) return;
+        if (globalAudio.paused) {
+            globalAudio.play();
+            playPauseBtn.innerText = '';
+        } else {
+            globalAudio.pause();
+            playPauseBtn.innerText = '▶';
+        }
+    });
+
+    globalAudio.addEventListener('timeupdate', () => {
+        if (!globalAudio.duration || isNaN(globalAudio.duration)) return;
+        progressBar.value = (globalAudio.currentTime / globalAudio.duration) * 100;
+        currentTimeEl.innerText = formatTime(globalAudio.currentTime);
+    });
+
+    progressBar.addEventListener('input', () => {
+        if (globalAudio.duration) globalAudio.currentTime = (progressBar.value / 100) * globalAudio.duration;
+    });
+
+    repeatBtn.addEventListener('click', () => {
+        isRepeat = !isRepeat;
+        repeatBtn.classList.toggle('active', isRepeat);
+    });
+
+    globalAudio.addEventListener('ended', () => {
+        if (isRepeat) {
+            globalAudio.currentTime = 0;
+            globalAudio.play();
+        } else {
+            playPauseBtn.innerText = '▶';
+        }
+    });
+
+    volumeSlider.addEventListener('input', (e) => {
+        globalAudio.volume = e.target.value;
+        muteBtn.innerText = globalAudio.volume == 0 ? '🔇' : '🔊';
+    });
+
+    muteBtn.addEventListener('click', () => {
+        if (globalAudio.volume > 0) {
+            previousVolume = globalAudio.volume;
+            globalAudio.volume = 0;
+            volumeSlider.value = 0;
+            muteBtn.innerText = '🔇';
+        } else {
+            globalAudio.volume = previousVolume || 0.8;
+            volumeSlider.value = globalAudio.volume;
+            muteBtn.innerText = '🔊';
+        }
+    });
+});
+
+function formatTime(seconds) {
+    if (isNaN(seconds) || seconds < 0) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+}
+
+// === ИГРЫ ===
+let currentGame = null, gameInterval = null, gameScore = 0, canvas, ctx;
+let input = { left: false, right: false, up: false, down: false, fire: false };
 
 function startGame(type) {
     currentGame = type;
@@ -779,9 +1588,9 @@ function startGame(type) {
     document.getElementById('activeGame').style.display = 'block';
     canvas = document.getElementById('gameCanvas');
     ctx = canvas.getContext('2d');
-    const containerWidth = canvas.parentElement.clientWidth - 40;
+    const containerWidth = canvas.parentElement.clientWidth - 30;
     canvas.width = Math.min(800, containerWidth);
-    canvas.height = 500;
+    canvas.height = canvas.width * 0.75;
 
     const games = {
         'shooter': { title: '🚀 Space Shooter' },
@@ -795,8 +1604,8 @@ function startGame(type) {
     else if (type === 'pacman') initPacman();
     else if (type === 'snake') initSnake();
 
-    if (!quests.quest1.completed) {
-        userData.gamesPlayed++;
+    if (!userData.gamesPlayed || userData.gamesPlayed === 0) {
+        userData.gamesPlayed = 1;
         updateQuest('quest1', 1);
         saveData();
         updateStats();
@@ -811,39 +1620,38 @@ function launchGame() {
 }
 
 function pauseGame() { if (gameInterval) clearInterval(gameInterval); }
-function resumeGame() { launchGame(); }
-function closeGame() { 
-    if (gameInterval) clearInterval(gameInterval); 
+function closeGame() {
+    if (gameInterval) clearInterval(gameInterval);
     document.getElementById('activeGame').style.display = 'none';
-    input.left = input.right = input.up = input.down = input.fire = false;
+    input = { left: false, right: false, up: false, down: false, fire: false };
 }
 
+// Keyboard controls
 document.addEventListener('keydown', (e) => {
-    const code = e.code;
-    if (code === 'ArrowLeft' || code === 'KeyA') input.left = true;
-    if (code === 'ArrowRight' || code === 'KeyD') input.right = true;
-    if (code === 'ArrowUp' || code === 'KeyW') input.up = true;
-    if (code === 'ArrowDown' || code === 'KeyS') input.down = true;
-    if (code === 'Space') input.fire = true;
-    
-    if (document.getElementById('quests').classList.contains('active') && !mazeCompleted) {
-        if (code === 'ArrowLeft' || code === 'KeyA') movePlayer(-1, 0);
-        if (code === 'ArrowRight' || code === 'KeyD') movePlayer(1, 0);
-        if (code === 'ArrowUp' || code === 'KeyW') movePlayer(0, -1);
-        if (code === 'ArrowDown' || code === 'KeyS') movePlayer(0, 1);
+    if (e.code === 'ArrowLeft' || e.code === 'KeyA') input.left = true;
+    if (e.code === 'ArrowRight' || e.code === 'KeyD') input.right = true;
+    if (e.code === 'ArrowUp' || e.code === 'KeyW') input.up = true;
+    if (e.code === 'ArrowDown' || e.code === 'KeyS') input.down = true;
+    if (e.code === 'Space') input.fire = true;
+
+    if (document.getElementById('quests').classList.contains('active')) {
+        if (e.code === 'ArrowLeft' || e.code === 'KeyA') movePlayer(-1, 0);
+        if (e.code === 'ArrowRight' || e.code === 'KeyD') movePlayer(1, 0);
+        if (e.code === 'ArrowUp' || e.code === 'KeyW') movePlayer(0, -1);
+        if (e.code === 'ArrowDown' || e.code === 'KeyS') movePlayer(0, 1);
     }
-    if (code === 'Space' && currentGame) e.preventDefault();
+    if (e.code === 'Space' && currentGame) e.preventDefault();
 });
 
 document.addEventListener('keyup', (e) => {
-    const code = e.code;
-    if (code === 'ArrowLeft' || code === 'KeyA') input.left = false;
-    if (code === 'ArrowRight' || code === 'KeyD') input.right = false;
-    if (code === 'ArrowUp' || code === 'KeyW') input.up = false;
-    if (code === 'ArrowDown' || code === 'KeyS') input.down = false;
-    if (code === 'Space') input.fire = false;
+    if (e.code === 'ArrowLeft' || e.code === 'KeyA') input.left = false;
+    if (e.code === 'ArrowRight' || e.code === 'KeyD') input.right = false;
+    if (e.code === 'ArrowUp' || e.code === 'KeyW') input.up = false;
+    if (e.code === 'ArrowDown' || e.code === 'KeyS') input.down = false;
+    if (e.code === 'Space') input.fire = false;
 });
 
+// Space Shooter
 let player, bullets, enemies;
 function initShooter() {
     player = { x: canvas.width/2 - 20, y: canvas.height - 60, w: 40, h: 40, cooldown: 0 };
@@ -856,9 +1664,12 @@ function startShooter() {
         if (input.right) player.x += 6;
         player.x = Math.max(0, Math.min(canvas.width - player.w, player.x));
         if (player.cooldown > 0) player.cooldown--;
-        if (input.fire && player.cooldown === 0) { bullets.push({ x: player.x + player.w/2 - 2, y: player.y }); player.cooldown = 8; }
+        if (input.fire && player.cooldown === 0) {
+            bullets.push({ x: player.x + player.w/2 - 2, y: player.y });
+            player.cooldown = 8;
+        }
         if (Math.random() < 0.04) enemies.push({ x: Math.random() * (canvas.width - 30), y: -30, w: 30, h: 30 });
-        
+
         bullets.forEach((b, i) => { b.y -= 10; if (b.y < 0) bullets.splice(i, 1); });
         enemies.forEach((e, i) => {
             e.y += 3;
@@ -872,7 +1683,7 @@ function startShooter() {
         });
         drawShooter();
         updateStats();
-        document.getElementById('gameInfo').textContent = 'Счёт: ' + gameScore + ' | XP: ' + userData.xp;
+        document.getElementById('gameInfo').textContent = `Счёт: ${gameScore} | XP: ${userData.xp}`;
     }, 16);
 }
 function drawShooter() {
@@ -886,6 +1697,7 @@ function drawShooter() {
     enemies.forEach(e => { ctx.fillStyle = '#ff0055'; ctx.shadowBlur = 10; ctx.shadowColor = '#ff0055'; ctx.fillRect(e.x, e.y, e.w, e.h); ctx.shadowBlur = 0; });
 }
 
+// Pac-Man
 let pacman, ghosts, dots, mazeData;
 function initPacman() {
     mazeData = ['####################','#........#.........#','#.####.#.#.#.####.#.#','#.#....#...#....#.#.#','#.#.##.#.#.#.##.#.#.#','#.#.#......#.#....#.#','#...#.####.#.####...#','#.#.#......#.#....#.#','#.#.##.####.##.#....#','#.#....#..#....#....#','#.####.#..#.####....#','#......#..#.........#','####################'];
@@ -906,52 +1718,53 @@ function startPacman() {
         if (input.right) pacman.nextDir = { x: 1, y: 0 };
         if (input.up) pacman.nextDir = { x: 0, y: -1 };
         if (input.down) pacman.nextDir = { x: 0, y: 1 };
-        
+
         let newX = pacman.x + pacman.nextDir.x, newY = pacman.y + pacman.nextDir.y;
         if (mazeData[newY] && mazeData[newY][newX] !== '#') pacman.dir = pacman.nextDir;
         newX = pacman.x + pacman.dir.x; newY = pacman.y + pacman.dir.y;
         if (mazeData[newY] && mazeData[newY][newX] !== '#') { pacman.x = newX; pacman.y = newY; }
-        
+
         for (let i = dots.length - 1; i >= 0; i--) {
-            if (dots[i].x === pacman.x && dots[i].y === pacman.y) { 
-                dots.splice(i, 1); gameScore += 10; userData.xp += 5; 
+            if (dots[i].x === pacman.x && dots[i].y === pacman.y) {
+                dots.splice(i, 1); gameScore += 10; userData.xp += 5;
             }
         }
-        
+
         ghosts.forEach(ghost => {
             const dirs = [{ x: 0, y: -1 }, { x: 0, y: 1 }, { x: -1, y: 0 }, { x: 1, y: 0 }];
             const validDirs = dirs.filter(d => { let nx = ghost.x + d.x, ny = ghost.y + d.y; return mazeData[ny] && mazeData[ny][nx] !== '#'; });
             if (validDirs.length > 0) { const dir = validDirs[Math.floor(Math.random() * validDirs.length)]; ghost.x += dir.x; ghost.y += dir.y; }
-            if (ghost.x === pacman.x && ghost.y === pacman.y) { 
-                showNotification('💀 Тебя поймали! Счёт: ' + gameScore); 
-                clearInterval(gameInterval); saveData(); 
+            if (ghost.x === pacman.x && ghost.y === pacman.y) {
+                showNotification('💀 Тебя поймали! Счёт: ' + gameScore);
+                clearInterval(gameInterval); saveData();
             }
         });
         drawPacman();
         updateStats();
-        document.getElementById('gameInfo').textContent = 'Счёт: ' + gameScore + ' | Осталось точек: ' + dots.length;
+        document.getElementById('gameInfo').textContent = `Счёт: ${gameScore} | Осталось точек: ${dots.length}`;
     }, 150);
 }
 function drawPacman() {
     const cellSize = Math.floor(canvas.width / 20);
     const offsetX = (canvas.width - (mazeData[0].length * cellSize)) / 2;
     const offsetY = (canvas.height - (mazeData.length * cellSize)) / 2;
-    
+
     ctx.fillStyle = '#050714'; ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = '#00f3ff';
     for (let y = 0; y < mazeData.length; y++) for (let x = 0; x < mazeData[y].length; x++) if (mazeData[y][x] === '#') ctx.fillRect(x * cellSize + offsetX, y * cellSize + offsetY, cellSize - 2, cellSize - 2);
-    
+
     ctx.fillStyle = '#ffd700';
     dots.forEach(dot => { ctx.beginPath(); ctx.arc(dot.x * cellSize + cellSize/2 + offsetX, dot.y * cellSize + cellSize/2 + offsetY, 3, 0, Math.PI * 2); ctx.fill(); });
-    
+
     ctx.fillStyle = '#ffff00'; ctx.shadowBlur = 10; ctx.shadowColor = '#ffff00';
     const pacX = pacman.x * cellSize + cellSize/2 + offsetX, pacY = pacman.y * cellSize + cellSize/2 + offsetY;
     ctx.beginPath(); ctx.arc(pacX, pacY, cellSize/2 - 4, 0.15 * Math.PI, 1.85 * Math.PI); ctx.lineTo(pacX, pacY); ctx.fill();
     ctx.shadowBlur = 0;
-    
+
     ghosts.forEach(ghost => { ctx.fillStyle = ghost.color; ctx.shadowBlur = 8; ctx.shadowColor = ghost.color; ctx.fillRect(ghost.x * cellSize + offsetX + 2, ghost.y * cellSize + offsetY + 2, cellSize - 4, cellSize - 4); ctx.shadowBlur = 0; });
 }
 
+// Snake
 let snake, dir, nextDir, food;
 function initSnake() {
     snake = [{ x: 15, y: 10 }]; dir = { x: 1, y: 0 }; nextDir = { x: 1, y: 0 }; food = { x: 20, y: 10 };
@@ -965,14 +1778,18 @@ function startSnake() {
         else if (input.down && dir.y !== -1) nextDir = { x: 0, y: 1 };
         dir = nextDir;
         const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
-        if (head.x < 0 || head.x >= 40 || head.y < 0 || head.y >= 25) { clearInterval(gameInterval); showNotification('💥 Game Over! Счёт: ' + gameScore); return; }
-        if (snake.some(s => s.x === head.x && s.y === head.y)) { clearInterval(gameInterval); showNotification('💥 Game Over! Счёт: ' + gameScore); return; }
+        const cols = Math.floor(canvas.width / 20), rows = Math.floor(canvas.height / 20);
+        if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows || snake.some(s => s.x === head.x && s.y === head.y)) {
+            clearInterval(gameInterval); showNotification('💥 Game Over! Счёт: ' + gameScore); return;
+        }
         snake.unshift(head);
-        if (head.x === food.x && head.y === food.y) { gameScore += 15; userData.xp += 10; food = { x: Math.floor(Math.random() * 38) + 1, y: Math.floor(Math.random() * 23) + 1 }; }
-        else snake.pop();
+        if (head.x === food.x && head.y === food.y) {
+            gameScore += 15; userData.xp += 10;
+            food = { x: Math.floor(Math.random() * (cols-2)) + 1, y: Math.floor(Math.random() * (rows-2)) + 1 };
+        } else snake.pop();
         drawSnake();
         updateStats();
-        document.getElementById('gameInfo').textContent = 'Счёт: ' + gameScore + ' | Длина: ' + snake.length;
+        document.getElementById('gameInfo').textContent = `Счёт: ${gameScore} | Длина: ${snake.length}`;
     }, 120);
 }
 function drawSnake() {
@@ -982,6 +1799,15 @@ function drawSnake() {
     ctx.shadowBlur = 0;
     ctx.fillStyle = '#ffd700'; ctx.beginPath(); ctx.arc(food.x * cellSize + cellSize/2, food.y * cellSize + cellSize/2, cellSize/2 - 2, 0, Math.PI * 2); ctx.fill();
 }
+
+// === КВЕСТЫ ===
+let maze = [], playerPos = { x: 0, y: 0 }, stars = [], mazeCompleted = false;
+let questPattern = [], userPattern = [], questStepIndex = 0, questShowingPattern = false;
+
+let quests = {
+    quest1: { current: 0, target: 1, reward: 50, completed: false },
+    quest3: { current: 0, target: 1, reward: 300, completed: false }
+};
 
 function initMazeQuest() {
     maze = [[1,0,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,1,0,0,1],[1,1,1,0,1,0,1,0,1,1],[1,0,0,0,1,0,0,0,0,1],[1,0,1,1,1,1,1,1,0,1],[1,0,0,0,0,0,0,1,0,1],[1,1,1,1,1,0,0,1,0,1],[1,0,0,0,1,0,0,0,0,1],[1,0,1,0,0,0,1,1,0,1],[1,1,1,1,1,1,1,1,1,1]];
@@ -1002,7 +1828,7 @@ function renderMaze() {
             const cell = document.createElement('div');
             cell.className = 'maze-cell';
             if (maze[y][x] === 1) { cell.classList.add('wall'); cell.textContent = '🌑'; }
-            else if (playerPos.x === x && playerPos.y === y) { cell.classList.add('player'); cell.textContent = '🚀'; }
+            else if (playerPos.x === x && playerPos.y === y) { cell.classList.add('player'); cell.textContent = ''; }
             else {
                 const star = stars.find(s => s.x === x && s.y === y && !s.collected);
                 if (star) { cell.classList.add('star'); cell.textContent = '⭐'; }
@@ -1054,8 +1880,8 @@ function initRepeatQuest() {
     userPattern = [];
     questStepIndex = 0;
     questShowingPattern = false;
-    
-    const sounds = ['🥁', '🎩', '👏', '🎸'];
+
+    const sounds = ['🥁', '', '', '🎸'];
     for (let i = 0; i < 8; i++) {
         questPattern.push(sounds[Math.floor(Math.random() * sounds.length)]);
     }
@@ -1082,10 +1908,10 @@ function showPattern() {
     userPattern = [];
     questStepIndex = 0;
     document.getElementById('questStatus').textContent = '👀 Запоминай последовательность...';
-    
+
     const steps = document.querySelectorAll('.pattern-step');
     let showIndex = 0;
-    
+
     const showInterval = setInterval(() => {
         steps.forEach(s => s.classList.remove('show'));
         if (showIndex < 8) {
@@ -1104,17 +1930,17 @@ function showPattern() {
 
 function handleQuestStepClick(index, element) {
     if (questShowingPattern || quests.quest3.completed) return;
-    
+
     const expectedSound = questPattern[questStepIndex];
     const clickedSound = element.textContent;
-    
+
     if (clickedSound === expectedSound) {
         element.classList.add('user-correct');
         userPattern.push(clickedSound);
         questStepIndex++;
-        
+
         if (questStepIndex >= 8) {
-            document.getElementById('questStatus').textContent = '🎉 Отлично! Ты повторил бит!';
+            document.getElementById('questStatus').textContent = ' Отлично! Ты повторил бит!';
             userData.xp += 300;
             userData.coins += 100;
             quests.quest3.current = 1;
@@ -1147,7 +1973,7 @@ function updateQuests() {
     if (p1) p1.style.width = Math.min(100, (q1.current / q1.target) * 100) + '%';
     const el1 = document.getElementById('quest1');
     if (el1 && q1.completed) el1.classList.add('completed');
-    
+
     const q3 = quests.quest3, p3 = document.getElementById('quest3Progress');
     if (p3) p3.style.width = Math.min(100, (q3.current / q3.target) * 100) + '%';
     const el3 = document.getElementById('quest3');
@@ -1173,154 +1999,6 @@ function updateQuest(questId, amount) {
         updateQuests();
     }
 }
-
-const globalAudio = new Audio();
-globalAudio.crossOrigin = "anonymous";
-let currentTrackData = null, isRepeat = false, previousVolume = 0.8, debounceTimer = null;
-const PIPED_API_BASE = 'https://pipedapi.kavin.rocks';
-
-function formatTime(seconds) {
-    if (isNaN(seconds) || seconds < 0) return "0:00";
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.getElementById('music-search-input');
-    const resultsList = document.getElementById('search-results-list');
-    const playerCard = document.getElementById('player-card');
-    const playPauseBtn = document.getElementById('play-pause-btn');
-    const repeatBtn = document.getElementById('repeat-btn');
-    const muteBtn = document.getElementById('mute-btn');
-    const progressBar = document.getElementById('progress-bar');
-    const volumeSlider = document.getElementById('volume-slider');
-    const currentTimeEl = document.getElementById('current-time');
-    const totalDurationEl = document.getElementById('total-duration');
-
-    searchInput.addEventListener('input', (e) => {
-        clearTimeout(debounceTimer);
-        const rawQuery = e.target.value.trim();
-        if (!rawQuery) { resultsList.innerHTML = ''; resultsList.classList.add('hidden'); return; }
-        debounceTimer = setTimeout(() => fetchTracksFromPiped(rawQuery), 400);
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!searchInput.contains(e.target) && !resultsList.contains(e.target)) resultsList.classList.add('hidden');
-    });
-
-    async function fetchTracksFromPiped(query) {
-        try {
-            const response = await fetch(`${PIPED_API_BASE}/search?q=${encodeURIComponent(query)}&filter=music_songs`);
-            if (!response.ok) throw new Error('Ошибка');
-            const data = await response.json();
-            const items = data.items || data.relatedStreams || [];
-            if (items.length > 0) {
-                const formatted = items.slice(0, 15).map(item => ({
-                    id: item.url?.replace('/watch?v=', '') || item.videoId || '',
-                    title: item.title || 'Без названия',
-                    artist: item.uploaderName || item.author || 'Исполнитель',
-                    duration: item.duration || 0,
-                    cover: item.thumbnail || 'https://via.placeholder.com/70',
-                    videoId: item.url?.replace('/watch?v=', '') || item.videoId || ''
-                }));
-                renderSearchResults(formatted);
-            } else { renderSearchResults([]); }
-        } catch (err) { renderSearchResults([]); }
-    }
-
-    function renderSearchResults(tracks) {
-        resultsList.innerHTML = '';
-        if (tracks.length === 0) {
-            resultsList.innerHTML = `<li style="padding:14px; color:var(--text-muted); text-align:center;">Ничего не найдено</li>`;
-            resultsList.classList.remove('hidden');
-            return;
-        }
-        tracks.forEach(track => {
-            const li = document.createElement('li');
-            li.innerHTML = `<div class="result-info"><span class="result-title">${track.title}</span><span class="result-artist">${track.artist}</span></div><div class="result-actions"><button class="preview-btn">Слушать</button><span class="duration-text">${formatTime(track.duration)}</span></div>`;
-            li.addEventListener('click', () => { selectTrack(track); resultsList.classList.add('hidden'); searchInput.blur(); });
-            resultsList.appendChild(li);
-        });
-        resultsList.classList.remove('hidden');
-    }
-
-    async function selectTrack(track) {
-        globalAudio.pause();
-        globalAudio.currentTime = 0;
-        progressBar.value = 0;
-        currentTimeEl.innerText = "0:00";
-        totalDurationEl.innerText = formatTime(track.duration || 0);
-        currentTrackData = track;
-        document.getElementById('player-title').innerText = track.title;
-        document.getElementById('player-artist').innerText = track.artist;
-        document.getElementById('player-cover').src = track.cover;
-        playerCard.classList.remove('hidden');
-
-        let audioUrl = track.streamUrl;
-        if (!audioUrl && track.videoId) {
-            try {
-                const streamRes = await fetch(`${PIPED_API_BASE}/streams/${track.videoId}`);
-                const streamData = await streamRes.json();
-                const audioStreams = streamData.audioStreams || [];
-                if (audioStreams.length > 0) {
-                    const sorted = audioStreams.sort((a, b) => a.bitrate - b.bitrate);
-                    audioUrl = sorted[sorted.length - 1].url;
-                }
-            } catch (err) { console.error("Ошибка потока:", err); }
-        }
-        if (audioUrl) {
-            globalAudio.src = audioUrl;
-            globalAudio.load();
-            globalAudio.play().then(() => { playPauseBtn.innerText = '⏸'; }).catch(err => console.error(err));
-        }
-    }
-
-    playPauseBtn.addEventListener('click', () => {
-        if (!globalAudio.src) return;
-        if (globalAudio.paused) { globalAudio.play(); playPauseBtn.innerText = '⏸'; }
-        else { globalAudio.pause(); playPauseBtn.innerText = '▶'; }
-    });
-
-    globalAudio.addEventListener('timeupdate', () => {
-        if (!globalAudio.duration || isNaN(globalAudio.duration)) return;
-        progressBar.value = (globalAudio.currentTime / globalAudio.duration) * 100;
-        currentTimeEl.innerText = formatTime(globalAudio.currentTime);
-        totalDurationEl.innerText = formatTime(globalAudio.duration);
-    });
-
-    progressBar.addEventListener('input', () => {
-        if (globalAudio.duration) globalAudio.currentTime = (progressBar.value / 100) * globalAudio.duration;
-    });
-
-    repeatBtn.addEventListener('click', () => {
-        isRepeat = !isRepeat;
-        repeatBtn.classList.toggle('active', isRepeat);
-    });
-
-    globalAudio.addEventListener('ended', () => {
-        if (isRepeat) { globalAudio.currentTime = 0; globalAudio.play(); }
-        else { playPauseBtn.innerText = '▶'; }
-    });
-
-    volumeSlider.addEventListener('input', (e) => {
-        globalAudio.volume = e.target.value;
-        muteBtn.innerText = globalAudio.volume == 0 ? '🔇' : '🔊';
-    });
-
-    muteBtn.addEventListener('click', () => {
-        if (globalAudio.volume > 0) {
-            previousVolume = globalAudio.volume;
-            globalAudio.volume = 0;
-            volumeSlider.value = 0;
-            muteBtn.innerText = '🔇';
-        } else {
-            globalAudio.volume = previousVolume || 0.8;
-            volumeSlider.value = globalAudio.volume;
-            muteBtn.innerText = '🔊';
-        }
-    });
-});
 
 function showNotification(text) {
     const div = document.getElementById('notification');
