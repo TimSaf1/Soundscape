@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ru"><head>
+<html lang="ru">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Soundscape | Музыкальная Вселенная</title>
@@ -515,7 +516,6 @@
             touch-action: none;
         }
 
-        /* МОБИЛЬНОЕ УПРАВЛЕНИЕ */
         .mobile-controls {
             display: none;
             position: absolute;
@@ -703,19 +703,19 @@
 </head>
 <body class="space-bg-active">
 
-<!-- AUTH OVERLAY -->
-<div class="auth-overlay" id="authOverlay" style="display: none;">
+<!-- AUTH OVERLAY (Убран style="display: none;", чтобы показывался по умолчанию) -->
+<div class="auth-overlay" id="authOverlay">
     <div class="auth-box">
-        <h2> SOUNDSCAPE</h2>
+        <h2>🪐 SOUNDSCAPE</h2>
         <p>Войди или создай аккаунт, чтобы сохранить прогресс</p>
         <input type="text" class="auth-input" id="authUsername" placeholder="Придумай никнейм">
         <input type="password" class="auth-input" id="authPassword" placeholder="Пароль">
-        <button class="auth-btn" onclick="registerUser()"> Начать путешествие</button>
+        <button class="auth-btn" onclick="registerUser()">🚀 Начать путешествие</button>
         <p style="margin-top: 15px; font-size: 12px;">Уже есть аккаунт? <a href="#" onclick="toggleAuthMode()" style="color: var(--accent);">Войти</a></p>
     </div>
 </div>
 
-<canvas id="spaceCanvas" width="1171" height="960"></canvas>
+<canvas id="spaceCanvas"></canvas>
 <div class="notification" id="notification">Уведомление</div>
 
 <header class="header">
@@ -724,17 +724,18 @@
         <div class="stats">
             <div class="stat-chip">⭐ <b id="userXP">0</b> XP</div>
             <div class="stat-chip">🏆 <b id="userLevel">1</b> LVL</div>
-            <div class="stat-chip"> <b id="userCoins">100</b></div>
-            <div class="stat-chip">👤 <b id="userName">timsaf</b></div>
+            <div class="stat-chip">🪙 <b id="userCoins">100</b></div>
+            <!-- Заменено timsaf на Гость -->
+            <div class="stat-chip">👤 <b id="userName">Гость</b></div>
         </div>
     </div>
     <div class="nav">
         <button class="nav-btn active" onclick="showSection('home', event)">🏠 Главная</button>
-        <button class="nav-btn" onclick="showSection('games', event)"> Игры</button>
+        <button class="nav-btn" onclick="showSection('games', event)">🎮 Игры</button>
         <button class="nav-btn" onclick="showSection('beatmaker', event)">🎛️ Студия Itunes</button>
         <a href="beatmaker_pro_list.html" class="nav-btn">🎹 Студия Про</a>
         <button class="nav-btn" onclick="showSection('quests', event)">📜 Квесты</button>
-        <button class="nav-btn" onclick="showSection('music', event)"> Музыка</button>
+        <button class="nav-btn" onclick="showSection('music', event)">🔊 Музыка</button>
         <button class="nav-btn" onclick="showSection('profile', event)">👤 Профиль</button>
     </div>
 </header>
@@ -748,8 +749,10 @@
             <p class="hero-subtitle">Погрузись в музыкальную вселенную. Играй в аркадные миссии, проходи ритм-квесты, создавай уникальные лупы с проверкой от нейросети и стань профессиональным космическим битмейкером.</p>
             <div class="hero-buttons">
                 <button class="hero-btn hero-btn-primary" onclick="showSection('games')">🚀 Начать миссию</button>
-                <a class="hero-btn hero-btn-secondary" href="beatmaker_pro_list.html">🎹 Стать битмейкером
-            </a></div></div><div class="features-grid">
+                <a class="hero-btn hero-btn-secondary" href="beatmaker_pro_list.html">🎹 Стать битмейкером</a>
+            </div>
+        </div>
+        <div class="features-grid">
             <div class="feature-card" onclick="showSection('games')">
                 <span class="feature-icon">🎮</span>
                 <div class="feature-title">Аркадные миссии</div>
@@ -766,17 +769,19 @@
                 <div class="feature-desc">Создавай биты с реальными звуками из iTunes превью. Экспорт в MP3.</div>
             </div>
             <div class="feature-card" onclick="window.location.href='beatmaker_pro_list.html'">
-    		<span class="feature-icon">🎹</span>
-    		<div class="feature-title">Beat Maker Pro</div>
-   		<div class="feature-desc">Создавай биты со встроенной библиотекой звуков с высоким качеством. Экспорт в MP3.</div>
-	    </div>
+                <span class="feature-icon">🎹</span>
+                <div class="feature-title">Beat Maker Pro</div>
+                <div class="feature-desc">Создавай биты со встроенной библиотекой звуков с высоким качеством. Экспорт в MP3.</div>
+            </div>
             <div class="feature-card" onclick="showSection('music')">
                 <span class="feature-icon">🔊</span>
                 <div class="feature-title">Музыка</div>
                 <div class="feature-desc">Ищи и слушай треки через iTunes API. 30-секундные превью.</div>
             </div>
         </div>
-    </div><!-- ИГРЫ -->
+    </div>
+
+    <!-- ИГРЫ -->
     <div id="games" class="section">
         <h2 class="section-title">🎮 Выбери миссию</h2>
         <div class="games-grid">
@@ -804,7 +809,6 @@
             <h3 id="gameTitle" style="text-align:center;margin-bottom:10px;color:var(--accent);"></h3>
             <canvas id="gameCanvas" class="game-canvas"></canvas>
 
-            <!-- МОБИЛЬНОЕ УПРАВЛЕНИЕ -->
             <div class="mobile-controls" id="mobileControls">
                 <div class="d-pad">
                     <div class="d-btn up" ontouchstart="input.up=true" ontouchend="input.up=false">⬆️</div>
@@ -817,7 +821,7 @@
 
             <div class="controls">
                 <button class="btn btn-primary" onclick="launchGame()">▶ Старт</button>
-                <button class="btn" onclick="pauseGame()"> Пауза</button>
+                <button class="btn" onclick="pauseGame()">⏸ Пауза</button>
                 <button class="btn btn-danger" onclick="closeGame()">❌ Закрыть</button>
             </div>
             <div id="gameInfo" style="text-align:center;margin-top:10px;color:var(--accent); font-weight: bold; font-size:14px;"></div>
@@ -826,15 +830,15 @@
 
     <!-- BEAT COMPOSER PRO Itunes -->
     <div id="beatmaker" class="section">
-        <h2 class="section-title"> Beat Composer Pro Itunes</h2>
+        <h2 class="section-title">🎛️ Beat Composer Pro Itunes</h2>
         <div class="daw-container">
             <div class="daw-header">
                 <div class="daw-title">BEAT COMPOSER PRO ITUNES</div>
                 <div class="daw-controls">
                     <button class="daw-btn daw-btn-play" onclick="playBeat()">▶ Play</button>
-                    <button class="daw-btn daw-btn-reset" onclick="resetBeat()"> Reset</button>
-                    <button class="daw-btn daw-btn-export" onclick="exportBeat()"> Export MP3 (320kbps)</button>
-                    <button class="daw-btn daw-btn-save" onclick="saveBeat()">💾 Сохранить проект</button>
+                    <button class="daw-btn daw-btn-reset" onclick="resetBeat()">⏹ Reset</button>
+                    <button class="daw-btn daw-btn-export" onclick="exportBeat()">💿 Export MP3</button>
+                    <button class="daw-btn daw-btn-save" onclick="saveBeat()">💾 Сохранить</button>
                 </div>
             </div>
 
@@ -853,7 +857,7 @@
                 </div>
                 <div class="daw-setting">
                     <label style="display: flex; align-items: center; gap: 5px;">
-                        <input type="checkbox" checked=""> Суммировать звуки
+                        <input type="checkbox" checked> Суммировать звуки
                     </label>
                 </div>
                 <div class="daw-setting" style="margin-left: auto;">
@@ -864,11 +868,11 @@
             <div class="daw-main">
                 <div class="daw-sidebar">
                     <h3>📁 SOUNDS/</h3>
-                    <div class="daw-sounds-list" id="dawSoundsList"><div class="daw-sound-item"><span class="icon">🥁</span><span class="name">808 Kick</span></div><div class="daw-sound-item"><span class="icon"></span><span class="name">Trap Snare</span></div><div class="daw-sound-item"><span class="icon">🎩</span><span class="name">Hi-Hat</span></div><div class="daw-sound-item"><span class="icon">🎸</span><span class="name">Reese Bass</span></div><div class="daw-sound-item"><span class="icon">🎤</span><span class="name">Vocal Chop</span></div><div class="daw-sound-item"><span class="icon">✨</span><span class="name">Riser FX</span></div><div class="daw-sound-item"><span class="icon"></span><span class="name">Synth Lead</span></div><div class="daw-sound-item"><span class="icon"></span><span class="name">Kick Drum</span></div></div>
+                    <div class="daw-sounds-list" id="dawSoundsList"></div>
                 </div>
 
                 <div class="daw-timeline-container">
-                    <div class="daw-timeline" id="dawTimeline"><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(217, 38, 38);">Track 1</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(217, 128, 38);">Track 2</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(217, 217, 38);">Track 3</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(128, 217, 38);">Track 4</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(38, 217, 38);">Track 5</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(38, 217, 128);">Track 6</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(38, 217, 217);">Track 7</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(38, 128, 217);">Track 8</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(38, 38, 217);">Track 9</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(128, 38, 217);">Track 10</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div><div class="daw-track"><div class="daw-track-header" style="border-left: 3px solid rgb(217, 38, 217);">Track 11</div><div class="daw-track-cells"><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div><div class="daw-cell"></div></div></div></div>
+                    <div class="daw-timeline" id="dawTimeline"></div>
                 </div>
             </div>
         </div>
@@ -880,8 +884,8 @@
 
         <div class="quest-section">
             <h3 style="margin-bottom:12px;color:var(--accent);">🎮 Квест 1: Лабиринт сокровищ</h3>
-            <div style="text-align:center;margin-bottom:8px; color: var(--text-muted);">Собери <b id="starsCollected" style="color:var(--accent)">0</b> из <b id="totalStars">5</b> </div>
-            <div class="maze-container" id="mazeGrid"><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell player"></div><div class="maze-cell"></div><div class="maze-cell star">⭐</div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell star">⭐</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell star">⭐</div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell star">⭐</div><div class="maze-cell wall">🌑</div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell"></div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell star">⭐</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div><div class="maze-cell wall">🌑</div></div>
+            <div style="text-align:center;margin-bottom:8px; color: var(--text-muted);">Собери <b id="starsCollected" style="color:var(--accent)">0</b> из <b id="totalStars">5</b> ⭐</div>
+            <div class="maze-container" id="mazeGrid"></div>
             <div style="text-align:center;margin-top:10px;">
                 <button class="btn btn-primary" onclick="initMazeQuest()">🔄 Заново</button>
             </div>
@@ -891,7 +895,7 @@
             <h3 style="margin-bottom:12px;color:var(--purple);">🧠 Квест 2: Повтори бит</h3>
             <div class="repeat-quest">
                 <p style="text-align:center;color:var(--text-muted);margin-bottom:12px;">Запомни последовательность и повтори её!</p>
-                <div class="quest-pattern" id="questPattern"><div class="pattern-step" data-index="0"></div><div class="pattern-step" data-index="1">🥁</div><div class="pattern-step" data-index="2"></div><div class="pattern-step" data-index="3">🥁</div><div class="pattern-step" data-index="4">🥁</div><div class="pattern-step" data-index="5">🎸</div><div class="pattern-step" data-index="6">🥁</div><div class="pattern-step" data-index="7"></div></div>
+                <div class="quest-pattern" id="questPattern"></div>
                 <div class="quest-status" id="questStatus">Нажми "Показать паттерн" чтобы начать</div>
                 <div style="text-align:center;margin-top:12px;">
                     <button class="btn btn-primary" onclick="showPattern()">👁 Показать паттерн</button>
@@ -960,10 +964,11 @@
 
     <!-- ПРОФИЛЬ -->
     <div id="profile" class="section">
-        <h2 class="section-title"> Профиль пилота</h2>
+        <h2 class="section-title">👤 Профиль пилота</h2>
         <div class="profile-card">
-            <div class="profile-avatar">👨🚀</div>
-            <h3 id="profileName" style="font-size:24px; margin-bottom:8px;">timsaf</h3>
+            <div class="profile-avatar">👨‍🚀</div>
+            <!-- Заменено timsaf на динамический id -->
+            <h3 id="profileName" style="font-size:24px; margin-bottom:8px;">Гость</h3>
             <p style="color:var(--accent); font-size:18px; margin-bottom:15px;">Уровень <span id="profileLevel">1</span></p>
             <div class="profile-stats">
                 <div class="p-stat">
@@ -983,7 +988,9 @@
         </div>
     </div>
 
-</div><script>
+</div>
+
+<script>
 // === АУТЕНТИФИКАЦИЯ ===
 let currentUser = null;
 let userData = {
@@ -999,6 +1006,9 @@ window.onload = function() {
         userData = currentUser.data || userData;
         document.getElementById('authOverlay').style.display = 'none';
         initApp();
+    } else {
+        // Если пользователя нет, показываем окно входа
+        document.getElementById('authOverlay').style.display = 'flex';
     }
 };
 
@@ -1019,7 +1029,7 @@ function registerUser() {
 
     if (isLoginMode) {
         // Login
-        const user = users.find(u => u.username === username && u.password === password);
+        const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
         if (user) {
             currentUser = user;
             userData = user.data || userData;
@@ -1032,7 +1042,7 @@ function registerUser() {
         }
     } else {
         // Register
-        if (users.find(u => u.username === username)) {
+        if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
             showNotification('❌ Такой пользователь уже существует');
             return;
         }
@@ -1040,7 +1050,7 @@ function registerUser() {
         currentUser = {
             username: username,
             password: password,
-            data: userData,
+            data: JSON.parse(JSON.stringify(userData)), // Глубокая копия, чтобы не было ссылок
             createdAt: new Date().toISOString()
         };
 
@@ -1072,12 +1082,15 @@ function toggleAuthMode() {
 
 function logout() {
     localStorage.removeItem('soundscape_current_user');
-    location.reload();
+    location.reload(); // Перезагрузка покажет экран входа
 }
 
 function initApp() {
-    document.getElementById('userName').textContent = currentUser.username;
-    document.getElementById('profileName').textContent = currentUser.username;
+    // Обновляем имя пользователя во всех местах
+    const name = currentUser.username;
+    document.getElementById('userName').textContent = name;
+    document.getElementById('profileName').textContent = name;
+    
     updateStats();
     updateQuests();
     initMazeQuest();
@@ -1207,7 +1220,6 @@ const totalSteps = 32;
 const totalTracks = 11;
 
 function initDAW() {
-    // Initialize tracks
     dawTracks = [];
     for (let i = 0; i < totalTracks; i++) {
         dawTracks.push({
@@ -1216,7 +1228,6 @@ function initDAW() {
             color: `hsl(${(i * 30) % 360}, 70%, 50%)`
         });
     }
-
     renderTimeline();
     loadDAWSounds();
 }
@@ -1225,13 +1236,13 @@ function loadDAWSounds() {
     const soundsList = document.getElementById('dawSoundsList');
     const sounds = [
         { icon: '🥁', name: '808 Kick', category: 'Drums' },
-        { icon: '', name: 'Trap Snare', category: 'Drums' },
+        { icon: '🪘', name: 'Trap Snare', category: 'Drums' },
         { icon: '🎩', name: 'Hi-Hat', category: 'Drums' },
         { icon: '🎸', name: 'Reese Bass', category: 'Bass' },
         { icon: '🎤', name: 'Vocal Chop', category: 'Vocals' },
         { icon: '✨', name: 'Riser FX', category: 'FX' },
-        { icon: '', name: 'Synth Lead', category: 'Synth' },
-        { icon: '', name: 'Kick Drum', category: 'Drums' }
+        { icon: '🎹', name: 'Synth Lead', category: 'Synth' },
+        { icon: '🥁', name: 'Kick Drum', category: 'Drums' }
     ];
 
     soundsList.innerHTML = '';
@@ -1287,7 +1298,6 @@ function toggleCell(trackIdx, stepIdx) {
 }
 
 function addSoundToCurrentTrack(sound) {
-    // Add to first empty track or create new
     const emptyTrack = dawTracks.findIndex(t => t.sounds.every(s => s === null));
     if (emptyTrack !== -1) {
         dawTracks[emptyTrack].name = sound.name;
@@ -1303,27 +1313,17 @@ function playBeat() {
     if (isPlaying) return;
     isPlaying = true;
     currentStep = 0;
-
-    const intervalMs = (60 / bpm) * 1000 / 4; // 16th notes
+    const intervalMs = (60 / bpm) * 1000 / 4;
 
     playInterval = setInterval(() => {
-        // Highlight current step
         document.querySelectorAll('.daw-cell').forEach((cell, idx) => {
             const step = idx % totalSteps;
-            if (step === currentStep) {
-                cell.style.boxShadow = '0 0 10px #00f3ff';
-            } else {
-                cell.style.boxShadow = '';
-            }
+            cell.style.boxShadow = step === currentStep ? '0 0 10px #00f3ff' : '';
         });
 
-        // Play sounds at current step
         dawTracks.forEach(track => {
-            if (track.sounds[currentStep]) {
-                playSoundEffect(track.sounds[currentStep]);
-            }
+            if (track.sounds[currentStep]) playSoundEffect(track.sounds[currentStep]);
         });
-
         currentStep = (currentStep + 1) % totalSteps;
     }, intervalMs);
 
@@ -1331,18 +1331,14 @@ function playBeat() {
 }
 
 function playSoundEffect(sound) {
-    // Web Audio API для реальных звуков
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!AudioContext) return;
-
     const ctx = new AudioContext();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-
     osc.connect(gain);
     gain.connect(ctx.destination);
 
-    // Different sounds
     if (sound.data && sound.data.name.includes('Kick')) {
         osc.frequency.setValueAtTime(60, ctx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
@@ -1365,7 +1361,6 @@ function playSoundEffect(sound) {
         osc.start(ctx.currentTime);
         osc.stop(ctx.currentTime + 0.05);
     } else {
-        // Default beep
         osc.frequency.setValueAtTime(440, ctx.currentTime);
         gain.gain.setValueAtTime(0.5, ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
@@ -1378,15 +1373,12 @@ function resetBeat() {
     if (playInterval) clearInterval(playInterval);
     isPlaying = false;
     currentStep = 0;
-    document.querySelectorAll('.daw-cell').forEach(cell => {
-        cell.style.boxShadow = '';
-    });
-    showNotification(' Reset');
+    document.querySelectorAll('.daw-cell').forEach(cell => cell.style.boxShadow = '');
+    showNotification('⏹ Reset');
 }
 
 function exportBeat() {
     showNotification('💿 Export MP3 (320kbps) - Функция требует сервер');
-    // BACKEND: Здесь будет реальный экспорт через сервер
     userData.xp += 100;
     saveData();
     updateStats();
@@ -1394,16 +1386,14 @@ function exportBeat() {
 
 function saveBeat() {
     if (!userData.projects) userData.projects = {};
-
     userData.projects[currentProject] = {
         tracks: dawTracks,
         bpm: bpm,
         name: document.getElementById('dawProject').value,
         savedAt: new Date().toISOString()
     };
-
     saveData();
-    showNotification(' Проект сохранён!');
+    showNotification('💾 Проект сохранён!');
 }
 
 // === ITUNES API ===
@@ -1411,9 +1401,7 @@ const globalAudio = new Audio();
 globalAudio.crossOrigin = "anonymous";
 let isRepeat = false, previousVolume = 0.8, debounceTimer = null;
 
-function loadItunesSounds() {
-    // Sounds are loaded dynamically via search
-}
+function loadItunesSounds() { }
 
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('music-search-input');
@@ -1425,7 +1413,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressBar = document.getElementById('progress-bar');
     const volumeSlider = document.getElementById('volume-slider');
     const currentTimeEl = document.getElementById('current-time');
-    const totalDurationEl = document.getElementById('total-duration');
 
     searchInput.addEventListener('input', (e) => {
         clearTimeout(debounceTimer);
@@ -1443,7 +1430,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=15`);
             if (!response.ok) throw new Error('Ошибка');
             const data = await response.json();
-
             if (data.results && data.results.length > 0) {
                 const tracks = data.results.map(track => ({
                     title: track.trackName,
@@ -1457,7 +1443,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderItunesResults([]);
             }
         } catch (err) {
-            console.error("iTunes API error:", err);
             renderItunesResults([]);
         }
     }
@@ -1496,8 +1481,7 @@ document.addEventListener('DOMContentLoaded', () => {
         globalAudio.currentTime = 0;
         progressBar.value = 0;
         currentTimeEl.innerText = "0:00";
-        totalDurationEl.innerText = "0:30";
-
+        document.getElementById('total-duration').innerText = "0:30";
         document.getElementById('player-title').innerText = track.title;
         document.getElementById('player-artist').innerText = track.artist;
         document.getElementById('player-cover').src = track.cover.replace('100x100', '300x300');
@@ -1506,21 +1490,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (track.previewUrl) {
             globalAudio.src = track.previewUrl;
             globalAudio.load();
-            globalAudio.play().then(() => {
-                playPauseBtn.innerText = '⏸';
-            }).catch(err => console.error(err));
+            globalAudio.play().then(() => { playPauseBtn.innerText = '⏸'; }).catch(err => console.error(err));
         }
     }
 
     playPauseBtn.addEventListener('click', () => {
         if (!globalAudio.src) return;
-        if (globalAudio.paused) {
-            globalAudio.play();
-            playPauseBtn.innerText = '';
-        } else {
-            globalAudio.pause();
-            playPauseBtn.innerText = '▶';
-        }
+        if (globalAudio.paused) { globalAudio.play(); playPauseBtn.innerText = '⏸'; } 
+        else { globalAudio.pause(); playPauseBtn.innerText = '▶'; }
     });
 
     globalAudio.addEventListener('timeupdate', () => {
@@ -1539,12 +1516,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     globalAudio.addEventListener('ended', () => {
-        if (isRepeat) {
-            globalAudio.currentTime = 0;
-            globalAudio.play();
-        } else {
-            playPauseBtn.innerText = '▶';
-        }
+        if (isRepeat) { globalAudio.currentTime = 0; globalAudio.play(); } 
+        else { playPauseBtn.innerText = '▶'; }
     });
 
     volumeSlider.addEventListener('input', (e) => {
@@ -1621,7 +1594,6 @@ function closeGame() {
     input = { left: false, right: false, up: false, down: false, fire: false };
 }
 
-// Keyboard controls
 document.addEventListener('keydown', (e) => {
     if (e.code === 'ArrowLeft' || e.code === 'KeyA') input.left = true;
     if (e.code === 'ArrowRight' || e.code === 'KeyD') input.right = true;
@@ -1646,7 +1618,6 @@ document.addEventListener('keyup', (e) => {
     if (e.code === 'Space') input.fire = false;
 });
 
-// Space Shooter
 let player, bullets, enemies;
 function initShooter() {
     player = { x: canvas.width/2 - 20, y: canvas.height - 60, w: 40, h: 40, cooldown: 0 };
@@ -1692,7 +1663,6 @@ function drawShooter() {
     enemies.forEach(e => { ctx.fillStyle = '#ff0055'; ctx.shadowBlur = 10; ctx.shadowColor = '#ff0055'; ctx.fillRect(e.x, e.y, e.w, e.h); ctx.shadowBlur = 0; });
 }
 
-// Pac-Man
 let pacman, ghosts, dots, mazeData;
 function initPacman() {
     mazeData = ['####################','#........#.........#','#.####.#.#.#.####.#.#','#.#....#...#....#.#.#','#.#.##.#.#.#.##.#.#.#','#.#.#......#.#....#.#','#...#.####.#.####...#','#.#.#......#.#....#.#','#.#.##.####.##.#....#','#.#....#..#....#....#','#.####.#..#.####....#','#......#..#.........#','####################'];
@@ -1759,7 +1729,6 @@ function drawPacman() {
     ghosts.forEach(ghost => { ctx.fillStyle = ghost.color; ctx.shadowBlur = 8; ctx.shadowColor = ghost.color; ctx.fillRect(ghost.x * cellSize + offsetX + 2, ghost.y * cellSize + offsetY + 2, cellSize - 4, cellSize - 4); ctx.shadowBlur = 0; });
 }
 
-// Snake
 let snake, dir, nextDir, food;
 function initSnake() {
     snake = [{ x: 15, y: 10 }]; dir = { x: 1, y: 0 }; nextDir = { x: 1, y: 0 }; food = { x: 20, y: 10 };
@@ -1823,7 +1792,7 @@ function renderMaze() {
             const cell = document.createElement('div');
             cell.className = 'maze-cell';
             if (maze[y][x] === 1) { cell.classList.add('wall'); cell.textContent = '🌑'; }
-            else if (playerPos.x === x && playerPos.y === y) { cell.classList.add('player'); cell.textContent = ''; }
+            else if (playerPos.x === x && playerPos.y === y) { cell.classList.add('player'); cell.textContent = '🚀'; }
             else {
                 const star = stars.find(s => s.x === x && s.y === y && !s.collected);
                 if (star) { cell.classList.add('star'); cell.textContent = '⭐'; }
@@ -1876,7 +1845,7 @@ function initRepeatQuest() {
     questStepIndex = 0;
     questShowingPattern = false;
 
-    const sounds = ['🥁', '', '', '🎸'];
+    const sounds = ['🥁', '🎩', '👏', '🎸'];
     for (let i = 0; i < 8; i++) {
         questPattern.push(sounds[Math.floor(Math.random() * sounds.length)]);
     }
@@ -1935,7 +1904,7 @@ function handleQuestStepClick(index, element) {
         questStepIndex++;
 
         if (questStepIndex >= 8) {
-            document.getElementById('questStatus').textContent = ' Отлично! Ты повторил бит!';
+            document.getElementById('questStatus').textContent = '🎉 Отлично! Ты повторил бит!';
             userData.xp += 300;
             userData.coins += 100;
             quests.quest3.current = 1;
@@ -2002,6 +1971,5 @@ function showNotification(text) {
     setTimeout(() => div.classList.remove('show'), 2500);
 }
 </script>
-
-
-</body></html>
+</body>
+</html>
