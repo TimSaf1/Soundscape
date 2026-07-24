@@ -62,10 +62,11 @@
             inset: 0;
             background: rgba(5, 7, 20, 0.98);
             z-index: 10000;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
         }
+        .auth-overlay.active { display: flex; }
         .auth-box {
             background: linear-gradient(135deg, rgba(17, 21, 48, 0.95), rgba(26, 31, 58, 0.95));
             border: 2px solid #00f3ff;
@@ -259,6 +260,10 @@
             cursor: pointer;
             margin-top: 10px;
             font-size: 13px;
+        }
+        .edit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         .projects-section {
             margin-top: 30px;
@@ -514,15 +519,15 @@
 </head>
 <body>
 
-<!-- AUTH -->
+<!-- AUTH MODAL -->
 <div class="auth-overlay" id="authOverlay">
     <div class="auth-box">
         <h2>🪐 SOUNDSCAPE</h2>
-        <p style="color:#aaa;margin-bottom:20px;">Войди или играй как гость</p>
+        <p style="color:#aaa;margin-bottom:20px;">Войди или создай аккаунт</p>
         <input type="text" class="auth-input" id="authUsername" placeholder="Имя пользователя">
         <input type="password" class="auth-input" id="authPassword" placeholder="Пароль">
-        <button class="auth-btn" onclick="registerUser()">🚀 Войти</button>
-        <button class="auth-btn guest-btn" onclick="guestLogin()">👤 Играть как гость</button>
+        <button class="auth-btn" onclick="registerUser()">🚀 Войти/Регистрация</button>
+        <button class="auth-btn guest-btn" onclick="guestLogin()"> Играть как гость</button>
     </div>
 </div>
 
@@ -530,7 +535,7 @@
 <div class="limit-modal" id="limitModal">
     <div class="limit-box">
         <h2>⚠️ Лимит исчерпан!</h2>
-        <p id="limitMessage">Вы достигли дневного лимита для гостевого аккаунта.</p>
+        <p id="limitMessage">Вы достигли дневного лимита.</p>
         <button class="auth-btn" onclick="showSubscriptions()" style="margin-bottom:10px;">💎 Оформить подписку</button>
         <button class="auth-btn guest-btn" onclick="closeLimitModal()">Закрыть</button>
     </div>
@@ -539,22 +544,25 @@
 <div class="notification" id="notification"></div>
 
 <header class="header">
-    <div class="logo">🪐 SOUNDSCAPE</div>
+    <div class="logo"> SOUNDSCAPE</div>
     <div class="stats">
         <div class="stat">⭐ <b id="userXP">0</b> XP</div>
-        <div class="stat">🏆 <b id="userLevel">1</b> LVL</div>
+        <div class="stat"> <b id="userLevel">1</b> LVL</div>
         <div class="stat">🪙 <b id="userCoins">100</b></div>
         <div class="stat">👤 <b id="userName">Гость</b><span id="userBadge" class="guest-badge">ГОСТЬ</span></div>
     </div>
     <div class="nav">
-        <button class="nav-btn active" onclick="showSection('games', event)">🎮 Игры</button>
+        <button class="nav-btn active" onclick="showSection('games', event)"> Игры</button>
         <button class="nav-btn" onclick="showSection('quests', event)">📜 Квесты</button>
         <button class="nav-btn" onclick="showSection('music', event)">🔊 Музыка</button>
+        <button class="nav-btn" onclick="showSection('beatmaker', event)">🎛️ Мини Студия</button>
+        <button class="nav-btn" onclick="showSection('beatmaker_pro', event)">🎹 Beat Pro</button>
         <button class="nav-btn" onclick="showSection('leaderboard', event)">🏆 Топ</button>
         <button class="nav-btn" onclick="showSection('achievements', event)">🏅 Награды</button>
         <button class="nav-btn" onclick="showSection('chat', event)">💬 Чат</button>
         <button class="nav-btn" onclick="showSection('profile', event)">👤 Профиль</button>
         <button class="nav-btn" onclick="showSection('subscriptions', event)">💎 Тарифы</button>
+        <button class="nav-btn" onclick="logout()" style="background:rgba(255,0,85,0.2);color:#ff0055;"> Выйти</button>
     </div>
 </header>
 
@@ -564,19 +572,19 @@
         <h2 style="text-align:center;margin-bottom:20px;font-size:28px;">Выбери миссию</h2>
         <div class="games-grid">
             <div class="game-card" onclick="startGame('shooter')">
-                <div class="game-icon"></div>
+                <div class="game-icon">🚀</div>
                 <div class="game-title">Space Shooter</div>
                 <div class="game-desc">Космический шутер с боссами!</div>
                 <button class="xp-btn">+100 XP</button>
             </div>
             <div class="game-card" onclick="startGame('pacman')">
-                <div class="game-icon"></div>
+                <div class="game-icon">🟡</div>
                 <div class="game-title">Звёздный Pac-Man</div>
                 <div class="game-desc">6 приведений, собирай точки!</div>
                 <button class="xp-btn">+200 XP</button>
             </div>
             <div class="game-card" onclick="startGame('invaders')">
-                <div class="game-icon">👾</div>
+                <div class="game-icon"></div>
                 <div class="game-title">Space Invaders</div>
                 <div class="game-desc">Классика! Уничтожь пришельцев</div>
                 <button class="xp-btn">+50 XP</button>
@@ -601,8 +609,8 @@
             <div id="memoryGameArea" style="display:none;"></div>
             <div class="controls">
                 <button class="btn btn-primary" onclick="launchGame()">▶ Старт</button>
-                <button class="btn" onclick="pauseGame()">⏸ Пауза</button>
-                <button class="btn" onclick="closeGame()"> Закрыть</button>
+                <button class="btn" onclick="pauseGame()"> Пауза</button>
+                <button class="btn" onclick="closeGame()">❌ Закрыть</button>
             </div>
             <div id="gameInfo" style="text-align:center;margin-top:15px;color:#00f3ff;font-weight:bold;"></div>
         </div>
@@ -610,7 +618,7 @@
 
     <!-- QUESTS -->
     <div id="quests" class="section">
-        <h2 style="text-align:center;margin-bottom:20px;font-size:28px;">📜 Активные квесты</h2>
+        <h2 style="text-align:center;margin-bottom:20px;font-size:28px;"> Активные квесты</h2>
         <div id="questsList" style="max-width:600px;margin:0 auto;"></div>
     </div>
 
@@ -634,6 +642,59 @@
                     <button id="repeat-btn" class="control-btn">🔁</button>
                     <button id="play-pause-btn" class="control-btn main-btn">▶</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MINI BEAT MAKER -->
+    <div id="beatmaker" class="section">
+        <h2 style="text-align:center;margin-bottom:20px;font-size:28px;">🎛️ Мини Бит Мэйкер</h2>
+        <div style="background:rgba(255,255,255,0.05);border:2px solid rgba(0,243,255,0.3);border-radius:20px;padding:30px;max-width:800px;margin:0 auto;">
+            <div style="text-align:center;margin-bottom:20px;">
+                <h3 style="color:#00f3ff;margin-bottom:10px;">Создай свой луп</h3>
+                <p style="color:#aaa;font-size:14px;">Выбирай звуки и создавай биты. Для сохранения проектов оформи подписку!</p>
+            </div>
+            
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:20px;">
+                <div onclick="playSound('kick')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(0,243,255,0.2);border-radius:10px;padding:15px;text-align:center;cursor:pointer;">
+                    <div style="font-size:30px;margin-bottom:5px;">🥁</div>
+                    <div style="font-size:12px;">808 Kick</div>
+                </div>
+                <div onclick="playSound('snare')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(0,243,255,0.2);border-radius:10px;padding:15px;text-align:center;cursor:pointer;">
+                    <div style="font-size:30px;margin-bottom:5px;">🪘</div>
+                    <div style="font-size:12px;">Trap Snare</div>
+                </div>
+                <div onclick="playSound('hihat')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(0,243,255,0.2);border-radius:10px;padding:15px;text-align:center;cursor:pointer;">
+                    <div style="font-size:30px;margin-bottom:5px;">🎩</div>
+                    <div style="font-size:12px;">Hi-Hat</div>
+                </div>
+                <div onclick="playSound('bass')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(0,243,255,0.2);border-radius:10px;padding:15px;text-align:center;cursor:pointer;">
+                    <div style="font-size:30px;margin-bottom:5px;">🎸</div>
+                    <div style="font-size:12px;">Reese Bass</div>
+                </div>
+                <div onclick="playSound('synth')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(0,243,255,0.2);border-radius:10px;padding:15px;text-align:center;cursor:pointer;">
+                    <div style="font-size:30px;margin-bottom:5px;">🎹</div>
+                    <div style="font-size:12px;">Synth</div>
+                </div>
+                <div onclick="playSound('fx')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(0,243,255,0.2);border-radius:10px;padding:15px;text-align:center;cursor:pointer;">
+                    <div style="font-size:30px;margin-bottom:5px;">✨</div>
+                    <div style="font-size:12px;">FX</div>
+                </div>
+            </div>
+
+            <div style="text-align:center;padding:20px;background:rgba(0,0,0,0.3);border-radius:12px;">
+                <p style="color:#aaa;margin-bottom:15px;">💡 Нажимай на звуки чтобы услышать их</p>
+                <button class="btn btn-primary" onclick="showSection('subscriptions')" style="margin-top:10px;">💎 Получить полный доступ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BEAT MAKER PRO -->
+    <div id="beatmaker_pro" class="section">
+        <h2 style="text-align:center;margin-bottom:20px;font-size:28px;">🎹 Beat Composer Pro</h2>
+        <div style="background:rgba(255,255,255,0.05);border:2px solid rgba(0,243,255,0.3);border-radius:20px;padding:30px;max-width:900px;margin:0 auto;">
+            <div id="beatProContent">
+                <!-- Контент загружается динамически -->
             </div>
         </div>
     </div>
@@ -662,10 +723,10 @@
 
     <!-- PROFILE -->
     <div id="profile" class="section">
-        <h2 style="text-align:center;margin-bottom:20px;font-size:28px;"> Профиль</h2>
+        <h2 style="text-align:center;margin-bottom:20px;font-size:28px;">👤 Профиль</h2>
         <div class="profile-card">
             <div class="profile-header">
-                <div class="profile-avatar">‍🚀</div>
+                <div class="profile-avatar">👨‍🚀</div>
                 <div class="profile-info">
                     <div class="profile-name" id="profileName">Гость</div>
                     <div class="profile-bio" id="profileBio">Нажми "Редактировать" чтобы добавить описание</div>
@@ -683,7 +744,7 @@
                             <div class="profile-stat-label">Игр</div>
                         </div>
                     </div>
-                    <button class="edit-btn" onclick="editBio()">✏️ Редактировать описание</button>
+                    <button class="edit-btn" id="editBioBtn" onclick="editBio()">✏️ Редактировать описание</button>
                 </div>
             </div>
 
@@ -708,11 +769,27 @@
                     <ul class="tier-features">
                         <li>🎮 2 игры в день</li>
                         <li> 1 квест в день</li>
-                        <li>🔊 Прослушивание превью</li>
+                        <li>🔊 Прослушивание музыки</li>
+                        <li>️ Мини бит мэйкер (без сохранения)</li>
                         <li> Без сохранения проектов</li>
-                        <li>❌ Нет премиум функций</li>
+                        <li>❌ Нет Beat Composer Pro</li>
                     </ul>
                     <button class="tier-btn" onclick="selectTier('guest')">Текущий тариф</button>
+                </div>
+
+                <div class="tier-card">
+                    <div class="tier-icon">‍💻</div>
+                    <h3 class="tier-name">Обычный</h3>
+                    <div class="tier-price">0 ₽<span>/мес</span></div>
+                    <ul class="tier-features">
+                        <li>🎮 Безлимитные игры</li>
+                        <li>📜 Безлимитные квесты</li>
+                        <li>🔊 Прослушивание музыки</li>
+                        <li>️ Мини бит мэйкер</li>
+                        <li>💾 До 3 проектов в месяц</li>
+                        <li>❌ Нет Beat Composer Pro</li>
+                    </ul>
+                    <button class="tier-btn" onclick="selectTier('regular')">Текущий тариф</button>
                 </div>
 
                 <div class="tier-card featured">
@@ -724,22 +801,22 @@
                         <li>🎮 Безлимитные игры</li>
                         <li>📜 Безлимитные квесты</li>
                         <li>🎵 До 20 битов в месяц</li>
-                        <li> Сохранение проектов</li>
+                        <li>💾 Сохранение проектов</li>
                         <li>🔊 Доступ к 50 звукам</li>
-                        <li> VIP статус</li>
+                        <li>🏆 VIP статус</li>
                     </ul>
                     <button class="tier-btn gold" onclick="selectTier('explorer')">Выбрать тариф</button>
                 </div>
 
                 <div class="tier-card">
-                    <div class="tier-icon">👑</div>
+                    <div class="tier-icon"></div>
                     <h3 class="tier-name">VIP Премиум</h3>
                     <div class="tier-price">799 ₽<span>/мес</span></div>
                     <ul class="tier-features">
-                        <li> Всё без ограничений</li>
-                        <li>🎵 Безлимитные биты</li>
+                        <li>🎮 Всё без ограничений</li>
+                        <li> Безлимитные биты</li>
                         <li>🔊 Все премиум звуки</li>
-                        <li> Автосохранение</li>
+                        <li>💾 Автосохранение</li>
                         <li>🌟 Ранний доступ</li>
                         <li>🎁 Эксклюзивные бонусы</li>
                     </ul>
@@ -758,7 +835,7 @@ let isGuest = false;
 let userData = {
     xp: 0, coins: 100, level: 1, gamesPlayed: 0, gamesToday: 0,
     lastGameDate: null, questsCompleted: 0, lastQuestDate: null,
-    bio: '', projects: [], achievements: []
+    bio: '', projects: [], achievements: [], beatsThisMonth: 0, lastBeatMonth: null
 };
 
 let currentGame = null, gameInterval = null, gameScore = 0, canvas, ctx;
@@ -766,10 +843,9 @@ let input = { left: false, right: false, up: false, down: false, fire: false };
 let globalAudio = new Audio();
 let isRepeat = false;
 
-// Quests data
 let questsData = [
-    { id: 'q1', title: 'Первая игра', desc: 'Сыграй в любую игру 1 раз', target: 1, current: 0, reward: 50, icon: '', completed: false },
-    { id: 'q2', title: 'Мастер игры', desc: 'Набери 500 очков в любой игре', target: 500, current: 0, reward: 150, icon: '🎯', completed: false },
+    { id: 'q1', title: 'Первая игра', desc: 'Сыграй в любую игру 1 раз', target: 1, current: 0, reward: 50, icon: '🎮', completed: false },
+    { id: 'q2', title: 'Мастер игры', desc: 'Набери 500 очков в любой игре', target: 500, current: 0, reward: 150, icon: '', completed: false },
     { id: 'q3', title: 'Музыкальная память', desc: 'Повтори бит из 8 шагов', target: 1, current: 0, reward: 300, icon: '🧠', completed: false },
     { id: 'q4', title: 'Коллекционер', desc: 'Собери 1000 XP', target: 1000, current: 0, reward: 200, icon: '💎', completed: false }
 ];
@@ -784,8 +860,9 @@ window.onload = function() {
         userTier = data.tier || 'guest';
         userData = data.userData || userData;
         checkDailyReset();
-        document.getElementById('authOverlay').style.display = 'none';
         initApp();
+    } else {
+        document.getElementById('authOverlay').classList.add('active');
     }
     renderQuests();
     renderAchievements();
@@ -801,6 +878,11 @@ function checkDailyReset() {
         userData.questsCompleted = 0;
         userData.lastQuestDate = today;
     }
+    const currentMonth = new Date().getMonth();
+    if (userData.lastBeatMonth !== currentMonth) {
+        userData.beatsThisMonth = 0;
+        userData.lastBeatMonth = currentMonth;
+    }
 }
 
 function registerUser() {
@@ -808,7 +890,7 @@ function registerUser() {
     const password = document.getElementById('authPassword').value.trim();
 
     if (username.length < 3) {
-        showNotification('❌ Никнейм минимум 3 символа');
+        showNotification(' Никнейм минимум 3 символа');
         return;
     }
     if (password.length < 4) {
@@ -818,8 +900,8 @@ function registerUser() {
 
     currentUser = username;
     isGuest = false;
-    userTier = 'guest';
-    document.getElementById('authOverlay').style.display = 'none';
+    userTier = 'regular'; // Обычный тариф для авторизованных
+    document.getElementById('authOverlay').classList.remove('active');
     initApp();
     saveUserData();
     showNotification('✅ Добро пожаловать, ' + username + '!');
@@ -829,18 +911,26 @@ function guestLogin() {
     currentUser = 'Guest_' + Math.floor(Math.random() * 10000);
     isGuest = true;
     userTier = 'guest';
-    document.getElementById('authOverlay').style.display = 'none';
+    document.getElementById('authOverlay').classList.remove('active');
     initApp();
     showNotification('👤 Гостевой режим');
 }
 
+function logout() {
+    localStorage.removeItem('soundscape_user');
+    location.reload();
+}
+
 function selectTier(tier) {
     if (tier === 'guest') {
-        showNotification('️ Вы уже используете гостевой тариф');
+        showNotification('⚠️ Вы уже используете гостевой тариф');
         return;
     }
     
-    if (tier === 'explorer') {
+    if (tier === 'regular') {
+        showNotification('✅ Тариф "Обычный" активирован\n\n🎮 Безлимитные игры\n📜 Безлимитные квесты\n💾 До 3 проектов в месяц');
+        userTier = 'regular';
+    } else if (tier === 'explorer') {
         showNotification('💎 Тариф "Исследователь" - 279₽/мес\n\n✅ Безлимитные игры и квесты\n✅ До 20 битов в месяц\n✅ Сохранение проектов');
         userTier = 'explorer';
     } else if (tier === 'vip') {
@@ -875,6 +965,10 @@ function initApp() {
         badge.textContent = 'VIP';
         badge.style.background = 'rgba(255,215,0,0.2)';
         badge.style.color = '#ffd700';
+    } else if (userTier === 'regular') {
+        badge.textContent = 'ОБЫЧНЫЙ';
+        badge.style.background = 'rgba(0,255,136,0.2)';
+        badge.style.color = '#00ff88';
     } else {
         badge.textContent = 'ГОСТЬ';
         badge.style.background = 'rgba(255,165,0,0.2)';
@@ -884,6 +978,7 @@ function initApp() {
     updateStats();
     updateProfile();
     loadProjects();
+    renderBeatPro();
 }
 
 function updateStats() {
@@ -900,9 +995,23 @@ function updateProfile() {
     if (userData.bio) {
         document.getElementById('profileBio').textContent = userData.bio;
     }
+    
+    // Запрет редактирования для гостей
+    const editBtn = document.getElementById('editBioBtn');
+    if (isGuest) {
+        editBtn.disabled = true;
+        editBtn.textContent = '🔒 Только для авторизованных';
+    } else {
+        editBtn.disabled = false;
+        editBtn.textContent = '✏️ Редактировать описание';
+    }
 }
 
 function editBio() {
+    if (isGuest) {
+        showNotification('❌ Редактирование доступно только для авторизованных пользователей');
+        return;
+    }
     const newBio = prompt('Введите описание профиля:', userData.bio || '');
     if (newBio !== null) {
         userData.bio = newBio;
@@ -949,6 +1058,7 @@ function showSection(id, event) {
     if (id === 'achievements') renderAchievements();
     if (id === 'leaderboard') renderLeaderboard();
     if (id === 'chat') renderChat();
+    if (id === 'beatmaker_pro') renderBeatPro();
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -965,7 +1075,7 @@ function closeLimitModal() {
 // === LIMITS ===
 function checkGameLimit() {
     if (userTier === 'guest' && userData.gamesToday >= 2) {
-        document.getElementById('limitMessage').textContent = 'Вы достигли лимита: 2 игры в день для гостей. Оформите подписку "Исследователь" за 279₽/мес для безлимита!';
+        document.getElementById('limitMessage').textContent = 'Вы достигли лимита: 2 игры в день для гостей. Оформите подписку для безлимита!';
         document.getElementById('limitModal').classList.add('active');
         return false;
     }
@@ -976,6 +1086,22 @@ function checkQuestLimit() {
     if (userTier === 'guest' && userData.questsCompleted >= 1) {
         document.getElementById('limitMessage').textContent = 'Вы достигли лимита: 1 квест в день для гостей. Оформите подписку для безлимита!';
         document.getElementById('limitModal').classList.add('active');
+        return false;
+    }
+    return true;
+}
+
+function checkBeatLimit() {
+    if (userTier === 'guest') {
+        showNotification('❌ Создание битов доступно только для авторизованных пользователей');
+        return false;
+    }
+    if (userTier === 'regular' && userData.beatsThisMonth >= 3) {
+        showNotification('❌ Лимит: 3 бита в месяц для обычного тарифа. Оформите подписку для увеличения лимита!');
+        return false;
+    }
+    if (userTier === 'explorer' && userData.beatsThisMonth >= 20) {
+        showNotification('❌ Лимит: 20 битов в месяц. Оформите VIP для безлимита!');
         return false;
     }
     return true;
@@ -996,11 +1122,11 @@ function startGame(type) {
     canvas.height = 500;
 
     const games = {
-        'shooter': { title: '🚀 Space Shooter' },
+        'shooter': { title: ' Space Shooter' },
         'pacman': { title: '🟡 Pac-Man' },
         'invaders': { title: '👾 Space Invaders' },
         'snake': { title: '🐍 Змейка' },
-        'memory': { title: ' Memory Game' }
+        'memory': { title: '🧠 Memory Game' }
     };
     document.getElementById('gameTitle').textContent = games[type].title;
 
@@ -1360,7 +1486,7 @@ function startSnake() {
         
         if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows) {
             clearInterval(gameInterval);
-            showNotification('💥 Game Over! Счёт: ' + gameScore);
+            showNotification(' Game Over! Счёт: ' + gameScore);
             return;
         }
         
@@ -1406,12 +1532,12 @@ function drawSnake() {
     ctx.fill();
 }
 
-// MEMORY GAME (NEW!)
+// MEMORY GAME
 let memoryCards = [];
 let flippedCards = [];
 let matchedPairs = 0;
 let memoryMoves = 0;
-const memorySymbols = ['🎵', '🎸', '', '🎺', '', '🥁', '', '🎧'];
+const memorySymbols = ['🎵', '', '🎺', '', '🥁', '', '🎤', ''];
 
 function initMemoryGame() {
     const area = document.getElementById('memoryGameArea');
@@ -1434,7 +1560,7 @@ function initMemoryGame() {
 
 function startMemoryGame() {
     initMemoryGame();
-    showNotification(' Найди все 8 пар!');
+    showNotification('🧠 Найди все 8 пар!');
 }
 
 function flipCard(card) {
@@ -1466,7 +1592,7 @@ function flipCard(card) {
                     saveUserData();
                     updateStats();
                     setTimeout(() => {
-                        showNotification(` Победа! Ходов: ${memoryMoves}`);
+                        showNotification(`🎉 Победа! Ходов: ${memoryMoves}`);
                     }, 500);
                 }
             } else {
@@ -1527,9 +1653,9 @@ function renderAchievements() {
     if (!container) return;
     
     const achievements = [
-        { id: 'a1', name: 'Первые шаги', desc: 'Сыграй первую игру', icon: '🎮' },
+        { id: 'a1', name: 'Первые шаги', desc: 'Сыграй первую игру', icon: '' },
         { id: 'a2', name: 'Коллекционер', desc: 'Собери 500 XP', icon: '💎' },
-        { id: 'a3', name: 'Мастер', desc: 'Достигни 5 уровня', icon: '🏆' },
+        { id: 'a3', name: 'Мастер', desc: 'Достигни 5 уровня', icon: '' },
         { id: 'a4', name: 'Музыкант', desc: 'Прослушай 10 треков', icon: '🎵' }
     ];
     
@@ -1540,7 +1666,7 @@ function renderAchievements() {
                 <div class="quest-header">
                     <div class="quest-icon">${a.icon}</div>
                     <div>
-                        <div class="quest-title">${a.name} ${unlocked ? '✅' : '🔒'}</div>
+                        <div class="quest-title">${a.name} ${unlocked ? '✅' : ''}</div>
                         <div class="quest-desc">${a.desc}</div>
                     </div>
                 </div>
@@ -1678,6 +1804,136 @@ function playTrack(url, title, artist, cover) {
     document.getElementById('player-cover').src = cover;
     document.getElementById('player-card').classList.remove('hidden');
     document.getElementById('play-pause-btn').innerText = '⏸';
+}
+
+// === MINI BEAT MAKER SOUNDS ===
+function playSound(type) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    const sounds = {
+        kick: { freq: 60, type: 'sine', duration: 0.5 },
+        snare: { freq: 200, type: 'triangle', duration: 0.2 },
+        hihat: { freq: 8000, type: 'square', duration: 0.05 },
+        bass: { freq: 50, type: 'sawtooth', duration: 0.4 },
+        synth: { freq: 440, type: 'sine', duration: 0.3 },
+        fx: { freq: 880, type: 'square', duration: 0.1 }
+    };
+
+    const sound = sounds[type];
+    osc.frequency.setValueAtTime(sound.freq, ctx.currentTime);
+    osc.type = sound.type;
+    gain.gain.setValueAtTime(0.5, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + sound.duration);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + sound.duration);
+}
+
+// === BEAT MAKER PRO ===
+function renderBeatPro() {
+    const container = document.getElementById('beatProContent');
+    
+    if (userTier === 'guest') {
+        container.innerHTML = `
+            <div style="text-align:center;padding:40px;">
+                <h3 style="color:#ff0055;margin-bottom:15px;"> Доступ ограничен</h3>
+                <p style="color:#aaa;margin-bottom:20px;">Beat Composer Pro доступен только для авторизованных пользователей</p>
+                <button class="btn btn-primary" onclick="showSection('subscriptions')">💎 Оформить подписку</button>
+            </div>
+        `;
+        return;
+    }
+    
+    const beatLimit = userTier === 'regular' ? 3 : (userTier === 'explorer' ? 20 : 999);
+    const remaining = beatLimit - userData.beatsThisMonth;
+    
+    container.innerHTML = `
+        <div style="text-align:center;margin-bottom:20px;">
+            <h3 style="color:#00f3ff;margin-bottom:10px;"> Beat Composer Pro</h3>
+            <p style="color:#aaa;">Осталось битов в этом месяце: <b style="color:#00f3ff;">${remaining}</b></p>
+        </div>
+        
+        <div style="background:rgba(0,0,0,0.3);padding:20px;border-radius:12px;margin-bottom:20px;">
+            <h4 style="color:#00f3ff;margin-bottom:15px;">Создать новый бит</h4>
+            <input type="text" id="beatName" placeholder="Название бита" style="width:100%;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(0,243,255,0.3);border-radius:8px;color:#fff;margin-bottom:15px;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-bottom:20px;">
+                <div onclick="addBeatSound('kick')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(0,243,255,0.2);border-radius:8px;padding:10px;text-align:center;cursor:pointer;">
+                    <div style="font-size:24px;">🥁</div>
+                    <div style="font-size:11px;">Kick</div>
+                </div>
+                <div onclick="addBeatSound('snare')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(0,243,255,0.2);border-radius:8px;padding:10px;text-align:center;cursor:pointer;">
+                    <div style="font-size:24px;">🪘</div>
+                    <div style="font-size:11px;">Snare</div>
+                </div>
+                <div onclick="addBeatSound('hihat')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(0,243,255,0.2);border-radius:8px;padding:10px;text-align:center;cursor:pointer;">
+                    <div style="font-size:24px;">🎩</div>
+                    <div style="font-size:11px;">Hi-Hat</div>
+                </div>
+                <div onclick="addBeatSound('bass')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(0,243,255,0.2);border-radius:8px;padding:10px;text-align:center;cursor:pointer;">
+                    <div style="font-size:24px;"></div>
+                    <div style="font-size:11px;">Bass</div>
+                </div>
+            </div>
+            <div id="beatSequence" style="background:rgba(0,0,0,0.3);padding:15px;border-radius:8px;margin-bottom:15px;min-height:60px;">
+                <p style="color:#aaa;text-align:center;">Добавь звуки для создания бита</p>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="saveBeat()">💾 Сохранить</button>
+                <button class="btn" onclick="clearBeat()">🗑️ Очистить</button>
+            </div>
+        </div>
+    `;
+}
+
+let currentBeat = [];
+
+function addBeatSound(type) {
+    currentBeat.push({ type, timestamp: Date.now() });
+    renderBeatSequence();
+}
+
+function renderBeatSequence() {
+    const container = document.getElementById('beatSequence');
+    if (currentBeat.length === 0) {
+        container.innerHTML = '<p style="color:#aaa;text-align:center;">Добавь звуки для создания бита</p>';
+        return;
+    }
+    
+    const icons = { kick: '', snare: '🪘', hihat: '🎩', bass: '' };
+    container.innerHTML = currentBeat.map((sound, i) => `
+        <span style="display:inline-block;background:rgba(0,243,255,0.2);padding:5px 10px;border-radius:5px;margin:2px;">
+            ${icons[sound.type] || '🎵'} ${sound.type}
+        </span>
+    `).join('');
+}
+
+function saveBeat() {
+    if (!checkBeatLimit()) return;
+    
+    const name = document.getElementById('beatName').value.trim() || 'Бит ' + (userData.projects.length + 1);
+    
+    userData.projects.push({
+        name: name,
+        sounds: currentBeat,
+        createdAt: new Date().toISOString()
+    });
+    
+    userData.beatsThisMonth++;
+    currentBeat = [];
+    
+    saveUserData();
+    renderBeatPro();
+    showNotification('✅ Бит сохранён!');
+}
+
+function clearBeat() {
+    currentBeat = [];
+    renderBeatSequence();
 }
 
 // === NOTIFICATIONS ===
