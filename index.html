@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Soundscape | Музыкальная Вселенная</title>
+<script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
 <style>
 :root {
 --bg-dark: #0a0e27; --bg-panel: #111530; --bg-cell: #1a1f3a;
@@ -209,6 +210,19 @@ canvas.game-canvas { width: 100%; max-width: 800px; height: auto; aspect-ratio: 
 .notification.show { transform: translateX(-50%) translateY(0); }
 .hidden { display: none !important; }
 .click-particle { position: fixed; color: #ffd700; font-weight: bold; font-size: 20px; pointer-events: none; z-index: 9999; transition: all 1s ease-out; }
+
+/* Beat Maker Styles */
+.beatmaker-container { background: rgba(0,0,0,0.5); border: 2px solid var(--accent); border-radius: 16px; padding: 20px; margin-top: 20px; }
+.sound-selector { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+.sound-btn { padding: 10px 20px; border: 2px solid var(--accent); border-radius: 8px; background: rgba(0,0,0,0.3); color: #fff; cursor: pointer; font-size: 14px; transition: all 0.3s; }
+.sound-btn:hover { background: var(--accent); color: #000; }
+.sound-btn.active { background: var(--accent); color: #000; }
+.beat-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; margin: 20px 0; }
+.beat-cell { aspect-ratio: 1; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.beat-cell:hover { border-color: var(--accent); background: rgba(0,243,255,0.1); }
+.beat-cell.active { background: var(--accent); border-color: var(--accent); color: #000; }
+.beat-controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+
 @media (max-width: 768px) {
 .hero-title { font-size: 32px; }
 .maze-container { grid-template-columns: repeat(10, 30px); grid-template-rows: repeat(10, 30px); }
@@ -217,6 +231,8 @@ canvas.game-canvas { width: 100%; max-width: 800px; height: auto; aspect-ratio: 
 .tier-card.featured { transform: none; }
 .memory-grid { grid-template-columns: repeat(4, 1fr); }
 .memory-card { font-size: 24px; }
+.beat-grid { grid-template-columns: repeat(4, 1fr); }
+.sound-selector { justify-content: center; }
 }
 </style>
 </head>
@@ -251,15 +267,15 @@ canvas.game-canvas { width: 100%; max-width: 800px; height: auto; aspect-ratio: 
 </div>
 </div>
 <div class="nav">
-<button class="nav-btn active" onclick="showSection('home', event)">🏠 Главная</button>
-<button class="nav-btn" onclick="showSection('games', event)">🎮 Игры</button>
+<button class="nav-btn active" onclick="showSection('home', event)"> Главная</button>
+<button class="nav-btn" onclick="showSection('games', event)"> Игры</button>
 <button class="nav-btn" onclick="showSection('quests', event)">📜 Квесты</button>
 <button class="nav-btn" onclick="showSection('music', event)">🔊 Музыка</button>
-<button class="nav-btn" onclick="goToBeatProList()">🎹 Beat Pro</button>
+<button class="nav-btn" onclick="showSection('beatmaker', event)">🎹 Beat Pro</button>
 <button class="nav-btn" onclick="showSection('leaderboard', event)">🏆 Топ</button>
 <button class="nav-btn" onclick="showSection('achievements', event)">🏅 Награды</button>
-<button class="nav-btn" onclick="showSection('chat', event)">💬 Чат</button>
-<button class="nav-btn" onclick="showSection('profile', event)">👤 Профиль</button>
+<button class="nav-btn" onclick="showSection('chat', event)"> Чат</button>
+<button class="nav-btn" onclick="showSection('profile', event)"> Профиль</button>
 <button class="nav-btn" onclick="showSection('subscriptions', event)">💎 Тарифы</button>
 <button class="nav-btn" onclick="logout()" style="background:rgba(255,0,85,0.2);color:#ff0055;">🚪 Выйти</button>
 </div>
@@ -271,7 +287,7 @@ canvas.game-canvas { width: 100%; max-width: 800px; height: auto; aspect-ratio: 
 <p class="hero-subtitle">Погрузись в музыкальную вселенную. Играй в аркадные миссии, проходи ритм-квесты и стань профессиональным космическим битмейкером.</p>
 <div class="hero-buttons">
 <button class="hero-btn hero-btn-primary" onclick="showSection('games')">🚀 Начать миссию</button>
-<button class="hero-btn hero-btn-secondary" onclick="goToBeatProList()">🎹 Стать битмейкером</button>
+<button class="hero-btn hero-btn-secondary" onclick="showSection('beatmaker')">🎹 Стать битмейкером</button>
 </div>
 </div>
 <div class="features-grid">
@@ -285,7 +301,7 @@ canvas.game-canvas { width: 100%; max-width: 800px; height: auto; aspect-ratio: 
 <div class="feature-title">Ритм-квесты</div>
 <div class="feature-desc">Проходи лабиринты и запоминай музыкальные паттерны для получения наград.</div>
 </div>
-<div class="feature-card" onclick="goToBeatProList()">
+<div class="feature-card" onclick="showSection('beatmaker')">
 <span class="feature-icon">🎹</span>
 <div class="feature-title">Beat Maker Pro</div>
 <div class="feature-desc">Профессиональная студия с высоким качеством звуков и экспортом в MP3.</div>
@@ -305,7 +321,7 @@ canvas.game-canvas { width: 100%; max-width: 800px; height: auto; aspect-ratio: 
 <div id="games" class="section">
 <h2 class="section-title">🎮 Выбери миссию</h2>
 <div class="games-grid">
-<div class="game-card" onclick="startGame('shooter')"><div class="game-icon">🚀</div><div class="game-title">Space Shooter</div><div class="game-desc">Космический шутер с боссами!</div><button class="xp-btn">+100 XP</button></div>
+<div class="game-card" onclick="startGame('shooter')"><div class="game-icon"></div><div class="game-title">Space Shooter</div><div class="game-desc">Космический шутер с боссами!</div><button class="xp-btn">+100 XP</button></div>
 <div class="game-card" onclick="startGame('pacman')"><div class="game-icon">🟡</div><div class="game-title">Звёздный Pac-Man</div><div class="game-desc">6 приведений, собирай точки!</div><button class="xp-btn">+200 XP</button></div>
 <div class="game-card" onclick="startGame('invaders')"><div class="game-icon">👾</div><div class="game-title">Space Invaders</div><div class="game-desc">Классика! Уничтожь пришельцев</div><button class="xp-btn">+50 XP</button></div>
 <div class="game-card" onclick="startGame('snake')"><div class="game-icon">🐍</div><div class="game-title">Звёздная змейка</div><div class="game-desc">Собирай звёзды</div><button class="xp-btn">+15 XP</button></div>
@@ -336,7 +352,7 @@ canvas.game-canvas { width: 100%; max-width: 800px; height: auto; aspect-ratio: 
 </div>
 <div class="controls">
 <button class="btn btn-primary" onclick="launchGame()">▶ Старт</button>
-<button class="btn" onclick="pauseGame()">⏸ Пауза</button>
+<button class="btn" onclick="pauseGame()"> Пауза</button>
 <button class="btn btn-danger" onclick="closeGame()">❌ Закрыть</button>
 </div>
 <div id="gameInfo" style="text-align:center;margin-top:10px;color:var(--accent); font-weight: bold; font-size:14px;"></div>
@@ -345,7 +361,7 @@ canvas.game-canvas { width: 100%; max-width: 800px; height: auto; aspect-ratio: 
 <div id="quests" class="section">
 <h2 class="section-title">📜 Активные квесты</h2>
 <div class="quest-section">
-<h3 style="margin-bottom:12px;color:var(--accent);">🎮 Квест 1: Лабиринт сокровищ</h3>
+<h3 style="margin-bottom:12px;color:var(--accent);"> Квест 1: Лабиринт сокровищ</h3>
 <div style="text-align:center;margin-bottom:8px; color: var(--text-muted);">Собери <b id="starsCollected" style="color:var(--accent)">0</b> из <b id="totalStars">5</b> ⭐</div>
 <div class="maze-container" id="mazeGrid"></div>
 <div style="text-align:center;margin-top:10px;">
@@ -359,7 +375,7 @@ canvas.game-canvas { width: 100%; max-width: 800px; height: auto; aspect-ratio: 
 <div class="quest-pattern" id="questPattern"></div>
 <div class="quest-status" id="questStatus">Нажми "Показать паттерн" чтобы начать</div>
 <div style="text-align:center;margin-top:12px;">
-<button class="btn btn-primary" onclick="showPattern()">👁 Показать паттерн</button>
+<button class="btn btn-primary" onclick="showPattern()"> Показать паттерн</button>
 <button class="btn" onclick="resetRepeatQuest()">🔄 Сбросить</button>
 </div>
 </div>
@@ -397,12 +413,31 @@ canvas.game-canvas { width: 100%; max-width: 800px; height: auto; aspect-ratio: 
 </div>
 </div>
 </div>
+<div id="beatmaker" class="section">
+<h2 class="section-title">🎹 Beat Composer Pro</h2>
+<div class="beatmaker-container">
+<div class="sound-selector">
+<button class="sound-btn active" onclick="selectSound('kick')"> Kick</button>
+<button class="sound-btn" onclick="selectSound('snare')"> Snare</button>
+<button class="sound-btn" onclick="selectSound('hihat')"> Hi-Hat</button>
+<button class="sound-btn" onclick="selectSound('bass')">🎸 Bass</button>
+<button class="sound-btn" onclick="selectSound('synth')">🎹 Synth</button>
+</div>
+<div class="beat-grid" id="beatGrid"></div>
+<div class="beat-controls">
+<button class="btn btn-primary" onclick="playBeat()">▶ Play</button>
+<button class="btn" onclick="stopBeat()"> Stop</button>
+<button class="btn" onclick="clearBeat()">🗑 Clear</button>
+<button class="btn btn-primary" onclick="exportBeat()">💾 Export MP3</button>
+</div>
+</div>
+</div>
 <div id="leaderboard" class="section">
 <h2 class="section-title">🏆 Топ игроков</h2>
 <div id="leaderboardList" class="leaderboard-card"></div>
 </div>
 <div id="achievements" class="section">
-<h2 class="section-title">🏅 Достижения</h2>
+<h2 class="section-title"> Достижения</h2>
 <div id="achievementsList" style="max-width:600px;margin:0 auto;"></div>
 </div>
 <div id="chat" class="section">
@@ -432,7 +467,7 @@ canvas.game-canvas { width: 100%; max-width: 800px; height: auto; aspect-ratio: 
 </div>
 </div>
 <div class="projects-section">
-<h3>🎵 Мои проекты</h3>
+<h3> Мои проекты</h3>
 <div id="projectList">
 <p style="color:var(--text-muted);text-align:center;padding:20px;">Нет сохранённых проектов</p>
 </div>
@@ -451,7 +486,7 @@ canvas.game-canvas { width: 100%; max-width: 800px; height: auto; aspect-ratio: 
 <ul class="tier-features">
 <li>🎮 2 игры в день</li>
 <li>📜 1 квест в день</li>
-<li>🔊 Прослушивание музыки</li>
+<li> Прослушивание музыки</li>
 <li>❌ Нет сохранения проектов</li>
 <li>❌ Нет доступа к Beat Pro</li>
 </ul>
@@ -462,7 +497,7 @@ canvas.game-canvas { width: 100%; max-width: 800px; height: auto; aspect-ratio: 
 <h3 class="tier-name">Обычный</h3>
 <div class="tier-price">0 ₽<span>/мес</span></div>
 <ul class="tier-features">
-<li>🎮 Безлимитные игры</li>
+<li> Безлимитные игры</li>
 <li>📜 Безлимитные квесты</li>
 <li>🔊 Прослушивание музыки</li>
 <li>💾 До 3 проектов в хранилище</li>
@@ -477,9 +512,9 @@ canvas.game-canvas { width: 100%; max-width: 800px; height: auto; aspect-ratio: 
 <div class="tier-price">279 ₽<span>/мес</span></div>
 <ul class="tier-features">
 <li>🎮 Безлимитные игры</li>
-<li>📜 Безлимитные квесты</li>
+<li> Безлимитные квесты</li>
 <li>💾 До 20 проектов в хранилище</li>
-<li>🎹 Полный доступ к Beat Pro</li>
+<li> Полный доступ к Beat Pro</li>
 <li>🏆 VIP статус</li>
 </ul>
 <button class="tier-btn gold" onclick="selectTier('explorer')">Выбрать тариф</button>
@@ -525,6 +560,12 @@ let questsData = [
 { id: 'q5', title: 'Космический магнат', desc: 'Накопи 1000 монет в кликере', target: 1000, current: 0, reward: 250, icon: '💰', completed: false }
 ];
 
+// Beat Maker variables
+let currentSound = 'kick';
+let beatPattern = Array(8).fill(null);
+let beatInterval = null;
+let audioContext = null;
+
 window.onload = function() {
     const saved = localStorage.getItem('soundscape_current_user') || localStorage.getItem('soundscape_user');
     if (saved) {
@@ -542,7 +583,132 @@ window.onload = function() {
     }
     renderQuests();
     renderAchievements();
+    initBeatMaker();
 };
+
+function initBeatMaker() {
+    const grid = document.getElementById('beatGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    for (let i = 0; i < 8; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'beat-cell';
+        cell.dataset.index = i;
+        cell.onclick = () => toggleBeatCell(i);
+        grid.appendChild(cell);
+    }
+}
+
+function selectSound(sound) {
+    currentSound = sound;
+    document.querySelectorAll('.sound-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+}
+
+function toggleBeatCell(index) {
+    const cell = document.querySelector(`.beat-cell[data-index="${index}"]`);
+    if (beatPattern[index] === null) {
+        beatPattern[index] = currentSound;
+        cell.classList.add('active');
+        playSound(currentSound);
+    } else {
+        beatPattern[index] = null;
+        cell.classList.remove('active');
+    }
+}
+
+function playSound(type) {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    switch(type) {
+        case 'kick':
+            oscillator.frequency.setValueAtTime(150, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            gainNode.gain.setValueAtTime(1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+            break;
+        case 'snare':
+            oscillator.type = 'triangle';
+            oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.2);
+            break;
+        case 'hihat':
+            oscillator.type = 'square';
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+            break;
+        case 'bass':
+            oscillator.frequency.setValueAtTime(60, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.8, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.4);
+            break;
+        case 'synth':
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+            break;
+    }
+}
+
+function playBeat() {
+    if (beatInterval) clearInterval(beatInterval);
+    let currentStep = 0;
+    beatInterval = setInterval(() => {
+        if (beatPattern[currentStep]) {
+            playSound(beatPattern[currentStep]);
+            const cells = document.querySelectorAll('.beat-cell');
+            cells.forEach((cell, i) => {
+                if (i === currentStep) cell.style.borderColor = '#00ff88';
+                else cell.style.borderColor = '';
+            });
+        }
+        currentStep = (currentStep + 1) % 8;
+    }, 250);
+}
+
+function stopBeat() {
+    if (beatInterval) {
+        clearInterval(beatInterval);
+        beatInterval = null;
+        const cells = document.querySelectorAll('.beat-cell');
+        cells.forEach(cell => cell.style.borderColor = '');
+    }
+}
+
+function clearBeat() {
+    beatPattern = Array(8).fill(null);
+    const cells = document.querySelectorAll('.beat-cell');
+    cells.forEach(cell => {
+        cell.classList.remove('active');
+        cell.style.borderColor = '';
+    });
+    stopBeat();
+}
+
+function exportBeat() {
+    showNotification(' Экспорт MP3 доступен в полной версии!');
+}
 
 function checkDailyReset() {
     const today = new Date().toDateString();
@@ -582,7 +748,7 @@ function logout() {
 }
 
 function selectTier(tier) {
-    if (tier === 'guest') { showNotification('⚠️ Вы уже используете гостевой тариф'); return; }
+    if (tier === 'guest') { showNotification('️ Вы уже используете гостевой тариф'); return; }
     isGuest = false;
     if (currentUser === 'Гость' || currentUser.startsWith('Гость_')) {
         currentUser = 'User_' + Math.floor(Math.random() * 10000);
@@ -671,6 +837,7 @@ function showSection(id, event) {
     if (id === 'achievements') renderAchievements();
     if (id === 'leaderboard') renderLeaderboard();
     if (id === 'chat') renderChat();
+    if (id === 'beatmaker') initBeatMaker();
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -693,15 +860,6 @@ function checkQuestLimit() {
         return false;
     }
     return true;
-}
-
-function goToBeatProList() {
-    if (isGuest) {
-        document.getElementById('limitMessage').textContent = '⛔ Beat Composer Pro доступен только для авторизованных пользователей. Оформите подписку для доступа!';
-        document.getElementById('limitModal').classList.add('active');
-        return;
-    }
-    window.location.href = 'beatmaker_pro_list.html';
 }
 
 function startGame(type) {
@@ -991,7 +1149,7 @@ function drawSnake() {
 }
 
 let memoryCards = [], flippedCards = [], matchedPairs = 0, memoryMoves = 0;
-const memorySymbols = ['🎵', '🎷', '🎺', '🎻', '🥁', '🎸', '🎤', '🎹'];
+const memorySymbols = ['🎵', '🎷', '🎺', '', '🥁', '🎸', '🎤', '🎹'];
 function initMemoryGame() {
     const area = document.getElementById('memoryGameArea');
     memoryCards = [...memorySymbols, ...memorySymbols].sort(() => Math.random() - 0.5);
@@ -1055,7 +1213,7 @@ function renderMaze() {
             const cell = document.createElement('div');
             cell.className = 'maze-cell';
             if (maze[y][x] === 1) { cell.classList.add('wall'); cell.textContent = '🌑'; }
-            else if (playerPos.x === x && playerPos.y === y) { cell.classList.add('player'); cell.textContent = '🚀'; }
+            else if (playerPos.x === x && playerPos.y === y) { cell.classList.add('player'); cell.textContent = ''; }
             else { const star = stars.find(s => s.x === x && s.y === y && !s.collected); if (star) { cell.classList.add('star'); cell.textContent = '⭐'; } }
             grid.appendChild(cell);
         }
@@ -1094,7 +1252,7 @@ function updateMazeStats() {
 function initRepeatQuest() {
     if (questsData.find(q => q.id === 'q3').completed) { document.getElementById('questStatus').textContent = '✅ Квест уже выполнен!'; return; }
     questPattern = []; userPattern = []; questStepIndex = 0; questShowingPattern = false;
-    const sounds = ['🥁', '🎩', '👏', '🎸'];
+    const sounds = ['🥁', '🎩', '', '🎸'];
     for (let i = 0; i < 8; i++) questPattern.push(sounds[Math.floor(Math.random() * sounds.length)]);
     renderQuestPattern();
     document.getElementById('questStatus').textContent = 'Нажми "Показать паттерн" чтобы начать';
@@ -1204,8 +1362,8 @@ function renderAchievements() {
     if (!container) return;
     const achievements = [
         { id: 'a1', name: 'Первые шаги', desc: 'Сыграй первую игру', icon: '🎮' },
-        { id: 'a2', name: 'Коллекционер', desc: 'Собери 500 XP', icon: '💎' },
-        { id: 'a3', name: 'Мастер', desc: 'Достигни 5 уровня', icon: '🏆' },
+        { id: 'a2', name: 'Коллекционер', desc: 'Собери 500 XP', icon: '' },
+        { id: 'a3', name: 'Мастер', desc: 'Достигни 5 уровня', icon: '' },
         { id: 'a4', name: 'Музыкант', desc: 'Прослушай 10 треков', icon: '🎵' },
         { id: 'a5', name: 'Космический магнат', desc: 'Накопи 1000 монет', icon: '💰' }
     ];
@@ -1309,7 +1467,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (playPauseBtn) {
         playPauseBtn.addEventListener('click', () => {
             if (!globalAudio.src) return;
-            if (globalAudio.paused) { globalAudio.play(); playPauseBtn.innerText = '⏸'; }
+            if (globalAudio.paused) { globalAudio.play(); playPauseBtn.innerText = ''; }
             else { globalAudio.pause(); playPauseBtn.innerText = '▶'; }
         });
     }
