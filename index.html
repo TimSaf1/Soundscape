@@ -4,26 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Soundscape | Музыкальная Вселенная</title>
-<script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
 <style>
 :root {
-  --bg-dark: #0a0e27; --bg-panel: #111530; --bg-cell: #1a1f3a;
-  --accent: #00f3ff; --accent-dim: rgba(0, 243, 255, 0.15);
-  --text: #ffffff; --text-muted: #8892b0; --border: #00f3ff;
-  --danger: #ff0055; --success: #00ff88; --purple: #bc13fe; --gold: #ffd700;
-  --gradient-1: linear-gradient(135deg, #00f3ff, #bc13fe);
+--bg-dark: #0a0e27; --bg-panel: #111530; --bg-cell: #1a1f3a;
+--accent: #00f3ff; --accent-dim: rgba(0, 243, 255, 0.15);
+--text: #ffffff; --text-muted: #8892b0; --border: #00f3ff;
+--danger: #ff0055; --success: #00ff88; --purple: #bc13fe;
+--gradient-1: linear-gradient(135deg, #00f3ff, #bc13fe);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body {
-  background: radial-gradient(ellipse at top, #1a1f3a 0%, #0a0e27 40%, #050714 100%);
-  color: var(--text); font-family: 'Segoe UI', Roboto, sans-serif;
-  min-height: 100vh; overflow-x: hidden;
+background: radial-gradient(ellipse at top, #1a1f3a 0%, #0a0e27 40%, #050714 100%);
+color: var(--text); font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+min-height: 100vh; overflow-x: hidden;
 }
-body { touch-action: pan-y; }
-
 #spaceCanvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 body.space-bg-active::before, body.space-bg-active::after {
-  content: ''; position: fixed; border-radius: 50%; filter: blur(120px); opacity: 0.2; z-index: 0; pointer-events: none;
+content: ''; position: fixed; border-radius: 50%; filter: blur(120px); opacity: 0.2; z-index: 0; pointer-events: none;
 }
 body.space-bg-active::before { width: 600px; height: 600px; background: radial-gradient(circle, var(--purple) 0%, transparent 70%); top: -150px; right: -150px; animation: float 20s ease-in-out infinite; }
 body.space-bg-active::after { width: 700px; height: 700px; background: radial-gradient(circle, var(--accent) 0%, transparent 70%); bottom: -200px; left: -200px; animation: float 25s ease-in-out infinite reverse; }
@@ -31,100 +28,103 @@ body.space-bg-active::after { width: 700px; height: 700px; background: radial-gr
 @keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 20px rgba(0, 243, 255, 0.4); } 50% { box-shadow: 0 0 40px rgba(188, 19, 254, 0.6); } }
 @keyframes shimmer { to { background-position: 200% center; } }
-
 .auth-overlay { position: fixed; inset: 0; background: rgba(5, 7, 20, 0.98); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
 .auth-overlay.active { display: flex; }
-.auth-box { background: linear-gradient(135deg, rgba(17, 21, 48, 0.95), rgba(26, 31, 58, 0.95)); border: 2px solid var(--accent); border-radius: 24px; padding: 40px; width: 90%; max-width: 450px; text-align: center; }
+.auth-box { background: linear-gradient(135deg, rgba(17, 21, 48, 0.95), rgba(26, 31, 58, 0.95)); border: 2px solid var(--accent); border-radius: 24px; padding: 40px; width: 90%; max-width: 450px; text-align: center; box-shadow: 0 0 60px rgba(0, 243, 255, 0.3); }
 .auth-box h2 { font-size: 32px; margin-bottom: 10px; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.auth-input { width: 100%; padding: 14px; margin: 10px 0; background: rgba(0,0,0,0.4); border: 2px solid rgba(0,243,255,0.3); border-radius: 12px; color: #fff; font-size: 16px; }
-.auth-btn { width: 100%; padding: 14px; margin-top: 20px; background: var(--gradient-1); border: none; border-radius: 12px; color: #000; font-size: 16px; font-weight: 700; cursor: pointer; }
+.auth-box p { color: var(--text-muted); margin-bottom: 30px; }
+.auth-input { width: 100%; padding: 14px 18px; margin: 10px 0; background: rgba(0, 0, 0, 0.4); border: 2px solid rgba(0, 243, 255, 0.3); border-radius: 12px; color: #fff; font-size: 16px; transition: all 0.3s; }
+.auth-input:focus { border-color: var(--accent); box-shadow: 0 0 20px rgba(0, 243, 255, 0.3); outline: none; }
+.auth-btn { width: 100%; padding: 14px; margin-top: 20px; background: var(--gradient-1); border: none; border-radius: 12px; color: #000; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s; }
+.auth-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0, 243, 255, 0.4); }
 .auth-btn.guest-btn { background: rgba(255,255,255,0.1); color: #fff; border: 2px solid rgba(255,255,255,0.2); }
-
-.header { position: sticky; top: 0; z-index: 100; background: rgba(10,14,39,0.95); padding: 15px 20px; border-bottom: 2px solid rgba(0,243,255,0.3); backdrop-filter: blur(15px); }
+.limit-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10001; display: none; align-items: center; justify-content: center; }
+.limit-modal.active { display: flex; }
+.limit-box { background: linear-gradient(135deg, #1a1f3a, #0a0e27); border: 2px solid var(--danger); border-radius: 20px; padding: 40px; max-width: 450px; width: 90%; text-align: center; }
+.limit-box h2 { color: var(--danger); margin-bottom: 15px; font-size: 24px; }
+.limit-box p { color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
+.header { position: sticky; top: 0; z-index: 100; background: rgba(10, 14, 39, 0.9); padding: 15px 20px; border-bottom: 2px solid rgba(0, 243, 255, 0.3); backdrop-filter: blur(15px); }
 .header-inner { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; flex-wrap: wrap; gap: 10px; }
-.logo { font-size: 24px; font-weight: 800; background: linear-gradient(90deg, var(--accent), var(--purple), #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.logo { font-size: 24px; font-weight: 800; background: linear-gradient(90deg, var(--accent), var(--purple), #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 10px; }
 .stats { display: flex; gap: 8px; flex-wrap: wrap; }
-.stat-chip { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 20px; font-size: 12px; }
+.stat-chip { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 5px; }
 .stat-chip b { color: #ffd700; }
-
+.guest-badge { background: rgba(255,165,0,0.2); color: orange; padding: 3px 8px; border-radius: 10px; font-size: 10px; margin-left: 5px; }
 .nav { display: flex; justify-content: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; overflow-x: auto; scrollbar-width: none; }
 .nav::-webkit-scrollbar { display: none; }
-.nav-btn { padding: 8px 16px; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; background: rgba(255,255,255,0.05); color: var(--text); cursor: pointer; font-size: 13px; font-weight: 600; white-space: nowrap; }
-.nav-btn:hover { background: var(--accent-dim); color: var(--accent); }
-.nav-btn.active { background: var(--gradient-1); color: #000; }
-
+.nav-btn { padding: 8px 16px; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; background: rgba(255,255,255,0.05); color: var(--text); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; transition: all 0.3s; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.nav-btn:hover { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); transform: translateY(-2px); }
+.nav-btn.active { background: var(--gradient-1); color: #000; border-color: transparent; }
 .page-wrapper { position: relative; z-index: 5; max-width: 1400px; margin: 0 auto; padding: 30px 20px 150px; }
-.section { display: none; animation: slideIn 0.4s; }
-.section.active { display: block; }
-.section-title { text-align: center; font-size: 32px; font-weight: 800; margin-bottom: 25px; }
-
-.hero-section { text-align: center; padding: 60px 20px; }
+.hero-section { text-align: center; padding: 50px 20px; }
 .hero-title { font-size: 48px; font-weight: 900; margin-bottom: 15px; background: linear-gradient(90deg, var(--accent), #fff, var(--purple)); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shimmer 4s linear infinite; }
-.hero-subtitle { font-size: 18px; color: var(--text-muted); max-width: 600px; margin: 0 auto 30px; line-height: 1.6; }
+.hero-subtitle { font-size: 16px; color: var(--text-muted); max-width: 600px; margin: 0 auto 30px; line-height: 1.6; }
 .hero-buttons { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
-.hero-btn { padding: 16px 32px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; border: none; }
+.hero-btn { padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; text-decoration: none; transition: all 0.3s; display: flex; align-items: center; gap: 8px; border: none; }
 .hero-btn-primary { background: var(--gradient-1); color: #000; animation: pulseGlow 3s infinite; }
+.hero-btn-primary:hover { transform: translateY(-3px) scale(1.05); }
 .hero-btn-secondary { background: rgba(255,255,255,0.05); color: var(--text); border: 2px solid var(--accent); }
-
+.hero-btn-secondary:hover { background: var(--accent-dim); transform: translateY(-3px); }
 .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 40px; }
-.feature-card { background: linear-gradient(135deg, rgba(17,21,48,0.8), rgba(26,31,58,0.6)); border: 1px solid rgba(0,243,255,0.2); border-radius: 16px; padding: 25px; text-align: center; cursor: pointer; }
-.feature-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+.feature-card { background: linear-gradient(135deg, rgba(17, 21, 48, 0.8), rgba(26, 31, 58, 0.6)); border: 1px solid rgba(0, 243, 255, 0.2); border-radius: 16px; padding: 25px; text-align: center; transition: all 0.3s; cursor: pointer; }
+.feature-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 15px 30px rgba(0, 243, 255, 0.1); }
 .feature-icon { font-size: 40px; margin-bottom: 12px; display: block; }
 .feature-title { font-size: 18px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
 .feature-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
-
+.section { display: none; animation: slideIn 0.4s; }
+.section.active { display: block; }
+.section-title { text-align: center; font-size: 32px; font-weight: 800; margin-bottom: 25px; }
 .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
-.game-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(0,243,255,0.2); border-radius: 16px; padding: 25px; text-align: center; cursor: pointer; }
-.game-card:hover { border-color: var(--accent); transform: translateY(-5px); }
+.game-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(0,243,255,0.2); border-radius: 16px; padding: 25px; text-align: center; cursor: pointer; transition: all 0.3s; }
+.game-card:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,243,255,0.15); background: rgba(0, 243, 255, 0.05); }
 .game-icon { font-size: 50px; margin-bottom: 12px; display: block; }
 .game-title { font-size: 18px; font-weight: bold; margin: 8px 0; color: var(--accent); }
-.xp-btn { background: linear-gradient(90deg, #ffd700, #ff8c00); color: #000; border: none; padding: 7px 18px; border-radius: 20px; font-weight: bold; font-size: 12px; }
-.game-container { background: rgba(0,0,0,0.7); border: 2px solid var(--accent); border-radius: 16px; padding: 15px; margin-top: 25px; display: none; }
-canvas.game-canvas { width: 100%; max-width: 800px; height: auto; aspect-ratio: 4/3; margin: 15px auto; display: block; background: #000; border-radius: 12px; }
-.controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 15px; }
-.btn { padding: 10px 20px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.1); color: #fff; }
-.btn:active { transform: scale(0.95); }
-.btn-primary { background: var(--gradient-1); color: #000; }
-.btn-danger { background: rgba(255,0,85,0.2); color: var(--danger); }
-
-.mobile-controls { display: none; position: fixed; bottom: 20px; left: 0; right: 0; justify-content: space-between; padding: 0 30px; pointer-events: none; z-index: 9999; }
-.d-btn, .action-btn { pointer-events: auto; touch-action: none; }
-.d-pad { display: grid; grid-template-columns: repeat(3, 60px); grid-template-rows: repeat(2, 60px); gap: 8px; }
-.d-btn { width: 60px; height: 60px; background: rgba(0,243,255,0.2); border: 2px solid var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; }
+.game-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+.xp-btn { background: linear-gradient(90deg, #ffd700, #ff8c00); color: #000; border: none; padding: 7px 18px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 12px; }
+.game-container { background: rgba(0,0,0,0.7); border: 2px solid var(--accent); border-radius: 16px; padding: 15px; margin-top: 25px; display: none; position: relative; }
+canvas.game-canvas { width: 100%; max-width: 800px; height: auto; aspect-ratio: 4/3; margin: 15px auto; display: block; background: #000; border-radius: 12px; border: 2px solid var(--accent); touch-action: none; }
+.mobile-controls { display: none; position: fixed; bottom: 20px; left: 0; right: 0; justify-content: space-between; padding: 0 20px; pointer-events: none; z-index: 9999; }
+.d-btn, .action-btn { pointer-events: auto; touch-action: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.d-pad { display: grid; grid-template-columns: repeat(3, 55px); grid-template-rows: repeat(2, 55px); gap: 6px; }
+.d-btn { width: 55px; height: 55px; background: rgba(0, 243, 255, 0.2); border: 2px solid var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; }
 .d-btn:active { background: var(--accent); color: #000; }
 .d-btn.up { grid-column: 2; grid-row: 1; }
 .d-btn.left { grid-column: 1; grid-row: 2; }
 .d-btn.down { grid-column: 2; grid-row: 2; }
 .d-btn.right { grid-column: 3; grid-row: 2; }
-.action-btn { width: 80px; height: 80px; background: rgba(255,0,85,0.3); border: 3px solid var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; cursor: pointer; }
+.action-btn { width: 75px; height: 75px; background: rgba(255, 0, 85, 0.3); border: 3px solid var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; cursor: pointer; }
 .action-btn:active { background: var(--danger); }
-
+.controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 15px; }
+.btn { padding: 10px 20px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.1); color: #fff; transition: all 0.2s; font-size: 13px; }
+.btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
+.btn-primary { background: var(--gradient-1); color: #000; }
+.btn-danger { background: rgba(255,0,85,0.2); color: var(--danger); }
+.memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-width: 500px; margin: 20px auto; }
+.memory-card { aspect-ratio: 1; background: linear-gradient(135deg, #1a1f3a, #0a0e27); border: 2px solid rgba(0,243,255,0.3); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 40px; cursor: pointer; transition: all 0.3s; user-select: none; }
+.memory-card.flipped { background: linear-gradient(135deg, #00f3ff, #bc13fe); transform: rotateY(180deg); }
+.memory-card.matched { background: linear-gradient(135deg, #00ff88, #00cc66); border-color: #00ff88; }
 .clicker-area { text-align: center; padding: 20px; }
-.clicker-target { width: 150px; height: 150px; background: radial-gradient(circle, #ffd700, #ff8c00); border-radius: 50%; margin: 0 auto 30px; cursor: pointer; box-shadow: 0 0 30px #ffd700; display: flex; align-items: center; justify-content: center; font-size: 60px; user-select: none; }
+.clicker-target { width: 150px; height: 150px; background: radial-gradient(circle, #ffd700, #ff8c00); border-radius: 50%; margin: 0 auto 30px; cursor: pointer; box-shadow: 0 0 30px #ffd700; transition: transform 0.1s; display: flex; align-items: center; justify-content: center; font-size: 60px; user-select: none; }
 .clicker-target:active { transform: scale(0.95); }
 .clicker-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 400px; margin: 0 auto; }
-
-.memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-width: 500px; margin: 20px auto; }
-.memory-card { aspect-ratio: 1; background: linear-gradient(135deg, #1a1f3a, #0a0e27); border: 2px solid rgba(0,243,255,0.3); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 40px; cursor: pointer; user-select: none; }
-.memory-card.flipped { background: linear-gradient(135deg, #00f3ff, #bc13fe); }
-.memory-card.matched { background: linear-gradient(135deg, #00ff88, #00cc66); border-color: #00ff88; }
-
+.clicker-stat-box { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; text-align: center; }
+.clicker-stat-value { font-size: 24px; font-weight: bold; color: #ffd700; }
+.clicker-stat-label { font-size: 12px; color: var(--text-muted); margin-top: 5px; }
 .quest-section { background: rgba(255,255,255,0.03); border: 1px solid rgba(0,243,255,0.2); border-radius: 16px; padding: 20px; margin: 20px 0; }
 .maze-container { display: grid; grid-template-columns: repeat(10, 35px); grid-template-rows: repeat(10, 35px); gap: 3px; margin: 15px auto; width: fit-content; }
-.maze-cell { width: 35px; height: 35px; background: rgba(255,255,255,0.05); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-.maze-cell.wall { background: rgba(100,100,100,0.4); }
+.maze-cell { width: 35px; height: 35px; background: rgba(255,255,255,0.05); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 20px; transition: all 0.2s; }
+.maze-cell.wall { background: rgba(100,100,100,0.4); border: 1px solid rgba(255,255,255,0.1); }
 .maze-cell.player { background: rgba(0,243,255,0.3); box-shadow: 0 0 15px var(--accent); }
 .maze-cell.star { background: rgba(255,215,0,0.2); }
-
 .repeat-quest { background: rgba(0,0,0,0.3); border: 1px solid var(--purple); border-radius: 16px; padding: 20px; margin: 20px 0; }
 .quest-pattern { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; margin: 15px auto; max-width: 500px; }
-.pattern-step { aspect-ratio: 1; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 26px; cursor: pointer; }
-.pattern-step:active { transform: scale(0.95); }
-.pattern-step.show { background: var(--gradient-1); border-color: var(--accent); }
+.pattern-step { aspect-ratio: 1; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 26px; cursor: pointer; transition: all 0.3s; }
+.pattern-step:hover { transform: scale(1.1); border-color: var(--accent); }
+.pattern-step.show { background: var(--gradient-1); border-color: var(--accent); animation: pulse 0.5s; }
 .pattern-step.user-correct { background: var(--success); border-color: var(--success); }
 .pattern-step.user-wrong { background: var(--danger); border-color: var(--danger); }
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
 .quest-status { text-align: center; font-size: 15px; margin: 15px 0; min-height: 24px; color: var(--accent); font-weight: 600; }
-
 .quest-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(0,243,255,0.2); border-radius: 12px; padding: 15px; margin-bottom: 15px; }
 .quest-card.completed { border-color: var(--success); background: rgba(0,255,136,0.05); }
 .quest-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
@@ -132,57 +132,36 @@ canvas.game-canvas { width: 100%; max-width: 800px; height: auto; aspect-ratio: 
 .quest-title { font-weight: bold; font-size: 15px; color: var(--accent); }
 .quest-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
 .quest-progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
-.quest-progress-fill { height: 100%; background: var(--gradient-1); }
+.quest-progress-fill { height: 100%; background: var(--gradient-1); transition: width 0.5s; }
 .quest-reward { background: linear-gradient(90deg, #ffd700, #ff8c00); color: #000; padding: 5px 12px; border-radius: 15px; font-size: 11px; font-weight: bold; display: inline-block; }
-
-.music-container { max-width: 900px; margin: 0 auto; }
+.music-container { max-width: 700px; margin: 0 auto; }
 .search-box-wrapper { position: relative; width: 100%; margin-bottom: 20px; }
 #music-search-input { width: 100%; padding: 14px; border: 2px solid rgba(255,255,255,0.2); border-radius: 12px; font-size: 15px; background: rgba(0,0,0,0.4); color: #fff; outline: none; }
-#music-search-input:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(0,243,255,0.2); }
-.results-list { position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-panel); border: 1px solid rgba(255,255,255,0.1); border-radius: 0 0 12px 12px; max-height: 400px; overflow-y: auto; z-index: 1000; margin: 5px 0 0 0; padding: 0; list-style: none; }
-.results-list li { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
-.results-list li:hover { background: rgba(0,243,255,0.1); }
+#music-search-input:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 243, 255, 0.2); }
+.results-list { position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-panel); border: 1px solid rgba(255,255,255,0.1); border-radius: 0 0 12px 12px; max-height: 300px; overflow-y: auto; z-index: 1000; margin: 5px 0 0 0; padding: 0; list-style: none; }
+.results-list li { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.2s; }
+.results-list li:hover { background: rgba(0, 243, 255, 0.1); }
 .result-info { display: flex; flex-direction: column; overflow: hidden; margin-right: 10px; flex: 1; }
 .result-title { font-weight: bold; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
 .result-artist { font-size: 12px; color: var(--text-muted); }
-.youtube-btn { background: linear-gradient(135deg, #ff0000, #cc0000); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: bold; }
-
-.bm-header { background: rgba(0,0,0,0.5); padding: 12px 20px; border-radius: 12px; margin-bottom: 10px; }
-.bm-header-top { display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
-.bm-logo { font-size: 20px; font-weight: 800; background: linear-gradient(90deg, var(--accent), #bc13fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.bm-controls-bar { display: flex; justify-content: center; gap: 12px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
-.bm-btn { padding: 8px 16px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.08); color: var(--text); font-size: 13px; }
-.bm-btn:hover { background: var(--accent-dim); color: var(--accent); }
-.bm-btn-primary { background: linear-gradient(90deg, var(--accent), #bc13fe); color: #000; }
-.bm-btn-reset { background: linear-gradient(90deg, var(--danger), #ff5500); color: #fff; }
-.bm-btn-download { background: linear-gradient(90deg, var(--success), #00aa55); color: #000; }
-.bm-bpm-input { width: 70px; padding: 8px; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; background: rgba(0,0,0,0.3); color: var(--accent); font-weight: bold; font-size: 14px; text-align: center; }
-.bm-main-container { display: flex; flex: 1; overflow: hidden; padding: 10px; gap: 15px; min-height: 400px; }
-.bm-sounds-panel { width: 200px; background: var(--bg-panel); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px; overflow-y: auto; flex-shrink: 0; display: flex; flex-direction: column; max-height: 400px; }
-.bm-panel-title { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-weight: 700; }
-.bm-sound-item { padding: 8px 10px; background: rgba(255,255,255,0.05); border-radius: 6px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 8px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.bm-sound-item:hover { background: var(--accent-dim); color: var(--accent); }
-.bm-sound-item.active { background: rgba(0,243,255,0.2); border: 1px solid var(--accent); color: var(--accent); }
-.bm-sound-item.back-btn { background: rgba(255,80,80,0.1); border: 1px solid rgba(255,80,80,0.3); justify-content: center; font-weight: bold; color: #ff8888; }
-.bm-sequencer-area { flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-.bm-custom-scrollbar { height: 14px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 7px; position: relative; flex-shrink: 0; overflow: hidden; cursor: pointer; }
-.bm-scrollbar-thumb { position: absolute; top: 2px; bottom: 2px; background: linear-gradient(90deg, var(--accent), #bc13fe); border-radius: 5px; cursor: grab; min-width: 30px; z-index: 20; touch-action: none; }
-.bm-grid-container { flex: 1; overflow-x: auto; overflow-y: hidden; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px; position: relative; scrollbar-width: none; touch-action: pan-x; }
-.bm-grid-container::-webkit-scrollbar { display: none; }
-.bm-track-row { display: flex; width: 15360px; height: 40px; margin-bottom: 2px; }
-.bm-track-label { width: 80px; flex-shrink: 0; background: var(--bg-panel); border-right: 2px solid var(--border); display: flex; align-items: center; padding: 0 10px; font-size: 11px; font-weight: 600; color: var(--text-muted); position: sticky; left: 0; z-index: 15; }
-.bm-grid-cell { width: 7.5px; height: 100%; border-right: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.03); position: relative; cursor: pointer; flex-shrink: 0; }
-.bm-grid-cell:hover { background: rgba(0,243,255,0.2); }
-.bm-grid-cell.bar-line { border-right: 2px solid rgba(0,243,255,0.9) !important; }
-.bm-note { position: absolute; top: 2px; bottom: 2px; left: 0; background: linear-gradient(90deg, var(--accent), #bc13fe); border-radius: 3px; z-index: 5; pointer-events: none; }
-.bm-playback-cursor { position: absolute; top: 10px; bottom: 10px; width: 2px; background: var(--danger); box-shadow: 0 0 10px var(--danger); z-index: 100; pointer-events: none; }
-.bm-visualizer-container { height: 80px; background: rgba(0,0,0,0.4); border-top: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; position: relative; margin-top: 10px; border-radius: 0 0 10px 10px; }
-#bmVisualizerCanvas { width: 100%; height: 100%; display: block; }
-
-.profile-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(0,243,255,0.2); padding: 30px 20px; border-radius: 20px; text-align: center; max-width: 700px; margin: 0 auto; }
-.profile-header { display: flex; gap: 30px; align-items: center; margin-bottom: 25px; flex-wrap: wrap; justify-content: center; }
-.profile-avatar { width: 120px; height: 120px; border-radius: 50%; background: var(--gradient-1); display: flex; align-items: center; justify-content: center; font-size: 70px; flex-shrink: 0; box-shadow: 0 0 30px rgba(0,243,255,0.3); object-fit: cover; border: 3px solid var(--accent); }
-.online-indicator { position: absolute; bottom: 5px; right: 5px; width: 20px; height: 20px; background: #00ff88; border: 3px solid #0a0e27; border-radius: 50%; }
+.result-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.preview-btn { background: var(--accent); color: #000; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: bold; }
+.duration-text { font-size: 11px; color: var(--text-muted); }
+.player-card { margin-top: 20px; background: rgba(0,0,0,0.5); border: 2px solid rgba(0, 243, 255, 0.3); color: #fff; padding: 20px; border-radius: 16px; display: flex; flex-direction: column; gap: 15px; backdrop-filter: blur(10px); }
+.track-details { display: flex; align-items: center; gap: 15px; }
+.track-cover { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; border: 2px solid var(--accent); }
+.progress-wrapper { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text-muted); }
+.progress-wrapper input[type="range"] { flex-grow: 1; accent-color: var(--accent); cursor: pointer; }
+.player-controls { display: flex; justify-content: center; align-items: center; gap: 20px; }
+.control-btn { background: transparent; border: 2px solid rgba(255,255,255,0.2); color: white; font-size: 18px; cursor: pointer; width: 45px; height: 45px; border-radius: 50%; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+.control-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--accent); }
+.control-btn.active { color: var(--accent); border-color: var(--accent); }
+.main-btn { font-size: 24px; background: var(--gradient-1); border: none; color: #000; width: 60px; height: 60px; }
+.main-btn:hover { transform: scale(1.1); }
+.volume-wrapper { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.profile-card, .chat-card, .leaderboard-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(0,243,255,0.2); padding: 30px 20px; border-radius: 20px; text-align: center; max-width: 600px; margin: 0 auto; }
+.profile-header { display: flex; gap: 20px; align-items: center; margin-bottom: 25px; flex-wrap: wrap; }
+.profile-avatar { width: 100px; height: 100px; border-radius: 50%; background: var(--gradient-1); display: flex; align-items: center; justify-content: center; font-size: 50px; flex-shrink: 0; box-shadow: 0 0 30px rgba(0, 243, 255, 0.3); }
 .profile-info { flex: 1; min-width: 200px; text-align: left; }
 .profile-name { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
 .profile-bio { color: var(--text-muted); font-size: 14px; line-height: 1.5; margin-bottom: 15px; min-height: 40px; }
@@ -191,1447 +170,1331 @@ canvas.game-canvas { width: 100%; max-width: 800px; height: auto; aspect-ratio: 
 .p-stat-val { font-size: 20px; font-weight: bold; color: var(--accent); }
 .p-stat-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
 .edit-btn { background: rgba(0,243,255,0.1); border: 2px solid var(--accent); color: var(--accent); padding: 8px 16px; border-radius: 8px; cursor: pointer; margin-top: 10px; font-size: 13px; }
-#avatarSelect { padding: 8px 12px; border-radius: 8px; border: 2px solid var(--accent); background: rgba(0,0,0,0.3); color: #fff; font-size: 20px; cursor: pointer; margin-top: 10px; }
-
-.vip-single-card { background: linear-gradient(135deg, rgba(40,35,10,0.9), rgba(60,50,10,0.7)); border: 2px solid var(--gold); border-radius: 24px; padding: 40px; max-width: 500px; margin: 30px auto; text-align: center; animation: pulseGlow 3s infinite; }
-.vip-single-card h3 { font-size: 32px; color: var(--gold); margin-bottom: 10px; }
-.vip-single-card .tier-price { font-size: 48px; font-weight: 900; color: #fff; margin-bottom: 20px; }
-.vip-single-card .tier-price span { font-size: 18px; color: var(--text-muted); }
-.vip-features { list-style: none; text-align: left; margin: 30px 0; }
-.vip-features li { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 16px; display: flex; align-items: center; gap: 10px; }
-.tier-btn.gold { background: linear-gradient(90deg, #ffd700, #ff8c00); color: #000; width: 100%; padding: 16px; font-size: 18px; font-weight: 800; border: none; border-radius: 12px; cursor: pointer; margin-top: 20px; }
-
-.chat-card, .leaderboard-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(0,243,255,0.2); padding: 30px 20px; border-radius: 20px; max-width: 600px; margin: 0 auto; }
+.edit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.projects-section { margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: left; }
+.projects-section h3 { color: var(--accent); margin-bottom: 15px; }
+.project-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(0,243,255,0.2); border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+.project-name { font-weight: bold; }
+.project-date { font-size: 11px; color: var(--text-muted); }
+.project-actions { display: flex; gap: 8px; }
+.play-project-btn { background: var(--gradient-1); color: #000; border: none; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-weight: bold; font-size: 12px; }
+.edit-project-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 15px; cursor: pointer; font-weight: bold; font-size: 12px; }
+.subscription-section { margin-top: 40px; padding: 40px 20px; background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(17,21,48,0.6)); border-radius: 24px; border: 2px solid rgba(0,243,255,0.2); }
+.subscription-title { text-align: center; font-size: 36px; margin-bottom: 30px; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.tiers-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
+.tier-card { background: linear-gradient(135deg, rgba(17,21,48,0.9), rgba(26,31,58,0.7)); border: 2px solid rgba(0,243,255,0.3); border-radius: 20px; padding: 30px; text-align: center; transition: all 0.3s; }
+.tier-card:hover { transform: translateY(-10px); box-shadow: 0 20px 50px rgba(0,243,255,0.3); }
+.tier-card.featured { border-color: #ffd700; transform: scale(1.05); }
+.tier-badge { background: linear-gradient(90deg, #ffd700, #ff8c00); color: #000; padding: 5px 12px; border-radius: 15px; font-size: 11px; font-weight: bold; display: inline-block; margin-bottom: 15px; }
+.tier-icon { font-size: 60px; margin-bottom: 15px; }
+.tier-name { font-size: 24px; font-weight: 800; margin-bottom: 10px; color: var(--accent); }
+.tier-price { font-size: 32px; font-weight: 900; margin-bottom: 20px; color: #ffd700; }
+.tier-price span { font-size: 14px; color: var(--text-muted); }
+.tier-features { list-style: none; text-align: left; margin: 20px 0; }
+.tier-features li { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.tier-btn { width: 100%; padding: 14px; margin-top: 20px; background: var(--gradient-1); border: none; border-radius: 12px; color: #000; font-size: 16px; font-weight: 700; cursor: pointer; }
+.tier-btn.gold { background: linear-gradient(90deg, #ffd700, #ff8c00); }
 .chat-messages { background: rgba(0,0,0,0.3); padding: 20px; border-radius: 15px; max-height: 400px; overflow-y: auto; margin-bottom: 15px; text-align: left; }
 .chat-message { margin-bottom: 12px; }
 .chat-author { color: var(--accent); font-weight: bold; font-size: 14px; }
 .chat-text { color: var(--text); font-size: 14px; margin-top: 4px; word-break: break-word; }
 .chat-input-wrapper { display: flex; gap: 10px; }
 #chatInput { flex: 1; padding: 12px; border: 2px solid rgba(0,243,255,0.3); border-radius: 10px; background: rgba(255,255,255,0.1); color: #fff; outline: none; }
-
 .leaderboard-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 10px; margin-bottom: 10px; }
-.leaderboard-item.me { border: 1px solid var(--accent); background: rgba(0,243,255,0.05); }
+.leaderboard-item.me { border: 1px solid var(--accent); background: rgba(0, 243, 255, 0.05); }
 .leaderboard-rank { font-size: 20px; font-weight: bold; width: 40px; }
 .leaderboard-name { flex: 1; text-align: left; font-weight: 600; }
 .leaderboard-xp { color: #ffd700; font-weight: bold; }
-
-.notification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: var(--gradient-1); color: #000; padding: 12px 24px; border-radius: 25px; font-weight: 700; font-size: 14px; z-index: 10000; transition: transform 0.4s; pointer-events: none; }
+.notification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: var(--gradient-1); color: #000; padding: 12px 24px; border-radius: 25px; font-weight: 700; font-size: 14px; z-index: 10000; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 10px 30px rgba(0, 243, 255, 0.4); }
 .notification.show { transform: translateX(-50%) translateY(0); }
-
-.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(8px); }
-.modal.active { display: flex; }
-.modal-content { background: var(--bg-panel); border: 1px solid var(--accent); border-radius: 16px; padding: 30px; width: 90%; max-width: 500px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
-.modal-header { padding: 0 0 15px 0; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
-.modal-header h3 { color: var(--accent); font-size: 16px; }
-
+.hidden { display: none !important; }
+.click-particle { position: fixed; color: #ffd700; font-weight: bold; font-size: 20px; pointer-events: none; z-index: 9999; transition: all 1s ease-out; }
 @media (max-width: 768px) {
-  .hero-title { font-size: 32px; }
-  .mobile-controls { display: flex !important; }
-  .bm-main-container { flex-direction: column; }
-  .bm-sounds-panel { width: 100%; max-height: 150px; flex-shrink: 0; }
-  .bm-track-label { width: 60px; font-size: 10px; }
-  .maze-container { grid-template-columns: repeat(10, 30px); grid-template-rows: repeat(10, 30px); }
-  .maze-cell { width: 30px; height: 30px; font-size: 18px; }
-  .profile-avatar { width: 100px; height: 100px; font-size: 60px; }
+.hero-title { font-size: 32px; }
+.maze-container { grid-template-columns: repeat(10, 30px); grid-template-rows: repeat(10, 30px); }
+.maze-cell { width: 30px; height: 30px; font-size: 18px; }
+.mobile-controls { display: flex !important; }
+.tier-card.featured { transform: none; }
+.memory-grid { grid-template-columns: repeat(4, 1fr); }
+.memory-card { font-size: 24px; }
 }
 </style>
 </head>
 <body class="space-bg-active">
-
-<input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
-
 <div class="auth-overlay" id="authOverlay">
-  <div class="auth-box">
-    <h2>🪐 SOUNDSCAPE</h2>
-    <p>Создавай биты, играй и зарабатывай XP</p>
-    <input type="text" class="auth-input" id="authUsername" placeholder="Имя пользователя">
-    <input type="password" class="auth-input" id="authPassword" placeholder="Пароль">
-    <button class="auth-btn" onclick="registerUser()">🚀 Войти / Регистрация</button>
-    <button class="auth-btn guest-btn" onclick="guestLogin()">👤 Играть как гость</button>
-  </div>
+<div class="auth-box">
+<h2>🪐 SOUNDSCAPE</h2>
+<p>Войди или создай аккаунт</p>
+<input type="text" class="auth-input" id="authUsername" placeholder="Имя пользователя">
+<input type="password" class="auth-input" id="authPassword" placeholder="Пароль">
+<button class="auth-btn" onclick="registerUser()">🚀 Войти/Регистрация</button>
+<button class="auth-btn guest-btn" onclick="guestLogin()">👤 Играть как гость</button>
 </div>
-
+</div>
+<div class="limit-modal" id="limitModal">
+<div class="limit-box">
+<h2>⚠️ Лимит исчерпан!</h2>
+<p id="limitMessage">Вы достигли лимита.</p>
+<button class="auth-btn" onclick="showSubscriptions()" style="margin-bottom:10px;">💎 Оформить подписку</button>
+<button class="auth-btn guest-btn" onclick="closeLimitModal()">Закрыть</button>
+</div>
+</div>
 <canvas id="spaceCanvas"></canvas>
 <div class="notification" id="notification">Уведомление</div>
-
 <header class="header">
-  <div class="header-inner">
-    <div class="logo">🪐 SOUNDSCAPE</div>
-    <div class="stats">
-      <div class="stat-chip">⭐ <b id="userXP">0</b> XP</div>
-      <div class="stat-chip">🪙 <b id="userCoins">0</b></div>
-    </div>
-  </div>
-  <div class="nav">
-    <button class="nav-btn active" onclick="showSection('home', event)"> Главная</button>
-    <button class="nav-btn" onclick="showSection('games', event)"> Игры</button>
-    <button class="nav-btn" onclick="showSection('quests', event)">📜 Квесты</button>
-    <button class="nav-btn" onclick="showSection('music', event)">🔊 Музыка</button>
-    <button class="nav-btn" onclick="showSection('beatmaker', event)">🎹 Beat Pro</button>
-    <button class="nav-btn" onclick="showSection('leaderboard', event)">🏆 Топ</button>
-    <button class="nav-btn" onclick="showSection('chat', event)"> Чат</button>
-    <button class="nav-btn" onclick="showSection('profile', event)">👤 Профиль</button>
-    <button class="nav-btn" onclick="logout()" style="background:rgba(255,0,85,0.2);color:#ff0055;">🚪 Выйти</button>
-  </div>
+<div class="header-inner">
+<div class="logo">🪐 SOUNDSCAPE</div>
+<div class="stats">
+<div class="stat-chip">⭐ <b id="userXP">0</b> XP</div>
+<div class="stat-chip">🪙 <b id="userCoins">0</b></div>
+<div class="stat-chip">👤 <b id="userName">Гость</b><span id="userBadge" class="guest-badge">ГОСТЬ</span></div>
+</div>
+</div>
+<div class="nav">
+<button class="nav-btn active" onclick="showSection('home', event)">🏠 Главная</button>
+<button class="nav-btn" onclick="showSection('games', event)">🎮 Игры</button>
+<button class="nav-btn" onclick="showSection('quests', event)">📜 Квесты</button>
+<button class="nav-btn" onclick="showSection('music', event)">🔊 Музыка</button>
+<button class="nav-btn" onclick="goToBeatProList()">🎹 Beat Pro</button>
+<button class="nav-btn" onclick="showSection('leaderboard', event)">🏆 Топ</button>
+<button class="nav-btn" onclick="showSection('achievements', event)">🏅 Награды</button>
+<button class="nav-btn" onclick="showSection('chat', event)">💬 Чат</button>
+<button class="nav-btn" onclick="showSection('profile', event)">👤 Профиль</button>
+<button class="nav-btn" onclick="showSection('subscriptions', event)">💎 Тарифы</button>
+<button class="nav-btn" onclick="logout()" style="background:rgba(255,0,85,0.2);color:#ff0055;">🚪 Выйти</button>
+</div>
 </header>
-
 <div class="page-wrapper">
-  <div id="home" class="section active">
-    <div class="hero-section">
-      <h1 class="hero-title">SOUNDSCAPE</h1>
-      <p class="hero-subtitle">Профессиональная студия для создания битов прямо в браузере. Играй в мини-игры, проходи квесты, зарабатывай XP и создавай хиты.</p>
-      <div class="hero-buttons">
-        <button class="hero-btn hero-btn-primary" onclick="showSection('beatmaker')">🎹 Создать свой первый бит</button>
-        <button class="hero-btn hero-btn-secondary" onclick="showSection('games')">🎮 Начать игру</button>
-      </div>
-    </div>
-    <div class="features-grid">
-      <div class="feature-card" onclick="showSection('beatmaker')"><span class="feature-icon"></span><div class="feature-title">Beat Maker Pro</div><div class="feature-desc">15 дорожек, FX-эффекты, экспорт в MP3 320kbps.</div></div>
-      <div class="feature-card" onclick="showSection('games')"><span class="feature-icon"></span><div class="feature-title">6 аркадных игр</div><div class="feature-desc">Space Shooter, Pac-Man, Invaders, Snake, Memory и Кликер.</div></div>
-      <div class="feature-card" onclick="showSection('quests')"><span class="feature-icon">📜</span><div class="feature-title">Ритм-квесты</div><div class="feature-desc">Проходи лабиринты и запоминай музыкальные паттерны.</div></div>
-      <div class="feature-card" onclick="showSection('music')"><span class="feature-icon">🔊</span><div class="feature-title">Поиск музыки</div><div class="feature-desc">Ищи треки через iTunes API и слушай на YouTube.</div></div>
-    </div>
-  </div>
-
-  <div id="games" class="section">
-    <h2 class="section-title">🎮 Выбери миссию</h2>
-    <div class="games-grid">
-      <div class="game-card" onclick="startGame('shooter')">
-        <div class="game-icon">🚀</div>
-        <div class="game-title">Space Shooter</div>
-        <button class="xp-btn">+100 XP</button>
-      </div>
-      <div class="game-card" onclick="startGame('pacman')">
-        <div class="game-icon">🟡</div>
-        <div class="game-title">Звёздный Pac-Man</div>
-        <button class="xp-btn">+200 XP</button>
-      </div>
-      <div class="game-card" onclick="startGame('invaders')">
-        <div class="game-icon">🛸</div>
-        <div class="game-title">Space Invaders</div>
-        <button class="xp-btn">+50 XP</button>
-      </div>
-      <div class="game-card" onclick="startGame('snake')">
-        <div class="game-icon">🐍</div>
-        <div class="game-title">Звёздная змейка</div>
-        <button class="xp-btn">+15 XP</button>
-      </div>
-      <div class="game-card" onclick="startGame('memory')">
-        <div class="game-icon">🧠</div>
-        <div class="game-title">Memory Game</div>
-        <button class="xp-btn">+75 XP</button>
-      </div>
-      <div class="game-card" onclick="startGame('clicker')">
-        <div class="game-icon">🖱️</div>
-        <div class="game-title">Звёздный Кликер</div>
-        <button class="xp-btn">Бесконечный XP</button>
-      </div>
-    </div>
-    <div id="activeGame" class="game-container">
-      <h3 id="gameTitle" style="text-align:center;margin-bottom:10px;color:var(--accent);"></h3>
-      <canvas id="gameCanvas" class="game-canvas"></canvas>
-      <div id="memoryGameArea" style="display:none;"></div>
-      <div id="clickerGameArea" class="clicker-area" style="display:none;">
-        <div style="font-size: 24px; margin-bottom: 10px;">Монеты: <span id="clickerCoins" style="color: #ffd700; font-weight: bold;">0</span></div>
-        <div style="font-size: 16px; margin-bottom: 20px;">Прибыль в секунду: <span id="clickerCPS" style="color: #00ff88;">0</span></div>
-        <div id="clickerTarget" class="clicker-target" onclick="clickerClick(event)">⭐</div>
-        <div class="clicker-stats">
-          <button class="btn btn-primary" onclick="buyClickerUpgrade('click')">Усилить клик (Цена: <span id="clickCost">10</span>)</button>
-          <button class="btn btn-primary" onclick="buyClickerUpgrade('auto')">Авто-клик (Цена: <span id="autoCost">50</span>)</button>
-        </div>
-      </div>
-      <div class="mobile-controls" id="mobileControls">
-        <div class="d-pad">
-          <div class="d-btn up">⬆️</div>
-          <div class="d-btn left">⬅️</div>
-          <div class="d-btn down">⬇️</div>
-          <div class="d-btn right">➡️</div>
-        </div>
-        <div class="action-btn">🔥</div>
-      </div>
-      <div class="controls">
-        <button class="btn btn-primary" onclick="launchGame()">▶️ Старт</button>
-        <button class="btn" onclick="pauseGame()">⏸️ Пауза</button>
-        <button class="btn btn-danger" onclick="closeGame()">❌ Закрыть</button>
-      </div>
-      <div id="gameInfo" style="text-align:center;margin-top:10px;color:var(--accent); font-weight: bold; font-size:14px;"></div>
-    </div>
-  </div>
-
-  <div id="quests" class="section">
-    <h2 class="section-title">📜 Активные квесты</h2>
-    <div class="quest-section">
-      <h3 style="margin-bottom:12px;color:var(--accent);">🎮 Квест 1: Лабиринт сокровищ</h3>
-      <div style="text-align:center;margin-bottom:8px; color: var(--text-muted);">Собери <b id="starsCollected" style="color:var(--accent)">0</b> из <b id="totalStars">5</b> ⭐</div>
-      <div class="maze-container" id="mazeGrid"></div>
-      <div style="text-align:center;margin-top:10px;">
-        <button class="btn btn-primary" onclick="initMazeQuest()">🔄 Заново</button>
-      </div>
-    </div>
-    <div class="quest-section">
-      <h3 style="margin-bottom:12px;color:var(--purple);">🧠 Квест 2: Повтори бит</h3>
-      <div class="repeat-quest">
-        <p style="text-align:center;color:var(--text-muted);margin-bottom:12px;">Запомни последовательность и повтори её!</p>
-        <div class="quest-pattern" id="questPattern"></div>
-        <div class="quest-status" id="questStatus">Нажми "Показать паттерн" чтобы начать</div>
-        <div style="text-align:center;margin-top:12px;">
-          <button class="btn btn-primary" onclick="showPattern()">👁️ Показать паттерн</button>
-          <button class="btn" onclick="resetRepeatQuest()">🔄 Сбросить</button>
-        </div>
-      </div>
-    </div>
-    <div id="questsList" style="max-width:600px;margin:0 auto;"></div>
-  </div>
-
-  <div id="music" class="section">
-    <h2 class="section-title">🔊 Космический плеер</h2>
-    <div class="music-container">
-      <div class="search-box-wrapper">
-        <input type="text" id="music-search-input" placeholder="🔍 Поиск трека или исполнителя (например: Егор Крид, OG Buda)..." autocomplete="off">
-        <ul id="search-results-list" class="results-list" style="display:none;"></ul>
-      </div>
-    </div>
-  </div>
-
-  <div id="beatmaker" class="section">
-    <h2 class="section-title">🎹 Beat Composer Pro</h2>
-    <div class="bm-header">
-      <div class="bm-header-top">
-        <div class="bm-logo"> BEAT COMPOSER PRO</div>
-        <input type="text" id="bmProjectNameInput" class="auth-input" style="width: 200px; margin: 0;" value="My Beat" placeholder="Project name">
-      </div>
-      <div class="bm-controls-bar">
-        <button class="bm-btn" id="bmProjectsBtn" style="background: rgba(0,243,255,0.2);">📁 Проекты</button>
-        <button class="bm-btn bm-btn-primary" id="bmPlayBtn">▶️ Play</button>
-        <button class="bm-btn bm-btn-reset" id="bmResetBtn">⏹️ Reset</button>
-        <button class="bm-btn bm-btn-download" id="bmDownloadBtn">💾 MP3</button>
-        <button class="btn btn-primary" id="bmSaveProjectBtn">💾 Сохранить</button>
-        <span style="color:var(--text-muted); font-size:13px;">BPM:</span>
-        <input type="number" id="bmBpmInput" class="bm-bpm-input" value="120" min="40" max="300">
-      </div>
-    </div>
-    <div class="bm-main-container">
-      <div class="bm-sounds-panel">
-        <div class="bm-panel-title">📁 sounds/</div>
-        <div id="bmSoundsList" style="display: flex; flex-direction: column; gap: 4px;"></div>
-      </div>
-      <div class="bm-sequencer-area">
-        <div class="bm-custom-scrollbar" id="bmCustomScrollbar">
-          <div class="bm-scrollbar-thumb" id="bmScrollbarThumb"></div>
-        </div>
-        <div class="bm-grid-container" id="bmGridContainer">
-          <div class="bm-playback-cursor" id="bmPlaybackCursor" style="left: 90px;"></div>
-        </div>
-      </div>
-    </div>
-    <div class="bm-visualizer-container"><canvas id="bmVisualizerCanvas"></canvas></div>
-  </div>
-
-  <div id="leaderboard" class="section">
-    <h2 class="section-title"> Топ игроков</h2>
-    <div id="leaderboardList" class="leaderboard-card"></div>
-  </div>
-
-  <div id="chat" class="section">
-    <h2 class="section-title">💬 Глобальный чат</h2>
-    <div class="chat-card">
-      <div id="chatMessages" class="chat-messages"></div>
-      <div class="chat-input-wrapper">
-        <input type="text" id="chatInput" placeholder="Сообщение..." autocomplete="off" onkeypress="if(event.key==='Enter') sendMessage()">
-        <button class="btn btn-primary" onclick="sendMessage()">📤 Отправить</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="profile" class="section">
-    <h2 class="section-title">👤 Профиль пилота</h2>
-    <div class="profile-card">
-      <div class="profile-header">
-        <div class="profile-avatar-wrapper" style="position: relative;">
-          <img id="profileAvatarImg" class="profile-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='70'%3E👨‍🚀%3C/text%3E%3C/svg%3E" alt="Avatar">
-          <div class="online-indicator" style="position: absolute; bottom: 5px; right: 5px; width: 20px; height: 20px; background: #00ff88; border: 3px solid #0a0e27; border-radius: 50%;"></div>
-        </div>
-        <div class="profile-info">
-          <div class="profile-name" id="profileName">Гость</div>
-          <div class="profile-bio" id="profileBio">Нажми "Редактировать" чтобы добавить описание</div>
-          <div style="margin-top: 15px;">
-            <select id="avatarSelect" onchange="changeAvatar(this.value)" style="padding: 8px 12px; border-radius: 8px; border: 2px solid var(--accent); background: rgba(0,0,0,0.3); color: #fff; font-size: 20px; cursor: pointer;">
-              <option value="‍🚀">👨‍🚀 Космонавт</option>
-              <option value="👩‍🚀">👩‍🚀 Космонавтка</option>
-              <option value="">🤖 Робот</option>
-              <option value="👽">👽 Пришелец</option>
-              <option value="👻">👻 Призрак</option>
-              <option value="🦸">🦸 Супергерой</option>
-              <option value="🦹">🦹 Злодей</option>
-              <option value="">🧙 Волшебник</option>
-              <option value="🧚">🧚 Фея</option>
-              <option value="">🧛 Вампир</option>
-              <option value="🧜"> Русалка</option>
-              <option value="🧟">🧟 Зомби</option>
-              <option value="👑">👑 Король</option>
-              <option value="👸">👸 Принцесса</option>
-              <option value="🎅">🎅 Санта</option>
-              <option value="🤡">🤡 Клоун</option>
-              <option value="😎">😎 Крутой</option>
-              <option value="🤠">🤠 Ковбой</option>
-              <option value="🧑🎤">🧑‍ Артист</option>
-              <option value="🧑‍🎨">🧑‍🎨 Художник</option>
-            </select>
-          </div>
-          <div class="profile-stats">
-            <div class="p-stat"><div class="p-stat-val" id="profileXP">0</div><div class="p-stat-label">Всего XP</div></div>
-            <div class="p-stat"><div class="p-stat-val" id="profileFriends">0</div><div class="p-stat-label">Друзей</div></div>
-            <div class="p-stat"><div class="p-stat-val" id="profilePosts">0</div><div class="p-stat-label">Постов</div></div>
-          </div>
-          <button class="edit-btn" id="editBioBtn" onclick="editProfile()">✏️ Редактировать профиль</button>
-        </div>
-      </div>
-    </div>
-    <div class="vip-single-card">
-      <h3>👑 VIP Доступ</h3>
-      <div class="tier-price">399 ₽<span>/мес</span></div>
-      <ul class="vip-features">
-        <li>✅ Безлимитное сохранение проектов</li>
-        <li>✅ Полный доступ ко всем функциям Beat Maker Pro</li>
-        <li>✅ Экспорт в MP3 320kbps без ограничений</li>
-        <li>✅ Отсутствие рекламы и лимитов</li>
-      </ul>
-      <button class="tier-btn.gold" onclick="activateVIP()">Оформить VIP за 399 ₽</button>
-    </div>
-  </div>
+<div id="home" class="section active">
+<div class="hero-section">
+<h1 class="hero-title">SOUNDSCAPE</h1>
+<p class="hero-subtitle">Погрузись в музыкальную вселенную. Играй в аркадные миссии, проходи ритм-квесты и стань профессиональным космическим битмейкером.</p>
+<div class="hero-buttons">
+<button class="hero-btn hero-btn-primary" onclick="showSection('games')">🚀 Начать миссию</button>
+<button class="hero-btn hero-btn-secondary" onclick="goToBeatProList()">🎹 Стать битмейкером</button>
 </div>
-
-<div class="modal" id="projectsModal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>📁 Мои проекты</h3>
-      <button class="btn" onclick="document.getElementById('projectsModal').classList.remove('active')">✕</button>
-    </div>
-    <div id="projectsListBody" style="padding: 20px 0; overflow-y: auto; flex: 1;"></div>
-    <div style="display: flex; gap: 10px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
-      <button class="btn btn-primary" style="flex:1;" onclick="bmCreateNewProject(); document.getElementById('projectsModal').classList.remove('active');">➕ Новый проект</button>
-    </div>
-  </div>
 </div>
-
+<div class="features-grid">
+<div class="feature-card" onclick="showSection('games')">
+<span class="feature-icon">🎮</span>
+<div class="feature-title">Аркадные миссии</div>
+<div class="feature-desc">Space Shooter, Pac-Man, Invaders, Snake, Memory и Кликер. Зарабатывай XP и монеты!</div>
+</div>
+<div class="feature-card" onclick="showSection('quests')">
+<span class="feature-icon">🧩</span>
+<div class="feature-title">Ритм-квесты</div>
+<div class="feature-desc">Проходи лабиринты и запоминай музыкальные паттерны для получения наград.</div>
+</div>
+<div class="feature-card" onclick="goToBeatProList()">
+<span class="feature-icon">🎹</span>
+<div class="feature-title">Beat Maker Pro</div>
+<div class="feature-desc">Профессиональная студия с высоким качеством звуков и экспортом в MP3.</div>
+</div>
+<div class="feature-card" onclick="showSection('music')">
+<span class="feature-icon">🔊</span>
+<div class="feature-title">Музыка</div>
+<div class="feature-desc">Ищи и слушай треки через iTunes API. 30-секундные превью.</div>
+</div>
+<div class="feature-card" onclick="showSection('subscriptions')">
+<span class="feature-icon">💎</span>
+<div class="feature-title">Тарифы</div>
+<div class="feature-desc">Оформи подписку для безлимитного доступа ко всем функциям.</div>
+</div>
+</div>
+</div>
+<div id="games" class="section">
+<h2 class="section-title">🎮 Выбери миссию</h2>
+<div class="games-grid">
+<div class="game-card" onclick="startGame('shooter')"><div class="game-icon">🚀</div><div class="game-title">Space Shooter</div><div class="game-desc">Космический шутер с боссами!</div><button class="xp-btn">+100 XP</button></div>
+<div class="game-card" onclick="startGame('pacman')"><div class="game-icon">🟡</div><div class="game-title">Звёздный Pac-Man</div><div class="game-desc">6 приведений, собирай точки!</div><button class="xp-btn">+200 XP</button></div>
+<div class="game-card" onclick="startGame('invaders')"><div class="game-icon">👾</div><div class="game-title">Space Invaders</div><div class="game-desc">Классика! Уничтожь пришельцев</div><button class="xp-btn">+50 XP</button></div>
+<div class="game-card" onclick="startGame('snake')"><div class="game-icon">🐍</div><div class="game-title">Звёздная змейка</div><div class="game-desc">Собирай звёзды</div><button class="xp-btn">+15 XP</button></div>
+<div class="game-card" onclick="startGame('memory')"><div class="game-icon">🧠</div><div class="game-title">Memory Game</div><div class="game-desc">Найди все пары карточек!</div><button class="xp-btn">+75 XP</button></div>
+<div class="game-card" onclick="startGame('clicker')"><div class="game-icon">🖱️</div><div class="game-title">Звёздный Кликер</div><div class="game-desc">Кликай, копи монеты и покупай улучшения!</div><button class="xp-btn">Бесконечный XP</button></div>
+</div>
+<div id="activeGame" class="game-container">
+<h3 id="gameTitle" style="text-align:center;margin-bottom:10px;color:var(--accent);"></h3>
+<canvas id="gameCanvas" class="game-canvas"></canvas>
+<div id="memoryGameArea" style="display:none;"></div>
+<div id="clickerGameArea" class="clicker-area" style="display:none;">
+    <div style="font-size: 24px; margin-bottom: 10px;">Монеты: <span id="clickerCoins" style="color: #ffd700; font-weight: bold;">0</span></div>
+    <div style="font-size: 16px; margin-bottom: 20px;">Прибыль в секунду: <span id="clickerCPS" style="color: #00ff88;">0</span></div>
+    <div id="clickerTarget" class="clicker-target" onclick="clickerClick(event)">⭐</div>
+    <div class="clicker-stats">
+        <button class="btn btn-primary" onclick="buyClickerUpgrade('click')">Усилить клик (Цена: <span id="clickCost">10</span>)</button>
+        <button class="btn btn-primary" onclick="buyClickerUpgrade('auto')">Авто-клик (Цена: <span id="autoCost">50</span>)</button>
+    </div>
+</div>
+<div class="mobile-controls" id="mobileControls">
+<div class="d-pad">
+<div class="d-btn up" ontouchstart="event.preventDefault(); input.up=true" ontouchend="input.up=false">⬆️</div>
+<div class="d-btn left" ontouchstart="event.preventDefault(); input.left=true" ontouchend="input.left=false">⬅️</div>
+<div class="d-btn down" ontouchstart="event.preventDefault(); input.down=true" ontouchend="input.down=false">⬇️</div>
+<div class="d-btn right" ontouchstart="event.preventDefault(); input.right=true" ontouchend="input.right=false">➡️</div>
+</div>
+<div class="action-btn" ontouchstart="event.preventDefault(); input.fire=true" ontouchend="input.fire=false">🔥</div>
+</div>
+<div class="controls">
+<button class="btn btn-primary" onclick="launchGame()">▶ Старт</button>
+<button class="btn" onclick="pauseGame()">⏸ Пауза</button>
+<button class="btn btn-danger" onclick="closeGame()">❌ Закрыть</button>
+</div>
+<div id="gameInfo" style="text-align:center;margin-top:10px;color:var(--accent); font-weight: bold; font-size:14px;"></div>
+</div>
+</div>
+<div id="quests" class="section">
+<h2 class="section-title">📜 Активные квесты</h2>
+<div class="quest-section">
+<h3 style="margin-bottom:12px;color:var(--accent);">🎮 Квест 1: Лабиринт сокровищ</h3>
+<div style="text-align:center;margin-bottom:8px; color: var(--text-muted);">Собери <b id="starsCollected" style="color:var(--accent)">0</b> из <b id="totalStars">5</b> ⭐</div>
+<div class="maze-container" id="mazeGrid"></div>
+<div style="text-align:center;margin-top:10px;">
+<button class="btn btn-primary" onclick="initMazeQuest()">🔄 Заново</button>
+</div>
+</div>
+<div class="quest-section">
+<h3 style="margin-bottom:12px;color:var(--purple);">🧠 Квест 2: Повтори бит</h3>
+<div class="repeat-quest">
+<p style="text-align:center;color:var(--text-muted);margin-bottom:12px;">Запомни последовательность и повтори её!</p>
+<div class="quest-pattern" id="questPattern"></div>
+<div class="quest-status" id="questStatus">Нажми "Показать паттерн" чтобы начать</div>
+<div style="text-align:center;margin-top:12px;">
+<button class="btn btn-primary" onclick="showPattern()">👁 Показать паттерн</button>
+<button class="btn" onclick="resetRepeatQuest()">🔄 Сбросить</button>
+</div>
+</div>
+</div>
+<div id="questsList" style="max-width:600px;margin:0 auto;"></div>
+</div>
+<div id="music" class="section">
+<h2 class="section-title">🔊 Космический плеер</h2>
+<div class="music-container">
+<div class="search-box-wrapper">
+<input type="text" id="music-search-input" placeholder="Поиск трека или исполнителя (iTunes)..." autocomplete="off">
+<ul id="search-results-list" class="results-list hidden"></ul>
+</div>
+<div id="player-card" class="player-card hidden">
+<div class="track-details">
+<img id="player-cover" src="https://via.placeholder.com/60" alt="Cover" class="track-cover">
+<div style="flex:1; overflow:hidden;">
+<div id="player-title" style="font-weight:700; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Название трека</div>
+<div id="player-artist" style="font-size:13px; color:var(--text-muted);">Исполнитель</div>
+</div>
+</div>
+<div class="progress-wrapper">
+<span id="current-time">0:00</span>
+<input type="range" id="progress-bar" value="0" min="0" max="100" step="0.1">
+<span id="total-duration">0:30</span>
+</div>
+<div class="player-controls">
+<button id="repeat-btn" class="control-btn" title="Зацикливание">🔁</button>
+<button id="play-pause-btn" class="control-btn main-btn">▶</button>
+</div>
+<div class="volume-wrapper">
+<button id="mute-btn" class="control-btn" style="width:35px; height:35px; font-size:14px;">🔊</button>
+<input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.8" style="width:80px;">
+</div>
+</div>
+</div>
+</div>
+<div id="leaderboard" class="section">
+<h2 class="section-title">🏆 Топ игроков</h2>
+<div id="leaderboardList" class="leaderboard-card"></div>
+</div>
+<div id="achievements" class="section">
+<h2 class="section-title">🏅 Достижения</h2>
+<div id="achievementsList" style="max-width:600px;margin:0 auto;"></div>
+</div>
+<div id="chat" class="section">
+<h2 class="section-title">💬 Глобальный чат</h2>
+<div class="chat-card">
+<div id="chatMessages" class="chat-messages"></div>
+<div class="chat-input-wrapper">
+<input type="text" id="chatInput" placeholder="Сообщение..." autocomplete="off">
+<button class="btn btn-primary" onclick="sendMessage()">Отправить</button>
+</div>
+</div>
+</div>
+<div id="profile" class="section">
+<h2 class="section-title">👤 Профиль пилота</h2>
+<div class="profile-card">
+<div class="profile-header">
+<div class="profile-avatar">👨‍🚀</div>
+<div class="profile-info">
+<div class="profile-name" id="profileName">Гость</div>
+<div class="profile-bio" id="profileBio">Нажми "Редактировать" чтобы добавить описание</div>
+<div class="profile-stats">
+<div class="p-stat"><div class="p-stat-val" id="profileXP">0</div><div class="p-stat-label">Всего XP</div></div>
+<div class="p-stat"><div class="p-stat-val" id="profileCoins">0</div><div class="p-stat-label">Монет</div></div>
+<div class="p-stat"><div class="p-stat-val" id="profileGames">0</div><div class="p-stat-label">Игр</div></div>
+</div>
+<button class="edit-btn" id="editBioBtn" onclick="editBio()">✏️ Редактировать описание</button>
+</div>
+</div>
+<div class="projects-section">
+<h3>🎵 Мои проекты</h3>
+<div id="projectList">
+<p style="color:var(--text-muted);text-align:center;padding:20px;">Нет сохранённых проектов</p>
+</div>
+</div>
+<button class="btn" style="margin-top: 25px; width: 100%; border: 2px solid var(--accent); color: var(--accent);" onclick="logout()">🚪 Выйти из аккаунта</button>
+</div>
+</div>
+<div id="subscriptions" class="section">
+<div class="subscription-section">
+<h2 class="subscription-title">💎 Выбери свой путь</h2>
+<div class="tiers-grid">
+<div class="tier-card">
+<div class="tier-icon">👤</div>
+<h3 class="tier-name">Гость</h3>
+<div class="tier-price">Бесплатно</div>
+<ul class="tier-features">
+<li>🎮 2 игры в день</li>
+<li>📜 1 квест в день</li>
+<li>🔊 Прослушивание музыки</li>
+<li>❌ Нет сохранения проектов</li>
+<li>❌ Нет доступа к Beat Pro</li>
+</ul>
+<button class="tier-btn" onclick="selectTier('guest')">Текущий тариф</button>
+</div>
+<div class="tier-card">
+<div class="tier-icon">👨‍💻</div>
+<h3 class="tier-name">Обычный</h3>
+<div class="tier-price">0 ₽<span>/мес</span></div>
+<ul class="tier-features">
+<li>🎮 Безлимитные игры</li>
+<li>📜 Безлимитные квесты</li>
+<li>🔊 Прослушивание музыки</li>
+<li>💾 До 3 проектов в хранилище</li>
+<li>❌ Нет доступа к Beat Pro</li>
+</ul>
+<button class="tier-btn" onclick="selectTier('regular')">Выбрать тариф</button>
+</div>
+<div class="tier-card featured">
+<div class="tier-badge">ПОПУЛЯРНЫЙ</div>
+<div class="tier-icon">🔭</div>
+<h3 class="tier-name">Исследователь</h3>
+<div class="tier-price">279 ₽<span>/мес</span></div>
+<ul class="tier-features">
+<li>🎮 Безлимитные игры</li>
+<li>📜 Безлимитные квесты</li>
+<li>💾 До 20 проектов в хранилище</li>
+<li>🎹 Полный доступ к Beat Pro</li>
+<li>🏆 VIP статус</li>
+</ul>
+<button class="tier-btn gold" onclick="selectTier('explorer')">Выбрать тариф</button>
+</div>
+<div class="tier-card">
+<div class="tier-icon">👑</div>
+<h3 class="tier-name">VIP Премиум</h3>
+<div class="tier-price">799 ₽<span>/мес</span></div>
+<ul class="tier-features">
+<li>🎮 Всё без ограничений</li>
+<li>💾 Безлимитное хранилище проектов</li>
+<li>🎹 Полный доступ к Beat Pro</li>
+<li>🌟 Ранний доступ</li>
+<li>🎁 Эксклюзивные бонусы</li>
+</ul>
+<button class="tier-btn" onclick="selectTier('vip')">Выбрать тариф</button>
+</div>
+</div>
+</div>
+</div>
+</div>
 <script>
-let currentUser = null, isGuest = false;
-let userData = { xp: 0, coins: 100, level: 1, gamesPlayed: 0, gamesToday: 0, lastGameDate: null, questsCompleted: 0, lastQuestDate: null, bio: '', achievements: [], friendsCount: 0, postsCount: 0, avatar: null, clicker: { clickPower: 1, autoClick: 0, clickCost: 10, autoCost: 50 }, isVip: false };
+let currentUser = null;
+let userTier = 'guest';
+let isGuest = false;
+let userData = {
+xp: 0, coins: 100, level: 1, gamesPlayed: 0, gamesToday: 0,
+lastGameDate: null, questsCompleted: 0, lastQuestDate: null,
+bio: '', achievements: [], beatsThisMonth: 0, lastBeatMonth: null,
+clicker: { clickPower: 1, autoClick: 0, clickCost: 10, autoCost: 50 }
+};
 let currentGame = null, gameInterval = null, gameScore = 0, canvas, ctx;
 let input = { left: false, right: false, up: false, down: false, fire: false };
-let debounceTimer = null, clickerInterval = null;
-let chatData = JSON.parse(localStorage.getItem('soundscape_chat') || '[]');
-
+let globalAudio = new Audio();
+globalAudio.crossOrigin = "anonymous";
+let isRepeat = false, previousVolume = 0.8, debounceTimer = null;
+let clickerInterval = null;
 let questsData = [
-  { id: 'q1', title: 'Первая игра', desc: 'Сыграй в любую игру 1 раз', target: 1, current: 0, reward: 50, icon: '', completed: false },
-  { id: 'q2', title: 'Мастер игры', desc: 'Набери 500 очков в любой игре', target: 500, current: 0, reward: 150, icon: '🏆', completed: false },
-  { id: 'q3', title: 'Музыкальная память', desc: 'Повтори бит из 8 шагов', target: 1, current: 0, reward: 300, icon: '', completed: false },
-  { id: 'q4', title: 'Коллекционер', desc: 'Собери 1000 XP', target: 1000, current: 0, reward: 200, icon: '', completed: false },
-  { id: 'q5', title: 'Космический магнат', desc: 'Накопи 1000 монет в кликере', target: 1000, current: 0, reward: 250, icon: '💰', completed: false }
+{ id: 'q1', title: 'Первая игра', desc: 'Сыграй в любую игру 1 раз', target: 1, current: 0, reward: 50, icon: '🎮', completed: false },
+{ id: 'q2', title: 'Мастер игры', desc: 'Набери 500 очков в любой игре', target: 500, current: 0, reward: 150, icon: '🏆', completed: false },
+{ id: 'q3', title: 'Музыкальная память', desc: 'Повтори бит из 8 шагов', target: 1, current: 0, reward: 300, icon: '🧠', completed: false },
+{ id: 'q4', title: 'Коллекционер', desc: 'Собери 1000 XP', target: 1000, current: 0, reward: 200, icon: '💎', completed: false },
+{ id: 'q5', title: 'Космический магнат', desc: 'Накопи 1000 монет в кликере', target: 1000, current: 0, reward: 250, icon: '💰', completed: false }
 ];
 
-// ============ ПОИСК МУЗЫКИ ЧЕРЕЗ JSONP (обход CORS) ============
-function searchITunesJSONP(query) {
-  return new Promise((resolve, reject) => {
-    const callbackName = 'itunes_cb_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
-    const script = document.createElement('script');
-    window[callbackName] = function(data) {
-      resolve(data);
-      try { delete window[callbackName]; } catch(e){}
-      if (script.parentNode) script.parentNode.removeChild(script);
-    };
-    script.onerror = function() {
-      reject(new Error('Network error'));
-      try { delete window[callbackName]; } catch(e){}
-      if (script.parentNode) script.parentNode.removeChild(script);
-    };
-    script.src = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=10&callback=${callbackName}`;
-    document.body.appendChild(script);
-    setTimeout(() => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-        try { delete window[callbackName]; } catch(e){}
-        reject(new Error('Timeout'));
-      }
-    }, 10000);
-  });
-}
-
-function initMusicSearch() {
-  const searchInput = document.getElementById('music-search-input');
-  const resultsList = document.getElementById('search-results-list');
-  if (!searchInput || !resultsList) return;
-
-  searchInput.addEventListener('input', (e) => {
-    clearTimeout(debounceTimer);
-    const query = e.target.value.trim();
-    if (!query) {
-      resultsList.innerHTML = '';
-      resultsList.style.display = 'none';
-      return;
-    }
-    debounceTimer = setTimeout(async () => {
-      resultsList.innerHTML = '<li style="padding:12px;color:#aaa;text-align:center;">⏳ Загрузка...</li>';
-      resultsList.style.display = 'block';
-      try {
-        const data = await searchITunesJSONP(query);
-        if (data && data.results && data.results.length > 0) {
-          resultsList.innerHTML = data.results.map(track => {
-            const artist = (track.artistName || '').replace(/'/g, "\\'");
-            const title = (track.trackName || '').replace(/'/g, "\\'");
-            const preview = track.previewUrl || '';
-            const youtubeQuery = encodeURIComponent(`${artist} ${title} official audio`);
-            return `<li>
-              <div class="result-info">
-                <span class="result-title">${track.trackName || 'Unknown'}</span>
-                <span class="result-artist">${track.artistName || 'Unknown'}</span>
-                ${preview ? `<audio controls style="margin-top:4px;height:28px;" src="${preview}"></audio>` : ''}
-              </div>
-              <button class="youtube-btn" onclick="openYouTube('${youtubeQuery}', '${title}')">🎬 Full</button>
-            </li>`;
-          }).join('');
-        } else {
-          resultsList.innerHTML = '<li style="padding:12px;color:#aaa;text-align:center;">😔 Ничего не найдено</li>';
-        }
-      } catch (err) {
-        resultsList.innerHTML = '<li style="padding:12px;color:#ff5555;text-align:center;">❌ Ошибка сети</li>';
-      }
-    }, 400);
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!searchInput.contains(e.target) && !resultsList.contains(e.target)) {
-      resultsList.style.display = 'none';
-    }
-  });
-}
-
-function openYouTube(query, title) {
-  window.open(`https://www.youtube.com/results?search_query=${query}`, '_blank');
-  showNotification(`🎬 Открыт YouTube: ${title}`);
-}
-
-// ============ АВТОРИЗАЦИЯ ============
 window.onload = function() {
-  const saved = localStorage.getItem('soundscape_user');
-  if (saved) {
-    const data = JSON.parse(saved);
-    currentUser = data.username; isGuest = data.isGuest || false;
-    userData = { ...userData, ...(data.userData || {}) };
-    if (!userData.clicker) userData.clicker = { clickPower: 1, autoClick: 0, clickCost: 10, autoCost: 50 };
-    checkDailyReset();
-    document.getElementById('authOverlay').style.display = 'none';
-    initApp();
-  } else {
-    document.getElementById('authOverlay').classList.add('active');
-  }
-  renderQuests(); renderLeaderboard(); initBm(); initSpace();
-  initMusicSearch();
+    const saved = localStorage.getItem('soundscape_current_user') || localStorage.getItem('soundscape_user');
+    if (saved) {
+        const data = JSON.parse(saved);
+        currentUser = data.username;
+        isGuest = data.isGuest || false;
+        userTier = data.tier || 'guest';
+        userData = data.userData || userData;
+        if (!userData.clicker) userData.clicker = { clickPower: 1, autoClick: 0, clickCost: 10, autoCost: 50 };
+        checkDailyReset();
+        document.getElementById('authOverlay').style.display = 'none';
+        initApp();
+    } else {
+        document.getElementById('authOverlay').classList.add('active');
+    }
+    renderQuests();
+    renderAchievements();
 };
 
 function checkDailyReset() {
-  const today = new Date().toDateString();
-  if (userData.lastGameDate !== today) { userData.gamesToday = 0; userData.lastGameDate = today; }
-  if (userData.lastQuestDate !== today) { userData.questsCompleted = 0; userData.lastQuestDate = today; }
+    const today = new Date().toDateString();
+    if (userData.lastGameDate !== today) { userData.gamesToday = 0; userData.lastGameDate = today; }
+    if (userData.lastQuestDate !== today) { userData.questsCompleted = 0; userData.lastQuestDate = today; }
+    const currentMonth = new Date().getMonth();
+    if (userData.lastBeatMonth !== currentMonth) { userData.beatsThisMonth = 0; userData.lastBeatMonth = currentMonth; }
 }
 
 function registerUser() {
-  const username = document.getElementById('authUsername').value.trim();
-  if (username.length < 3) { showNotification('❌ Никнейм минимум 3 символа'); return; }
-  currentUser = username; isGuest = false;
-  document.getElementById('authOverlay').style.display = 'none';
-  initApp(); saveUserData(); showNotification('✅ Добро пожаловать, ' + username + '!');
+    const username = document.getElementById('authUsername').value.trim();
+    const password = document.getElementById('authPassword').value.trim();
+    if (username.length < 3) { showNotification('❌ Никнейм минимум 3 символа'); return; }
+    if (password.length < 4) { showNotification('❌ Пароль минимум 4 символа'); return; }
+    currentUser = username;
+    isGuest = false;
+    userTier = 'regular';
+    document.getElementById('authOverlay').style.display = 'none';
+    initApp();
+    saveUserData();
+    showNotification('✅ Добро пожаловать, ' + username + '!');
 }
 
 function guestLogin() {
-  currentUser = 'Гость_' + Math.floor(Math.random() * 10000); isGuest = true;
-  document.getElementById('authOverlay').style.display = 'none';
-  initApp(); showNotification('👤 Гостевой режим');
+    currentUser = 'Гость_' + Math.floor(Math.random() * 10000);
+    isGuest = true;
+    userTier = 'guest';
+    document.getElementById('authOverlay').style.display = 'none';
+    initApp();
+    showNotification('👤 Гостевой режим');
 }
 
 function logout() {
-  localStorage.removeItem('soundscape_user');
-  location.reload();
+    localStorage.removeItem('soundscape_user');
+    localStorage.removeItem('soundscape_current_user');
+    location.reload();
+}
+
+function selectTier(tier) {
+    if (tier === 'guest') { showNotification('⚠️ Вы уже используете гостевой тариф'); return; }
+    isGuest = false;
+    if (currentUser === 'Гость' || currentUser.startsWith('Гость_')) {
+        currentUser = 'User_' + Math.floor(Math.random() * 10000);
+    }
+    if (tier === 'regular') { showNotification('✅ Тариф "Обычный" активирован'); userTier = 'regular'; } 
+    else if (tier === 'explorer') { showNotification('💎 Тариф "Исследователь" активирован - 279₽/мес'); userTier = 'explorer'; } 
+    else if (tier === 'vip') { showNotification('👑 Тариф "VIP Премиум" активирован - 799₽/мес'); userTier = 'vip'; }
+    saveUserData();
+    updateUI();
 }
 
 function saveUserData() {
-  localStorage.setItem('soundscape_user', JSON.stringify({ username: currentUser, isGuest: isGuest, userData: userData }));
+    const data = { username: currentUser, isGuest: isGuest, tier: userTier, userData: userData };
+    localStorage.setItem('soundscape_current_user', JSON.stringify(data));
+    localStorage.setItem('soundscape_user', JSON.stringify(data));
 }
 
 function initApp() {
-  document.getElementById('profileName').textContent = currentUser;
-  document.getElementById('userXP').textContent = userData.xp;
-  document.getElementById('userCoins').textContent = Math.floor(userData.coins);
-  document.getElementById('profileXP').textContent = userData.xp;
-  document.getElementById('profileFriends').textContent = userData.friendsCount || 0;
-  document.getElementById('profilePosts').textContent = userData.postsCount || 0;
-  if (userData.bio) document.getElementById('profileBio').textContent = userData.bio;
-  if (userData.avatar) document.getElementById('profileAvatarImg').src = userData.avatar;
+    document.getElementById('userName').textContent = currentUser;
+    document.getElementById('profileName').textContent = currentUser;
+    const badge = document.getElementById('userBadge');
+    if (userTier === 'explorer') { badge.textContent = 'ИССЛЕДОВАТЕЛЬ'; badge.style.background = 'rgba(0,243,255,0.2)'; badge.style.color = '#00f3ff'; }
+    else if (userTier === 'vip') { badge.textContent = 'VIP'; badge.style.background = 'rgba(255,215,0,0.2)'; badge.style.color = '#ffd700'; }
+    else if (userTier === 'regular') { badge.textContent = 'ОБЫЧНЫЙ'; badge.style.background = 'rgba(0,255,136,0.2)'; badge.style.color = '#00ff88'; }
+    else { badge.textContent = 'ГОСТЬ'; badge.style.background = 'rgba(255,165,0,0.2)'; badge.style.color = 'orange'; }
+    updateStats();
+    updateProfile();
+    loadProjects();
+    resizeSpaceCanvas();
+    drawSpaceStars();
 }
+
+function updateStats() {
+    userData.level = Math.floor(userData.xp / 500) + 1;
+    document.getElementById('userXP').textContent = userData.xp;
+    document.getElementById('userCoins').textContent = Math.floor(userData.coins);
+    updateQuestProgress('q4', 0);
+}
+
+function updateProfile() {
+    document.getElementById('profileLevel').textContent = userData.level;
+    document.getElementById('profileXP').textContent = userData.xp;
+    document.getElementById('profileCoins').textContent = Math.floor(userData.coins);
+    document.getElementById('profileGames').textContent = userData.gamesPlayed;
+    if (userData.bio) { document.getElementById('profileBio').textContent = userData.bio; }
+    const editBtn = document.getElementById('editBioBtn');
+    if (isGuest) { editBtn.disabled = true; editBtn.textContent = '🔒 Только для авторизованных'; }
+    else { editBtn.disabled = false; editBtn.textContent = '✏️ Редактировать описание'; }
+}
+
+function editBio() {
+    if (isGuest) { showNotification('❌ Редактирование доступно только для авторизованных'); return; }
+    const newBio = prompt('Введите описание профиля:', userData.bio || '');
+    if (newBio !== null) { userData.bio = newBio; saveUserData(); updateProfile(); showNotification('✅ Описание обновлено'); }
+}
+
+function loadProjects() {
+    const projectList = document.getElementById('projectList');
+    const projects = JSON.parse(localStorage.getItem('beatmaker_pro_projects') || '[]');
+    if (projects.length === 0) {
+        projectList.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:20px;">Нет сохранённых проектов</p>';
+        return;
+    }
+    projectList.innerHTML = projects.map((proj, i) => `
+<div class="project-item">
+<div>
+<div class="project-name">${proj.name || 'Проект ' + (i + 1)}</div>
+<div class="project-date">${new Date(proj.createdAt).toLocaleDateString()}</div>
+</div>
+<div class="project-actions">
+<button class="play-project-btn" onclick="window.location.href='beatmaker_pro_list.html?play=${encodeURIComponent(proj.id)}'">▶ Слушать</button>
+<button class="edit-project-btn" onclick="sessionStorage.setItem('beatmaker_edit_id', '${proj.id}'); window.location.href='beatmaker_pro.html?edit=${encodeURIComponent(proj.id)}'">✏️ Изменить</button>
+</div>
+</div>`).join('');
+}
+
+function updateUI() { initApp(); }
 
 function showSection(id, event) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  if (event) { let target = event.target.closest('.nav-btn'); if(target) target.classList.add('active'); }
-  if (id === 'profile') initApp();
-  if (id === 'quests') { initMazeQuest(); initRepeatQuest(); renderQuests(); }
-  if (id === 'leaderboard') renderLeaderboard();
-  if (id === 'chat') renderChat();
-  if (id === 'beatmaker') { setTimeout(() => { updateBmScrollbarThumb(); resizeBmCanvas(); }, 100); }
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if (event) { let target = event.target.closest('.nav-btn'); if(target) target.classList.add('active'); }
+    if (id === 'profile') updateProfile();
+    if (id === 'quests') { initMazeQuest(); initRepeatQuest(); renderQuests(); }
+    if (id === 'achievements') renderAchievements();
+    if (id === 'leaderboard') renderLeaderboard();
+    if (id === 'chat') renderChat();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function showNotification(text) {
-  const div = document.getElementById('notification');
-  div.textContent = text; div.classList.add('show');
-  setTimeout(() => div.classList.remove('show'), 3000);
+function showSubscriptions() { closeLimitModal(); showSection('subscriptions'); }
+function closeLimitModal() { document.getElementById('limitModal').classList.remove('active'); }
+
+function checkGameLimit() {
+    if (userTier === 'guest' && userData.gamesToday >= 2) {
+        document.getElementById('limitMessage').textContent = 'Вы достигли лимита: 2 игры в день для гостей. Оформите подписку для безлимита!';
+        document.getElementById('limitModal').classList.add('active');
+        return false;
+    }
+    return true;
 }
 
-function editProfile() {
-  if (isGuest) { showNotification('❌ Редактирование доступно только для авторизованных'); return; }
-  const newBio = prompt('Введите описание профиля:', userData.bio || '');
-  if (newBio !== null) {
-    userData.bio = newBio;
-    userData.postsCount = (userData.postsCount || 0) + 1;
-    document.getElementById('avatarInput').click();
-    saveUserData();
-    initApp();
-    showNotification('✅ Профиль обновлен!');
-  }
+function checkQuestLimit() {
+    if (userTier === 'guest' && userData.questsCompleted >= 1) {
+        document.getElementById('limitMessage').textContent = 'Вы достигли лимита: 1 квест в день для гостей. Оформите подписку для безлимита!';
+        document.getElementById('limitModal').classList.add('active');
+        return false;
+    }
+    return true;
 }
 
-function handleAvatarUpload(event) {
-  const file = event.target.files[0];
-  if (file) {
-    if (file.size > 2 * 1024 * 1024) { showNotification('❌ Файл слишком большой (макс. 2MB)'); return; }
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      userData.avatar = e.target.result;
-      saveUserData();
-      initApp();
-      showNotification('✅ Аватарка обновлена!');
-    };
-    reader.readAsDataURL(file);
-  }
+function goToBeatProList() {
+    if (isGuest) {
+        document.getElementById('limitMessage').textContent = '⛔ Beat Composer Pro доступен только для авторизованных пользователей. Оформите подписку для доступа!';
+        document.getElementById('limitModal').classList.add('active');
+        return;
+    }
+    window.location.href = 'beatmaker_pro_list.html';
 }
 
-function changeAvatar(emoji) {
-  userData.avatar = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='70'%3E${encodeURIComponent(emoji)}%3C/text%3E%3C/svg%3E`;
-  document.getElementById('profileAvatarImg').src = userData.avatar;
-  saveUserData();
-  showNotification(`✅ Аватар изменён на ${emoji}`);
-}
-
-function activateVIP() {
-  userData.isVip = true;
-  saveUserData();
-  initApp();
-  showNotification('👑 VIP доступ активирован! (Демо)');
-}
-
-// ============ ИГРЫ ============
 function startGame(type) {
-  currentGame = type; gameScore = 0;
-  document.getElementById('activeGame').style.display = 'block';
-  document.getElementById('gameCanvas').style.display = 'none';
-  document.getElementById('memoryGameArea').style.display = 'none';
-  document.getElementById('clickerGameArea').style.display = 'none';
-  if (clickerInterval) clearInterval(clickerInterval);
+    if (!checkGameLimit()) return;
+    currentGame = type;
+    gameScore = 0;
+    document.getElementById('activeGame').style.display = 'block';
+    
+    document.getElementById('gameCanvas').style.display = 'none';
+    document.getElementById('memoryGameArea').style.display = 'none';
+    document.getElementById('clickerGameArea').style.display = 'none';
+    
+    if (clickerInterval) clearInterval(clickerInterval);
 
-  if (type === 'memory') {
-    document.getElementById('memoryGameArea').style.display = 'block';
-    document.getElementById('gameTitle').textContent = '🧠 Memory Game';
-    initMemoryGame();
-  } else if (type === 'clicker') {
-    document.getElementById('clickerGameArea').style.display = 'block';
-    document.getElementById('gameTitle').textContent = '🖱️ Звёздный Кликер';
-    startClickerGame();
-  } else {
-    canvas = document.getElementById('gameCanvas'); canvas.style.display = 'block';
-    ctx = canvas.getContext('2d');
-    canvas.width = Math.min(600, canvas.parentElement.clientWidth - 30); canvas.height = 500;
-    const games = { 'shooter': { title: '🚀 Space Shooter' }, 'pacman': { title: '🟡 Pac-Man' }, 'invaders': { title: '🛸 Invaders' }, 'snake': { title: ' Змейка' } };
-    document.getElementById('gameTitle').textContent = games[type].title;
-    if (type === 'shooter') initShooter(); else if (type === 'pacman') initPacman(); else if (type === 'invaders') initInvaders(); else if (type === 'snake') initSnake();
-  }
-  userData.gamesPlayed++;
-  userData.gamesToday = (userData.gamesToday || 0) + 1;
-  if (!userData.achievements) userData.achievements = [];
-  if (!userData.achievements.includes('a1')) { userData.achievements.push('a1'); showNotification(' Достижение: Первые шаги!'); }
-  updateQuestProgress('q1', 1);
-  saveUserData();
+    if (type === 'memory') {
+        document.getElementById('memoryGameArea').style.display = 'block';
+        document.getElementById('gameTitle').textContent = '🧠 Memory Game';
+        initMemoryGame();
+    } else if (type === 'clicker') {
+        document.getElementById('clickerGameArea').style.display = 'block';
+        document.getElementById('gameTitle').textContent = '🖱️ Звёздный Кликер';
+        startClickerGame();
+    } else {
+        canvas = document.getElementById('gameCanvas');
+        canvas.style.display = 'block';
+        ctx = canvas.getContext('2d');
+        const containerWidth = canvas.parentElement.clientWidth - 30;
+        canvas.width = Math.min(600, containerWidth);
+        canvas.height = 500;
+        const games = {
+            'shooter': { title: '🚀 Space Shooter' },
+            'pacman': { title: '🟡 Pac-Man' },
+            'invaders': { title: '👾 Space Invaders' },
+            'snake': { title: '🐍 Змейка' }
+        };
+        document.getElementById('gameTitle').textContent = games[type].title;
+        if (type === 'shooter') initShooter();
+        else if (type === 'pacman') initPacman();
+        else if (type === 'invaders') initInvaders();
+        else if (type === 'snake') initSnake();
+    }
+    
+    userData.gamesPlayed++;
+    userData.gamesToday = (userData.gamesToday || 0) + 1;
+    if (!userData.achievements) userData.achievements = [];
+    if (!userData.achievements.includes('a1')) { userData.achievements.push('a1'); renderAchievements(); showNotification('🏅 Достижение: Первые шаги!'); }
+    updateQuestProgress('q1', 1);
+    saveUserData();
+    updateStats();
 }
 
 function launchGame() {
-  if (currentGame === 'shooter') startShooter(); else if (currentGame === 'pacman') startPacman();
-  else if (currentGame === 'invaders') startInvaders(); else if (currentGame === 'snake') startSnake();
-  else if (currentGame === 'memory') startMemoryGame(); else if (currentGame === 'clicker') startClickerGame();
-  showNotification('🎮 Игра началась!');
+    if (currentGame === 'shooter') startShooter();
+    else if (currentGame === 'pacman') startPacman();
+    else if (currentGame === 'invaders') startInvaders();
+    else if (currentGame === 'snake') startSnake();
+    else if (currentGame === 'memory') startMemoryGame();
+    else if (currentGame === 'clicker') startClickerGame();
+    showNotification('🎮 Игра началась!');
 }
 
 function pauseGame() { if (gameInterval) { clearInterval(gameInterval); gameInterval = null; } }
+
 function closeGame() {
-  if (gameInterval) { clearInterval(gameInterval); gameInterval = null; }
-  if (clickerInterval) { clearInterval(clickerInterval); clickerInterval = null; }
-  document.getElementById('activeGame').style.display = 'none';
-  input = { left: false, right: false, up: false, down: false, fire: false };
+    if (gameInterval) { clearInterval(gameInterval); gameInterval = null; }
+    if (clickerInterval) { clearInterval(clickerInterval); clickerInterval = null; }
+    document.getElementById('activeGame').style.display = 'none';
+    input = { left: false, right: false, up: false, down: false, fire: false };
 }
 
 document.addEventListener('keydown', (e) => {
-  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) e.preventDefault();
-  if (e.code === 'ArrowLeft' || e.code === 'KeyA') input.left = true;
-  if (e.code === 'ArrowRight' || e.code === 'KeyD') input.right = true;
-  if (e.code === 'ArrowUp' || e.code === 'KeyW') input.up = true;
-  if (e.code === 'ArrowDown' || e.code === 'KeyS') input.down = true;
-  if (e.code === 'Space') input.fire = true;
+    const isGameActive = document.getElementById('games').classList.contains('active');
+    const isQuestActive = document.getElementById('quests').classList.contains('active');
+    if (isGameActive || isQuestActive) {
+        if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space'].includes(e.code)) {
+            e.preventDefault();
+        }
+    }
+    if (e.code === 'ArrowLeft' || e.code === 'KeyA') input.left = true;
+    if (e.code === 'ArrowRight' || e.code === 'KeyD') input.right = true;
+    if (e.code === 'ArrowUp' || e.code === 'KeyW') input.up = true;
+    if (e.code === 'ArrowDown' || e.code === 'KeyS') input.down = true;
+    if (e.code === 'Space') input.fire = true;
+    if (isQuestActive) {
+        if (e.code === 'ArrowLeft' || e.code === 'KeyA') movePlayer(-1, 0);
+        if (e.code === 'ArrowRight' || e.code === 'KeyD') movePlayer(1, 0);
+        if (e.code === 'ArrowUp' || e.code === 'KeyW') movePlayer(0, -1);
+        if (e.code === 'ArrowDown' || e.code === 'KeyS') movePlayer(0, 1);
+    }
 });
+
 document.addEventListener('keyup', (e) => {
-  if (e.code === 'ArrowLeft' || e.code === 'KeyA') input.left = false;
-  if (e.code === 'ArrowRight' || e.code === 'KeyD') input.right = false;
-  if (e.code === 'ArrowUp' || e.code === 'KeyW') input.up = false;
-  if (e.code === 'ArrowDown' || e.code === 'KeyS') input.down = false;
-  if (e.code === 'Space') input.fire = false;
+    if (e.code === 'ArrowLeft' || e.code === 'KeyA') input.left = false;
+    if (e.code === 'ArrowRight' || e.code === 'KeyD') input.right = false;
+    if (e.code === 'ArrowUp' || e.code === 'KeyW') input.up = false;
+    if (e.code === 'ArrowDown' || e.code === 'KeyS') input.down = false;
+    if (e.code === 'Space') input.fire = false;
 });
 
-function handleMobileInput(dir, isPress) { input[dir] = isPress; }
-document.querySelectorAll('.d-btn, .action-btn').forEach(btn => {
-  const dir = btn.classList.contains('up') ? 'up' : btn.classList.contains('down') ? 'down' : btn.classList.contains('left') ? 'left' : btn.classList.contains('right') ? 'right' : 'fire';
-  btn.addEventListener('touchstart', (e) => { e.preventDefault(); handleMobileInput(dir, true); });
-  btn.addEventListener('touchend', (e) => { e.preventDefault(); handleMobileInput(dir, false); });
-  btn.addEventListener('mousedown', () => handleMobileInput(dir, true));
-  btn.addEventListener('mouseup', () => handleMobileInput(dir, false));
-});
-
-// SHOOTER
 let player, bullets, enemies;
 function initShooter() { player = { x: canvas.width/2 - 20, y: canvas.height - 60, w: 40, h: 40, cooldown: 0 }; bullets = []; enemies = []; }
 function startShooter() {
-  if (gameInterval) clearInterval(gameInterval);
-  gameInterval = setInterval(() => {
-    if (input.left) player.x -= 5; if (input.right) player.x += 5;
-    player.x = Math.max(0, Math.min(canvas.width - player.w, player.x));
-    if (input.fire && player.cooldown === 0) { bullets.push({ x: player.x + player.w/2 - 2, y: player.y }); player.cooldown = 10; }
-    if (player.cooldown > 0) player.cooldown--;
-    if (Math.random() < 0.03) enemies.push({ x: Math.random() * (canvas.width - 30), y: -30, w: 30, h: 30 });
-    bullets = bullets.filter(b => { b.y -= 8; return b.y > 0; });
-    for (let i = enemies.length - 1; i >= 0; i--) {
-      let e = enemies[i]; e.y += 2;
-      if (e.y + e.h > player.y && e.x < player.x + player.w && e.x + e.w > player.x) {
-        clearInterval(gameInterval); showNotification('💥 Game Over! Счёт: ' + gameScore); input = { left: false, right: false, up: false, down: false, fire: false }; return;
-      }
-      for (let j = bullets.length - 1; j >= 0; j--) {
-        let b = bullets[j];
-        if (b.x > e.x && b.x < e.x + e.w && b.y > e.y && b.y < e.y + e.h) {
-          enemies.splice(i, 1); bullets.splice(j, 1); gameScore += 10;
-          userData.xp += 2; updateQuestProgress('q2', 10);
-          createClickParticle(b.x, b.y, '+10');
-          break;
+    if (gameInterval) clearInterval(gameInterval);
+    gameInterval = setInterval(() => {
+        if (input.left) player.x -= 5;
+        if (input.right) player.x += 5;
+        player.x = Math.max(0, Math.min(canvas.width - player.w, player.x));
+        if (input.fire && player.cooldown === 0) { bullets.push({ x: player.x + player.w/2 - 2, y: player.y }); player.cooldown = 10; }
+        if (player.cooldown > 0) player.cooldown--;
+        if (Math.random() < 0.03) { enemies.push({ x: Math.random() * (canvas.width - 30), y: -30, w: 30, h: 30 }); }
+        bullets = bullets.filter(b => { b.y -= 8; return b.y > 0; });
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            let e = enemies[i];
+            e.y += 2;
+            if (e.y + e.h > player.y && e.x < player.x + player.w && e.x + e.w > player.x) {
+                clearInterval(gameInterval);
+                showNotification('💥 Game Over! Враг столкнулся с тобой. Счёт: ' + gameScore);
+                input = { left: false, right: false, up: false, down: false, fire: false };
+                return;
+            }
+            for (let j = bullets.length - 1; j >= 0; j--) {
+                let b = bullets[j];
+                if (b.x > e.x && b.x < e.x + e.w && b.y > e.y && b.y < e.y + e.h) {
+                    enemies.splice(i, 1);
+                    bullets.splice(j, 1);
+                    gameScore += 10;
+                    userData.xp += 2;
+                    updateQuestProgress('q2', 10);
+                    createClickParticle(b.x, b.y, '+10');
+                    break;
+                }
+            }
         }
-      }
-    }
-    enemies = enemies.filter(e => e.y < canvas.height);
-    drawShooter();
-    document.getElementById('gameInfo').textContent = `Счёт: ${gameScore}`;
-  }, 16);
+        enemies = enemies.filter(e => e.y < canvas.height);
+        drawShooter();
+        updateStats();
+        document.getElementById('gameInfo').textContent = `Счёт: ${gameScore}`;
+    }, 16);
 }
 function drawShooter() {
-  ctx.fillStyle = '#050714'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = '#00f3ff'; ctx.beginPath(); ctx.moveTo(player.x + player.w/2, player.y); ctx.lineTo(player.x + player.w, player.y + player.h); ctx.lineTo(player.x, player.y + player.h); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = '#0ff'; bullets.forEach(b => ctx.fillRect(b.x, b.y, 4, 12));
-  ctx.fillStyle = '#ff0055'; enemies.forEach(e => ctx.fillRect(e.x, e.y, e.w, e.h));
+    ctx.fillStyle = '#050714'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#fff';
+    for (let i = 0; i < 40; i++) ctx.fillRect((i*137)%canvas.width, (i*241 + Date.now()/50)%canvas.height, 1.5, 1.5);
+    ctx.fillStyle = '#00f3ff'; ctx.beginPath(); ctx.moveTo(player.x + player.w/2, player.y); ctx.lineTo(player.x + player.w, player.y + player.h); ctx.lineTo(player.x, player.y + player.h); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#0ff'; bullets.forEach(b => ctx.fillRect(b.x, b.y, 4, 12));
+    ctx.fillStyle = '#ff0055'; enemies.forEach(e => ctx.fillRect(e.x, e.y, e.w, e.h));
 }
 
-// PACMAN
 let pacman, ghosts, dots, mazeData;
 function initPacman() {
-  mazeData = ['####################','#........#.........#','#.####.#.#.#.####.#.#','#.#....#...#....#.#.#','#.#.##.#.#.#.##.#.#.#','#.#.#......#.#....#.#','#...#.####.#.####...#','#.#.#......#.#....#.#','#.#.##.####.##.#....#','#.#....#..#....#....#','#.####.#..#.####....#','#......#..#.........#','####################'];
-  pacman = { x: 1, y: 1, dir: { x: 0, y: 0 }, nextDir: { x: 0, y: 0 } };
-  ghosts = [ { x: 10, y: 6, color: '#ff0055' }, { x: 9, y: 6, color: '#ffb8ff' }, { x: 10, y: 7, color: '#00f3ff' }, { x: 9, y: 7, color: '#ffb852' }, { x: 5, y: 5, color: '#bc13fe' }, { x: 15, y: 10, color: '#00ff88' } ];
-  dots = [];
-  for (let y = 0; y < mazeData.length; y++) for (let x = 0; x < mazeData[y].length; x++) if (mazeData[y][x] === '.') dots.push({ x, y });
+    mazeData = ['####################','#........#.........#','#.####.#.#.#.####.#.#','#.#....#...#....#.#.#','#.#.##.#.#.#.##.#.#.#','#.#.#......#.#....#.#','#...#.####.#.####...#','#.#.#......#.#....#.#','#.#.##.####.##.#....#','#.#....#..#....#....#','#.####.#..#.####....#','#......#..#.........#','####################'];
+    pacman = { x: 1, y: 1, dir: { x: 0, y: 0 }, nextDir: { x: 0, y: 0 } };
+    ghosts = [ { x: 10, y: 6, color: '#ff0055' }, { x: 9, y: 6, color: '#ffb8ff' }, { x: 10, y: 7, color: '#00f3ff' }, { x: 9, y: 7, color: '#ffb852' }, { x: 5, y: 5, color: '#bc13fe' }, { x: 15, y: 10, color: '#00ff88' } ];
+    dots = [];
+    for (let y = 0; y < mazeData.length; y++) for (let x = 0; x < mazeData[y].length; x++) if (mazeData[y][x] === '.') dots.push({ x, y });
 }
 function startPacman() {
-  if (gameInterval) clearInterval(gameInterval);
-  gameInterval = setInterval(() => {
-    if (input.left) pacman.nextDir = { x: -1, y: 0 }; if (input.right) pacman.nextDir = { x: 1, y: 0 };
-    if (input.up) pacman.nextDir = { x: 0, y: -1 }; if (input.down) pacman.nextDir = { x: 0, y: 1 };
-    let newX = pacman.x + pacman.nextDir.x, newY = pacman.y + pacman.nextDir.y;
-    if (mazeData[newY] && mazeData[newY][newX] !== '#') pacman.dir = pacman.nextDir;
-    newX = pacman.x + pacman.dir.x; newY = pacman.y + pacman.dir.y;
-    if (mazeData[newY] && mazeData[newY][newX] !== '#') { pacman.x = newX; pacman.y = newY; }
-    for (let i = dots.length - 1; i >= 0; i--) {
-      if (dots[i].x === pacman.x && dots[i].y === pacman.y) {
-        dots.splice(i, 1); gameScore += 10;
-        userData.xp += 5; updateQuestProgress('q2', 10);
-      }
-    }
-    ghosts.forEach(ghost => {
-      const dirs = [{ x: 0, y: -1 }, { x: 0, y: 1 }, { x: -1, y: 0 }, { x: 1, y: 0 }];
-      const validDirs = dirs.filter(d => { let nx = ghost.x + d.x, ny = ghost.y + d.y; return mazeData[ny] && mazeData[ny][nx] !== '#'; });
-      if (validDirs.length > 0) { const dir = validDirs[Math.floor(Math.random() * validDirs.length)]; ghost.x += dir.x; ghost.y += dir.y; }
-      if (ghost.x === pacman.x && ghost.y === pacman.y) { clearInterval(gameInterval); showNotification('💀 Пойман! Счёт: ' + gameScore); }
-    });
-    drawPacman();
-    document.getElementById('gameInfo').textContent = `Счёт: ${gameScore}`;
-  }, 150);
+    if (gameInterval) clearInterval(gameInterval);
+    gameInterval = setInterval(() => {
+        if (input.left) pacman.nextDir = { x: -1, y: 0 };
+        if (input.right) pacman.nextDir = { x: 1, y: 0 };
+        if (input.up) pacman.nextDir = { x: 0, y: -1 };
+        if (input.down) pacman.nextDir = { x: 0, y: 1 };
+        let newX = pacman.x + pacman.nextDir.x, newY = pacman.y + pacman.nextDir.y;
+        if (mazeData[newY] && mazeData[newY][newX] !== '#') pacman.dir = pacman.nextDir;
+        newX = pacman.x + pacman.dir.x; newY = pacman.y + pacman.dir.y;
+        if (mazeData[newY] && mazeData[newY][newX] !== '#') { pacman.x = newX; pacman.y = newY; }
+        for (let i = dots.length - 1; i >= 0; i--) {
+            if (dots[i].x === pacman.x && dots[i].y === pacman.y) { 
+                dots.splice(i, 1); 
+                gameScore += 10; 
+                userData.xp += 5; 
+                updateQuestProgress('q2', 10); 
+            }
+        }
+        ghosts.forEach(ghost => {
+            const dirs = [{ x: 0, y: -1 }, { x: 0, y: 1 }, { x: -1, y: 0 }, { x: 1, y: 0 }];
+            const validDirs = dirs.filter(d => { let nx = ghost.x + d.x, ny = ghost.y + d.y; return mazeData[ny] && mazeData[ny][nx] !== '#'; });
+            if (validDirs.length > 0) { const dir = validDirs[Math.floor(Math.random() * validDirs.length)]; ghost.x += dir.x; ghost.y += dir.y; }
+            if (ghost.x === pacman.x && ghost.y === pacman.y) {
+                clearInterval(gameInterval);
+                showNotification('💀 Пойман! Счёт: ' + gameScore);
+            }
+        });
+        drawPacman();
+        updateStats();
+        document.getElementById('gameInfo').textContent = `Счёт: ${gameScore}`;
+    }, 150);
 }
 function drawPacman() {
-  const cellSize = Math.floor(canvas.width / 20), offsetX = (canvas.width - (mazeData[0].length * cellSize)) / 2, offsetY = (canvas.height - (mazeData.length * cellSize)) / 2;
-  ctx.fillStyle = '#050714'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = '#00f3ff';
-  for (let y = 0; y < mazeData.length; y++) for (let x = 0; x < mazeData[y].length; x++) if (mazeData[y][x] === '#') ctx.fillRect(x * cellSize + offsetX, y * cellSize + offsetY, cellSize - 2, cellSize - 2);
-  ctx.fillStyle = '#ffd700';
-  dots.forEach(dot => { ctx.beginPath(); ctx.arc(dot.x * cellSize + cellSize/2 + offsetX, dot.y * cellSize + cellSize/2 + offsetY, 3, 0, Math.PI * 2); ctx.fill(); });
-  ctx.fillStyle = '#ffff00';
-  const pacX = pacman.x * cellSize + cellSize/2 + offsetX, pacY = pacman.y * cellSize + cellSize/2 + offsetY;
-  ctx.beginPath(); ctx.arc(pacX, pacY, cellSize/2 - 4, 0.15 * Math.PI, 1.85 * Math.PI); ctx.lineTo(pacX, pacY); ctx.fill();
-  ghosts.forEach(ghost => { ctx.fillStyle = ghost.color; ctx.fillRect(ghost.x * cellSize + offsetX + 2, ghost.y * cellSize + offsetY + 2, cellSize - 4, cellSize - 4); });
+    const cellSize = Math.floor(canvas.width / 20);
+    const offsetX = (canvas.width - (mazeData[0].length * cellSize)) / 2;
+    const offsetY = (canvas.height - (mazeData.length * cellSize)) / 2;
+    ctx.fillStyle = '#050714'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#00f3ff';
+    for (let y = 0; y < mazeData.length; y++) for (let x = 0; x < mazeData[y].length; x++) if (mazeData[y][x] === '#') ctx.fillRect(x * cellSize + offsetX, y * cellSize + offsetY, cellSize - 2, cellSize - 2);
+    ctx.fillStyle = '#ffd700';
+    dots.forEach(dot => { ctx.beginPath(); ctx.arc(dot.x * cellSize + cellSize/2 + offsetX, dot.y * cellSize + cellSize/2 + offsetY, 3, 0, Math.PI * 2); ctx.fill(); });
+    ctx.fillStyle = '#ffff00';
+    const pacX = pacman.x * cellSize + cellSize/2 + offsetX, pacY = pacman.y * cellSize + cellSize/2 + offsetY;
+    ctx.beginPath(); ctx.arc(pacX, pacY, cellSize/2 - 4, 0.15 * Math.PI, 1.85 * Math.PI); ctx.lineTo(pacX, pacY); ctx.fill();
+    ghosts.forEach(ghost => { ctx.fillStyle = ghost.color; ctx.fillRect(ghost.x * cellSize + offsetX + 2, ghost.y * cellSize + offsetY + 2, cellSize - 4, cellSize - 4); });
 }
 
-// INVADERS
 let invaderPlayer, invaderBullets, invaderDirection;
 function initInvaders() {
-  invaderPlayer = { x: canvas.width/2, y: canvas.height - 40, w: 30, h: 20 }; bullets = []; invaderBullets = []; invaderDirection = 1; enemies = [];
-  for (let row = 0; row < 4; row++) for (let col = 0; col < 8; col++) enemies.push({ x: 50 + col * 60, y: 50 + row * 40, w: 30, h: 25 });
+    invaderPlayer = { x: canvas.width/2, y: canvas.height - 40, w: 30, h: 20 };
+    bullets = []; invaderBullets = []; invaderDirection = 1; enemies = [];
+    for (let row = 0; row < 4; row++) for (let col = 0; col < 8; col++) enemies.push({ x: 50 + col * 60, y: 50 + row * 40, w: 30, h: 25 });
 }
 function startInvaders() {
-  if (gameInterval) clearInterval(gameInterval);
-  gameInterval = setInterval(() => {
-    if (input.left) invaderPlayer.x -= 5; if (input.right) invaderPlayer.x += 5;
-    invaderPlayer.x = Math.max(0, Math.min(canvas.width - invaderPlayer.w, invaderPlayer.x));
-    if (input.fire && Math.random() < 0.1) bullets.push({ x: invaderPlayer.x + invaderPlayer.w/2, y: invaderPlayer.y });
-    let hitEdge = false;
-    enemies.forEach(e => { e.x += invaderDirection * 1; if (e.x <= 10 || e.x >= canvas.width - 40) hitEdge = true; });
-    if (hitEdge) { invaderDirection *= -1; enemies.forEach(e => e.y += 20); }
-    if (Math.random() < 0.02 && enemies.length > 0) { const shooter = enemies[Math.floor(Math.random() * enemies.length)]; invaderBullets.push({ x: shooter.x + shooter.w/2, y: shooter.y + shooter.h }); }
-    bullets = bullets.filter(b => { b.y -= 8; return b.y > 0; });
-    invaderBullets = invaderBullets.filter(b => {
-      b.y += 4; if (b.y > canvas.height) return false;
-      if (Math.abs(b.x - invaderPlayer.x) < 20 && Math.abs(b.y - invaderPlayer.y) < 20) { clearInterval(gameInterval); showNotification('💥 Подбили! Счёт: ' + gameScore); return false; }
-      return true;
-    });
-    for (let i = bullets.length - 1; i >= 0; i--) {
-      let b = bullets[i];
-      for (let j = enemies.length - 1; j >= 0; j--) {
-        let e = enemies[j];
-        if (b.x > e.x && b.x < e.x + e.w && b.y > e.y && b.y < e.y + e.h) { enemies.splice(j, 1); bullets.splice(i, 1); gameScore += 10; userData.xp += 2; updateQuestProgress('q2', 10); break; }
-      }
-    }
-    if (enemies.length === 0) { clearInterval(gameInterval); showNotification(' Победа! Счёт: ' + gameScore); }
-    drawInvaders();
-    document.getElementById('gameInfo').textContent = `Счёт: ${gameScore} | Врагов: ${enemies.length}`;
-  }, 16);
+    if (gameInterval) clearInterval(gameInterval);
+    gameInterval = setInterval(() => {
+        if (input.left) invaderPlayer.x -= 5;
+        if (input.right) invaderPlayer.x += 5;
+        invaderPlayer.x = Math.max(0, Math.min(canvas.width - invaderPlayer.w, invaderPlayer.x));
+        if (input.fire && Math.random() < 0.1) { bullets.push({ x: invaderPlayer.x + invaderPlayer.w/2, y: invaderPlayer.y }); }
+        let hitEdge = false;
+        enemies.forEach(e => { e.x += invaderDirection * 1; if (e.x <= 10 || e.x >= canvas.width - 40) hitEdge = true; });
+        if (hitEdge) { invaderDirection *= -1; enemies.forEach(e => e.y += 20); }
+        if (Math.random() < 0.02 && enemies.length > 0) { const shooter = enemies[Math.floor(Math.random() * enemies.length)]; invaderBullets.push({ x: shooter.x + shooter.w/2, y: shooter.y + shooter.h }); }
+        bullets = bullets.filter(b => { b.y -= 8; return b.y > 0; });
+        invaderBullets = invaderBullets.filter(b => {
+            b.y += 4;
+            if (b.y > canvas.height) return false;
+            if (Math.abs(b.x - invaderPlayer.x) < 20 && Math.abs(b.y - invaderPlayer.y) < 20) {
+                clearInterval(gameInterval);
+                showNotification('💥 Подбили! Счёт: ' + gameScore);
+                return false;
+            }
+            return true;
+        });
+        for (let i = bullets.length - 1; i >= 0; i--) {
+            let b = bullets[i];
+            for (let j = enemies.length - 1; j >= 0; j--) {
+                let e = enemies[j];
+                if (b.x > e.x && b.x < e.x + e.w && b.y > e.y && b.y < e.y + e.h) {
+                    enemies.splice(j, 1); bullets.splice(i, 1); gameScore += 10; userData.xp += 2; updateQuestProgress('q2', 10);
+                    break;
+                }
+            }
+        }
+        if (enemies.length === 0) { clearInterval(gameInterval); showNotification('🏆 Победа! Счёт: ' + gameScore); }
+        drawInvaders();
+        updateStats();
+        document.getElementById('gameInfo').textContent = `Счёт: ${gameScore} | Врагов: ${enemies.length}`;
+    }, 16);
 }
 function drawInvaders() {
-  ctx.fillStyle = '#050714'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = '#00f3ff'; ctx.fillRect(invaderPlayer.x, invaderPlayer.y, invaderPlayer.w, invaderPlayer.h);
-  ctx.fillStyle = '#0ff'; bullets.forEach(b => ctx.fillRect(b.x - 2, b.y, 4, 10));
-  ctx.fillStyle = '#ff0055'; enemies.forEach(e => ctx.fillRect(e.x, e.y, e.w, e.h));
-  ctx.fillStyle = '#ff5500'; invaderBullets.forEach(b => ctx.fillRect(b.x - 2, b.y, 4, 10));
+    ctx.fillStyle = '#050714'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#00f3ff'; ctx.fillRect(invaderPlayer.x, invaderPlayer.y, invaderPlayer.w, invaderPlayer.h);
+    ctx.fillStyle = '#0ff'; bullets.forEach(b => ctx.fillRect(b.x - 2, b.y, 4, 10));
+    ctx.fillStyle = '#ff0055'; enemies.forEach(e => ctx.fillRect(e.x, e.y, e.w, e.h));
+    ctx.fillStyle = '#ff5500'; invaderBullets.forEach(b => ctx.fillRect(b.x - 2, b.y, 4, 10));
 }
 
-// SNAKE
 let snake, dir, nextDir, food;
 function initSnake() { snake = [{ x: 15, y: 10 }]; dir = { x: 1, y: 0 }; nextDir = { x: 1, y: 0 }; food = { x: 20, y: 10 }; }
 function startSnake() {
-  if (gameInterval) clearInterval(gameInterval);
-  gameInterval = setInterval(() => {
-    if (input.left && dir.x !== 1) nextDir = { x: -1, y: 0 }; else if (input.right && dir.x !== -1) nextDir = { x: 1, y: 0 };
-    else if (input.up && dir.y !== 1) nextDir = { x: 0, y: -1 }; else if (input.down && dir.y !== -1) nextDir = { x: 0, y: 1 };
-    dir = nextDir;
-    const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
-    const cols = Math.floor(canvas.width / 20), rows = Math.floor(canvas.height / 20);
-    if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows || snake.some(s => s.x === head.x && s.y === head.y)) { clearInterval(gameInterval); showNotification('💥 Game Over! Счёт: ' + gameScore); return; }
-    snake.unshift(head);
-    if (head.x === food.x && head.y === food.y) { gameScore += 15; userData.xp += 10; updateQuestProgress('q2', 15); food = { x: Math.floor(Math.random() * (cols-2)) + 1, y: Math.floor(Math.random() * (rows-2)) + 1 }; } else snake.pop();
-    drawSnake();
-    document.getElementById('gameInfo').textContent = `Счёт: ${gameScore} | Длина: ${snake.length}`;
-  }, 120);
+    if (gameInterval) clearInterval(gameInterval);
+    gameInterval = setInterval(() => {
+        if (input.left && dir.x !== 1) nextDir = { x: -1, y: 0 };
+        else if (input.right && dir.x !== -1) nextDir = { x: 1, y: 0 };
+        else if (input.up && dir.y !== 1) nextDir = { x: 0, y: -1 };
+        else if (input.down && dir.y !== -1) nextDir = { x: 0, y: 1 };
+        dir = nextDir;
+        const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+        const cols = Math.floor(canvas.width / 20), rows = Math.floor(canvas.height / 20);
+        if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows || snake.some(s => s.x === head.x && s.y === head.y)) {
+            clearInterval(gameInterval); showNotification('💥 Game Over! Счёт: ' + gameScore); return;
+        }
+        snake.unshift(head);
+        if (head.x === food.x && head.y === food.y) {
+            gameScore += 15; userData.xp += 10; updateQuestProgress('q2', 15);
+            food = { x: Math.floor(Math.random() * (cols-2)) + 1, y: Math.floor(Math.random() * (rows-2)) + 1 };
+        } else snake.pop();
+        drawSnake();
+        updateStats();
+        document.getElementById('gameInfo').textContent = `Счёт: ${gameScore} | Длина: ${snake.length}`;
+    }, 120);
 }
 function drawSnake() {
-  const cellSize = 20;
-  ctx.fillStyle = '#050714'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-  snake.forEach((s, i) => { ctx.fillStyle = i === 0 ? '#fff' : '#00f3ff'; ctx.fillRect(s.x * cellSize + 1, s.y * cellSize + 1, cellSize - 2, cellSize - 2); });
-  ctx.fillStyle = '#ffd700'; ctx.beginPath(); ctx.arc(food.x * cellSize + cellSize/2, food.y * cellSize + cellSize/2, cellSize/2 - 2, 0, Math.PI * 2); ctx.fill();
+    const cellSize = 20;
+    ctx.fillStyle = '#050714'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    snake.forEach((s, i) => { ctx.fillStyle = i === 0 ? '#fff' : '#00f3ff'; ctx.fillRect(s.x * cellSize + 1, s.y * cellSize + 1, cellSize - 2, cellSize - 2); });
+    ctx.fillStyle = '#ffd700'; ctx.beginPath(); ctx.arc(food.x * cellSize + cellSize/2, food.y * cellSize + cellSize/2, cellSize/2 - 2, 0, Math.PI * 2); ctx.fill();
 }
 
-// MEMORY
 let memoryCards = [], flippedCards = [], matchedPairs = 0, memoryMoves = 0;
-const memorySymbols = ['🎵', '🎷', '🎺', '🎻', '🥁', '', '🎤', '🎹'];
+const memorySymbols = ['🎵', '🎷', '🎺', '🎻', '🥁', '🎸', '🎤', '🎹'];
 function initMemoryGame() {
-  const area = document.getElementById('memoryGameArea');
-  memoryCards = [...memorySymbols, ...memorySymbols].sort(() => Math.random() - 0.5);
-  flippedCards = []; matchedPairs = 0; memoryMoves = 0;
-  area.innerHTML = `<div class="memory-grid" id="memoryGrid">${memoryCards.map((symbol, i) => `<div class="memory-card" data-index="${i}" data-symbol="${symbol}" onclick="flipCard(this)">❓</div>`).join('')}</div><div style="text-align:center;margin-top:20px;"><p>Ходы: <span id="memoryMoves">0</span> | Пары: <span id="memoryPairs">0</span>/8</p></div>`;
+    const area = document.getElementById('memoryGameArea');
+    memoryCards = [...memorySymbols, ...memorySymbols].sort(() => Math.random() - 0.5);
+    flippedCards = []; matchedPairs = 0; memoryMoves = 0;
+    area.innerHTML = `
+<div class="memory-grid" id="memoryGrid">
+${memoryCards.map((symbol, i) => `<div class="memory-card" data-index="${i}" data-symbol="${symbol}" onclick="flipCard(this)">?</div>`).join('')}
+</div>
+<div style="text-align:center;margin-top:20px;">
+<p>Ходы: <span id="memoryMoves">0</span> | Пары: <span id="memoryPairs">0</span>/8</p>
+</div>`;
 }
-function startMemoryGame() { initMemoryGame(); showNotification(' Найди все 8 пар!'); }
+function startMemoryGame() { initMemoryGame(); showNotification('🧠 Найди все 8 пар!'); }
 function flipCard(card) {
-  if (card.classList.contains('flipped') || card.classList.contains('matched') || flippedCards.length >= 2) return;
-  card.classList.add('flipped'); card.textContent = card.dataset.symbol; flippedCards.push(card);
-  if (flippedCards.length === 2) {
-    memoryMoves++; document.getElementById('memoryMoves').textContent = memoryMoves;
-    setTimeout(() => {
-      if (flippedCards[0].dataset.symbol === flippedCards[1].dataset.symbol) {
-        flippedCards.forEach(c => { c.classList.remove('flipped'); c.classList.add('matched'); });
-        matchedPairs++; document.getElementById('memoryPairs').textContent = matchedPairs;
-        userData.xp += 10;
-        if (matchedPairs === 8) { userData.xp += 75; updateQuestProgress('q1', 1); saveUserData(); setTimeout(() => showNotification(`🎉 Победа! Ходов: ${memoryMoves}`), 500); }
-      } else { flippedCards.forEach(c => { c.classList.remove('flipped'); c.textContent = '❓'; }); }
-      flippedCards = [];
-    }, 800);
-  }
-}
-
-// CLICKER
-function startClickerGame() {
-  if (!userData.clicker) userData.clicker = { clickPower: 1, autoClick: 0, clickCost: 10, autoCost: 50 };
-  updateClickerUI();
-  if (clickerInterval) clearInterval(clickerInterval);
-  clickerInterval = setInterval(() => {
-    if (userData.clicker.autoClick > 0) {
-      userData.coins += userData.clicker.autoClick;
-      updateClickerUI(); saveUserData();
-      if (userData.coins >= 1000) updateQuestProgress('q5', 1000);
+    if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
+    if (flippedCards.length >= 2) return;
+    card.classList.add('flipped');
+    card.textContent = card.dataset.symbol;
+    flippedCards.push(card);
+    if (flippedCards.length === 2) {
+        memoryMoves++;
+        document.getElementById('memoryMoves').textContent = memoryMoves;
+        setTimeout(() => {
+            if (flippedCards[0].dataset.symbol === flippedCards[1].dataset.symbol) {
+                flippedCards.forEach(c => { c.classList.remove('flipped'); c.classList.add('matched'); });
+                matchedPairs++;
+                document.getElementById('memoryPairs').textContent = matchedPairs;
+                userData.xp += 10;
+                updateStats();
+                if (matchedPairs === 8) {
+                    userData.xp += 75;
+                    updateQuestProgress('q1', 1);
+                    saveUserData();
+                    updateStats();
+                    setTimeout(() => showNotification(`🎉 Победа! Ходов: ${memoryMoves}`), 500);
+                }
+            } else {
+                flippedCards.forEach(c => { c.classList.remove('flipped'); c.textContent = '?'; });
+            }
+            flippedCards = [];
+        }, 800);
     }
-  }, 1000);
-}
-function clickerClick(event) {
-  userData.coins += userData.clicker.clickPower;
-  createClickParticle(event.clientX, event.clientY, `+${userData.clicker.clickPower}`);
-  updateClickerUI(); saveUserData();
-  if (userData.coins >= 1000) updateQuestProgress('q5', 1000);
-}
-function buyClickerUpgrade(type) {
-  if (type === 'click') {
-    if (userData.coins >= userData.clicker.clickCost) {
-      userData.coins -= userData.clicker.clickCost; userData.clicker.clickPower += 1;
-      userData.clicker.clickCost = Math.floor(userData.clicker.clickCost * 1.5);
-      updateClickerUI(); saveUserData(); showNotification('✅ Сила клика улучшена!');
-    } else showNotification('❌ Недостаточно монет!');
-  } else if (type === 'auto') {
-    if (userData.coins >= userData.clicker.autoCost) {
-      userData.coins -= userData.clicker.autoCost; userData.clicker.autoClick += 1;
-      userData.clicker.autoCost = Math.floor(userData.clicker.autoCost * 1.5);
-      updateClickerUI(); saveUserData(); showNotification('✅ Авто-клик улучшен!');
-    } else showNotification(' Недостаточно монет!');
-  }
-}
-function updateClickerUI() {
-  const coinsEl = document.getElementById('clickerCoins'), cpsEl = document.getElementById('clickerCPS');
-  const clickCostEl = document.getElementById('clickCost'), autoCostEl = document.getElementById('autoCost');
-  if (coinsEl) coinsEl.textContent = Math.floor(userData.coins);
-  if (cpsEl) cpsEl.textContent = userData.clicker.autoClick;
-  if (clickCostEl) clickCostEl.textContent = userData.clicker.clickCost;
-  if (autoCostEl) autoCostEl.textContent = userData.clicker.autoCost;
-}
-function createClickParticle(x, y, text) {
-  const particle = document.createElement('div');
-  particle.textContent = text;
-  particle.style.cssText = `position:fixed;color:#ffd700;font-weight:bold;font-size:20px;pointer-events:none;z-index:9999;left:${x}px;top:${y}px;transition:all 1s ease-out;`;
-  document.body.appendChild(particle);
-  setTimeout(() => { particle.style.transform = `translateY(-50px)`; particle.style.opacity = '0'; }, 50);
-  setTimeout(() => { if (document.body.contains(particle)) document.body.removeChild(particle); }, 1000);
 }
 
-// MAZE QUEST
-let maze = [], playerPos = { x: 0, y: 0 }, mazeStars = [], mazeCompleted = false;
+let maze = [], playerPos = { x: 0, y: 0 }, stars = [], mazeCompleted = false;
+let questPattern = [], userPattern = [], questStepIndex = 0, questShowingPattern = false;
 function initMazeQuest() {
-  maze = [[1,0,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,1,0,0,1],[1,1,1,0,1,0,1,0,1,1],[1,0,0,0,1,0,0,0,0,1],[1,0,1,1,1,1,1,1,0,1],[1,0,0,0,0,0,0,1,0,1],[1,1,1,1,1,0,0,1,0,1],[1,0,0,0,1,0,0,0,0,1],[1,0,1,0,0,0,1,1,0,1],[1,1,1,1,1,1,1,1,1,1]];
-  playerPos = { x: 1, y: 1 };
-  mazeStars = [{ x: 3, y: 1, collected: false },{ x: 8, y: 1, collected: false },{ x: 5, y: 5, collected: false },{ x: 1, y: 8, collected: false },{ x: 8, y: 8, collected: false }];
-  mazeCompleted = false; renderMaze(); updateMazeStats();
+    maze = [[1,0,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,1,0,0,1],[1,1,1,0,1,0,1,0,1,1],[1,0,0,0,1,0,0,0,0,1],[1,0,1,1,1,1,1,1,0,1],[1,0,0,0,0,0,0,1,0,1],[1,1,1,1,1,0,0,1,0,1],[1,0,0,0,1,0,0,0,0,1],[1,0,1,0,0,0,1,1,0,1],[1,1,1,1,1,1,1,1,1,1]];
+    playerPos = { x: 1, y: 1 };
+    stars = [{ x: 3, y: 1, collected: false },{ x: 8, y: 1, collected: false },{ x: 5, y: 5, collected: false },{ x: 1, y: 8, collected: false },{ x: 8, y: 8, collected: false }];
+    mazeCompleted = false;
+    renderMaze();
+    updateMazeStats();
 }
 function renderMaze() {
-  const grid = document.getElementById('mazeGrid'); if (!grid) return; grid.innerHTML = '';
-  for (let y = 0; y < 10; y++) {
-    for (let x = 0; x < 10; x++) {
-      const cell = document.createElement('div'); cell.className = 'maze-cell';
-      if (maze[y][x] === 1) { cell.classList.add('wall'); cell.textContent = '🌑'; }
-      else if (playerPos.x === x && playerPos.y === y) { cell.classList.add('player'); cell.textContent = ''; }
-      else { const star = mazeStars.find(s => s.x === x && s.y === y && !s.collected); if (star) { cell.classList.add('star'); cell.textContent = '⭐'; } }
-      grid.appendChild(cell);
+    const grid = document.getElementById('mazeGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    for (let y = 0; y < 10; y++) {
+        for (let x = 0; x < 10; x++) {
+            const cell = document.createElement('div');
+            cell.className = 'maze-cell';
+            if (maze[y][x] === 1) { cell.classList.add('wall'); cell.textContent = '🌑'; }
+            else if (playerPos.x === x && playerPos.y === y) { cell.classList.add('player'); cell.textContent = '🚀'; }
+            else { const star = stars.find(s => s.x === x && s.y === y && !s.collected); if (star) { cell.classList.add('star'); cell.textContent = '⭐'; } }
+            grid.appendChild(cell);
+        }
     }
-  }
 }
-document.addEventListener('keydown', (e) => {
-  if (document.getElementById('quests').classList.contains('active')) {
-    if (e.key === 'ArrowUp' || e.key === 'w') movePlayer(0, -1);
-    if (e.key === 'ArrowDown' || e.key === 's') movePlayer(0, 1);
-    if (e.key === 'ArrowLeft' || e.key === 'a') movePlayer(-1, 0);
-    if (e.key === 'ArrowRight' || e.key === 'd') movePlayer(1, 0);
-  }
-});
 function movePlayer(dx, dy) {
-  if (mazeCompleted) return;
-  const newX = playerPos.x + dx, newY = playerPos.y + dy;
-  if (newX >= 0 && newX < 10 && newY >= 0 && newY < 10 && maze[newY][newX] === 0) {
-    playerPos.x = newX; playerPos.y = newY;
-    mazeStars.forEach(star => {
-      if (!star.collected && star.x === newX && star.y === newY) {
-        star.collected = true; userData.xp += 20; showNotification('⭐ +20 XP'); updateMazeStats(); saveUserData();
-      }
-    });
-    if (mazeStars.every(s => s.collected) && !mazeCompleted) { mazeCompleted = true; userData.xp += 100; showNotification('🎉 Лабиринт пройден! +100 XP'); saveUserData(); }
-    renderMaze();
-  }
+    if (mazeCompleted) return;
+    const newX = playerPos.x + dx, newY = playerPos.y + dy;
+    if (newX >= 0 && newX < 10 && newY >= 0 && newY < 10 && maze[newY][newX] === 0) {
+        playerPos.x = newX; playerPos.y = newY;
+        stars.forEach(star => {
+            if (!star.collected && star.x === newX && star.y === newY) {
+                star.collected = true;
+                userData.xp += 20;
+                showNotification('⭐ +20 XP');
+                updateMazeStats();
+                saveUserData();
+                updateStats();
+            }
+        });
+        if (stars.every(s => s.collected) && !mazeCompleted) {
+            mazeCompleted = true;
+            userData.xp += 100;
+            showNotification('🎉 Лабиринт пройден! +100 XP');
+            saveUserData();
+            updateStats();
+        }
+        renderMaze();
+    }
 }
 function updateMazeStats() {
-  const sc = document.getElementById('starsCollected'), ts = document.getElementById('totalStars');
-  if (sc) sc.textContent = mazeStars.filter(s => s.collected).length;
-  if (ts) ts.textContent = mazeStars.length;
+    const sc = document.getElementById('starsCollected'), ts = document.getElementById('totalStars');
+    if (sc) sc.textContent = stars.filter(s => s.collected).length;
+    if (ts) ts.textContent = stars.length;
 }
-
-// REPEAT QUEST
-let questPattern = [], userPattern = [], questStepIndex = 0, questShowingPattern = false;
 function initRepeatQuest() {
-  if (questsData.find(q => q.id === 'q3').completed) { document.getElementById('questStatus').textContent = '✅ Квест уже выполнен!'; return; }
-  questPattern = []; userPattern = []; questStepIndex = 0; questShowingPattern = false;
-  const sounds = ['🥁', '🎩', '👏', '🎵'];
-  for (let i = 0; i < 8; i++) questPattern.push(sounds[Math.floor(Math.random() * sounds.length)]);
-  renderQuestPattern(); document.getElementById('questStatus').textContent = 'Нажми "Показать паттерн"';
+    if (questsData.find(q => q.id === 'q3').completed) { document.getElementById('questStatus').textContent = '✅ Квест уже выполнен!'; return; }
+    questPattern = []; userPattern = []; questStepIndex = 0; questShowingPattern = false;
+    const sounds = ['🥁', '🎩', '👏', '🎸'];
+    for (let i = 0; i < 8; i++) questPattern.push(sounds[Math.floor(Math.random() * sounds.length)]);
+    renderQuestPattern();
+    document.getElementById('questStatus').textContent = 'Нажми "Показать паттерн" чтобы начать';
 }
 function renderQuestPattern() {
-  const container = document.getElementById('questPattern'); container.innerHTML = '';
-  for (let i = 0; i < 8; i++) {
-    const step = document.createElement('div'); step.className = 'pattern-step'; step.dataset.index = i; step.textContent = questPattern[i];
-    step.onclick = () => handleQuestStepClick(i, step); container.appendChild(step);
-  }
+    const container = document.getElementById('questPattern');
+    container.innerHTML = '';
+    for (let i = 0; i < 8; i++) {
+        const step = document.createElement('div');
+        step.className = 'pattern-step'; step.dataset.index = i; step.textContent = questPattern[i];
+        step.onclick = () => handleQuestStepClick(i, step);
+        container.appendChild(step);
+    }
 }
 function showPattern() {
-  if (questsData.find(q => q.id === 'q3').completed) return;
-  questShowingPattern = true; userPattern = []; questStepIndex = 0;
-  document.getElementById('questStatus').textContent = ' Запоминай...';
-  const steps = document.querySelectorAll('.pattern-step'); let showIndex = 0;
-  const showInterval = setInterval(() => {
-    steps.forEach(s => s.classList.remove('show'));
-    if (showIndex < 8) { steps[showIndex].classList.add('show'); showIndex++; }
-    else { clearInterval(showInterval); setTimeout(() => { steps.forEach(s => s.classList.remove('show')); questShowingPattern = false; document.getElementById('questStatus').textContent = '🎯 Твой ход!'; }, 500); }
-  }, 600);
+    if (questsData.find(q => q.id === 'q3').completed) return;
+    questShowingPattern = true; userPattern = []; questStepIndex = 0;
+    document.getElementById('questStatus').textContent = '👀 Запоминай последовательность...';
+    const steps = document.querySelectorAll('.pattern-step');
+    let showIndex = 0;
+    const showInterval = setInterval(() => {
+        steps.forEach(s => s.classList.remove('show'));
+        if (showIndex < 8) { steps[showIndex].classList.add('show'); showIndex++; }
+        else {
+            clearInterval(showInterval);
+            setTimeout(() => {
+                steps.forEach(s => s.classList.remove('show'));
+                questShowingPattern = false;
+                document.getElementById('questStatus').textContent = '🎯 Твой ход! Повтори последовательность';
+            }, 500);
+        }
+    }, 600);
 }
 function handleQuestStepClick(index, element) {
-  if (questShowingPattern || questsData.find(q => q.id === 'q3').completed) return;
-  const expectedSound = questPattern[questStepIndex];
-  if (element.textContent === expectedSound) {
-    element.classList.add('user-correct'); userPattern.push(element.textContent); questStepIndex++;
-    if (questStepIndex >= 8) {
-      document.getElementById('questStatus').textContent = '🎉 Отлично!';
-      userData.xp += 300; userData.coins += 100; updateQuestProgress('q3', 1); saveUserData(); renderQuests();
-      showNotification('🏆 Квест выполнен! +300 XP');
+    if (questShowingPattern || questsData.find(q => q.id === 'q3').completed) return;
+    const expectedSound = questPattern[questStepIndex];
+    const clickedSound = element.textContent;
+    if (clickedSound === expectedSound) {
+        element.classList.add('user-correct');
+        userPattern.push(clickedSound);
+        questStepIndex++;
+        if (questStepIndex >= 8) {
+            document.getElementById('questStatus').textContent = '🎉 Отлично! Ты повторил бит!';
+            userData.xp += 300;
+            userData.coins += 100;
+            updateQuestProgress('q3', 1);
+            saveUserData();
+            updateStats();
+            renderQuests();
+            showNotification('🏆 Квест выполнен! +300 XP');
+        }
+    } else {
+        element.classList.add('user-wrong');
+        document.getElementById('questStatus').textContent = '❌ Неверно! Попробуй ещё раз';
+        setTimeout(() => {
+            element.classList.remove('user-wrong');
+            userPattern = [];
+            questStepIndex = 0;
+            document.querySelectorAll('.pattern-step').forEach(s => s.classList.remove('user-correct', 'user-wrong'));
+        }, 500);
     }
-  } else {
-    element.classList.add('user-wrong'); document.getElementById('questStatus').textContent = '❌ Неверно!';
-    setTimeout(() => { element.classList.remove('user-wrong'); userPattern = []; questStepIndex = 0; document.querySelectorAll('.pattern-step').forEach(s => s.classList.remove('user-correct', 'user-wrong')); }, 500);
-  }
 }
-function resetRepeatQuest() { if (questsData.find(q => q.id === 'q3').completed) return; initRepeatQuest(); showNotification('🔄 Паттерн сброшен'); }
+function resetRepeatQuest() {
+    if (questsData.find(q => q.id === 'q3').completed) return;
+    initRepeatQuest();
+    showNotification('🔄 Паттерн сброшен');
+}
 function renderQuests() {
-  const container = document.getElementById('questsList'); if (!container) return;
-  container.innerHTML = questsData.map(q => {
-    const progress = Math.min(100, (q.current / q.target) * 100);
-    return `<div class="quest-card ${q.completed ? 'completed' : ''}"><div class="quest-header"><div class="quest-icon">${q.icon}</div><div><div class="quest-title">${q.title} ${q.completed ? '✅' : ''}</div><div class="quest-desc">${q.desc}</div></div></div><div class="quest-progress-bar"><div class="quest-progress-fill" style="width: ${progress}%"></div></div><div class="quest-reward">+${q.reward} XP</div></div>`;
-  }).join('');
+    const container = document.getElementById('questsList');
+    if (!container) return;
+    container.innerHTML = questsData.map(q => {
+        const progress = Math.min(100, (q.current / q.target) * 100);
+        return `
+<div class="quest-card ${q.completed ? 'completed' : ''}">
+<div class="quest-header">
+<div class="quest-icon">${q.icon}</div>
+<div>
+<div class="quest-title">${q.title} ${q.completed ? '✅' : ''}</div>
+<div class="quest-desc">${q.desc}</div>
+</div>
+</div>
+<div class="quest-progress-bar">
+<div class="quest-progress-fill" style="width: ${progress}%"></div>
+</div>
+<div class="quest-reward">+${q.reward} XP</div>
+</div>`;
+    }).join('');
 }
 function updateQuestProgress(questId, amount) {
-  const quest = questsData.find(q => q.id === questId);
-  if (quest && !quest.completed) {
-    quest.current += amount;
-    if (quest.current >= quest.target) {
-      quest.completed = true; userData.xp += quest.reward; userData.questsCompleted++; saveUserData(); renderQuests();
-      showNotification(` Квест "${quest.title}" выполнен! +${quest.reward} XP`);
+    const quest = questsData.find(q => q.id === questId);
+    if (quest && !quest.completed) {
+        quest.current += amount;
+        if (quest.current >= quest.target) {
+            if (!checkQuestLimit() && questId !== 'q4' && questId !== 'q5') return;
+            quest.completed = true;
+            userData.xp += quest.reward;
+            userData.questsCompleted++;
+            saveUserData();
+            updateStats();
+            renderQuests();
+            showNotification(`🏆 Квест "${quest.title}" выполнен! +${quest.reward} XP`);
+        }
     }
-  }
 }
-
-// CHAT
+function renderAchievements() {
+    const container = document.getElementById('achievementsList');
+    if (!container) return;
+    const achievements = [
+        { id: 'a1', name: 'Первые шаги', desc: 'Сыграй первую игру', icon: '🎮' },
+        { id: 'a2', name: 'Коллекционер', desc: 'Собери 500 XP', icon: '💎' },
+        { id: 'a3', name: 'Мастер', desc: 'Достигни 5 уровня', icon: '🏆' },
+        { id: 'a4', name: 'Музыкант', desc: 'Прослушай 10 треков', icon: '🎵' },
+        { id: 'a5', name: 'Космический магнат', desc: 'Накопи 1000 монет', icon: '💰' }
+    ];
+    container.innerHTML = achievements.map(a => {
+        const unlocked = userData.achievements && userData.achievements.includes(a.id);
+        return `
+<div class="quest-card ${unlocked ? 'completed' : ''}">
+<div class="quest-header">
+<div class="quest-icon">${a.icon}</div>
+<div>
+<div class="quest-title">${a.name} ${unlocked ? '✅' : ''}</div>
+<div class="quest-desc">${a.desc}</div>
+</div>
+</div>
+</div>`;
+    }).join('');
+}
+function renderLeaderboard() {
+    const container = document.getElementById('leaderboardList');
+    if (!container) return;
+    const leaderboard = [
+        { name: 'ProGamer', xp: 5000 },
+        { name: 'MusicKing', xp: 3500 },
+        { name: 'BeatMaster', xp: 2100 },
+        { name: currentUser || 'Гость', xp: userData.xp, isMe: true }
+    ];
+    leaderboard.sort((a, b) => b.xp - a.xp);
+    container.innerHTML = leaderboard.map((p, i) => {
+        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`;
+        return `
+<div class="leaderboard-item ${p.isMe ? 'me' : ''}">
+<div class="leaderboard-rank">${medal}</div>
+<div class="leaderboard-name">${p.name} ${p.isMe ? '(ты)' : ''}</div>
+<div class="leaderboard-xp">${p.xp} XP</div>
+</div>`;
+    }).join('');
+}
+let chatData = JSON.parse(localStorage.getItem('soundscape_chat') || '[]');
 function renderChat() {
-  const container = document.getElementById('chatMessages');
-  container.innerHTML = chatData.map(m => `<div class="chat-message"><div class="chat-author">${m.author}</div><div class="chat-text">${m.text}</div></div>`).join('');
-  container.scrollTop = container.scrollHeight;
+    const container = document.getElementById('chatMessages');
+    if (!container) return;
+    container.innerHTML = chatData.map(m => `
+<div class="chat-message">
+<div class="chat-author">${m.author}</div>
+<div class="chat-text">${m.text}</div>
+</div>`).join('');
+    container.scrollTop = container.scrollHeight;
 }
 function sendMessage() {
-  const inputEl = document.getElementById('chatInput');
-  const text = inputEl.value.trim();
-  if (isGuest) { showNotification('❌ Войдите в аккаунт, чтобы писать в чат'); return; }
-  if (text) {
-    chatData.push({ author: currentUser, text: text, time: new Date().toLocaleTimeString() });
-    if (chatData.length > 50) chatData.shift();
-    localStorage.setItem('soundscape_chat', JSON.stringify(chatData));
-    inputEl.value = '';
-    renderChat();
-  }
-}
-
-// LEADERBOARD
-function renderLeaderboard() {
-  const container = document.getElementById('leaderboardList');
-  const leaderboard = [
-    { name: 'ProGamer', xp: 5000 }, { name: 'MusicKing', xp: 3500 }, { name: 'BeatMaster', xp: 2100 },
-    { name: currentUser || 'Гость', xp: userData.xp, isMe: true }
-  ];
-  leaderboard.sort((a, b) => b.xp - a.xp);
-  container.innerHTML = leaderboard.map((p, i) => {
-    const medal = i === 0 ? '' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`;
-    return `<div class="leaderboard-item ${p.isMe ? 'me' : ''}"><div class="leaderboard-rank">${medal}</div><div class="leaderboard-name">${p.name} ${p.isMe ? '(ты)' : ''}</div><div class="leaderboard-xp">${p.xp} XP</div></div>`;
-  }).join('');
-}
-
-// BEAT MAKER
-const BM_TRACKS = 15;
-const BM_SUB_DIVISIONS = 4;
-const BM_BASE_STEPS = 512;
-const BM_STEPS = BM_BASE_STEPS * BM_SUB_DIVISIONS;
-const BM_CELL_WIDTH = 30 / BM_SUB_DIVISIONS;
-
-let bmCurrentSoundName = null, bmCurrentSoundFile = null, bmCurrentFolderPath = '';
-let bmGrid = Array(BM_TRACKS).fill().map(() => Array(BM_STEPS).fill(null));
-let bmProjectName = 'My Beat', bmBpm = 120;
-let bmCurrentSnapSize = 4;
-let bmCurrentMusicalDuration = 1.0;
-let bmTickDurationMs = ((60 / 120) / 4 * 1000) / BM_SUB_DIVISIONS;
-let bmIsPlaying = false, bmCurrentStep = 0, bmPlayInterval = null, bmPreviewSource = null;
-
-const bmContainer = document.getElementById('bmGridContainer');
-const bmSoundsList = document.getElementById('bmSoundsList');
-const bmPlayBtn = document.getElementById('bmPlayBtn');
-const bmResetBtn = document.getElementById('bmResetBtn');
-const bmDownloadBtn = document.getElementById('bmDownloadBtn');
-const bmPlaybackCursor = document.getElementById('bmPlaybackCursor');
-const bmProjectNameInput = document.getElementById('bmProjectNameInput');
-const bmBpmInput = document.getElementById('bmBpmInput');
-const bmCustomScrollbar = document.getElementById('bmCustomScrollbar');
-const bmScrollbarThumb = document.getElementById('bmScrollbarThumb');
-
-const bmAudioContext = new (window.AudioContext || window.webkitAudioContext)();
-const bmAudioBuffers = new Map();
-const bmAnalyser = bmAudioContext.createAnalyser();
-bmAnalyser.fftSize = 256;
-const bmMasterGain = bmAudioContext.createGain();
-bmMasterGain.connect(bmAnalyser);
-bmAnalyser.connect(bmAudioContext.destination);
-
-async function bmScanDirectory(path = 'sounds/') {
-  bmSoundsList.innerHTML = '<div class="bm-sound-item" style="color:var(--text-muted); justify-content:center;">Загрузка...</div>';
-  try {
-    const response = await fetch(path);
-    if (!response.ok) throw new Error("Directory listing not enabled");
-    const text = await response.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(text, 'text/html');
-    const items = new Map();
-    Array.from(doc.querySelectorAll('a')).forEach(a => {
-      const href = a.getAttribute('href'), name = a.textContent.trim();
-      if (name === '../' || name === '..' || name === 'Parent Directory') return;
-      if (href.endsWith('/') || href.match(/\.(mp3|wav|ogg)$/i))
-        items.set(name, { name, isFolder: href.endsWith('/'), href, fullPath: path + href });
-    });
-    bmRenderSoundsPanel(Array.from(items.values()));
-  } catch (e) {
-    console.warn("Не удалось загрузить папку 'sounds/'. Запуск в режиме синтезированных звуков.");
-    bmRenderFallbackSounds();
-  }
-}
-
-function bmRenderFallbackSounds() {
-  bmSoundsList.innerHTML = '';
-  const info = document.createElement('div');
-  info.className = 'bm-sound-item';
-  info.style.cssText = 'color:#ffd700;justify-content:center;font-size:11px;';
-  info.textContent = '⚠️ Папка sounds/ не найдена. Используются синтезированные звуки.';
-  bmSoundsList.appendChild(info);
-  
-  const fallbackSounds = [
-    { name: 'kick.wav', freq: 150, type: 'sine', duration: 0.5 },
-    { name: 'snare.wav', freq: 200, type: 'triangle', duration: 0.2 },
-    { name: 'hihat.wav', freq: 8000, type: 'square', duration: 0.05 },
-    { name: 'bass.wav', freq: 60, type: 'sawtooth', duration: 0.4 },
-    { name: 'synth1.wav', freq: 440, type: 'sine', duration: 0.3 }
-  ];
-  fallbackSounds.forEach(sound => {
-    const el = document.createElement('div');
-    el.className = 'bm-sound-item';
-    el.textContent = '🎵 ' + sound.name;
-    el.dataset.synth = 'true';
-    el.dataset.freq = sound.freq;
-    el.dataset.type = sound.type;
-    el.dataset.dur = sound.duration;
-    if (bmCurrentSoundName === sound.name) el.classList.add('active');
-    el.onclick = () => {
-      bmCurrentSoundName = sound.name; bmCurrentSoundFile = 'synth:' + sound.freq + ':' + sound.type + ':' + sound.duration;
-      document.querySelectorAll('.bm-sound-item').forEach(s => s.classList.remove('active'));
-      el.classList.add('active');
-      bmPreviewSynthSound(sound);
-    };
-    bmSoundsList.appendChild(el);
-  });
-}
-
-function bmPreviewSynthSound(sound) {
-  if (bmAudioContext.state === 'suspended') bmAudioContext.resume();
-  if (bmPreviewSource) try { bmPreviewSource.stop(); } catch(e){}
-  const osc = bmAudioContext.createOscillator();
-  const gain = bmAudioContext.createGain();
-  osc.type = sound.type;
-  osc.frequency.value = sound.freq;
-  gain.gain.value = 0.2;
-  osc.connect(gain);
-  gain.connect(bmAudioContext.destination);
-  osc.start();
-  osc.stop(bmAudioContext.currentTime + sound.duration);
-  bmPreviewSource = osc;
-}
-
-function bmRenderSoundsPanel(items) {
-  bmSoundsList.innerHTML = '';
-  if (bmCurrentFolderPath !== '') {
-    const b = document.createElement('div'); b.className = 'bm-sound-item back-btn'; b.textContent = '⬅️ Назад';
-    b.onclick = () => { const p = bmCurrentFolderPath.split('/').filter(x=>x); p.pop(); bmCurrentFolderPath = p.join('/') + (p.length ? '/' : ''); bmScanDirectory('sounds/' + bmCurrentFolderPath); };
-    bmSoundsList.appendChild(b);
-  }
-  if (!items.length) { bmSoundsList.innerHTML = '<div class="bm-sound-item" style="color:var(--text-muted); justify-content:center;">(Папка пуста)</div>'; return; }
-  items.sort((a, b) => a.isFolder === b.isFolder ? a.name.localeCompare(b.name) : (a.isFolder ? -1 : 1));
-  items.forEach(item => {
-    const el = document.createElement('div'); el.className = 'bm-sound-item';
-    if (item.isFolder) {
-      el.textContent = '📁 ' + item.name;
-      el.onclick = () => { bmCurrentFolderPath += item.name + '/'; bmScanDirectory('sounds/' + bmCurrentFolderPath); };
-    } else {
-      el.textContent = '🎵 ' + item.name;
-      if (bmCurrentSoundName === item.name) el.classList.add('active');
-      el.onclick = async () => {
-        bmCurrentSoundName = item.name; bmCurrentSoundFile = item.fullPath;
-        document.querySelectorAll('.bm-sound-item').forEach(s => s.classList.remove('active'));
-        el.classList.add('active');
-        if (bmPreviewSource) try { bmPreviewSource.stop(); } catch(e){}
-        const buf = await bmLoadAudioBuffer(item.fullPath);
-        if (buf) { bmPreviewSource = bmAudioContext.createBufferSource(); bmPreviewSource.buffer = buf; const g = bmAudioContext.createGain(); g.gain.value = 0.2; bmPreviewSource.connect(g); g.connect(bmAudioContext.destination); bmPreviewSource.start(); }
-      };
+    const inputEl = document.getElementById('chatInput');
+    const text = inputEl.value.trim();
+    if (isGuest) { showNotification('❌ Войдите в аккаунт, чтобы писать в чат'); return; }
+    if (text && currentUser) {
+        chatData.push({ author: currentUser, text: text });
+        if (chatData.length > 50) chatData.shift();
+        localStorage.setItem('soundscape_chat', JSON.stringify(chatData));
+        inputEl.value = '';
+        renderChat();
     }
-    bmSoundsList.appendChild(el);
-  });
 }
-
-async function bmLoadAudioBuffer(url) {
-  if (url.startsWith('synth:')) return null;
-  if (bmAudioBuffers.has(url)) return bmAudioBuffers.get(url);
-  try { const r = await fetch(url); const b = await bmAudioContext.decodeAudioData(await r.arrayBuffer()); bmAudioBuffers.set(url, b); return b; }
-  catch(e) { return null; }
-}
-
-function bmStartPlayback() { if (bmAudioContext.state === 'suspended') bmAudioContext.resume(); bmIsPlaying = true; bmPlayBtn.textContent = '⏸️ Pause'; bmPlayStep(); }
-function bmStopPlayback() { bmIsPlaying = false; bmPlayBtn.textContent = '▶️ Play'; if (bmPlayInterval) { clearTimeout(bmPlayInterval); bmPlayInterval = null; } }
-function bmResetPlayback() { bmStopPlayback(); bmCurrentStep = 0; bmUpdateCursorVisuals(); }
-
-function bmPlayStep() {
-  if (!bmIsPlaying) return;
-  for (let t = 0; t < BM_TRACKS; t++) {
-    const note = bmGrid[t][bmCurrentStep];
-    if (note && note !== 'occupied') {
-      if (note.file && note.file.startsWith('synth:')) {
-        const parts = note.file.split(':');
-        const osc = bmAudioContext.createOscillator();
-        const gain = bmAudioContext.createGain();
-        osc.type = parts[2] || 'sine';
-        osc.frequency.value = parseFloat(parts[1]) * Math.pow(2, (note.pitch || 0) / 12);
-        gain.gain.value = (note.volume || 1.0) * 0.3;
-        osc.connect(gain);
-        gain.connect(bmMasterGain);
-        osc.start();
-        osc.stop(bmAudioContext.currentTime + (parseFloat(parts[3]) || 0.3));
-      } else {
-        bmLoadAudioBuffer(note.file).then((buffer) => {
-          if (!buffer) return;
-          const source = bmAudioContext.createBufferSource();
-          source.buffer = buffer;
-          source.playbackRate.value = (note.speed || 1.0) * Math.pow(2, (note.pitch || 0) / 12);
-          const gain = bmAudioContext.createGain();
-          gain.gain.value = note.volume || 1.0;
-          source.connect(gain);
-          gain.connect(bmMasterGain);
-          source.start(bmAudioContext.currentTime);
-          source.stop(bmAudioContext.currentTime + 0.2);
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('music-search-input');
+    const resultsList = document.getElementById('search-results-list');
+    const playerCard = document.getElementById('player-card');
+    const playPauseBtn = document.getElementById('play-pause-btn');
+    const repeatBtn = document.getElementById('repeat-btn');
+    const muteBtn = document.getElementById('mute-btn');
+    const progressBar = document.getElementById('progress-bar');
+    const volumeSlider = document.getElementById('volume-slider');
+    const currentTimeEl = document.getElementById('current-time');
+    if (searchInput) {
+        searchInput.addEventListener('input', async (e) => {
+            clearTimeout(debounceTimer);
+            const query = e.target.value.trim();
+            if (!query) { resultsList.innerHTML = ''; resultsList.classList.add('hidden'); return; }
+            debounceTimer = setTimeout(async () => {
+                try {
+                    const response = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=10`);
+                    const data = await response.json();
+                    if (data.results && data.results.length > 0) {
+                        resultsList.innerHTML = data.results.map(track => `
+<li onclick="playTrack('${track.previewUrl}', '${track.trackName.replace(/'/g, "\\'")}', '${track.artistName.replace(/'/g, "\\'")}', '${track.artworkUrl100}')">
+<div class="result-info">
+<span class="result-title">${track.trackName}</span>
+<span class="result-artist">${track.artistName}</span>
+</div>
+<button class="preview-btn">▶ 30s</button>
+</li>`).join('');
+                        resultsList.classList.remove('hidden');
+                    } else {
+                        resultsList.innerHTML = '<li style="padding:12px;color:#aaa;text-align:center;">Ничего не найдено</li>';
+                        resultsList.classList.remove('hidden');
+                    }
+                } catch (err) { resultsList.classList.add('hidden'); }
+            }, 400);
         });
-      }
     }
-  }
-  bmUpdateCursorVisuals();
-  bmCurrentStep = (bmCurrentStep + 1) % BM_STEPS;
-  bmPlayInterval = setTimeout(bmPlayStep, bmTickDurationMs);
+    document.addEventListener('click', (e) => {
+        if (searchInput && !searchInput.contains(e.target) && resultsList && !resultsList.contains(e.target)) resultsList.classList.add('hidden');
+    });
+    if (playPauseBtn) {
+        playPauseBtn.addEventListener('click', () => {
+            if (!globalAudio.src) return;
+            if (globalAudio.paused) { globalAudio.play(); playPauseBtn.innerText = '⏸'; }
+            else { globalAudio.pause(); playPauseBtn.innerText = '▶'; }
+        });
+    }
+    if (repeatBtn) {
+        repeatBtn.addEventListener('click', () => { isRepeat = !isRepeat; repeatBtn.classList.toggle('active', isRepeat); });
+    }
+    globalAudio.addEventListener('timeupdate', () => {
+        if (!globalAudio.duration || isNaN(globalAudio.duration)) return;
+        if (progressBar) progressBar.value = (globalAudio.currentTime / globalAudio.duration) * 100;
+        if (currentTimeEl) currentTimeEl.innerText = formatTime(globalAudio.currentTime);
+    });
+    if (progressBar) {
+        progressBar.addEventListener('input', () => {
+            if (globalAudio.duration) globalAudio.currentTime = (progressBar.value / 100) * globalAudio.duration;
+        });
+    }
+    globalAudio.addEventListener('ended', () => {
+        if (isRepeat) { globalAudio.currentTime = 0; globalAudio.play(); }
+        else if (playPauseBtn) playPauseBtn.innerText = '▶';
+    });
+    if (volumeSlider) {
+        volumeSlider.addEventListener('input', (e) => {
+            globalAudio.volume = e.target.value;
+            if (muteBtn) muteBtn.innerText = globalAudio.volume == 0 ? '🔇' : '🔊';
+        });
+    }
+    if (muteBtn) {
+        muteBtn.addEventListener('click', () => {
+            if (globalAudio.volume > 0) {
+                previousVolume = globalAudio.volume;
+                globalAudio.volume = 0;
+                if (volumeSlider) volumeSlider.value = 0;
+                muteBtn.innerText = '🔇';
+            } else {
+                globalAudio.volume = previousVolume || 0.8;
+                if (volumeSlider) volumeSlider.value = globalAudio.volume;
+                muteBtn.innerText = '🔊';
+            }
+        });
+    }
+});
+function playTrack(url, title, artist, cover) {
+    globalAudio.pause();
+    globalAudio.src = url;
+    globalAudio.play();
+    document.getElementById('player-title').innerText = title;
+    document.getElementById('player-artist').innerText = artist;
+    document.getElementById('player-cover').src = cover;
+    document.getElementById('player-card').classList.remove('hidden');
+    document.getElementById('play-pause-btn').innerText = '⏸';
 }
 
-function bmUpdateCursorVisuals() {
-  const leftPos = 90 + bmCurrentStep * BM_CELL_WIDTH;
-  bmPlaybackCursor.style.left = `${leftPos}px`;
-  const cl = bmContainer.scrollLeft, cr = cl + bmContainer.clientWidth;
-  if (leftPos > cr - 50) bmContainer.scrollLeft = leftPos - 50;
-  else if (leftPos < cl) bmContainer.scrollLeft = leftPos;
-  updateBmScrollbarThumb();
-}
-
-function bmCreateGrid() {
-  bmContainer.querySelectorAll('.bm-track-row').forEach(r => r.remove());
-  for (let t = 0; t < BM_TRACKS; t++) {
-    const row = document.createElement('div'); row.className = 'bm-track-row';
-    const label = document.createElement('div'); label.className = 'bm-track-label'; label.textContent = `Tr ${t + 1}`; row.appendChild(label);
-    for (let s = 0; s < BM_STEPS; s++) {
-      const cell = document.createElement('div');
-      const isBarLine = (s + 1) % (16 * BM_SUB_DIVISIONS) === 0;
-      cell.className = `bm-grid-cell ${isBarLine ? 'bar-line' : ''}`;
-      cell.dataset.track = t; cell.dataset.step = s;
-      cell.addEventListener('click', () => {
-        if (!bmCurrentSoundFile) { showNotification('⚠️ Сначала выберите звук!'); return; }
-        const snappedStep = Math.floor(s / bmCurrentSnapSize) * bmCurrentSnapSize;
-        if (bmGrid[t][snappedStep] === null) {
-          bmGrid[t][snappedStep] = { soundName: bmCurrentSoundName, file: bmCurrentSoundFile, duration: bmCurrentMusicalDuration, volume: 1.0, speed: 1.0, pitch: 0 };
-          for(let i=1; i<bmCurrentSnapSize; i++) { if(bmGrid[t][snappedStep+i] === null) bmGrid[t][snappedStep+i] = 'occupied'; }
-          bmRenderNotes();
-        } else {
-          for(let i=0; i<bmCurrentSnapSize; i++) { bmGrid[t][snappedStep+i] = null; }
-          bmRenderNotes();
+function startClickerGame() {
+    if (!userData.clicker) userData.clicker = { clickPower: 1, autoClick: 0, clickCost: 10, autoCost: 50 };
+    updateClickerUI();
+    if (clickerInterval) clearInterval(clickerInterval);
+    clickerInterval = setInterval(() => {
+        if (userData.clicker.autoClick > 0) {
+            userData.coins += userData.clicker.autoClick;
+            updateClickerUI();
+            saveUserData();
+            updateStats();
+            if (userData.coins >= 1000) updateQuestProgress('q5', 1000);
         }
-      });
-      row.appendChild(cell);
-    }
-    bmContainer.appendChild(row);
-  }
-  setTimeout(updateBmScrollbarThumb, 100); bmRenderNotes();
+    }, 1000);
 }
 
-function bmRenderNotes() {
-  document.querySelectorAll('.bm-note').forEach(n => n.remove());
-  for (let t = 0; t < BM_TRACKS; t++) {
-    for (let s = 0; s < BM_STEPS; s++) {
-      const note = bmGrid[t][s];
-      if (note && note !== 'occupied') {
-        const cell = document.querySelector(`.bm-grid-cell[data-track="${t}"][data-step="${s}"]`);
-        if (!cell) continue;
-        const el = document.createElement('div');
-        el.className = 'bm-note';
-        el.style.width = `${(bmCurrentSnapSize * BM_CELL_WIDTH) - 1}px`;
-        cell.appendChild(el);
-      }
-    }
-  }
+function clickerClick(event) {
+    userData.coins += userData.clicker.clickPower;
+    createClickParticle(event.clientX, event.clientY, `+${userData.clicker.clickPower}`);
+    updateClickerUI();
+    saveUserData();
+    updateStats();
+    if (userData.coins >= 1000) updateQuestProgress('q5', 1000);
 }
 
-let bmIsDraggingThumb = false, bmDragStartX = 0, bmDragStartLeft = 0;
-function updateBmScrollbarThumb() {
-  if (!bmCustomScrollbar || !bmContainer) return;
-  const trackWidth = bmCustomScrollbar.clientWidth - 4;
-  const contentWidth = bmContainer.scrollWidth;
-  const visibleWidth = bmContainer.clientWidth;
-  if (contentWidth <= visibleWidth) { bmScrollbarThumb.style.display = 'none'; return; }
-  bmScrollbarThumb.style.display = 'block';
-  let thumbWidth = Math.max(30, (visibleWidth / contentWidth) * trackWidth);
-  bmScrollbarThumb.style.width = thumbWidth + 'px';
-  const maxScroll = contentWidth - visibleWidth;
-  const maxThumbLeft = trackWidth - thumbWidth;
-  bmScrollbarThumb.style.left = ((bmContainer.scrollLeft / maxScroll) * maxThumbLeft) + 'px';
-}
-function bmHandleDragStart(e) { bmIsDraggingThumb = true; bmDragStartX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX; bmDragStartLeft = bmScrollbarThumb.offsetLeft; e.preventDefault(); }
-function bmHandleDragMove(e) {
-  if (!bmIsDraggingThumb) return;
-  const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-  const deltaX = clientX - bmDragStartX;
-  const trackWidth = bmCustomScrollbar.clientWidth - 4;
-  const thumbWidth = bmScrollbarThumb.offsetWidth;
-  const maxThumbLeft = trackWidth - thumbWidth;
-  let newLeft = Math.max(0, Math.min(maxThumbLeft, bmDragStartLeft + deltaX));
-  bmScrollbarThumb.style.left = newLeft + 'px';
-  const maxScroll = bmContainer.scrollWidth - bmContainer.clientWidth;
-  bmContainer.scrollLeft = maxScroll > 0 ? (newLeft / maxThumbLeft) * maxScroll : 0;
-}
-function bmHandleDragEnd() { bmIsDraggingThumb = false; }
-bmScrollbarThumb.addEventListener('mousedown', bmHandleDragStart);
-bmScrollbarThumb.addEventListener('touchstart', bmHandleDragStart, { passive: false });
-document.addEventListener('mousemove', bmHandleDragMove);
-document.addEventListener('touchmove', bmHandleDragMove, { passive: false });
-document.addEventListener('mouseup', bmHandleDragEnd);
-document.addEventListener('touchend', bmHandleDragEnd);
-bmContainer.addEventListener('scroll', updateBmScrollbarThumb);
-
-const bmCanvas = document.getElementById('bmVisualizerCanvas'), bmCanvasCtx = bmCanvas.getContext('2d');
-function resizeBmCanvas() { if(bmCanvas) { bmCanvas.width = bmCanvas.offsetWidth; bmCanvas.height = bmCanvas.offsetHeight; } }
-window.addEventListener('resize', resizeBmCanvas); resizeBmCanvas();
-function drawBmVisualizer() {
-  requestAnimationFrame(drawBmVisualizer);
-  if (!bmCanvas || !bmCanvasCtx) return;
-  const bl = bmAnalyser.frequencyBinCount, da = new Uint8Array(bl); bmAnalyser.getByteFrequencyData(da);
-  bmCanvasCtx.fillStyle = 'rgba(10, 14, 39, 0.3)'; bmCanvasCtx.fillRect(0, 0, bmCanvas.width, bmCanvas.height);
-  const bw = (bmCanvas.width / bl) * 2.5; let x = 0;
-  for (let i = 0; i < bl; i++) {
-    const bh = (da[i] / 255) * bmCanvas.height;
-    const g = bmCanvasCtx.createLinearGradient(0, bmCanvas.height, 0, bmCanvas.height - bh);
-    g.addColorStop(0, '#00f3ff'); g.addColorStop(0.5, '#bc13fe'); g.addColorStop(1, '#ff0055');
-    bmCanvasCtx.fillStyle = g; bmCanvasCtx.fillRect(x, bmCanvas.height - bh, bw, bh); x += bw + 1;
-  }
-}
-drawBmVisualizer();
-
-bmPlayBtn.addEventListener('click', () => bmIsPlaying ? bmStopPlayback() : bmStartPlayback());
-bmResetBtn.addEventListener('click', bmResetPlayback);
-bmProjectNameInput.addEventListener('input', (e) => bmProjectName = e.target.value || 'My Beat');
-bmBpmInput.addEventListener('input', (e) => { 
-  const v = parseInt(e.target.value); 
-  if (v >= 40 && v <= 300) { bmBpm = v; bmTickDurationMs = ((60 / bmBpm) / 4 * 1000) / BM_SUB_DIVISIONS; } 
-});
-
-bmDownloadBtn.addEventListener('click', async () => {
-  showNotification('🎵 Рендеринг MP3...');
-  let maxStep = 0;
-  for (let t = 0; t < BM_TRACKS; t++) {
-    for (let s = 0; s < BM_STEPS; s++) {
-      const n = bmGrid[t][s];
-      if (n && n !== 'occupied') { const end = s + 1; if (end > maxStep) maxStep = end; }
-    }
-  }
-  if (maxStep === 0) { showNotification('❌ Нет нот для экспорта!'); return; }
-  
-  const sr = 44100;
-  const duration = (maxStep * bmTickDurationMs) / 1000;
-  const offCtx = new OfflineAudioContext(2, Math.ceil(duration * sr), sr);
-  const master = offCtx.createGain();
-  master.connect(offCtx.destination);
-  
-  for (let t = 0; t < BM_TRACKS; t++) {
-    for (let s = 0; s < BM_STEPS; s++) {
-      const note = bmGrid[t][s];
-      if (note && note !== 'occupied') {
-        const time = (s * bmTickDurationMs) / 1000;
-        if (note.file && note.file.startsWith('synth:')) {
-          const parts = note.file.split(':');
-          const osc = offCtx.createOscillator();
-          const gain = offCtx.createGain();
-          osc.type = parts[2] || 'sine';
-          osc.frequency.value = parseFloat(parts[1]);
-          gain.gain.value = 0.3;
-          osc.connect(gain); gain.connect(master);
-          osc.start(time); osc.stop(time + 0.2);
+function buyClickerUpgrade(type) {
+    if (type === 'click') {
+        if (userData.coins >= userData.clicker.clickCost) {
+            userData.coins -= userData.clicker.clickCost;
+            userData.clicker.clickPower += 1;
+            userData.clicker.clickCost = Math.floor(userData.clicker.clickCost * 1.5);
+            updateClickerUI();
+            saveUserData();
+            updateStats();
+            showNotification('✅ Сила клика улучшена!');
         } else {
-          const buffer = await bmLoadAudioBuffer(note.file);
-          if (buffer) {
-            const source = offCtx.createBufferSource();
-            source.buffer = buffer;
-            const gain = offCtx.createGain();
-            gain.gain.value = note.volume || 1.0;
-            source.connect(gain); gain.connect(master);
-            source.start(time);
-          }
+            showNotification('❌ Недостаточно монет!');
         }
-      }
+    } else if (type === 'auto') {
+        if (userData.coins >= userData.clicker.autoCost) {
+            userData.coins -= userData.clicker.autoCost;
+            userData.clicker.autoClick += 1;
+            userData.clicker.autoCost = Math.floor(userData.clicker.autoCost * 1.5);
+            updateClickerUI();
+            saveUserData();
+            updateStats();
+            showNotification('✅ Авто-клик улучшен!');
+        } else {
+            showNotification('❌ Недостаточно монет!');
+        }
     }
-  }
-  
-  const rendered = await offCtx.startRendering();
-  const encoder = new lamejs.Mp3Encoder(2, sr, 320);
-  const mp3Data = [];
-  const blockSize = 1152;
-  const left = rendered.getChannelData(0);
-  const right = rendered.getChannelData(1);
-  
-  for (let i = 0; i < left.length; i += blockSize) {
-    const leftChunk = left.subarray(i, i + blockSize);
-    const rightChunk = right.subarray(i, i + blockSize);
-    const leftInt = new Int16Array(leftChunk.length);
-    const rightInt = new Int16Array(rightChunk.length);
-    for (let j = 0; j < leftChunk.length; j++) {
-      leftInt[j] = Math.max(-1, Math.min(1, leftChunk[j])) * 0x7FFF;
-      rightInt[j] = Math.max(-1, Math.min(1, rightChunk[j])) * 0x7FFF;
-    }
-    const mp3buf = encoder.encodeBuffer(leftInt, rightInt);
-    if (mp3buf.length > 0) mp3Data.push(mp3buf);
-  }
-  const end = encoder.flush();
-  if (end.length > 0) mp3Data.push(end);
-  
-  const blob = new Blob(mp3Data, { type: 'audio/mp3' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = `${bmProjectName}.mp3`;
-  document.body.appendChild(a); a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  showNotification('✅ MP3 сохранён!');
-});
-
-document.getElementById('bmSaveProjectBtn').addEventListener('click', () => {
-  let projects = JSON.parse(localStorage.getItem('bm_projects') || '[]');
-  const newProj = { id: Date.now().toString(), name: bmProjectName, bpm: bmBpm, grid: bmGrid, createdAt: new Date().toLocaleDateString() };
-  projects.push(newProj);
-  localStorage.setItem('bm_projects', JSON.stringify(projects));
-  userData.projectsCount = projects.length;
-  saveUserData(); initApp();
-  showNotification('✅ Проект сохранён!');
-});
-
-document.getElementById('bmProjectsBtn').addEventListener('click', () => {
-  const list = document.getElementById('projectsListBody');
-  const projects = JSON.parse(localStorage.getItem('bm_projects') || '[]');
-  if (projects.length === 0) {
-    list.innerHTML = '<p style="text-align:center; color:var(--text-muted);">Нет проектов</p>';
-  } else {
-    list.innerHTML = projects.map(p => `
-      <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
-        <div>
-          <div style="font-weight:bold;">${p.name}</div>
-          <div style="font-size:12px; color:var(--text-muted);">${p.bpm} BPM • ${p.createdAt}</div>
-        </div>
-        <button class="btn btn-primary" style="padding:6px 12px; font-size:12px;" onclick="bmLoadProject('${p.id}')">Открыть</button>
-      </div>
-    `).join('');
-  }
-  document.getElementById('projectsModal').classList.add('active');
-});
-
-function bmLoadProject(id) {
-  const projects = JSON.parse(localStorage.getItem('bm_projects') || '[]');
-  const proj = projects.find(p => p.id === id);
-  if (proj) {
-    bmProjectName = proj.name; bmProjectNameInput.value = bmProjectName;
-    bmBpm = proj.bpm; bmBpmInput.value = bmBpm;
-    bmGrid = proj.grid; bmRenderNotes();
-    document.getElementById('projectsModal').classList.remove('active');
-    showNotification('📂 Проект загружен!');
-  }
-}
-function bmCreateNewProject() {
-  bmGrid = Array(BM_TRACKS).fill().map(() => Array(BM_STEPS).fill(null));
-  bmProjectName = 'Новый бит ' + (Math.floor(Math.random() * 1000));
-  bmProjectNameInput.value = bmProjectName;
-  bmRenderNotes();
-}
-function initBm() {
-  bmCreateGrid();
-  bmScanDirectory('sounds/');
-  new ResizeObserver(updateBmScrollbarThumb).observe(bmContainer);
 }
 
-// SPACE BACKGROUND
+function updateClickerUI() {
+    const coinsEl = document.getElementById('clickerCoins');
+    const cpsEl = document.getElementById('clickerCPS');
+    const clickCostEl = document.getElementById('clickCost');
+    const autoCostEl = document.getElementById('autoCost');
+    if (coinsEl) coinsEl.textContent = Math.floor(userData.coins);
+    if (cpsEl) cpsEl.textContent = userData.clicker.autoClick;
+    if (clickCostEl) clickCostEl.textContent = userData.clicker.clickCost;
+    if (autoCostEl) autoCostEl.textContent = userData.clicker.autoCost;
+}
+
+function createClickParticle(x, y, text) {
+    const particle = document.createElement('div');
+    particle.textContent = text;
+    particle.className = 'click-particle';
+    particle.style.left = x + 'px';
+    particle.style.top = y + 'px';
+    document.body.appendChild(particle);
+    setTimeout(() => {
+        particle.style.transform = `translateY(-50px)`;
+        particle.style.opacity = '0';
+    }, 50);
+    setTimeout(() => {
+        if (document.body.contains(particle)) document.body.removeChild(particle);
+    }, 1000);
+}
+
 const spaceCanvas = document.getElementById('spaceCanvas');
 const sCtx = spaceCanvas.getContext('2d');
 let starsArr = [];
-function initSpace() {
-  if (!spaceCanvas) return;
-  spaceCanvas.width = window.innerWidth; spaceCanvas.height = window.innerHeight;
-  starsArr = [];
-  const count = Math.floor((spaceCanvas.width * spaceCanvas.height) / 6000);
-  for (let i = 0; i < count; i++) {
-    starsArr.push({ x: Math.random() * spaceCanvas.width, y: Math.random() * spaceCanvas.height, r: Math.random() * 1.5 + 0.3, alpha: Math.random(), speed: Math.random() * 0.02 + 0.005, color: Math.random() > 0.85 ? '#00f3ff' : (Math.random() > 0.7 ? '#bc13fe' : '#ffffff') });
-  }
-  drawSpaceStars();
+function resizeSpaceCanvas() {
+    spaceCanvas.width = window.innerWidth;
+    spaceCanvas.height = window.innerHeight;
+    initSpaceStars();
+}
+function initSpaceStars() {
+    starsArr = [];
+    const count = Math.floor((spaceCanvas.width * spaceCanvas.height) / 6000);
+    for (let i = 0; i < count; i++) {
+        starsArr.push({
+            x: Math.random() * spaceCanvas.width,
+            y: Math.random() * spaceCanvas.height,
+            r: Math.random() * 1.5 + 0.3,
+            alpha: Math.random(),
+            speed: Math.random() * 0.02 + 0.005,
+            color: Math.random() > 0.85 ? '#00f3ff' : (Math.random() > 0.7 ? '#bc13fe' : '#ffffff')
+        });
+    }
 }
 function drawSpaceStars() {
-  if (!sCtx || !spaceCanvas) return;
-  sCtx.clearRect(0, 0, spaceCanvas.width, spaceCanvas.height);
-  starsArr.forEach(s => {
-    s.alpha += s.speed; const a = (Math.sin(s.alpha) + 1) / 2;
-    sCtx.beginPath(); sCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2); sCtx.fillStyle = s.color; sCtx.globalAlpha = a * 0.9; sCtx.fill();
-    if (s.r > 1.2) { sCtx.globalAlpha = a * 0.3; sCtx.arc(s.x, s.y, s.r * 3, 0, Math.PI * 2); sCtx.fill(); }
-  });
-  sCtx.globalAlpha = 1;
-  requestAnimationFrame(drawSpaceStars);
+    sCtx.clearRect(0, 0, spaceCanvas.width, spaceCanvas.height);
+    starsArr.forEach(s => {
+        s.alpha += s.speed;
+        const a = (Math.sin(s.alpha) + 1) / 2;
+        sCtx.beginPath();
+        sCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        sCtx.fillStyle = s.color;
+        sCtx.globalAlpha = a * 0.9;
+        sCtx.fill();
+        if (s.r > 1.2) {
+            sCtx.globalAlpha = a * 0.3;
+            sCtx.arc(s.x, s.y, s.r * 3, 0, Math.PI * 2);
+            sCtx.fill();
+        }
+    });
+    sCtx.globalAlpha = 1;
+    requestAnimationFrame(drawSpaceStars);
 }
-window.addEventListener('resize', () => { spaceCanvas.width = window.innerWidth; spaceCanvas.height = window.innerHeight; });
+window.addEventListener('resize', resizeSpaceCanvas);
+function formatTime(seconds) {
+    if (isNaN(seconds) || seconds < 0) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+}
+function showNotification(text) {
+    const div = document.getElementById('notification');
+    div.textContent = text;
+    div.classList.add('show');
+    setTimeout(() => div.classList.remove('show'), 3000);
+}
 </script>
 </body>
 </html>
