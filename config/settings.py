@@ -3,11 +3,6 @@ from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
 
-# Загрузка .env файла (для локальной разработки)
-if os.path.exists('.env'):
-    from dotenv import load_dotenv
-    load_dotenv()
-
 # Теперь BASE_DIR указывает на корень репозитория, где лежит manage.py
 BASE_DIR = Path(__file__).resolve().parent.parent 
 
