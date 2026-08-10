@@ -7,9 +7,30 @@ __v0_jsx-dev-runtime.ts
 .vercel/
 
 # Environment variables
-.env*.local
+# .env*.local
 
 # Common ignores
 node_modules
 .next/
 .DS_Store
+
+# Virtual Environment
+.venv/
+env/
+venv/
+ENV/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Database
+*.sqlite3
+
+# Static and media files (они соберутся сами при деплое)
+staticfiles/
+media/
+
+# Local environment variables
+.env
