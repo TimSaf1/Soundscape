@@ -1,0 +1,10 @@
+.git
+.github
+.env*
+*.md
+tests/
+docs/
+.vscode/
+node_modules/
+Dockerfile
+.railwayignore
