@@ -1,8 +1,0 @@
-// types/index.ts
-
-/** Один звуковой пакет (папка) */
-export type BeatPackType = {
-  name: string;
-  files?: string[]; // Прямые ссылки на .wav-файлы
-  children?: BeatPackType[]; // Подпапки
-};
