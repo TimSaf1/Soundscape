@@ -63,7 +63,7 @@ function loadSoundLibrary() {
         const item = document.createElement('div');
         item.className = 'cp-sound-item';
         item.dataset.filePath = filePath; // Сохраняем полный путь как атрибут
-        item.textContent = displayName;
+        item.textContent = displayName.replace('.wav', '').replace('.mp3', '');
         
         item.addEventListener('click', () => selectSound(item));
         
