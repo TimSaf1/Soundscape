@@ -1,79 +1,97 @@
-// Функция для создания кнопки проигрывания звука
-function createSoundButton(filePath) {
-    const button = document.createElement('button');
-    // Убираем расширение файла
-    button.textContent = filePath.split('/').pop().replace('.wav', '');
+function loadSoundLibrary() {
+    const soundsPanel = document.getElementById('cpSoundsList');
     
-    button.addEventListener('click', () => {
-        const audio = new Audio(filePath);
-        audio.play();
-    });
-
-    return button;
-}
-
-// Рекурсивная функция для построения дерева
-async function buildTree(container, url) {
-    try {
-        // Получаем содержимое папки
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`Не удалось получить ${url}`);
-        
-        // Парсим ответ как текст (браузер возвращает HTML-список ссылок)
-        const text = await response.text();
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(text, 'text/html');
-
-        // Ищем все ссылки в этом документе
-        const links = Array.from(doc.querySelectorAll('a'));
-
-        for (const link of links) {
-            const href = link.getAttribute('href') || '';
+    async function fetchDirectory(url) {
+        try {
+            // Получаем HTML-список файлов/папок по URL (браузер так возвращает содержимое статической директории)
+            const response = await fetch(url);
+            if (!response.ok) return [];
             
-            // Пропускаем служебные ссылки типа "Parent Directory"
-            if (href.includes('../')) continue;
-
-            // Определяем полный путь до объекта
-            let fullUrl = `${url}/${href}`;
-            // Для корректной работы fetch нужно убрать лишний слеш
-            if (fullUrl.endsWith('//')) fullUrl = fullUrl.slice(0, -1);
-
-            // Проверяем, является ли ссылка папкой или файлом
-            if (href.endsWith('/')) { // Папка
-                const folderName = href.replace('/', '');
+            const text = await response.text();
+            const parser = new DOMParser().parseFromString(text, 'text/html');
+            const links = Array.from(parser.querySelectorAll('a'));
+            
+            for (const link of links) {
+                let href = link.getAttribute('href') || '';
                 
-                // Создаем элемент для папки
-                const details = document.createElement('details');
-                container.appendChild(details);
-
-                const summary = document.createElement('summary');
-                summary.textContent = folderName;
-                details.appendChild(summary);
-
-                // Внутрь этой папки рекурсивно добавляем её содержимое
-                const folderContainer = document.createElement('ul');
-                details.appendChild(folderContainer);
-
-                await buildTree(folderContainer, fullUrl); // Рекурсия!
-            } else { // Файл
-                // Мы работаем только с .wav
-                if (href.toLowerCase().endsWith('.wav')) {
-                    const li = document.createElement('li');
-                    li.appendChild(createSoundButton(fullUrl));
-                    container.appendChild(li);
+                // Пропускаем служебные ссылки типа "Parent Directory"
+                if (href.includes('../')) continue;
+                
+                // Полный путь до объекта
+                let fullUrl = `${url}/${href}`;
+                if (fullUrl.endsWith('//')) fullUrl = fullUrl.slice(0, -1); // Убираем лишний слеш
+                
+                // Определяем имя без расширения
+                const name = decodeURIComponent(href.replace('/', ''));
+                
+                // Если это папка — рекурсивно вызываем функцию для неё
+                if (href.endsWith('/')) {
+                    const folderEl = createFolder(name);
+                    soundsPanel.appendChild(folderEl);
+                    
+                    // Внутри этой папки добавляем список её содержимого
+                    const innerContainer = folderEl.querySelector('.inner-list');
+                    const filesAndFolders = await fetchDirectory(fullUrl);
+                    filesAndFolders.forEach(item => innerContainer.appendChild(item));
+                } else {
+                    // Это файл .wav — делаем кнопку проигрывания
+                    if (href.toLowerCase().endsWith('.wav')) {
+                        const soundItem = createSoundButton(fullUrl, name);
+                        soundsPanel.appendChild(soundItem);
+                    }
                 }
             }
-        }
-    } catch (error) {
-        console.error(error);
+        } catch (error) { console.error(error); }
     }
+
+    function createFolder(name) {
+        const details = document.createElement('details');
+        details.className = 'cp-sound-item cp-folder';
+        
+        const summary = document.createElement('summary');
+        summary.textContent = name + '/';
+        details.appendChild(summary);
+        
+        const innerList = document.createElement('div');
+        innerList.className = 'inner-list';
+        details.appendChild(innerList);
+        
+        return details;
+    }
+
+    function createSoundButton(filePath, displayName) {
+        const item = document.createElement('div');
+        item.className = 'cp-sound-item';
+        item.dataset.filePath = filePath; // Сохраняем полный путь как атрибут
+        item.textContent = displayName;
+        
+        item.addEventListener('click', () => selectSound(item));
+        
+        return item;
+    }
+
+    // Функция выбора звука при клике на элемент
+    function selectSound(el) {
+        // Снимаем выделение с предыдущего элемента
+        const prevSelected = soundsPanel.querySelector('.cp-sound-item.active');
+        if (prevSelected) prevSelected.classList.remove('active');
+        
+        el.classList.add('active');
+        
+        currentSoundFile = el.dataset.filePath;
+        currentSoundName = el.textContent.trim();
+        currentFolderPath = ''; // Для твоей структуры не используется явно, но можно расширить
+        
+        // Обновляем название трека (если нужно)
+        updateTrackLabel(currentSoundName);
+    }
+
+    // Вспомогательная функция для обновления лейбла текущего трека
+    function updateTrackLabel(name) {
+        const trackLabels = document.querySelectorAll('.cp-track-label');
+        trackLabels.forEach(label => label.textContent = name);
+    }
+
+    // Запускаем загрузку корневой папки Sounds/
+    fetchDirectory('/Sounds/');
 }
-
-// Запуск скрипта
-document.addEventListener('DOMContentLoaded', async () => {
-    const libraryRoot = document.getElementById('sound-library');
-    const rootUrl = '/Sounds/';
-
-    // Начинаем строить дерево от корня
-    await buildTree(libraryRoot, rootUrl);
-});
