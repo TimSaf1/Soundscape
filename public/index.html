@@ -1696,9 +1696,7 @@ async function generateAIBeat() {
           notesPlaced++;
         });
       }
-    }
-
-
+    } // ← ВАЖНО: Закрытие цикла for (let bar = 0; bar < 4; bar++)
     
     renderNotes();
     showNotification(`✅ AI создал бит: ${notesPlaced} нот в стиле ${genre.toUpperCase()}!`);
@@ -1709,7 +1707,7 @@ async function generateAIBeat() {
   } else {
     showNotification('⚠️ Beat Composer не готов. Попробуйте ещё раз.');
   }
-}
+} // ← ВАЖНО: Закрытие функции generateAIBeat()
 
 /* ==========================================================================
    GAMES ENGINE
