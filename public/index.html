@@ -1527,7 +1527,8 @@ async function generateAIBeat() {
   await new Promise(resolve => setTimeout(resolve, 500));
   
   // Заполняем сетку нотами
-  if (typeof initBeatComposer !== 'undefined' && window.grid) {
+  if (window.BeatComposer) {
+    const { placeNote, renderNotes, showCpNotification } = window.BeatComposer;
     const tracks = {
       kick: 0, snare: 1, hihat: 2, open_hat: 3, clap: 4, 
       bass: 5, percussion: 6, tom: 7, synth_lead: 8, 
@@ -1699,13 +1700,13 @@ async function generateAIBeat() {
     } // ← ВАЖНО: Закрытие цикла for (let bar = 0; bar < 4; bar++)
     
     renderNotes();
-    showNotification(`✅ AI создал бит: ${notesPlaced} нот в стиле ${genre.toUpperCase()}!`);
+    showCpNotification(`✅ AI создал бит: ${notesPlaced} нот в стиле ${genre.toUpperCase()}!`);
     userData.tracksCreated++;
     updateStats();
     saveUserData();
-    
+  
   } else {
-    showNotification('⚠️ Beat Composer не готов. Попробуйте ещё раз.');
+    showNotification('⚠️ Beat Composer не готов. Откройте раздел Beat Pro и попробуйте снова.');
   }
 } // ← ВАЖНО: Закрытие функции generateAIBeat()
 
@@ -2726,6 +2727,19 @@ async function scanDirectory(path) {
   scanDirectory('sounds/'); 
   updateFxGroupsVisual();
   new ResizeObserver(updateScrollbarThumb).observe(container);
+    // Делаем API доступным извне
+  window.BeatComposer = {
+    grid,
+    placeNote,
+    renderNotes,
+    canPlaceNote,
+    showCpNotification,
+    TRACKS,
+    STEPS,
+    get currentSoundFile() { return currentSoundFile; }
+  };
+  
+  console.log('✅ Beat Composer готов к работе');
 }
 </script>
 </body>
