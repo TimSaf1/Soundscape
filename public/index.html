@@ -751,71 +751,6 @@ let questsData = [
 
 let chatData = JSON.parse(localStorage.getItem('soundscape_chat') || '[]');
 
-  // Глобальный объект для хранения загруженных звуков
-window.SoundLibrary = {
-  files: [],
-  buffers: {},
-    
-  async init() {
-    try {
-        // 1. Загружаем список файлов из манифеста
-      const response = await fetch('sounds/manifest.json');
-      if (!response.ok) throw new Error('manifest.json не найден. Убедитесь, что вы запустили generate-manifest.js');
-        
-      this.files = await response.json();
-      console.log(`✅ Загружено ${this.files.length} звуков из манифеста`);
-        
-        // 2. Предзагружаем все звуки (опционально, для быстрого доступа)
-      await this.preloadAll();
-        
-        // 3. Вызываем событие, чтобы Beat Composer знал, что звуки готовы
-      window.dispatchEvent(new CustomEvent('sounds-loaded', { 
-        detail: { files: this.files } 
-      }));
-        
-    } catch (error) {
-      console.error('❌ Ошибка загрузки звуков:', error);
-    }
-  },
-    
-    // Предзагрузка всех аудиофайлов в память
-  async preloadAll() {
-    const loadPromises = this.files.map(async (filePath) => {
-      try {
-        const response = await fetch(filePath);
-        const arrayBuffer = await response.arrayBuffer();
-          // Сохраняем ArrayBuffer для Web Audio API (если нужно)
-        this.buffers[filePath] = arrayBuffer;
-      } catch (err) {
-        console.warn(`Не удалось загрузить ${filePath}`, err);
-      }
-    });
-      
-    await Promise.all(loadPromises);
-    console.log('✅ Все звуки предзагружены в память');
-  },
-    
-    // Получить URL звука по имени файла
-  getSoundURL(filename) {
-    return this.files.find(path => path.includes(filename));
-  },
-    
-    // Воспроизвести звук по имени
-  async play(filename) {
-    const url = this.getSoundURL(filename);
-    if (!url) {
-      console.error(`Звук "${filename}" не найден`);
-      return;
-    }
-      
-    const audio = new Audio(url);
-    await audio.play();
-    return audio;
-  }
-};
-  
-  // Инициализируем библиотеку при загрузке страницы
-window.SoundLibrary.init();
 /* ==========================================================================
    INITIALIZATION
    ========================================================================== */
@@ -1628,26 +1563,118 @@ function initBeatComposer() {
   }
 
   // ИСПРАВЛЕНИЕ 6: Обработка ошибки папки sounds
-  async function scanDirectory(path) {
-    soundsList.innerHTML = '<div class="cp-sound-item" style="color:var(--text-muted); justify-content:center;">Загрузка...</div>';
-    try {
-      const response = await fetch(path);
-      if (!response.ok) throw new Error("Directory listing not enabled");
-      const text = await response.text();
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(text, 'text/html');
-      const items = new Map();
-      Array.from(doc.querySelectorAll('a')).forEach(a => {
-        const href = a.getAttribute('href'), name = a.textContent.trim();
-        if (name === '../' || name === '..' || name === 'Parent Directory') return;
-        if (href.endsWith('/') || href.match(/\.(mp3|wav|ogg)$/i))
-          items.set(name, { name, isFolder: href.endsWith('/'), href, fullPath: path + href });
+  // НОВАЯ ФУНКЦИЯ ДЛЯ VERCEL (Использует manifest.json)
+// ===== "БАЗА ДАННЫХ" ЗВУКОВ =====
+const ALL_SOUNDS = [
+  // 808 BEAT 1 - Drums
+  'sounds/808_BEAT_1/Drums/808_K.wav',
+  'sounds/808_BEAT_1/Drums/808_S.wav',
+  // 808 BEAT 1 - Percussion
+  'sounds/808_BEAT_1/Percussion/808_5.wav',
+  'sounds/808_BEAT_1/Percussion/808_6.wav',
+  'sounds/808_BEAT_1/Percussion/8O8_R.wav',
+  // 808 BEAT 1 - Plates
+  'sounds/808_BEAT_1/Plates/808_2.wav',
+  'sounds/808_BEAT_1/Plates/808_3.wav',
+  'sounds/808_BEAT_1/Plates/808_4.wav',
+  'sounds/808_BEAT_1/Plates/808_7.wav',
+  'sounds/808_BEAT_1/Plates/808_C.wav',
+  'sounds/808_BEAT_1/Plates/808_O.wav',
+  // 909 BEAT 1 - Drums
+  'sounds/909_BEAT_1/Drums/909CX 31 SN3  2.wav',
+  'sounds/909_BEAT_1/Drums/909CX 33 BD3  1.wav',
+  'sounds/909_BEAT_1/Drums/909CX 35 BD1  2.wav',
+  // SFXs
+  'sounds/SFXs/plane1.wav',
+  'sounds/SFXs/plane2.wav',
+  'sounds/SFXs/plane3.wav',
+  'sounds/SFXs/plane4.wav',
+  // Synth Effects
+  'sounds/Synth Effects/FX-1972.wav',
+  'sounds/Synth Effects/FX-8DOTTED.wav',
+  'sounds/Synth Effects/FX-ANALPROBE.wav',
+  'sounds/Synth Effects/FX-APOLLO13.wav',
+  'sounds/Synth Effects/FX-BANGDELAY.wav',
+  'sounds/Synth Effects/FX-BOMB.wav',
+  'sounds/Synth Effects/FX-BPDOWN.wav',
+  'sounds/Synth Effects/FX-BPDOWN2.wav',
+  'sounds/Synth Effects/FX-BPUP.wav',
+  'sounds/Synth Effects/FX-CLASSIC.wav',
+  'sounds/Synth Effects/FX-CLASSIC2.wav',
+  'sounds/Synth Effects/FX-CLASSIC3.wav',
+  'sounds/Synth Effects/FX-CONTAINER.wav',
+  'sounds/Synth Effects/FX-CONTAINER2.wav',
+  'sounds/Synth Effects/FX-CREAMY.wav',
+  'sounds/Synth Effects/FX-DESCENDING1.wav',
+  'sounds/Synth Effects/FX-DUDUM.wav',
+  'sounds/Synth Effects/FX-EMES20.wav',
+  'sounds/Synth Effects/FX-EMES22.wav',
+  'sounds/Synth Effects/FX-GLENDO.wav',
+  'sounds/Synth Effects/FX-KRAYZ.wav',
+  'sounds/Synth Effects/FX-LINUS.wav',
+  'sounds/Synth Effects/FX-LOWCAV.wav',
+  'sounds/Synth Effects/FX-LPDOWN.wav',
+  'sounds/Synth Effects/FX-MARSATTAX.wav',
+  'sounds/Synth Effects/FX-MISTERY.wav',
+  'sounds/Synth Effects/FX-MODARPER.wav',
+  'sounds/Synth Effects/FX-MODERATOR.wav',
+  'sounds/Synth Effects/FX-MODULATE.wav',
+  'sounds/Synth Effects/FX-NASTYCARD.wav',
+  'sounds/Synth Effects/FX-NOABS.wav',
+  'sounds/Synth Effects/FX-NOISEFALL.wav',
+  'sounds/Synth Effects/FX-NOISEFALL2.wav',
+  'sounds/Synth Effects/FX-NOISEFALL3.wav',
+  'sounds/Synth Effects/FX-NOISEFALL4.wav',
+  'sounds/Synth Effects/FX-NOISEFALL5.wav',
+  'sounds/Synth Effects/FX-NOISEFALL6.wav',
+  'sounds/Synth Effects/FX-PEPELOPEZ.wav',
+  'sounds/Synth Effects/FX-PIPELINE.wav',
+  'sounds/Synth Effects/FX-PULSEDOWN.wav',
+  'sounds/Synth Effects/FX-R2D3.wav',
+  'sounds/Synth Effects/FX-RDOWN.wav',
+  'sounds/Synth Effects/FX-RDOWN2.wav',
+  'sounds/Synth Effects/FX-RISE.wav',
+  'sounds/Synth Effects/FX-RISEUP.wav',
+  'sounds/Synth Effects/FX-SCARYHALLS.wav',
+  'sounds/Synth Effects/FX-SCREECH.wav',
+  'sounds/Synth Effects/FX-SEEPU.wav',
+  'sounds/Synth Effects/FX-SEERISE.wav',
+  'sounds/Synth Effects/FX-SPACE.wav',
+  'sounds/Synth Effects/FX-SPACEYWIND.wav',
+  'sounds/Synth Effects/FX-SYNTHBELL.wav',
+  'sounds/Synth Effects/FX-SYNTHCHIME.wav',
+  'sounds/Synth Effects/FX-SYNTHDOG.wav',
+  'sounds/Synth Effects/FX-SYNTHDOWN.wav',
+  'sounds/Synth Effects/FX-SYNTHDOWN2.wav',
+];
+
+async function scanDirectory(path) {
+  soundsList.innerHTML = '<div class="cp-sound-item" style="color:var(--text-muted);">Загрузка...</div>';
+  
+  const folders = new Set();
+  const files = [];
+  
+  ALL_SOUNDS.forEach(filePath => {
+    if (!filePath.startsWith(path)) return;
+    const rest = filePath.slice(path.length);
+    if (rest.includes('/')) {
+      folders.add(rest.split('/')[0]);
+    } else {
+      files.push({ 
+        name: rest, 
+        isFolder: false, 
+        href: rest, 
+        fullPath: filePath 
       });
-      renderSoundsPanel(Array.from(items.values()));
-    } catch (e) {
-      soundsList.innerHTML = '<div class="cp-sound-item" style="color:#ff8888; flex-direction:column; text-align:center; padding:15px; font-size:12px;">⚠️ Локальный режим: браузер блокирует чтение папок. Используйте расширение "Live Server" в VS Code или используйте AI-генератор битов!</div>';
     }
-  }
+  });
+  
+  const items = [];
+  folders.forEach(name => items.push({ name, isFolder: true, href: name + '/' }));
+  items.push(...files);
+  
+  renderSoundsPanel(items);
+}
 
   function renderSoundsPanel(items) {
     soundsList.innerHTML = '';
