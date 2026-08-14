@@ -751,6 +751,71 @@ let questsData = [
 
 let chatData = JSON.parse(localStorage.getItem('soundscape_chat') || '[]');
 
+  // Глобальный объект для хранения загруженных звуков
+window.SoundLibrary = {
+  files: [],
+  buffers: {},
+    
+  async init() {
+    try {
+        // 1. Загружаем список файлов из манифеста
+      const response = await fetch('sounds/manifest.json');
+      if (!response.ok) throw new Error('manifest.json не найден. Убедитесь, что вы запустили generate-manifest.js');
+        
+      this.files = await response.json();
+      console.log(`✅ Загружено ${this.files.length} звуков из манифеста`);
+        
+        // 2. Предзагружаем все звуки (опционально, для быстрого доступа)
+      await this.preloadAll();
+        
+        // 3. Вызываем событие, чтобы Beat Composer знал, что звуки готовы
+      window.dispatchEvent(new CustomEvent('sounds-loaded', { 
+        detail: { files: this.files } 
+      }));
+        
+    } catch (error) {
+      console.error('❌ Ошибка загрузки звуков:', error);
+    }
+  },
+    
+    // Предзагрузка всех аудиофайлов в память
+  async preloadAll() {
+    const loadPromises = this.files.map(async (filePath) => {
+      try {
+        const response = await fetch(filePath);
+        const arrayBuffer = await response.arrayBuffer();
+          // Сохраняем ArrayBuffer для Web Audio API (если нужно)
+        this.buffers[filePath] = arrayBuffer;
+      } catch (err) {
+        console.warn(`Не удалось загрузить ${filePath}`, err);
+      }
+    });
+      
+    await Promise.all(loadPromises);
+    console.log('✅ Все звуки предзагружены в память');
+  },
+    
+    // Получить URL звука по имени файла
+  getSoundURL(filename) {
+    return this.files.find(path => path.includes(filename));
+  },
+    
+    // Воспроизвести звук по имени
+  async play(filename) {
+    const url = this.getSoundURL(filename);
+    if (!url) {
+      console.error(`Звук "${filename}" не найден`);
+      return;
+    }
+      
+    const audio = new Audio(url);
+    await audio.play();
+    return audio;
+  }
+};
+  
+  // Инициализируем библиотеку при загрузке страницы
+window.SoundLibrary.init();
 /* ==========================================================================
    INITIALIZATION
    ========================================================================== */
