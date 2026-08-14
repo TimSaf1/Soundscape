@@ -413,19 +413,46 @@ body {
 <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">AI проанализирует вашу мелодию и создаст ритм-секцию</p>
 <div class="ai-controls">
 <label style="display: block; text-align: left; color: var(--success); font-size: 12px; margin-bottom: 5px;">Жанр музыки:</label>
-<select id="genreSelect">
-<option value="hiphop">Hip-Hop / Rap</option>
-<option value="trap">Trap</option>
-<option value="house">House</option>
-<option value="techno">Techno</option>
-<option value="lofi">Lo-Fi</option>
+<select id="genreSelect" style="width: 100%; padding: 8px; background: #1a1a1a; color: white; border: 1px solid #333; border-radius: 4px; margin-bottom: 10px;">
+  
+  <optgroup label="🔥 Популярное">
+    <option value="hiphop">Hip-Hop / Rap (Рэп)</option>
+    <option value="trap">Trap (Трэп)</option>
+    <option value="ru-hits">Хиты РФ (Pop/Rap)</option>
+    <option value="pop">Pop (Попса)</option>
+  </optgroup>
+
+  <optgroup label="🎧 Электроника">
+    <option value="house">House (Хаус)</option>
+    <option value="techno">Techno (Техно)</option>
+    <option value="electronic">Electronic / EDM</option>
+  </optgroup>
+
+  <optgroup label="🎸 Живые инструменты">
+    <option value="rock">Rock (Рок)</option>
+    <option value="metal">Metal (Метал)</option>
+    <option value="jazz">Jazz (Джаз)</option>
+  </optgroup>
+
+  <optgroup label="🌙 Вайб">
+    <option value="lofi">Lo-Fi / Chill</option>
+    <option value="rnb">R&B / Soul</option>
+  </optgroup>
+
 </select>
 <label style="display: block; text-align: left; color: var(--success); font-size: 12px; margin-bottom: 5px;">Добавить инструменты:</label>
-<select id="instrumentSelect" multiple size="3" style="height: 80px;">
-<option value="kick" selected>Kick Drum</option>
-<option value="snare" selected>Snare</option>
-<option value="hihat" selected>Hi-Hat</option>
-<option value="bass">Bass Line</option>
+<select id="instrumentSelect" multiple size="6" style="height: 140px;">
+  <option value="kick" selected>🥁 Kick Drum</option>
+  <option value="snare" selected>🥁 Snare</option>
+  <option value="hihat" selected>🎩 Hi-Hat</option>
+  <option value="open_hat">🎩 Open Hi-Hat</option>
+  <option value="clap">👏 Clap</option>
+  <option value="bass" selected>🎸 Bass Line</option>
+  <option value="percussion">🥁 Percussion</option>
+  <option value="tom">🥁 Toms</option>
+  <option value="synth_lead">🎹 Synth Lead</option>
+  <option value="riser">⬆️ Riser (переходы)</option>
+  <option value="impact">💥 Impact (акценты)</option>
 </select>
 <button class="ai-generate-btn" onclick="generateAIBeat()" id="generateBtn" disabled>🤖 Сгенерировать бит из мелодии</button>
 </div>
@@ -1019,13 +1046,278 @@ function freqToNote(freq) {
     const halfSteps = Math.round(12 * Math.log2(freq / (440 * Math.pow(2, -4.75))));
     return notes[halfSteps % 12];
 }
-function generateAIBeat() {
-    if (detectedNotes.length === 0) { showNotification('❌ Сначала запишите мелодию!'); return; }
-    showNotification('🤖 Генерация бита...');
+// ===== AI ГЕНЕРАТОР КОМПОЗИЦИЙ =====
+async function generateAIBeat() {
+  if (detectedNotes.length === 0) { 
+    showNotification('❌ Сначала запишите мелодию!'); 
+    return; 
+  }
+  
+  const genre = document.getElementById('genreSelect').value;
+  const instruments = Array.from(document.getElementById('instrumentSelect').selectedOptions).map(o => o.value);
+  
+  showNotification('🤖 AI анализирует мелодию и создаёт бит в стиле ' + genre.toUpperCase() + '...');
+  
+  // База звуков (та же, что мы уже сделали)
+  const SOUNDS_DB = {
+    kick: ['sounds/808_BEAT_1/Drums/808_K.wav', 'sounds/909_BEAT_1/Drums/909CX 33 BD3  1.wav', 'sounds/909_BEAT_1/Drums/909CX 35 BD1  2.wav'],
+    snare: ['sounds/808_BEAT_1/Drums/808_S.wav', 'sounds/909_BEAT_1/Drums/909CX 31 SN3  2.wav'],
+    hihat: ['sounds/808_BEAT_1/Plates/808_C.wav', 'sounds/808_BEAT_1/Plates/808_O.wav'],
+    bass: ['sounds/808_BEAT_1/Percussion/808_6.wav'],
+    fx: ['sounds/Synth Effects/FX-RISE.wav', 'sounds/Synth Effects/FX-BOMB.wav', 'sounds/SFXs/plane1.wav']
+  };
+  
+  // Шаблоны паттернов по жанрам
+  const PATTERNS = {
+    'hiphop': { bpm: 90,
+      kick: [0, 4, 8, 12], snare: [4, 12], hihat: [0,2,4,6,8,10,12,14],
+      open_hat: [6, 14], clap: [4, 12], percussion: [10], tom: [],
+      synth_lead: [0, 8], riser: [12], impact: [0] },
+
+    'trap': { bpm: 140,
+      kick: [0, 3, 6, 10], snare: [4, 12], hihat: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],
+      open_hat: [7, 15], clap: [4, 12], percussion: [1, 5, 9, 13], tom: [],
+      synth_lead: [0, 6, 10], riser: [12], impact: [0] },
+
+    'house': { bpm: 124,
+      kick: [0, 4, 8, 12], snare: [], hihat: [0, 8],
+      open_hat: [2, 6, 10, 14], clap: [4, 12], percussion: [3, 7, 11, 15], tom: [],
+      synth_lead: [0, 8], riser: [12], impact: [0] },
+
+    'techno': { bpm: 130,
+      kick: [0, 4, 8, 12], snare: [], hihat: [0, 8],
+      open_hat: [2, 6, 10, 14], clap: [4, 12], percussion: [3, 7, 11, 15], tom: [14],
+      synth_lead: [0], riser: [8, 12], impact: [0] },
+
+    'lofi': { bpm: 80,
+      kick: [0, 8], snare: [4, 12], hihat: [0,2,4,6,8,10,12,14],
+      open_hat: [14], clap: [4, 12], percussion: [7, 15], tom: [],
+      synth_lead: [0, 6, 10], riser: [], impact: [0] },
+
+    'ru-hits': { bpm: 110,
+      kick: [0, 4, 8, 12], snare: [4, 12], hihat: [0,2,4,6,8,10,12,14],
+      open_hat: [14], clap: [4, 12], percussion: [2, 10], tom: [],
+      synth_lead: [0, 4, 8, 12], riser: [12], impact: [0] },
+
+    'pop': { bpm: 120,
+      kick: [0, 4, 8, 12], snare: [4, 12], hihat: [2, 6, 10, 14],
+      open_hat: [6, 14], clap: [4, 12], percussion: [3, 11], tom: [14],
+      synth_lead: [0, 8], riser: [12], impact: [0] },
+
+    'rock': { bpm: 128,
+      kick: [0, 8, 10], snare: [4, 12], hihat: [0,2,4,6,8,10,12,14],
+      open_hat: [14], clap: [], percussion: [], tom: [12, 13, 14],
+      synth_lead: [], riser: [], impact: [0] },
+
+    'metal': { bpm: 160,
+      kick: [0, 2, 4, 6, 8, 10, 12, 14], snare: [4, 12], hihat: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],
+      open_hat: [], clap: [], percussion: [], tom: [12, 13, 14, 15],
+      synth_lead: [], riser: [8], impact: [0] },
+
+    'jazz': { bpm: 110,
+      kick: [0, 10], snare: [4, 12], hihat: [0, 3, 6, 8, 11, 14],
+      open_hat: [], clap: [], percussion: [2, 7], tom: [10, 14],
+      synth_lead: [0, 8], riser: [], impact: [] },
+
+    'rnb': { bpm: 95,
+      kick: [0, 8, 11], snare: [4, 12], hihat: [0, 4, 8, 12],
+      open_hat: [6, 14], clap: [4, 12], percussion: [7, 15], tom: [],
+      synth_lead: [0, 6, 10], riser: [12], impact: [0] },
+
+    'electronic': { bpm: 128,
+      kick: [0, 4, 8, 12], snare: [4, 12], hihat: [0, 8],
+      open_hat: [2, 6, 10, 14], clap: [4, 12], percussion: [3, 7, 11, 15], tom: [],
+      synth_lead: [0, 4, 8, 12], riser: [8, 12], impact: [0] }
+  };
+  
+  const pattern = PATTERNS[genre] || PATTERNS.hiphop;
+  
+  // Ждём 1.5 секунды для эффекта "AI думает"
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  // Переключаемся в Beat Composer
+  showSection('beatmaker');
+  
+  // Ждём инициализации Beat Composer
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // Заполняем сетку нотами
+  if (typeof initBeatComposer !== 'undefined' && window.grid) {
+    const tracks = {
+      kick: 0,
+      snare: 1,
+      hihat: 2,
+      bass: 3,
+      tom: 4,
+      synth: 5,
+      riser: 6,
+      impact: 7,
+      fx: 8
+    };
+    
+    let notesPlaced = 0;
+    
+    // Генерируем 4 такта (64 шага)
+    for (let bar = 0; bar < 4; bar++) {
+      const offset = bar * 16;
+      
+      // Tom
+      if (instruments.includes('tom') && SOUNDS_DB.tom.length && pattern.tom && pattern.tom.length) {
+        pattern.tom.forEach((step, idx) => {
+          const sound = SOUNDS_DB.tom[idx % SOUNDS_DB.tom.length];
+          const fx = { trim:{start:0,end:0}, distortion:{active:false,drive:20,tone:2000}, bitcrusher:{active:false,bits:8,freqReduction:1}, compressor:{active:true,threshold:-20,ratio:4}, reverb:{active:true,mix:30,decay:1.5}, delay:{active:false,time:0.3,feedback:40,mix:30}, killer:{active:false,freq:200,q:1}, eq:{active:true,low:2,mid:1,high:-2}, panner:{pan:(idx-1)*40} };
+          placeNote(tracks.tom, offset + step, 'Tom', sound, 1, 0.6, 1.0, 0, fx);
+          notesPlaced++;
+        });
+      }
+      
+      // Synth
+      if (instruments.includes('synth_lead') && SOUNDS_DB.synth_lead.length && pattern.synth_lead && pattern.synth_lead.length) {
+        pattern.synth_lead.forEach((step, idx) => {
+          const ref = detectedNotes[idx % Math.max(1, detectedNotes.length)] || { freq: 440 };
+          const pitchShift = Math.max(-12, Math.min(12, Math.round((ref.freq - 440) / 60)));
+          const sound = SOUNDS_DB.synth_lead[idx % SOUNDS_DB.synth_lead.length];
+          const fx = { trim:{start:0,end:0}, distortion:{active:genre==='techno'||genre==='metal',drive:20,tone:2500}, bitcrusher:{active:false,bits:8,freqReduction:1}, compressor:{active:true,threshold:-18,ratio:3}, reverb:{active:true,mix:40,decay:2.0}, delay:{active:true,time:0.375,feedback:35,mix:30}, killer:{active:false,freq:200,q:1}, eq:{active:true,low:-2,mid:3,high:2}, panner:{pan:(idx%2)*40-20} };
+          placeNote(tracks.synth_lead, offset + step, 'Synth', sound, 2, 0.5, 1.0, pitchShift, fx);
+          notesPlaced++;
+        });
+      }
+
+      // Riser
+      if (instruments.includes('riser') && SOUNDS_DB.riser.length && pattern.riser && pattern.riser.length) {
+        pattern.riser.forEach((step, idx) => {
+          const sound = SOUNDS_DB.riser[idx % SOUNDS_DB.riser.length];
+          const fx = { trim:{start:0,end:0}, distortion:{active:false,drive:20,tone:2000}, bitcrusher:{active:false,bits:8,freqReduction:1}, compressor:{active:false,threshold:-24,ratio:4}, reverb:{active:true,mix:60,decay:2.5}, delay:{active:true,time:0.4,feedback:50,mix:40}, killer:{active:false,freq:200,q:1}, eq:{active:true,low:-3,mid:2,high:4}, panner:{pan:0} };
+          placeNote(tracks.riser, offset + step, 'Riser', sound, 4, 0.4, 1.0, 0, fx);
+          notesPlaced++;
+        });
+      }
+      
+      // Impact
+      if (instruments.includes('impact') && SOUNDS_DB.impact.length && pattern.impact && pattern.impact.length) {
+        pattern.impact.forEach((step, idx) => {
+          const sound = SOUNDS_DB.impact[(bar + idx) % SOUNDS_DB.impact.length];
+          const fx = { trim:{start:0,end:0}, distortion:{active:false,drive:20,tone:2000}, bitcrusher:{active:false,bits:8,freqReduction:1}, compressor:{active:false,threshold:-24,ratio:4}, reverb:{active:true,mix:50,decay:3.0}, delay:{active:false,time:0.3,feedback:40,mix:30}, killer:{active:false,freq:200,q:1}, eq:{active:false,low:0,mid:0,high:0}, panner:{pan:0} };
+          placeNote(tracks.impact, offset + step, 'Impact', sound, 2, 0.5, 1.0, 0, fx);
+          notesPlaced++;
+        });
+      }
+      
+      // Kick
+      if (instruments.includes('kick') && SOUNDS_DB.kick.length > 0) {
+        const kickSound = SOUNDS_DB.kick[Math.floor(Math.random() * SOUNDS_DB.kick.length)];
+        pattern.kick.forEach(step => {
+          const fx = {
+            trim: { start: 0, end: 0 },
+            distortion: { active: false, drive: 20, tone: 2000 },
+            bitcrusher: { active: false, bits: 8, freqReduction: 1 },
+            compressor: { active: genre === 'trap', threshold: -20, ratio: 6 },
+            reverb: { active: genre === 'lofi', mix: 20, decay: 1.0 },
+            delay: { active: false, time: 0.3, feedback: 40, mix: 30 },
+            killer: { active: false, freq: 200, q: 1 },
+            eq: { active: true, low: 3, mid: 0, high: -2 },
+            panner: { pan: 0 }
+          };
+          placeNote(tracks.kick, offset + step, 'Kick', kickSound, 1, 0.9, 1.0, 0, fx);
+          notesPlaced++;
+        });
+      }
+      
+      // Snare
+      if (instruments.includes('snare') && SOUNDS_DB.snare.length > 0) {
+        const snareSound = SOUNDS_DB.snare[Math.floor(Math.random() * SOUNDS_DB.snare.length)];
+        pattern.snare.forEach(step => {
+          const fx = {
+            trim: { start: 0, end: 0 },
+            distortion: { active: genre === 'techno', drive: 30, tone: 3000 },
+            bitcrusher: { active: false, bits: 8, freqReduction: 1 },
+            compressor: { active: true, threshold: -18, ratio: 4 },
+            reverb: { active: genre === 'house' || genre === 'lofi', mix: 25, decay: 1.2 },
+            delay: { active: false, time: 0.3, feedback: 40, mix: 30 },
+            killer: { active: false, freq: 200, q: 1 },
+            eq: { active: true, low: -2, mid: 2, high: 1 },
+            panner: { pan: 0 }
+          };
+          placeNote(tracks.snare, offset + step, 'Snare', snareSound, 1, 0.8, 1.0, 0, fx);
+          notesPlaced++;
+        });
+      }
+      
+      // Hi-Hat
+      if (instruments.includes('hihat') && SOUNDS_DB.hihat.length > 0) {
+        const hihatSound = SOUNDS_DB.hihat[Math.floor(Math.random() * SOUNDS_DB.hihat.length)];
+        pattern.hihat.forEach(step => {
+          const fx = {
+            trim: { start: 0, end: 0 },
+            distortion: { active: false, drive: 20, tone: 2000 },
+            bitcrusher: { active: false, bits: 8, freqReduction: 1 },
+            compressor: { active: false, threshold: -24, ratio: 4 },
+            reverb: { active: false, mix: 30, decay: 1.5 },
+            delay: { active: false, time: 0.3, feedback: 40, mix: 30 },
+            killer: { active: false, freq: 200, q: 1 },
+            eq: { active: true, low: -4, mid: 0, high: 3 },
+            panner: { pan: Math.random() > 0.5 ? 20 : -20 }
+          };
+          placeNote(tracks.hihat, offset + step, 'HiHat', hihatSound, 1, 0.5, 1.0, 0, fx);
+          notesPlaced++;
+        });
+      }
+      
+      // Bass (на основе распознанных нот)
+      if (instruments.includes('bass') && SOUNDS_DB.bass.length > 0) {
+        const bassSound = SOUNDS_DB.bass[0];
+        detectedNotes.forEach((note, idx) => {
+          if (idx < 8) { // Только первые 8 нот
+            const step = Math.floor(note.time * (pattern.bpm / 60) * 4) % 16;
+            const fx = {
+              trim: { start: 0, end: 0 },
+              distortion: { active: genre === 'trap', drive: 15, tone: 1500 },
+              bitcrusher: { active: false, bits: 8, freqReduction: 1 },
+              compressor: { active: true, threshold: -15, ratio: 8 },
+              reverb: { active: false, mix: 30, decay: 1.5 },
+              delay: { active: false, time: 0.3, feedback: 40, mix: 30 },
+              killer: { active: false, freq: 200, q: 1 },
+              eq: { active: true, low: 6, mid: -3, high: -6 },
+              panner: { pan: 0 }
+            };
+            placeNote(tracks.bass, offset + step, 'Bass', bassSound, 2, 0.7, 1.0, 0, fx);
+            notesPlaced++;
+          }
+        });
+      }
+    }
+    
+    // Добавляем FX-звуки в начале каждого такта
+    if (SOUNDS_DB.fx.length > 0) {
+      for (let bar = 0; bar < 4; bar++) {
+        if (Math.random() > 0.6) {
+          const fxSound = SOUNDS_DB.fx[Math.floor(Math.random() * SOUNDS_DB.fx.length)];
+          const fx = {
+            trim: { start: 0, end: 0 },
+            distortion: { active: false, drive: 20, tone: 2000 },
+            bitcrusher: { active: false, bits: 8, freqReduction: 1 },
+            compressor: { active: false, threshold: -24, ratio: 4 },
+            reverb: { active: true, mix: 60, decay: 2.5 },
+            delay: { active: true, time: 0.4, feedback: 50, mix: 40 },
+            killer: { active: false, freq: 200, q: 1 },
+            eq: { active: false, low: 0, mid: 0, high: 0 },
+            panner: { pan: 0 }
+          };
+          placeNote(tracks.fx, bar * 16, 'FX', fxSound, 4, 0.6, 1.0, 0, fx);
+          notesPlaced++;
+        }
+      }
+    }
+    
+    renderNotes();
+    showNotification(`✅ AI создал бит: ${notesPlaced} нот в стиле ${genre.toUpperCase()}!`);
     userData.tracksCreated++;
     updateStats();
     saveUserData();
-    setTimeout(() => { showSection('beatmaker'); showNotification('✅ Бит сгенерирован!'); }, 1000);
+    
+  } else {
+    showNotification('⚠️ Beat Composer не готов. Попробуйте ещё раз.');
+  }
 }
 
 /* ==========================================================================
