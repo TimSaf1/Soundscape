@@ -1,39 +1,31 @@
-# v0 sandbox internal files
-__v0_runtime_loader.js
-__v0_devtools.tsx
-__v0_jsx-dev-runtime.ts
-.snowflake/
-.v0-trash/
-.vercel/
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
 
-# Environment variables
-# .env*.local
+# next.js
+/.next/
+/out/
 
-# Common ignores
-node_modules
-.next/
+# production
+/build
+
+# misc
 .DS_Store
+*.pem
 
-# Virtual Environment
-.venv/
-env/
-venv/
-ENV/
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-
-# Database
-*.sqlite3
-
-# Static and media files (они соберутся сами при деплое)
-staticfiles/
-media/
-
-# Local environment variables
+# local env files
+.env*.local
 .env
-.env.local
 
-__pycache__/
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# pnpm
+.pnpm-store/

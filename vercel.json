@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "name": "beat-composer-pro",
+  "builds": [
+    {
+      "src": "./next.config.js",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/" }
+  ],
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
+      ]
+    }
+  ]
+}
